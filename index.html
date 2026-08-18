@@ -46,7 +46,7 @@
                     </select>
                 </div>
 
-                <!-- NOUVEAU : Filtre de Zone / Pays -->
+                <!-- Filtre de Zone / Pays -->
                 <div class="filter-group">
                     <label for="country-select">Area</label>
                     <select id="country-select" class="filter-select">
@@ -120,6 +120,11 @@
                 <li id="modal-link-container"><strong>Watch:</strong> <a id="modal-episode-link" href="#" target="_blank">Watch Episode</a></li>
             </ul>
             
+            <!-- NOUVEAU : Lecteur Vidéo Embed (Caché par défaut) -->
+            <div id="modal-video-container" class="modal-video-container hidden">
+                <iframe id="modal-video" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
             <div class="modal-gallery" id="modal-gallery"></div>
             
             <div class="modal-info">
