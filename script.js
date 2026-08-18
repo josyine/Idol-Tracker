@@ -7,7 +7,23 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Filter Configuration Data (No "Group" inside members anymore)
+// 2. Elegant SVG Icons Library (Matches the style of IMG_9190.jpg)
+const iconsSVG = {
+    "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
+    "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
+    "Restaurants": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`,
+    "Cafe": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>`,
+    "Museums": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>`,
+    "MV Location": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
+    "Concerts": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+    "Fashion": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a8.59 8.59 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>`,
+    "Pop-up Store": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
+    "Default": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`
+};
+
+const mapPinSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
+
+// 3. Filter Configuration Data
 const filterData = {
     "BTS": {
         members: ["Namjoon", "Jin", "Suga", "JHope", "Jimin", "V", "Jungkook"],
@@ -21,7 +37,7 @@ const filterData = {
 
 let activeCategory = "All"; 
 
-// 3. Locations Database
+// 4. Locations Database
 const celebLocations = [
     {
         id: 1,
@@ -39,7 +55,14 @@ const celebLocations = [
         lat: 37.5255,
         lng: 127.0375,
         img: "images/Camptong1.jpg", 
-        gallery: ["images/Camptong1.jpg", "images/Camptong2.jpg", "images/Camptong3.jpg", "images/Camptong4.jpg", "images/Camptong5.jpg", "images/Camptong6.jpg", "images/Camptong7.jpg", "images/Camptong8.jpg", "images/Camptong9.jpg", "images/Camptong10.jpg", "images/Camptong11.jpg", "images/Camptong12.jpg", "images/Camptong13.jpg"],
+        // 13 Images restored
+        gallery: [
+            "images/Camptong1.jpg", "images/Camptong2.jpg", "images/Camptong3.jpg",
+            "images/Camptong4.jpg", "images/Camptong5.jpg", "images/Camptong6.jpg",
+            "images/Camptong7.jpg", "images/Camptong8.jpg", "images/Camptong9.jpg",
+            "images/Camptong10.jpg", "images/Camptong11.jpg", "images/Camptong12.jpg",
+            "images/Camptong13.jpg"
+        ],
         fullDescription: "This large, multi-story cafe was rented out for the filming of the Run BTS! show. The members played a game searching for hidden sticky notes throughout the building to score points.",
         directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes."
     },
@@ -125,12 +148,7 @@ const celebLocations = [
     }
 ];
 
-// Icons Mapping
-function getCategoryIcon(category) {
-    const icons = { "Run BTS": "🎬", "Bon Voyage": "🧳", "Restaurants": "🍽️", "Cafe": "☕", "Museums": "🏛️", "MV Location": "🎥", "Concerts": "🎤", "Fashion": "👗", "Pop-up Store": "🛍️" };
-    return icons[category] || "📍";
-}
-
+// Graphic Marker Configuration
 const magentaIcon = L.divIcon({ className: 'custom-magenta-marker', html: `<div></div>`, iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -10] });
 
 // DOM Elements
@@ -157,7 +175,6 @@ function initializeFilters() {
         });
     }
 
-    // Attach click events to category buttons
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -187,12 +204,10 @@ function renderLocations() {
 
     const filteredLocations = celebLocations.filter(loc => {
         const matchGroup = (fGroup === "All" || loc.group === fGroup);
-        // Important: If a specific member is selected, show their solo spots OR spots where "All" members were present
         const matchMember = (fMember === "All" || loc.member === fMember || loc.member === "All");
         const matchCategory = (activeCategory === "All" || loc.category === activeCategory);
         const matchYear = (fYear === "All" || loc.year === fYear);
         
-        // Search logic (checks name, city, and context)
         const matchSearch = loc.name.toLowerCase().includes(searchTerm) || 
                             loc.city.toLowerCase().includes(searchTerm) || 
                             loc.context.toLowerCase().includes(searchTerm);
@@ -210,34 +225,36 @@ function renderLocations() {
         // 1. Map Marker
         const marker = L.marker([loc.lat, loc.lng], { icon: magentaIcon }).addTo(markerGroup);
 
-        // Build Extra Meta HTML for Popup
+        const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
+        
         let metaHtml = `<strong>Year:</strong> ${loc.year}`;
         if(loc.episode) { metaHtml += ` <br><strong>Ep:</strong> ${loc.episode}`; }
 
         const popupContent = `
             <div class="popup-title" onclick="openModal(${loc.id})">${loc.name} ↗️</div>
-            <span class="popup-tag">${getCategoryIcon(loc.category)} ${loc.category}</span>
+            <span class="popup-tag">${catIconSvg} ${loc.category}</span>
             <img src="${loc.img}" alt="${loc.name}" class="popup-img" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
             <div class="popup-context">"${loc.context}"</div>
             <div class="popup-meta">${metaHtml}</div>
             <button onclick="openModal(${loc.id})" style="width:100%; padding:8px; background:var(--primary-magenta); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
-                ➕ More details
+                More details
             </button>
         `;
         marker.bindPopup(popupContent);
 
-        // 2. Sidebar Card
+        // 2. Sidebar Card (Matched to IMG_9190.jpg layout)
         const card = document.createElement('div');
         card.className = 'location-card';
-        let membersDisplay = loc.member === "All" ? `All Members` : loc.member;
-
+        
         card.innerHTML = `
-            <div class="card-title-row">
-                <span class="card-icon">${getCategoryIcon(loc.category)}</span>
-                <span class="card-title">${loc.name}</span>
+            <div class="card-icon-box">
+                ${catIconSvg}
             </div>
-            <div class="card-desc">📍 ${loc.address.split(',').pop().trim()}</div>
-            <div class="card-desc" style="margin-top: 6px; font-weight: 600; color: #D94680;">${loc.group} • ${membersDisplay}</div>
+            <div class="card-content">
+                <div class="card-meta-top">${loc.category} • ${loc.city}, ${loc.country === "South Korea" ? "KR" : loc.country}</div>
+                <div class="card-title">${loc.name}</div>
+                <div class="card-address">${mapPinSvg} ${loc.city}</div>
+            </div>
         `;
 
         card.addEventListener('click', () => {
@@ -279,7 +296,7 @@ window.openModal = function(id) {
     if (loc.episodeLink) { document.getElementById('modal-episode-link').href = loc.episodeLink; linkContainer.style.display = 'block'; } 
     else { linkContainer.style.display = 'none'; }
 
-    document.getElementById('modal-address').textContent = `📍 ${loc.address}, ${loc.city}`;
+    document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
     document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
     const galleryContainer = document.getElementById('modal-gallery');
