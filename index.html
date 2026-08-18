@@ -46,7 +46,7 @@
                     </select>
                 </div>
 
-                <!-- Filtre de Zone / Pays -->
+                <!-- Area / Country Filter -->
                 <div class="filter-group">
                     <label for="country-select">Area</label>
                     <select id="country-select" class="filter-select">
@@ -71,9 +71,7 @@
             <!-- Dynamic Category Buttons -->
             <div class="category-filter-section">
                 <label>Categories</label>
-                <div id="category-buttons" class="category-buttons">
-                    <!-- Buttons injected via JS -->
-                </div>
+                <div id="category-buttons" class="category-buttons"></div>
             </div>
 
             <!-- Location list header -->
@@ -117,19 +115,29 @@
                 <li><strong>Address:</strong> <span id="modal-full-address"></span></li>
                 <li><strong>Date:</strong> <span id="modal-date"></span></li>
                 <li id="modal-episode-container"><strong>Episode:</strong> <span id="modal-episode"></span></li>
-                <li id="modal-link-container"><strong>Watch:</strong> <a id="modal-episode-link" href="#" target="_blank">Watch Episode</a></li>
+                <li id="modal-link-container"><strong>Watch:</strong> <a id="modal-episode-link" href="#" target="_blank">Official Link</a></li>
             </ul>
             
-            <!-- Lecteurs Vidéos Embed Multiples (Caché par défaut via CSS) -->
-            <div id="modal-video-container" class="modal-videos"></div>
-
-            <!-- Galerie d'images -->
-            <div class="modal-gallery" id="modal-gallery"></div>
-            
-            <div class="modal-info">
-                <h3>The story of this place</h3>
+            <!-- 1. THE STORY -->
+            <div class="modal-info" style="margin-top: 25px;">
+                <h3>📖 The story of this place</h3>
                 <p id="modal-desc"></p>
-                
+            </div>
+
+            <!-- 2. THE PHOTOS (Now comes before videos) -->
+            <div id="modal-gallery-section" class="media-section hidden">
+                <h3>Location Photos</h3>
+                <div class="modal-gallery" id="modal-gallery"></div>
+            </div>
+
+            <!-- 3. THE VIDEOS -->
+            <div id="modal-video-section" class="media-section hidden">
+                <h3>Watch the Episode</h3>
+                <div id="modal-video-container" class="modal-videos"></div>
+            </div>
+            
+            <!-- 4. THE DIRECTIONS -->
+            <div class="modal-info">
                 <h3>How to get there</h3>
                 <p id="modal-directions"></p>
                 <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
