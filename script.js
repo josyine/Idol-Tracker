@@ -101,13 +101,9 @@ const celebLocations = [
         address: "240 Olympic-ro, Songpa-gu",
         lat: 37.5113,
         lng: 127.0980,
-        // Miniature YouTube officielle pour la petite bulle de la carte
         img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
-        
-        // C'est cette ligne 'videoEmbed' qui fait apparaître la vidéo !
-        videoEmbed: "https://www.youtube.com/embed/d--MDCCJ3jg", 
-        
-        gallery: [], // Vide car on utilise la vidéo à la place
+        videoEmbed: "https://www.youtube.com/embed/d--MDCCJ3jg",
+        gallery: [], // Vide car on utilise la vidéo
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
@@ -429,15 +425,16 @@ window.openModal = function(id) {
     document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
     document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-    // Gestion de la vidéo intégrée
+    // FORCER L'AFFICHAGE ET MASQUAGE STRICT DE LA VIDÉO (PLUS D'ESPACE BLANC)
     const videoContainer = document.getElementById('modal-video-container');
     const videoIframe = document.getElementById('modal-video');
+    
     if (loc.videoEmbed) {
         videoIframe.src = loc.videoEmbed;
-        videoContainer.classList.remove('hidden');
+        videoContainer.style.display = 'block'; // Affiche la vidéo
     } else {
         videoIframe.src = "";
-        videoContainer.classList.add('hidden');
+        videoContainer.style.display = 'none'; // Efface totalement l'espace blanc
     }
 
     const galleryContainer = document.getElementById('modal-gallery');
