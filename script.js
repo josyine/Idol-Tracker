@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Elegant SVG Icons Library (Matches the style of IMG_9190.jpg)
+// 2. Elegant SVG Icons Library (Replaces Emojis)
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
     "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
@@ -18,6 +18,7 @@ const iconsSVG = {
     "Concerts": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
     "Fashion": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a8.59 8.59 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>`,
     "Pop-up Store": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
+    "Landmarks": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="13" x="4" y="8" rx="2" ry="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
     "Default": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`
 };
 
@@ -27,7 +28,7 @@ const mapPinSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" s
 const filterData = {
     "BTS": {
         members: ["Namjoon", "Jin", "Suga", "JHope", "Jimin", "V", "Jungkook"],
-        categories: ["Run BTS", "Bon Voyage", "Museums", "Restaurants", "Cafe", "MV Location", "Concerts"]
+        categories: ["Run BTS", "Bon Voyage", "Museums", "Restaurants", "Cafe", "MV Location", "Concerts", "Fashion", "Landmarks"]
     },
     "Blackpink": {
         members: ["Jisoo", "Jennie", "Rosé", "Lisa"],
@@ -55,7 +56,6 @@ const celebLocations = [
         lat: 37.5255,
         lng: 127.0375,
         img: "images/Camptong1.jpg", 
-        // 13 Images restored
         gallery: [
             "images/Camptong1.jpg", "images/Camptong2.jpg", "images/Camptong3.jpg",
             "images/Camptong4.jpg", "images/Camptong5.jpg", "images/Camptong6.jpg",
@@ -81,8 +81,8 @@ const celebLocations = [
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu",
         lat: 37.5105,
         lng: 127.1085,
-        img: "images/OssuSeiromushi1.jpg", 
-        gallery: ["images/OssuSeiromushi1.jpg", "images/OssuSeiromushi2.jpg", "images/OssuSeiromushi3.jpg", "images/OssuSeiromushi4.png"],
+        img: "images/Otsu1.jpg", 
+        gallery: ["images/Otsu1.jpg"],
         fullDescription: "Opened in 2018 by Jin's older brother, Jin is a co-director. The restaurant specializes in traditional Japanese wooden steamer dishes featuring sliced beef, pork, and fresh vegetables.",
         directions: "Take Line 8 to Seokchon Station or Line 9 to Songpanaru Station. It's a short 5-minute walk from Songpanaru Exit 1."
     },
@@ -101,8 +101,8 @@ const celebLocations = [
         address: "240 Olympic-ro, Songpa-gu",
         lat: 37.5113,
         lng: 127.0980,
-        img: "images/RunLotte1.jpg",
-        gallery: ["images/RunLotte1.jpg", "images/RunLotte3.png", "images/RunLotte4.jpg", "images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.png"],
+        img: "images/Lotte1.jpg",
+        gallery: ["images/Lotte1.jpg"],
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
@@ -122,7 +122,7 @@ const celebLocations = [
         lat: 35.8455,
         lng: 127.1895,
         img: "images/Ahwon1.jpg",
-        gallery: ["images/Ahwon1.jpg", "images/Ahwon2.jpg","images/Ahwon3.jpg","images/Ahwon4.jpg"],
+        gallery: ["images/Ahwon1.jpg"],
         fullDescription: "A gorgeous Hanok (traditional Korean house) turned into a modern art museum and boutique hotel. BTS shot the breathtaking photos for their 2019 Summer Package here, surrounded by mountains.",
         directions: "Located in Wanju-gun, Jeollabuk-do. Best accessed by car or taxi from Jeonju city center (about 30 mins)."
     },
@@ -162,7 +162,7 @@ const celebLocations = [
         lat: 48.8569,
         lng: 2.3572,
         img: "images/Pozzetto1.jpg", 
-        gallery: ["images/Pozzetto1.jpg","images/Pozzetto2.png","images/Pozzetto3.jpg","images/Pozzetto4.jpg","images/Pozzetto5.jpg"],
+        gallery: ["images/Pozzetto1.jpg"],
         fullDescription: "During BTS's time in Paris in 2019, Jimin visited Pozzetto, a highly rated artisanal Italian gelato and espresso shop located in the historic Marais district.",
         directions: "Take Metro Line 1 or 11 to Hôtel de Ville, then walk about 5 minutes into the Le Marais neighborhood."
     },
@@ -174,15 +174,15 @@ const celebLocations = [
         country: "France",
         city: "Paris",
         category: "Fashion",
-        year: "2026",
+        year: "2023",
         episode: "",
         episodeLink: "",
-        context: "Jimin posed here for his stunning Dior Men Spring 2026 campaign.",
+        context: "Jimin posed here for his stunning Dior Men Spring 2024 campaign.",
         address: "63 Rue de Monceau, 75008 Paris",
         lat: 48.8795,
         lng: 2.3117,
-        img: "images/JiminNissim1.png",
-        gallery: ["images/JiminNissim1.png", "images/JiminNissim2.png", "images/JiminNissim3.webp", "images/JiminNissim4.webp", "images/JiminNissim5.jpg", "images/JiminNissim6.png", "images/JiminNissim7.png", "images/JiminNissim8.webp", "images/JiminNissim9.jpg"],
+        img: "images/Nissim1.jpg",
+        gallery: ["images/Nissim1.jpg"],
         fullDescription: "This elegant museum, a fully preserved 20th-century aristocratic mansion, served as the breathtaking backdrop for Jimin's Dior Men Spring 2024 global campaign. Its opulent interiors perfectly matched his sophisticated look.",
         directions: "Take Metro Line 2 to Villiers or Monceau station. The museum is a short walk from Parc Monceau."
     },
@@ -208,7 +208,7 @@ const celebLocations = [
     },
     {
         id: 9,
-        name: "Wall of Love (Mur des je t'aime)",
+        name: "Wall of Love",
         group: "BTS",
         member: "Jimin",
         country: "France",
@@ -248,13 +248,11 @@ const celebLocations = [
     }
 ];
 
-// Graphic Marker Configuration
-const magentaIcon = L.divIcon({ className: 'custom-magenta-marker', html: `<div></div>`, iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -10] });
-
 // DOM Elements
 const groupSelect = document.getElementById('group-select');
 const memberSelect = document.getElementById('member-select');
 const yearSelect = document.getElementById('year-select');
+const countrySelect = document.getElementById('country-select');
 const searchInput = document.getElementById('search-input');
 const categoryButtonsContainer = document.getElementById('category-buttons');
 
@@ -262,9 +260,16 @@ const categoryButtonsContainer = document.getElementById('category-buttons');
 function initializeFilters() {
     const selectedGroup = groupSelect.value;
     memberSelect.innerHTML = '<option value="All">All Members</option>';
+    countrySelect.innerHTML = '<option value="All">All Areas</option>';
     categoryButtonsContainer.innerHTML = '<button class="filter-btn active" data-cat="All">All Categories</button>';
     activeCategory = "All";
     
+    // Populate Country filter based on database
+    const uniqueCountries = [...new Set(celebLocations.map(loc => loc.country))].sort();
+    uniqueCountries.forEach(country => {
+        countrySelect.innerHTML += `<option value="${country}">${country}</option>`;
+    });
+
     if (selectedGroup !== "All" && filterData[selectedGroup]) {
         filterData[selectedGroup].members.forEach(member => {
             memberSelect.innerHTML += `<option value="${member}">${member}</option>`;
@@ -289,6 +294,7 @@ function initializeFilters() {
 groupSelect.addEventListener('change', () => { initializeFilters(); renderLocations(); });
 memberSelect.addEventListener('change', renderLocations);
 yearSelect.addEventListener('change', renderLocations);
+countrySelect.addEventListener('change', renderLocations);
 searchInput.addEventListener('input', renderLocations);
 
 // Main Render Function
@@ -300,6 +306,7 @@ function renderLocations() {
     const fGroup = groupSelect.value;
     const fMember = memberSelect.value;
     const fYear = yearSelect.value;
+    const fCountry = countrySelect.value;
     const searchTerm = searchInput.value.toLowerCase();
 
     const filteredLocations = celebLocations.filter(loc => {
@@ -307,26 +314,39 @@ function renderLocations() {
         const matchMember = (fMember === "All" || loc.member === fMember || loc.member === "All");
         const matchCategory = (activeCategory === "All" || loc.category === activeCategory);
         const matchYear = (fYear === "All" || loc.year === fYear);
+        const matchCountry = (fCountry === "All" || loc.country === fCountry);
         
         const matchSearch = loc.name.toLowerCase().includes(searchTerm) || 
                             loc.city.toLowerCase().includes(searchTerm) || 
                             loc.context.toLowerCase().includes(searchTerm);
                             
-        return matchGroup && matchMember && matchCategory && matchYear && matchSearch;
+        return matchGroup && matchMember && matchCategory && matchYear && matchCountry && matchSearch;
     });
 
     // Update Stats on UI
     document.getElementById('location-count-sidebar').textContent = filteredLocations.length;
     document.getElementById('stat-locations').textContent = filteredLocations.length;
-    const uniqueCountries = new Set(filteredLocations.map(l => l.country)).size;
-    document.getElementById('stat-countries').textContent = uniqueCountries;
+    const uniqueCountriesCount = new Set(filteredLocations.map(l => l.country)).size;
+    document.getElementById('stat-countries').textContent = uniqueCountriesCount;
+
+    // Array to store map markers for auto-zooming
+    const mapMarkers = [];
 
     filteredLocations.forEach(loc => {
-        // 1. Map Marker
-        const marker = L.marker([loc.lat, loc.lng], { icon: magentaIcon }).addTo(markerGroup);
-
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
         
+        // 1. Custom SVG Map Marker
+        const customIcon = L.divIcon({ 
+            className: 'custom-category-marker', 
+            html: `<div>${catIconSvg}</div>`, 
+            iconSize: [32, 32], 
+            iconAnchor: [16, 16], 
+            popupAnchor: [0, -16] 
+        });
+
+        const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(markerGroup);
+        mapMarkers.push(marker);
+
         let metaHtml = `<strong>Year:</strong> ${loc.year}`;
         if(loc.episode) { metaHtml += ` <br><strong>Ep:</strong> ${loc.episode}`; }
 
@@ -346,12 +366,17 @@ function renderLocations() {
         const card = document.createElement('div');
         card.className = 'location-card';
         
+        // Format country code for the card text
+        let countryCode = loc.country;
+        if (loc.country === "South Korea") countryCode = "KR";
+        if (loc.country === "France") countryCode = "FR";
+
         card.innerHTML = `
             <div class="card-icon-box">
                 ${catIconSvg}
             </div>
             <div class="card-content">
-                <div class="card-meta-top">${loc.category} • ${loc.city}, ${loc.country === "South Korea" ? "KR" : loc.country}</div>
+                <div class="card-meta-top">${loc.category} • ${loc.city}, ${countryCode}</div>
                 <div class="card-title">${loc.name}</div>
                 <div class="card-address">${mapPinSvg} ${loc.city}</div>
             </div>
@@ -360,12 +385,18 @@ function renderLocations() {
         card.addEventListener('click', () => {
             document.querySelectorAll('.location-card').forEach(c => c.style.borderColor = '#F5D0DF');
             card.style.borderColor = '#D94680';
-            map.flyTo([loc.lat, loc.lng], 15, { duration: 1.5 });
+            map.flyTo([loc.lat, loc.lng], 16, { duration: 1.5 });
             setTimeout(() => marker.openPopup(), 1500);
         });
 
         locationListElement.appendChild(card);
     });
+
+    // 3. Auto-zoom map to fit all filtered markers
+    if (mapMarkers.length > 0) {
+        const group = new L.featureGroup(mapMarkers);
+        map.fitBounds(group.getBounds(), { padding: [50, 50], maxZoom: 16 });
+    }
 }
 
 // Initial Load
