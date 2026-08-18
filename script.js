@@ -14,7 +14,7 @@ const celebLocations = [
     {
         id: 1,
         name: "Cafe Camptong",
-        member: "BTS (Group)",
+        member: "Namjoon, Jin, Suga, JHope, Jimin, V, Jungkook",
         country: "South Korea",
         city: "Seoul",
         category: "Run BTS",
