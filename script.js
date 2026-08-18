@@ -82,7 +82,7 @@ const celebLocations = [
         lat: 37.5105,
         lng: 127.1085,
         img: "images/OssuSeiromushi1.jpg", 
-        gallery: ["OssuSeiromushi1.jpg", "images/OssuSeiromushi2.jpg", "images/OssuSeiromushi3.jpg", "images/OssuSeiromushi4.png"],
+        gallery: ["images/OssuSeiromushi1.jpg", "images/OssuSeiromushi2.jpg", "images/OssuSeiromushi3.jpg", "images/OssuSeiromushi4.png"],
         fullDescription: "Opened in 2018 by Jin's older brother, Jin is a co-director. The restaurant specializes in traditional Japanese wooden steamer dishes featuring sliced beef, pork, and fresh vegetables.",
         directions: "Take Line 8 to Seokchon Station or Line 9 to Songpanaru Station. It's a short 5-minute walk from Songpanaru Exit 1."
     },
@@ -101,8 +101,8 @@ const celebLocations = [
         address: "240 Olympic-ro, Songpa-gu",
         lat: 37.5113,
         lng: 127.0980,
-        img: "images/Lotte1.jpg",
-        gallery: ["images/Lotte1.jpg"],
+        img: "images/RunLotte1.jpg",
+        gallery: ["images/RunLotte1.jpg", "images/RunLotte2.jpg", "images/RunLotte3.jpg", "images/RunLotte4.jpg", "images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.jpg"],
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
