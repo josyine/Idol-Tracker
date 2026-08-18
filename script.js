@@ -14,12 +14,13 @@ const celebLocations = [
     {
         id: 1,
         name: "Cafe Camptong",
-        member: "Namjoon, Jin, Suga, JHope, Jimin, V, Jungkook",
+        member: "BTS (Group)",
         country: "South Korea",
         city: "Seoul",
         category: "Run BTS",
         year: "2020",
         episode: "Episodes 118-119",
+        episodeLink: "https://weverse.io/bts/media/3-104694116", // Link to watch the episode
         context: "Run BTS! filming location for Episodes 118-119.",
         address: "40 Apgujeong-ro 42-gil, Gangnam-gu",
         lat: 37.5255,
@@ -35,7 +36,7 @@ const celebLocations = [
         fullDescription: "This large, multi-story cafe was rented out for the filming of the Run BTS! show. The members played a game searching for hidden sticky notes throughout the building to score points. It has become a must-visit spot for fans.",
         directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes. The building is easily recognizable by its modern architecture."
     }
-    // You can copy/paste this block to add other locations
+    // You can add other locations here
 ];
 
 // 3. Graphic Marker Configuration
@@ -89,13 +90,11 @@ celebLocations.forEach(loc => {
 });
 
 // 5. Functions for the Details Modal Window
-
 window.openModal = function(id) {
-    // Find the location in the database via its ID
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
 
-    // Fill in the basic text fields
+    // Fill in basic text fields
     document.getElementById('modal-title').textContent = loc.name;
     document.getElementById('modal-desc').textContent = loc.fullDescription;
     document.getElementById('modal-directions').textContent = loc.directions;
@@ -107,7 +106,7 @@ window.openModal = function(id) {
     document.getElementById('modal-full-address').textContent = loc.address;
     document.getElementById('modal-date').textContent = loc.year;
 
-    // Manage episode display (hide it if there isn't one for another location)
+    // Manage episode display
     const epContainer = document.getElementById('modal-episode-container');
     if (loc.episode) {
         document.getElementById('modal-episode').textContent = loc.episode;
@@ -116,27 +115,35 @@ window.openModal = function(id) {
         epContainer.style.display = 'none';  
     }
 
-    // Address marker at the bottom
+    // Manage episode link display
+    const linkContainer = document.getElementById('modal-link-container');
+    if (loc.episodeLink) {
+        document.getElementById('modal-episode-link').href = loc.episodeLink;
+        linkContainer.style.display = 'block'; 
+    } else {
+        linkContainer.style.display = 'none';  
+    }
+
+    // Bottom address marker
     document.getElementById('modal-address').textContent = `📍 ${loc.address}, ${loc.city}`;
     
-    // Generate Google Maps link
+    // Google Maps Link
     const mapLink = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
     document.getElementById('modal-map-link').href = mapLink;
 
-    // Inject images into the scrolling gallery
+    // Inject images into the gallery
     const galleryContainer = document.getElementById('modal-gallery');
-    galleryContainer.innerHTML = ""; // Clear previous gallery
+    galleryContainer.innerHTML = ""; 
     if(loc.gallery && loc.gallery.length > 0) {
         loc.gallery.forEach(imagePath => {
             const img = document.createElement('img');
             img.src = imagePath;
-            // Fallback just in case the image is not found
             img.onerror = function() { this.src = 'https://via.placeholder.com/300x250?text=Pending+Image'; };
             galleryContainer.appendChild(img);
         });
     }
 
-    // Display the modal by removing the 'hidden' class
+    // Show modal
     document.getElementById('details-modal').classList.remove('hidden');
 };
 
@@ -144,7 +151,6 @@ window.closeModal = function() {
     document.getElementById('details-modal').classList.add('hidden');
 };
 
-// Close modal if user clicks outside the white box
 window.onclick = function(event) {
     const modal = document.getElementById('details-modal');
     if (event.target === modal) {
