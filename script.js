@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Elegant SVG Icons Library (Replaces Emojis)
+// 2. Elegant SVG Icons Library
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
     "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
@@ -101,10 +101,12 @@ const celebLocations = [
         address: "240 Olympic-ro, Songpa-gu",
         lat: 37.5113,
         lng: 127.0980,
-        // Miniature YouTube officielle automatique :
+        // Miniature YouTube officielle pour la petite bulle de la carte
         img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
-        // Vidéo Embed YouTube :
-        videoEmbed: "https://www.youtube.com/embed/d--MDCCJ3jg",
+        
+        // C'est cette ligne 'videoEmbed' qui fait apparaître la vidéo !
+        videoEmbed: "https://www.youtube.com/embed/d--MDCCJ3jg", 
+        
         gallery: [], // Vide car on utilise la vidéo à la place
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
@@ -267,7 +269,6 @@ function initializeFilters() {
     categoryButtonsContainer.innerHTML = '<button class="filter-btn active" data-cat="All">All Categories</button>';
     activeCategory = "All";
     
-    // Populate Country filter based on database
     const uniqueCountries = [...new Set(celebLocations.map(loc => loc.country))].sort();
     uniqueCountries.forEach(country => {
         countrySelect.innerHTML += `<option value="${country}">${country}</option>`;
@@ -332,13 +333,11 @@ function renderLocations() {
     const uniqueCountriesCount = new Set(filteredLocations.map(l => l.country)).size;
     document.getElementById('stat-countries').textContent = uniqueCountriesCount;
 
-    // Array to store map markers for auto-zooming
     const mapMarkers = [];
 
     filteredLocations.forEach(loc => {
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
         
-        // 1. Custom SVG Map Marker
         const customIcon = L.divIcon({ 
             className: 'custom-category-marker', 
             html: `<div>${catIconSvg}</div>`, 
@@ -365,11 +364,9 @@ function renderLocations() {
         `;
         marker.bindPopup(popupContent);
 
-        // 2. Sidebar Card (Matched to IMG_9190.jpg layout)
         const card = document.createElement('div');
         card.className = 'location-card';
         
-        // Format country code for the card text
         let countryCode = loc.country;
         if (loc.country === "South Korea") countryCode = "KR";
         if (loc.country === "France") countryCode = "FR";
@@ -395,7 +392,6 @@ function renderLocations() {
         locationListElement.appendChild(card);
     });
 
-    // 3. Auto-zoom map to fit all filtered markers
     if (mapMarkers.length > 0) {
         const group = new L.featureGroup(mapMarkers);
         map.fitBounds(group.getBounds(), { padding: [50, 50], maxZoom: 16 });
