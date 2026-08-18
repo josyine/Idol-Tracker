@@ -18,9 +18,9 @@
             <h1>🌸 Celeb Map Explorer</h1>
             <p class="subtitle">Following the footsteps of your favorite artists</p>
             
-            <!-- NEW: Search Bar -->
+            <!-- Search Bar -->
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="🔍 Search a location, city, context...">
+                <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
             
             <!-- Filters Section -->
@@ -68,9 +68,9 @@
                 </div>
             </div>
 
-            <!-- Location list header -->
+            <!-- Location list header (Formatted identically to Categories) -->
             <div class="locations-header">
-                <h2>📍 Locations (<span id="location-count-sidebar">0</span>)</h2>
+                <label>Locations (<span id="location-count-sidebar">0</span>)</label>
             </div>
             
             <!-- Location list -->
@@ -79,14 +79,14 @@
 
         <!-- Map Area -->
         <main class="map-container">
-            <!-- NEW: Elegant Map Stats Overlay (Top Right) -->
+            <!-- Elegant Map Stats Overlay (No Emojis) -->
             <div class="map-stats">
                 <div class="stat-item">
-                    📍 <span id="stat-locations">0</span> Locations
+                    <span id="stat-locations">0</span> Locations
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                    🌍 <span id="stat-countries">0</span> Countries
+                    <span id="stat-countries">0</span> Countries
                 </div>
             </div>
             <div id="map"></div>
@@ -109,20 +109,20 @@
                 <li><strong>Address:</strong> <span id="modal-full-address"></span></li>
                 <li><strong>Date:</strong> <span id="modal-date"></span></li>
                 <li id="modal-episode-container"><strong>Episode:</strong> <span id="modal-episode"></span></li>
-                <li id="modal-link-container"><strong>Watch:</strong> <a id="modal-episode-link" href="#" target="_blank">🔗 Watch Episode</a></li>
+                <li id="modal-link-container"><strong>Watch:</strong> <a id="modal-episode-link" href="#" target="_blank">Watch Episode</a></li>
             </ul>
             
             <div class="modal-gallery" id="modal-gallery"></div>
             
             <div class="modal-info">
-                <h3>📖 The story of this place</h3>
+                <h3>The story of this place</h3>
                 <p id="modal-desc"></p>
                 
-                <h3>🚶 How to get there</h3>
+                <h3>How to get there</h3>
                 <p id="modal-directions"></p>
                 <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
                 
-                <a id="modal-map-link" href="#" target="_blank" class="action-btn">🗺️ Open in Google Maps</a>
+                <a id="modal-map-link" href="#" target="_blank" class="action-btn">Open in Google Maps</a>
             </div>
         </div>
     </div>
