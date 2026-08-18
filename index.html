@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Celeb Map Explorer</title>
+    <title>Idol</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -15,7 +15,7 @@
         
         <!-- Sidebar -->
         <aside class="sidebar">
-            <h1>🌸 Celeb Map Explorer</h1>
+            <h1>Screen To Street</h1>
             <p class="subtitle">Following the footsteps of your favorite artists</p>
             
             <!-- Search Bar -->
@@ -46,7 +46,15 @@
                     </select>
                 </div>
 
-                <div class="filter-group" style="grid-column: span 2;">
+                <!-- NOUVEAU : Filtre de Zone / Pays -->
+                <div class="filter-group">
+                    <label for="country-select">Area</label>
+                    <select id="country-select" class="filter-select">
+                        <option value="All">All Areas</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
                     <label for="year-select">Year</label>
                     <select id="year-select" class="filter-select">
                         <option value="All">All Years</option>
