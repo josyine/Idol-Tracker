@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Elegant SVG Icons Library (Replaces Emojis)
+// 2. Elegant SVG Icons Library
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
     "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
@@ -51,7 +51,7 @@ const celebLocations = [
         year: "2020",
         episode: "Episodes 118-119",
         episodeLink: "https://weverse.io/bts/media/3-104694116",
-        context: "The boys played a game searching for hidden sticky notes.",
+        context: "The boys played an energetic game searching for hidden sticky notes in this massive cafe.",
         address: "40 Apgujeong-ro 42-gil, Gangnam-gu",
         lat: 37.5255,
         lng: 127.0375,
@@ -67,8 +67,8 @@ const celebLocations = [
             "images/Camptong10.jpg", "images/Camptong11.jpg", "images/Camptong12.jpg",
             "images/Camptong13.jpg"
         ],
-        fullDescription: "This large, multi-story cafe was rented out for the filming of the Run BTS! show. The members played a game searching for hidden sticky notes throughout the building to score points.",
-        directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes."
+        fullDescription: "Cafe Camptong is a massive, multi-story industrial-chic cafe located in the bustling streets of Gangnam. It gained legendary status among ARMYs when it was entirely rented out for Episodes 118 and 119 of Run BTS! Beyond its pop-culture fame, the cafe is an architectural marvel featuring high ceilings, exposed concrete walls, and large windows that bathe the interior in natural light. Visitors can enjoy a wide selection of artisanal pastries, freshly roasted coffee, and unique seasonal beverages.\n\nInside this huge space, the members ran around wildly, playing an intense game of finding hidden sticky notes to score points. The cafe has lovingly kept many traces of BTS's visit, making it a perfect pilgrimage spot. You can see the actual spots where the members hid, strategized, and playfully betrayed each other! Whether you are here to retrace your favorite idols' footsteps or simply to enjoy a quiet afternoon with a delicious dessert, Cafe Camptong offers an unforgettable Seoul cafe experience.",
+        directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes through the upscale neighborhood."
     },
     {
         id: 2,
@@ -361,12 +361,12 @@ function renderLocations() {
         if(loc.episode) { metaHtml += ` <br><strong>Ep:</strong> ${loc.episode}`; }
 
         const popupContent = `
-            <div class="popup-title" onclick="openModal(${loc.id})">${loc.name} ↗️</div>
+            <div class="popup-title" onclick="window.openModal(${loc.id}); event.stopPropagation();">${loc.name} ↗️</div>
             <span class="popup-tag">${catIconSvg} ${loc.category}</span>
             <img src="${loc.img}" alt="${loc.name}" class="popup-img" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
             <div class="popup-context">"${loc.context}"</div>
             <div class="popup-meta">${metaHtml}</div>
-            <button onclick="openModal(${loc.id})" style="width:100%; padding:8px; background:var(--primary-magenta); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
+            <button type="button" onclick="window.openModal(${loc.id}); event.stopPropagation();" style="width:100%; padding:8px; background:var(--primary-magenta); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
                 More details
             </button>
         `;
@@ -410,72 +410,89 @@ function renderLocations() {
 initializeFilters();
 renderLocations();
 
-// Modal Functions
+// Modal Functions (Secured with Try/Catch and explicit media sections)
 window.openModal = function(id) {
-    const loc = celebLocations.find(l => l.id === id);
-    if(!loc) return;
+    try {
+        const loc = celebLocations.find(l => l.id === id);
+        if(!loc) return;
 
-    document.getElementById('modal-title').textContent = loc.name;
-    document.getElementById('modal-desc').textContent = loc.fullDescription;
-    document.getElementById('modal-directions').textContent = loc.directions;
-    
-    document.getElementById('modal-group').textContent = loc.group;
-    document.getElementById('modal-member').textContent = loc.member === "All" ? `All Members` : loc.member;
-    document.getElementById('modal-country').textContent = loc.country;
-    document.getElementById('modal-city').textContent = loc.city;
-    document.getElementById('modal-full-address').textContent = loc.address;
-    document.getElementById('modal-date').textContent = loc.year;
+        // Note: Using innerHTML for fullDescription so we can use line breaks (\n\n) converted to <br> if needed
+        document.getElementById('modal-title').textContent = loc.name;
+        document.getElementById('modal-desc').innerHTML = loc.fullDescription.replace(/\n/g, '<br>');
+        document.getElementById('modal-directions').textContent = loc.directions;
+        
+        document.getElementById('modal-group').textContent = loc.group;
+        document.getElementById('modal-member').textContent = loc.member === "All" ? `All Members` : loc.member;
+        document.getElementById('modal-country').textContent = loc.country;
+        document.getElementById('modal-city').textContent = loc.city;
+        document.getElementById('modal-full-address').textContent = loc.address;
+        document.getElementById('modal-date').textContent = loc.year;
 
-    const epContainer = document.getElementById('modal-episode-container');
-    if (loc.episode) { document.getElementById('modal-episode').textContent = loc.episode; epContainer.style.display = 'block'; } 
-    else { epContainer.style.display = 'none'; }
+        const epContainer = document.getElementById('modal-episode-container');
+        if (loc.episode) { document.getElementById('modal-episode').textContent = loc.episode; epContainer.style.display = 'block'; } 
+        else { epContainer.style.display = 'none'; }
 
-    const linkContainer = document.getElementById('modal-link-container');
-    if (loc.episodeLink) { document.getElementById('modal-episode-link').href = loc.episodeLink; linkContainer.style.display = 'block'; } 
-    else { linkContainer.style.display = 'none'; }
+        const linkContainer = document.getElementById('modal-link-container');
+        if (loc.episodeLink) { document.getElementById('modal-episode-link').href = loc.episodeLink; linkContainer.style.display = 'block'; } 
+        else { linkContainer.style.display = 'none'; }
 
-    document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
-    document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+        document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
+        document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-    // FORCER L'AFFICHAGE DYNAMIQUE DES VIDÉOS SANS ESPACE BLANC
-    const videoContainer = document.getElementById('modal-video-container');
-    videoContainer.innerHTML = ""; 
-    
-    if (loc.videoEmbeds && loc.videoEmbeds.length > 0) {
-        loc.videoEmbeds.forEach(vidSrc => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'video-wrapper';
-            wrapper.innerHTML = `<iframe src="${vidSrc}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-            videoContainer.appendChild(wrapper);
-        });
-        videoContainer.style.display = 'flex'; 
-    } else {
-        videoContainer.style.display = 'none'; 
+        // MEDIA SECTIONS LOGIC: Gallery First, Videos Second
+
+        // 1. GALLERY
+        const gallerySection = document.getElementById('modal-gallery-section');
+        const galleryContainer = document.getElementById('modal-gallery');
+        if (galleryContainer) {
+            galleryContainer.innerHTML = ""; 
+            if(loc.gallery && loc.gallery.length > 0) {
+                galleryContainer.style.display = 'flex';
+                loc.gallery.forEach(imagePath => {
+                    const img = document.createElement('img');
+                    img.src = imagePath;
+                    img.onerror = function() { this.src = 'https://via.placeholder.com/300x250?text=Pending+Image'; };
+                    galleryContainer.appendChild(img);
+                });
+                gallerySection.classList.remove('hidden');
+            } else {
+                galleryContainer.style.display = 'none';
+                gallerySection.classList.add('hidden');
+            }
+        }
+
+        // 2. VIDEOS
+        const videoSection = document.getElementById('modal-video-section');
+        const videoContainer = document.getElementById('modal-video-container');
+        if (videoContainer) {
+            videoContainer.innerHTML = ""; 
+            if (loc.videoEmbeds && loc.videoEmbeds.length > 0) {
+                loc.videoEmbeds.forEach(vidSrc => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'video-wrapper';
+                    wrapper.innerHTML = `<iframe src="${vidSrc}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                    videoContainer.appendChild(wrapper);
+                });
+                videoContainer.style.display = 'flex'; 
+                videoSection.classList.remove('hidden');
+            } else {
+                videoContainer.style.display = 'none'; 
+                videoSection.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('details-modal').classList.remove('hidden');
+    } catch (error) {
+        console.error("Error opening modal:", error);
     }
-
-    // FORCER L'AFFICHAGE DE LA GALERIE SANS ESPACE BLANC
-    const galleryContainer = document.getElementById('modal-gallery');
-    galleryContainer.innerHTML = ""; 
-    if(loc.gallery && loc.gallery.length > 0) {
-        galleryContainer.style.display = 'flex';
-        loc.gallery.forEach(imagePath => {
-            const img = document.createElement('img');
-            img.src = imagePath;
-            img.onerror = function() { this.src = 'https://via.placeholder.com/300x250?text=Pending+Image'; };
-            galleryContainer.appendChild(img);
-        });
-    } else {
-        galleryContainer.style.display = 'none';
-    }
-
-    document.getElementById('details-modal').classList.remove('hidden');
 };
 
 window.closeModal = function() { 
     document.getElementById('details-modal').classList.add('hidden'); 
     
-    // Couper les vidéos YouTube quand on ferme la modale
-    document.getElementById('modal-video-container').innerHTML = ""; 
+    // Stop YouTube videos playing when closing the modal
+    const videoContainer = document.getElementById('modal-video-container');
+    if(videoContainer) videoContainer.innerHTML = ""; 
 };
 
 window.onclick = function(event) { 
