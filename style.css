@@ -19,7 +19,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-main);
     height: 100vh;
-    overflow: hidden; /* Prevents whole page scrolling */
+    overflow: hidden; 
 }
 
 .app-container {
@@ -86,7 +86,6 @@ h1 {
     padding-right: 5px;
 }
 
-/* Scrollbar style for the list */
 .location-list::-webkit-scrollbar { width: 6px; }
 .location-list::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
 
@@ -211,7 +210,6 @@ h1 {
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
-/* Modal Scrollbar */
 .modal-content::-webkit-scrollbar { width: 8px; }
 .modal-content::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
 
@@ -251,6 +249,18 @@ h1 {
     color: var(--primary-magenta);
     display: inline-block;
     min-width: 90px;
+}
+
+#modal-episode-link {
+    color: var(--primary-magenta);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+#modal-episode-link:hover {
+    color: #bd336b;
+    text-decoration: underline;
 }
 
 .modal-gallery {
