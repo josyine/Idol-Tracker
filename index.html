@@ -1,23 +1,58 @@
-<!-- ... (Garde le début de ton index.html tel quel) ... -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celeb Map Explorer - BTS Prototype</title>
+    
+    <!-- CSS de Leaflet (Librairie de la carte interactive) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Ton fichier CSS personnalisé -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Conteneur principal de l'application -->
+    <div class="app-container">
+        
+        <!-- Barre latérale (Filtres et Liste des lieux) -->
+        <aside class="sidebar">
+            <h1>🌸 Celeb Map Explorer</h1>
+            <p class="subtitle">Sur les traces de vos artistes préférés</p>
+            
+            <div class="filters">
+                <button class="filter-btn active">Tous</button>
+                <button class="filter-btn">Run BTS</button>
+                <button class="filter-btn">Musées</button>
+                <button class="filter-btn">Concerts</button>
+            </div>
 
-        <!-- Zone de la carte -->
+            <!-- La liste des lieux s'injectera ici automatiquement via JavaScript -->
+            <div class="location-list" id="location-list"></div>
+        </aside>
+
+        <!-- Zone d'affichage de la carte géographique -->
         <main class="map-container">
             <div id="map"></div>
         </main>
+        
     </div>
 
-    <!-- NOUVEAU : Fenêtre Modale pour les détails du lieu -->
+    <!-- Fenêtre Modale pour les détails complets du lieu (Cachée par défaut) -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
+            <!-- Bouton pour fermer la fenêtre -->
             <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <!-- En-tête de la fenêtre (Titre) -->
             <h2 id="modal-title">Nom du lieu</h2>
             <div id="modal-tags" class="modal-tags"></div>
             
-            <!-- Galerie d'images -->
+            <!-- Galerie d'images locales défilantes -->
             <div class="modal-gallery" id="modal-gallery">
-                <!-- Les images (Camptong1.jpg...) apparaîtront ici -->
+                <!-- Les images (Camptong1.jpg, Camptong2.jpg...) apparaîtront ici -->
             </div>
             
+            <!-- Section d'informations détaillées -->
             <div class="modal-info">
                 <h3>📖 L'histoire de ce lieu</h3>
                 <p id="modal-desc"></p>
@@ -26,14 +61,15 @@
                 <p id="modal-directions"></p>
                 <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
                 
+                <!-- Bouton de redirection vers Google Maps -->
                 <a id="modal-map-link" href="#" target="_blank" class="action-btn">🗺️ Ouvrir dans Google Maps</a>
             </div>
         </div>
     </div>
 
-    <!-- JS de Leaflet -->
+    <!-- JS de Leaflet (Librairie de la carte interactive) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Ton fichier JS -->
+    <!-- Ton fichier JavaScript personnalisé -->
     <script src="script.js"></script>
 </body>
 </html>
