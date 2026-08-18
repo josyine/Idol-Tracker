@@ -1,4 +1,4 @@
-// 1. Map Initialization
+// 1. Map initialization
 const map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6); // Wider view
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
