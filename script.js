@@ -81,8 +81,8 @@ const celebLocations = [
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu",
         lat: 37.5105,
         lng: 127.1085,
-        img: "images/Otsu1.jpg", 
-        gallery: ["images/Otsu1.jpg"],
+        img: "images/OssuSeiromushi1.jpg", 
+        gallery: ["OssuSeiromushi1.jpg", "images/OssuSeiromushi2.jpg", "images/OssuSeiromushi3.jpg", "images/OssuSeiromushi4.png"],
         fullDescription: "Opened in 2018 by Jin's older brother, Jin is a co-director. The restaurant specializes in traditional Japanese wooden steamer dishes featuring sliced beef, pork, and fresh vegetables.",
         directions: "Take Line 8 to Seokchon Station or Line 9 to Songpanaru Station. It's a short 5-minute walk from Songpanaru Exit 1."
     },
