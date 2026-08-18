@@ -18,7 +18,7 @@
             <h1>🌸 Celeb Map Explorer</h1>
             <p class="subtitle">Following the footsteps of your favorite artists</p>
             
-            <!-- NEW: Dynamic Filters Section -->
+            <!-- Filters Section -->
             <div class="filters-container">
                 <div class="filter-group">
                     <label for="group-select">Group</label>
@@ -42,13 +42,6 @@
                 </div>
 
                 <div class="filter-group">
-                    <label for="category-select">Category</label>
-                    <select id="category-select" class="filter-select">
-                        <option value="All">All Categories</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
                     <label for="year-select">Year</label>
                     <select id="year-select" class="filter-select">
                         <option value="All">All Years</option>
@@ -56,21 +49,42 @@
                         <option value="2022">2022</option>
                         <option value="2021">2021</option>
                         <option value="2020">2020</option>
+                        <option value="2019">2019</option>
+                        <option value="2018">2018</option>
                     </select>
                 </div>
             </div>
 
+            <!-- Dynamic Category Buttons -->
+            <div class="category-filter-section">
+                <label>Categories</label>
+                <div id="category-buttons" class="category-buttons">
+                    <!-- Buttons will be injected here via JS -->
+                </div>
+            </div>
+
+            <!-- Location list header -->
+            <div class="locations-header">
+                <h2>Locations (<span id="location-count-sidebar">0</span>)</h2>
+            </div>
+            
             <!-- Location list -->
             <div class="location-list" id="location-list"></div>
         </aside>
 
-        <!-- Map -->
+        <!-- Map Area -->
         <main class="map-container">
+            <!-- Map Stats Overlay (Top Right) -->
+            <div id="map-stats" class="map-stats">
+                <span>📍 <span id="stat-locations">0</span> Locations</span>
+                <span class="stat-divider">|</span>
+                <span>🌍 <span id="stat-countries">0</span> Countries</span>
+            </div>
             <div id="map"></div>
         </main>
     </div>
 
-    <!-- Modal Window -->
+    <!-- Modal Window (Details) -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
