@@ -96,13 +96,16 @@ const celebLocations = [
         category: "Run BTS",
         year: "2018",
         episode: "Episode 51",
-        episodeLink: "",
+        episodeLink: "https://www.youtube.com/watch?v=d--MDCCJ3jg",
         context: "The members went on the pirate ship and other rides for a special amusement park episode.",
         address: "240 Olympic-ro, Songpa-gu",
         lat: 37.5113,
         lng: 127.0980,
-        img: "images/Lotte1.jpg",
-        gallery: ["images/Lotte1.jpg"],
+        // Miniature YouTube officielle automatique :
+        img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
+        // Vidéo Embed YouTube :
+        videoEmbed: "https://www.youtube.com/embed/d--MDCCJ3jg",
+        gallery: [], // Vide car on utilise la vidéo à la place
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
@@ -430,19 +433,41 @@ window.openModal = function(id) {
     document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
     document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
+    // Gestion de la vidéo intégrée
+    const videoContainer = document.getElementById('modal-video-container');
+    const videoIframe = document.getElementById('modal-video');
+    if (loc.videoEmbed) {
+        videoIframe.src = loc.videoEmbed;
+        videoContainer.classList.remove('hidden');
+    } else {
+        videoIframe.src = "";
+        videoContainer.classList.add('hidden');
+    }
+
     const galleryContainer = document.getElementById('modal-gallery');
     galleryContainer.innerHTML = ""; 
     if(loc.gallery && loc.gallery.length > 0) {
+        galleryContainer.style.display = 'flex';
         loc.gallery.forEach(imagePath => {
             const img = document.createElement('img');
             img.src = imagePath;
             img.onerror = function() { this.src = 'https://via.placeholder.com/300x250?text=Pending+Image'; };
             galleryContainer.appendChild(img);
         });
+    } else {
+        galleryContainer.style.display = 'none';
     }
 
     document.getElementById('details-modal').classList.remove('hidden');
 };
 
-window.closeModal = function() { document.getElementById('details-modal').classList.add('hidden'); };
-window.onclick = function(event) { if (event.target === document.getElementById('details-modal')) window.closeModal(); };
+window.closeModal = function() { 
+    document.getElementById('details-modal').classList.add('hidden'); 
+    
+    // Couper la vidéo YouTube quand on ferme la modale
+    document.getElementById('modal-video').src = "";
+};
+
+window.onclick = function(event) { 
+    if (event.target === document.getElementById('details-modal')) window.closeModal(); 
+};
