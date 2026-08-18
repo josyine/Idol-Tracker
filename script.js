@@ -162,7 +162,7 @@ const celebLocations = [
         lat: 48.8569,
         lng: 2.3572,
         img: "images/Pozzetto1.jpg", 
-        gallery: ["images/Pozzetto1.jpg"],
+        gallery: ["images/Pozzetto1.jpg","images/Pozzetto2.png","images/Pozzetto3.jpg","images/Pozzetto4.jpg","images/Pozzetto5.jpg"],
         fullDescription: "During BTS's time in Paris in 2019, Jimin visited Pozzetto, a highly rated artisanal Italian gelato and espresso shop located in the historic Marais district.",
         directions: "Take Metro Line 1 or 11 to Hôtel de Ville, then walk about 5 minutes into the Le Marais neighborhood."
     },
