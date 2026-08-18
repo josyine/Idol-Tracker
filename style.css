@@ -61,7 +61,7 @@ h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-
 /* Locations List Header */
 .locations-header { margin-bottom: 12px; }
 
-/* Locations List Cards (Matched to IMG_9190.jpg) */
+/* Locations List Cards (Matched to IMG_9190.jpg layout) */
 .location-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; }
 .location-list::-webkit-scrollbar { width: 6px; }
 .location-list::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
@@ -168,4 +168,27 @@ h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-
     background-color: var(--primary-magenta);
     color: white;
     box-shadow: 0 6px 12px rgba(217, 70, 128, 0.3);
+}
+
+/* --- NOUVEAU : Style de la vidéo intégrée (Embed) --- */
+.modal-video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* Ratio 16:9 de YouTube */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.modal-video-container.hidden {
+    display: none;
+}
+
+.modal-video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
