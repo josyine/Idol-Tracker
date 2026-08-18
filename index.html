@@ -1,38 +1,34 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Celeb Map Explorer - BTS Prototype</title>
-    
-    <!-- CSS de Leaflet (Librairie de la carte) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Ton fichier CSS -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="app-container">
-        <!-- Barre latérale (Filtres et Liste) -->
-        <aside class="sidebar">
-            <h1>🌸 Celeb Map Explorer</h1>
-            <p class="subtitle">Sur les traces de vos artistes préférés</p>
-            
-            <div class="filters">
-                <button class="filter-btn active">Tous</button>
-                <button class="filter-btn">Run BTS</button>
-                <button class="filter-btn">Musées</button>
-                <button class="filter-btn">Concerts</button>
-            </div>
-
-            <div class="location-list" id="location-list">
-                <!-- Les lieux seront injectés ici par JavaScript -->
-            </div>
-        </aside>
+<!-- ... (Garde le début de ton index.html tel quel) ... -->
 
         <!-- Zone de la carte -->
         <main class="map-container">
             <div id="map"></div>
         </main>
+    </div>
+
+    <!-- NOUVEAU : Fenêtre Modale pour les détails du lieu -->
+    <div id="details-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Nom du lieu</h2>
+            <div id="modal-tags" class="modal-tags"></div>
+            
+            <!-- Galerie d'images -->
+            <div class="modal-gallery" id="modal-gallery">
+                <!-- Les images (Camptong1.jpg...) apparaîtront ici -->
+            </div>
+            
+            <div class="modal-info">
+                <h3>📖 L'histoire de ce lieu</h3>
+                <p id="modal-desc"></p>
+                
+                <h3>🚶 Comment s'y rendre</h3>
+                <p id="modal-directions"></p>
+                <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
+                
+                <a id="modal-map-link" href="#" target="_blank" class="action-btn">🗺️ Ouvrir dans Google Maps</a>
+            </div>
+        </div>
     </div>
 
     <!-- JS de Leaflet -->
