@@ -3,52 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Celeb Map Explorer - BTS Prototype</title>
+    <title>Celeb Map Explorer</title>
     
-    <!-- Leaflet CSS (Interactive map library) -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Your custom CSS file -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Main application container -->
     <div class="app-container">
         
-        <!-- Sidebar (Filters and Location list) -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <h1>🌸 Celeb Map Explorer</h1>
             <p class="subtitle">Following the footsteps of your favorite artists</p>
             
-            <div class="filters">
-                <button class="filter-btn active">All</button>
-                <button class="filter-btn">Run BTS</button>
-                <button class="filter-btn">Museums</button>
-                <button class="filter-btn">Concerts</button>
+            <!-- NEW: Dynamic Filters Section -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="group-select">Group</label>
+                    <select id="group-select" class="filter-select">
+                        <option value="All">All Groups</option>
+                        <option value="BTS">BTS</option>
+                        <option value="Blackpink">Blackpink</option>
+                        <option value="Twice">Twice</option>
+                        <option value="Seventeen">Seventeen</option>
+                        <option value="Katseye">Katseye</option>
+                        <option value="TXT">TXT</option>
+                        <option value="Enhypen">Enhypen</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="member-select">Member</label>
+                    <select id="member-select" class="filter-select">
+                        <option value="All">All Members</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="category-select">Category</label>
+                    <select id="category-select" class="filter-select">
+                        <option value="All">All Categories</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="year-select">Year</label>
+                    <select id="year-select" class="filter-select">
+                        <option value="All">All Years</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- The location list will be injected here automatically via JavaScript -->
+            <!-- Location list -->
             <div class="location-list" id="location-list"></div>
         </aside>
 
-        <!-- Map display area -->
+        <!-- Map -->
         <main class="map-container">
             <div id="map"></div>
         </main>
-        
     </div>
 
-    <!-- Modal Window for full location details (Hidden by default) -->
+    <!-- Modal Window -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
-            <!-- Close button -->
             <span class="close-btn" onclick="closeModal()">&times;</span>
             
-            <!-- Modal Header (Title) -->
             <h2 id="modal-title">Location Name</h2>
             <div id="modal-tags" class="modal-tags"></div>
             
-            <!-- Key information list -->
             <ul class="modal-metadata">
+                <li><strong>Group:</strong> <span id="modal-group"></span></li>
                 <li><strong>Members:</strong> <span id="modal-member"></span></li>
                 <li><strong>Country:</strong> <span id="modal-country"></span></li>
                 <li><strong>City:</strong> <span id="modal-city"></span></li>
@@ -58,12 +89,8 @@
                 <li id="modal-link-container"><strong>Watch:</strong> <a id="modal-episode-link" href="#" target="_blank">🔗 Watch Episode</a></li>
             </ul>
             
-            <!-- Scrolling local images gallery -->
-            <div class="modal-gallery" id="modal-gallery">
-                <!-- Images (Camptong1.jpg, Camptong2.jpg...) will appear here -->
-            </div>
+            <div class="modal-gallery" id="modal-gallery"></div>
             
-            <!-- Detailed information section -->
             <div class="modal-info">
                 <h3>📖 The story of this place</h3>
                 <p id="modal-desc"></p>
@@ -72,15 +99,14 @@
                 <p id="modal-directions"></p>
                 <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
                 
-                <!-- Google Maps redirection button -->
                 <a id="modal-map-link" href="#" target="_blank" class="action-btn">🗺️ Open in Google Maps</a>
             </div>
         </div>
     </div>
 
-    <!-- Leaflet JS (Interactive map library) -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Your custom JavaScript file -->
+    <!-- Custom JS -->
     <script src="script.js"></script>
 </body>
 </html>
