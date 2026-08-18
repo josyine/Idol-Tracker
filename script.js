@@ -55,7 +55,16 @@ const celebLocations = [
         address: "40 Apgujeong-ro 42-gil, Gangnam-gu",
         lat: 37.5255,
         lng: 127.0375,
-        img: "images/Camptong1.jpg", 
+        // Miniature YouTube pour la popup sur la carte (Episode 118)
+        img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", 
+        
+        // NOUVEAU : Liste des vidéos (Les deux vidéos demandées)
+        videoEmbeds: [
+            "https://www.youtube.com/embed/yiqe-aegVk0",
+            "https://www.youtube.com/embed/wlHS-fpJrm0"
+        ],
+        
+        // On conserve la galerie photo
         gallery: [
             "images/Camptong1.jpg", "images/Camptong2.jpg", "images/Camptong3.jpg",
             "images/Camptong4.jpg", "images/Camptong5.jpg", "images/Camptong6.jpg",
@@ -82,6 +91,7 @@ const celebLocations = [
         lat: 37.5105,
         lng: 127.1085,
         img: "images/Otsu1.jpg", 
+        videoEmbeds: [], // Pas de vidéo
         gallery: ["images/Otsu1.jpg"],
         fullDescription: "Opened in 2018 by Jin's older brother, Jin is a co-director. The restaurant specializes in traditional Japanese wooden steamer dishes featuring sliced beef, pork, and fresh vegetables.",
         directions: "Take Line 8 to Seokchon Station or Line 9 to Songpanaru Station. It's a short 5-minute walk from Songpanaru Exit 1."
@@ -102,8 +112,11 @@ const celebLocations = [
         lat: 37.5113,
         lng: 127.0980,
         img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
-        videoEmbed: "https://www.youtube.com/embed/d--MDCCJ3jg",
-        gallery: [], // Vide car on utilise la vidéo
+        
+        // NOUVEAU : Format tableau pour la vidéo
+        videoEmbeds: ["https://www.youtube.com/embed/d--MDCCJ3jg"],
+        
+        gallery: [], 
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
@@ -123,6 +136,7 @@ const celebLocations = [
         lat: 35.8455,
         lng: 127.1895,
         img: "images/Ahwon1.jpg",
+        videoEmbeds: [],
         gallery: ["images/Ahwon1.jpg"],
         fullDescription: "A gorgeous Hanok (traditional Korean house) turned into a modern art museum and boutique hotel. BTS shot the breathtaking photos for their 2019 Summer Package here, surrounded by mountains.",
         directions: "Located in Wanju-gun, Jeollabuk-do. Best accessed by car or taxi from Jeonju city center (about 30 mins)."
@@ -143,6 +157,7 @@ const celebLocations = [
         lat: 37.5197,
         lng: 127.0229,
         img: "images/Kitsune1.jpg", 
+        videoEmbeds: [],
         gallery: ["images/Kitsune1.jpg"],
         fullDescription: "A chic French-Japanese aesthetic cafe located in the trendy Garosu-gil area. Jennie was spotted here enjoying a drink and taking pictures by the famous bamboo entrance.",
         directions: "Take Line 3 (Orange) to Sinsa Station. Exit 8 and walk about 8 minutes."
@@ -163,6 +178,7 @@ const celebLocations = [
         lat: 48.8569,
         lng: 2.3572,
         img: "images/Pozzetto1.jpg", 
+        videoEmbeds: [],
         gallery: ["images/Pozzetto1.jpg"],
         fullDescription: "During BTS's time in Paris in 2019, Jimin visited Pozzetto, a highly rated artisanal Italian gelato and espresso shop located in the historic Marais district.",
         directions: "Take Metro Line 1 or 11 to Hôtel de Ville, then walk about 5 minutes into the Le Marais neighborhood."
@@ -183,6 +199,7 @@ const celebLocations = [
         lat: 48.8795,
         lng: 2.3117,
         img: "images/Nissim1.jpg",
+        videoEmbeds: [],
         gallery: ["images/Nissim1.jpg"],
         fullDescription: "This elegant museum, a fully preserved 20th-century aristocratic mansion, served as the breathtaking backdrop for Jimin's Dior Men Spring 2024 global campaign. Its opulent interiors perfectly matched his sophisticated look.",
         directions: "Take Metro Line 2 to Villiers or Monceau station. The museum is a short walk from Parc Monceau."
@@ -203,6 +220,7 @@ const celebLocations = [
         lat: 48.8856,
         lng: 2.3432,
         img: "images/MontmartreStairs1.jpg",
+        videoEmbeds: [],
         gallery: ["images/MontmartreStairs1.jpg"],
         fullDescription: "During his free time in Paris, Jimin wandered around the historic Montmartre neighborhood. He shared photos posing gracefully on these steep, picturesque stairs leading up to the Sacré-Cœur basilica, capturing the authentic Parisian vibe.",
         directions: "Take Metro Line 2 to Anvers. Walk up the hill towards the Sacré-Cœur; the famous stairs run right alongside the funicular."
@@ -223,6 +241,7 @@ const celebLocations = [
         lat: 48.8848,
         lng: 2.3386,
         img: "images/WallOfLove1.jpg",
+        videoEmbeds: [],
         gallery: ["images/WallOfLove1.jpg"],
         fullDescription: "Located in the heart of Montmartre, this beautiful art installation features the phrase 'I love you' in 250 languages. Jimin visited this romantic spot during his personal vacation in Paris.",
         directions: "Take Metro Line 12 and get off at Abbesses station. The wall is located in the small park right outside the metro exit."
@@ -243,6 +262,7 @@ const celebLocations = [
         lat: 48.8643,
         lng: 2.2965,
         img: "images/PalaisTokyo1.jpg",
+        videoEmbeds: [],
         gallery: ["images/PalaisTokyo1.jpg"],
         fullDescription: "This contemporary art museum frequently hosts major Paris Fashion Week events. Jimin, as a global ambassador for Dior, made a highly anticipated appearance here, drawing thousands of fans to the museum's striking brutalist exterior.",
         directions: "Take Metro Line 9 to Iéna or Alma-Marceau station. The museum is directly facing the Eiffel Tower across the river."
@@ -425,18 +445,23 @@ window.openModal = function(id) {
     document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
     document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-    // FORCER L'AFFICHAGE ET MASQUAGE STRICT DE LA VIDÉO (PLUS D'ESPACE BLANC)
+    // NOUVEAU : GESTION MULTIPLES VIDÉOS
     const videoContainer = document.getElementById('modal-video-container');
-    const videoIframe = document.getElementById('modal-video');
+    videoContainer.innerHTML = ""; // On vide les anciennes vidéos
     
-    if (loc.videoEmbed) {
-        videoIframe.src = loc.videoEmbed;
-        videoContainer.style.display = 'block'; // Affiche la vidéo
+    if (loc.videoEmbeds && loc.videoEmbeds.length > 0) {
+        loc.videoEmbeds.forEach(vidSrc => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'video-wrapper';
+            wrapper.innerHTML = `<iframe src="${vidSrc}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            videoContainer.appendChild(wrapper);
+        });
+        videoContainer.style.display = 'flex'; // On affiche le conteneur
     } else {
-        videoIframe.src = "";
-        videoContainer.style.display = 'none'; // Efface totalement l'espace blanc
+        videoContainer.style.display = 'none'; // Efface totalement s'il n'y a pas de vidéo
     }
 
+    // GESTION DE LA GALERIE
     const galleryContainer = document.getElementById('modal-gallery');
     galleryContainer.innerHTML = ""; 
     if(loc.gallery && loc.gallery.length > 0) {
@@ -457,8 +482,8 @@ window.openModal = function(id) {
 window.closeModal = function() { 
     document.getElementById('details-modal').classList.add('hidden'); 
     
-    // Couper la vidéo YouTube quand on ferme la modale
-    document.getElementById('modal-video').src = "";
+    // Couper les vidéos YouTube quand on ferme la modale
+    document.getElementById('modal-video-container').innerHTML = ""; 
 };
 
 window.onclick = function(event) { 
