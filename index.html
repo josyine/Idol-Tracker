@@ -37,20 +37,26 @@
         
     </div>
 
-    <!-- Fenêtre Modale pour les détails complets du lieu (Cachée par défaut) -->
+    <!-- Fenêtre Modale pour les détails complets du lieu -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
-            <!-- Bouton pour fermer la fenêtre -->
             <span class="close-btn" onclick="closeModal()">&times;</span>
             
-            <!-- En-tête de la fenêtre (Titre) -->
             <h2 id="modal-title">Nom du lieu</h2>
             <div id="modal-tags" class="modal-tags"></div>
             
+            <!-- NOUVEAU : La liste des informations clés -->
+            <ul class="modal-metadata">
+                <li><strong>Membres :</strong> <span id="modal-member"></span></li>
+                <li><strong>Pays :</strong> <span id="modal-country"></span></li>
+                <li><strong>Ville :</strong> <span id="modal-city"></span></li>
+                <li><strong>Adresse :</strong> <span id="modal-full-address"></span></li>
+                <li><strong>Date :</strong> <span id="modal-date"></span></li>
+                <li id="modal-episode-container"><strong>Épisode :</strong> <span id="modal-episode"></span></li>
+            </ul>
+            
             <!-- Galerie d'images locales défilantes -->
-            <div class="modal-gallery" id="modal-gallery">
-                <!-- Les images (Camptong1.jpg, Camptong2.jpg...) apparaîtront ici -->
-            </div>
+            <div class="modal-gallery" id="modal-gallery"></div>
             
             <!-- Section d'informations détaillées -->
             <div class="modal-info">
@@ -61,7 +67,6 @@
                 <p id="modal-directions"></p>
                 <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
                 
-                <!-- Bouton de redirection vers Google Maps -->
                 <a id="modal-map-link" href="#" target="_blank" class="action-btn">🗺️ Ouvrir dans Google Maps</a>
             </div>
         </div>
