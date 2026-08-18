@@ -15,8 +15,13 @@
         
         <!-- Sidebar -->
         <aside class="sidebar">
-            <h1>Celeb Map Explorer</h1>
+            <h1>🌸 Celeb Map Explorer</h1>
             <p class="subtitle">Following the footsteps of your favorite artists</p>
+            
+            <!-- NEW: Search Bar -->
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="🔍 Search a location, city, context...">
+            </div>
             
             <!-- Filters Section -->
             <div class="filters-container">
@@ -41,7 +46,7 @@
                     </select>
                 </div>
 
-                <div class="filter-group">
+                <div class="filter-group" style="grid-column: span 2;">
                     <label for="year-select">Year</label>
                     <select id="year-select" class="filter-select">
                         <option value="All">All Years</option>
@@ -59,13 +64,13 @@
             <div class="category-filter-section">
                 <label>Categories</label>
                 <div id="category-buttons" class="category-buttons">
-                    <!-- Buttons will be injected here via JS -->
+                    <!-- Buttons injected via JS -->
                 </div>
             </div>
 
             <!-- Location list header -->
             <div class="locations-header">
-                <h2>Locations (<span id="location-count-sidebar">0</span>)</h2>
+                <h2>📍 Locations (<span id="location-count-sidebar">0</span>)</h2>
             </div>
             
             <!-- Location list -->
@@ -74,11 +79,15 @@
 
         <!-- Map Area -->
         <main class="map-container">
-            <!-- Map Stats Overlay (Top Right) -->
-            <div id="map-stats" class="map-stats">
-                <span>📍 <span id="stat-locations">0</span> Locations</span>
-                <span class="stat-divider">|</span>
-                <span>🌍 <span id="stat-countries">0</span> Countries</span>
+            <!-- NEW: Elegant Map Stats Overlay (Top Right) -->
+            <div class="map-stats">
+                <div class="stat-item">
+                    📍 <span id="stat-locations">0</span> Locations
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    🌍 <span id="stat-countries">0</span> Countries
+                </div>
             </div>
             <div id="map"></div>
         </main>
