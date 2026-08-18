@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Elegant SVG Icons Library
+// 2. Elegant SVG Icons Library (Replaces Emojis)
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
     "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
@@ -55,16 +55,11 @@ const celebLocations = [
         address: "40 Apgujeong-ro 42-gil, Gangnam-gu",
         lat: 37.5255,
         lng: 127.0375,
-        // Miniature YouTube pour la popup sur la carte (Episode 118)
         img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", 
-        
-        // NOUVEAU : Liste des vidéos (Les deux vidéos demandées)
         videoEmbeds: [
             "https://www.youtube.com/embed/yiqe-aegVk0",
             "https://www.youtube.com/embed/wlHS-fpJrm0"
         ],
-        
-        // On conserve la galerie photo
         gallery: [
             "images/Camptong1.jpg", "images/Camptong2.jpg", "images/Camptong3.jpg",
             "images/Camptong4.jpg", "images/Camptong5.jpg", "images/Camptong6.jpg",
@@ -91,7 +86,7 @@ const celebLocations = [
         lat: 37.5105,
         lng: 127.1085,
         img: "images/Otsu1.jpg", 
-        videoEmbeds: [], // Pas de vidéo
+        videoEmbeds: [],
         gallery: ["images/Otsu1.jpg"],
         fullDescription: "Opened in 2018 by Jin's older brother, Jin is a co-director. The restaurant specializes in traditional Japanese wooden steamer dishes featuring sliced beef, pork, and fresh vegetables.",
         directions: "Take Line 8 to Seokchon Station or Line 9 to Songpanaru Station. It's a short 5-minute walk from Songpanaru Exit 1."
@@ -112,10 +107,7 @@ const celebLocations = [
         lat: 37.5113,
         lng: 127.0980,
         img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
-        
-        // NOUVEAU : Format tableau pour la vidéo
         videoEmbeds: ["https://www.youtube.com/embed/d--MDCCJ3jg"],
-        
         gallery: [], 
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
@@ -445,9 +437,9 @@ window.openModal = function(id) {
     document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
     document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-    // NOUVEAU : GESTION MULTIPLES VIDÉOS
+    // FORCER L'AFFICHAGE DYNAMIQUE DES VIDÉOS SANS ESPACE BLANC
     const videoContainer = document.getElementById('modal-video-container');
-    videoContainer.innerHTML = ""; // On vide les anciennes vidéos
+    videoContainer.innerHTML = ""; 
     
     if (loc.videoEmbeds && loc.videoEmbeds.length > 0) {
         loc.videoEmbeds.forEach(vidSrc => {
@@ -456,12 +448,12 @@ window.openModal = function(id) {
             wrapper.innerHTML = `<iframe src="${vidSrc}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
             videoContainer.appendChild(wrapper);
         });
-        videoContainer.style.display = 'flex'; // On affiche le conteneur
+        videoContainer.style.display = 'flex'; 
     } else {
-        videoContainer.style.display = 'none'; // Efface totalement s'il n'y a pas de vidéo
+        videoContainer.style.display = 'none'; 
     }
 
-    // GESTION DE LA GALERIE
+    // FORCER L'AFFICHAGE DE LA GALERIE SANS ESPACE BLANC
     const galleryContainer = document.getElementById('modal-gallery');
     galleryContainer.innerHTML = ""; 
     if(loc.gallery && loc.gallery.length > 0) {
