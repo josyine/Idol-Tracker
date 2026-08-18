@@ -102,7 +102,7 @@ const celebLocations = [
         lat: 37.5113,
         lng: 127.0980,
         img: "images/RunLotte1.jpg",
-        gallery: ["images/RunLotte1.jpg", "images/RunLotte2.jpg", "images/RunLotte3.png", "images/RunLotte4.jpg", "images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.png"],
+        gallery: ["images/RunLotte1.jpg", "images/RunLotte3.png", "images/RunLotte4.jpg", "images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.png"],
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
@@ -122,7 +122,7 @@ const celebLocations = [
         lat: 35.8455,
         lng: 127.1895,
         img: "images/Ahwon1.jpg",
-        gallery: ["images/Ahwon1.jpg"],
+        gallery: ["images/Ahwon1.jpg", "images/Ahwon2.jpg","images/Ahwon3.jpg","images/Ahwon4.jpg"],
         fullDescription: "A gorgeous Hanok (traditional Korean house) turned into a modern art museum and boutique hotel. BTS shot the breathtaking photos for their 2019 Summer Package here, surrounded by mountains.",
         directions: "Located in Wanju-gun, Jeollabuk-do. Best accessed by car or taxi from Jeonju city center (about 30 mins)."
     },
