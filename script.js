@@ -145,6 +145,26 @@ const celebLocations = [
         gallery: ["images/Kitsune1.jpg"],
         fullDescription: "A chic French-Japanese aesthetic cafe located in the trendy Garosu-gil area. Jennie was spotted here enjoying a drink and taking pictures by the famous bamboo entrance.",
         directions: "Take Line 3 (Orange) to Sinsa Station. Exit 8 and walk about 8 minutes."
+    },
+    {
+        id: 6,
+        name: "Pozzetto",
+        group: "BTS",
+        member: "Jimin", 
+        country: "France",
+        city: "Paris",
+        category: "Cafe",
+        year: "2019",
+        episode: "",
+        episodeLink: "",
+        context: "Jimin was spotted enjoying artisanal gelato here.",
+        address: "39 Rue du Roi de Sicile, 75004 Paris",
+        lat: 48.8569,
+        lng: 2.3572,
+        img: "images/Pozzetto1.jpg", 
+        gallery: ["images/Pozzetto1.jpg"],
+        fullDescription: "During BTS's time in Paris in 2019, Jimin visited Pozzetto, a highly rated artisanal Italian gelato and espresso shop located in the historic Marais district.",
+        directions: "Take Metro Line 1 or 11 to Hôtel de Ville, then walk about 5 minutes into the Le Marais neighborhood."
     }
 ];
 
