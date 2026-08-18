@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celeb Map Explorer - BTS Prototype</title>
+    
+    <!-- CSS de Leaflet (Librairie de la carte) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Ton fichier CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Barre latérale (Filtres et Liste) -->
+        <aside class="sidebar">
+            <h1>🌸 Celeb Map Explorer</h1>
+            <p class="subtitle">Sur les traces de vos artistes préférés</p>
+            
+            <div class="filters">
+                <button class="filter-btn active">Tous</button>
+                <button class="filter-btn">Run BTS</button>
+                <button class="filter-btn">Musées</button>
+                <button class="filter-btn">Concerts</button>
+            </div>
+
+            <div class="location-list" id="location-list">
+                <!-- Les lieux seront injectés ici par JavaScript -->
+            </div>
+        </aside>
+
+        <!-- Zone de la carte -->
+        <main class="map-container">
+            <div id="map"></div>
+        </main>
+    </div>
+
+    <!-- JS de Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Ton fichier JS -->
+    <script src="script.js"></script>
+</body>
+</html>
