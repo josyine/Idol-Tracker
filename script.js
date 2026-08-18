@@ -1,17 +1,15 @@
-// 1. Map initialization
-const map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6); // Wider view
+// 1. Map Initialization
+const map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
 L.control.zoom({ position: 'bottomright' }).addTo(map);
-
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19
 }).addTo(map);
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Filter Configuration Data
+// 2. Filter Configuration Data (No "Group" inside members anymore)
 const filterData = {
     "BTS": {
-        // "Group" is removed from the members list
         members: ["Namjoon", "Jin", "Suga", "JHope", "Jimin", "V", "Jungkook"],
         categories: ["Run BTS", "Bon Voyage", "Museums", "Restaurants", "Cafe", "MV Location", "Concerts"]
     },
@@ -21,7 +19,7 @@ const filterData = {
     }
 };
 
-let activeCategory = "All"; // Tracks which category button is clicked
+let activeCategory = "All"; 
 
 // 3. Locations Database
 const celebLocations = [
@@ -29,27 +27,27 @@ const celebLocations = [
         id: 1,
         name: "Cafe Camptong",
         group: "BTS",
-        member: "All", // "All" means all members of the group were present
+        member: "All", 
         country: "South Korea",
         city: "Seoul",
         category: "Run BTS",
         year: "2020",
         episode: "Episodes 118-119",
         episodeLink: "https://weverse.io/bts/media/3-104694116",
-        context: "The boys played a game searching for hidden sticky notes to score points.",
+        context: "The boys played a game searching for hidden sticky notes.",
         address: "40 Apgujeong-ro 42-gil, Gangnam-gu",
         lat: 37.5255,
         lng: 127.0375,
         img: "images/Camptong1.jpg", 
         gallery: ["images/Camptong1.jpg", "images/Camptong2.jpg"],
-        fullDescription: "This large, multi-story cafe was rented out for the filming of the Run BTS! show. The members played a game searching for hidden sticky notes throughout the building to score points. It has become a must-visit spot for fans.",
+        fullDescription: "This large, multi-story cafe was rented out for the filming of the Run BTS! show. The members played a game searching for hidden sticky notes throughout the building to score points.",
         directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes."
     },
     {
         id: 2,
         name: "Otsu Seiromushi",
         group: "BTS",
-        member: "Jin", // Solo or specific member
+        member: "Jin", 
         country: "South Korea",
         city: "Seoul",
         category: "Restaurants",
@@ -103,7 +101,7 @@ const celebLocations = [
         img: "images/Ahwon1.jpg",
         gallery: ["images/Ahwon1.jpg"],
         fullDescription: "A gorgeous Hanok (traditional Korean house) turned into a modern art museum and boutique hotel. BTS shot the breathtaking photos for their 2019 Summer Package here, surrounded by mountains.",
-        directions: "Located in Wanju-gun, Jeollabuk-do. It is best accessed by car or taxi from Jeonju city center (about 30 minutes drive)."
+        directions: "Located in Wanju-gun, Jeollabuk-do. Best accessed by car or taxi from Jeonju city center (about 30 mins)."
     },
     {
         id: 5,
@@ -123,83 +121,58 @@ const celebLocations = [
         img: "images/Kitsune1.jpg", 
         gallery: ["images/Kitsune1.jpg"],
         fullDescription: "A chic French-Japanese aesthetic cafe located in the trendy Garosu-gil area. Jennie was spotted here enjoying a drink and taking pictures by the famous bamboo entrance.",
-        directions: "Take Line 3 (Orange) to Sinsa Station. Exit 8 and walk about 8 minutes to the Garosu-gil main street."
+        directions: "Take Line 3 (Orange) to Sinsa Station. Exit 8 and walk about 8 minutes."
     }
 ];
 
-// Helper Function for Icons
+// Icons Mapping
 function getCategoryIcon(category) {
-    const icons = {
-        "Run BTS": "🎬",
-        "Bon Voyage": "🧳",
-        "Restaurants": "🍽️",
-        "Cafe": "☕",
-        "Museums": "🏛️",
-        "MV Location": "🎥",
-        "Concerts": "🎤",
-        "Fashion": "👗",
-        "Pop-up Store": "🛍️"
-    };
+    const icons = { "Run BTS": "🎬", "Bon Voyage": "🧳", "Restaurants": "🍽️", "Cafe": "☕", "Museums": "🏛️", "MV Location": "🎥", "Concerts": "🎤", "Fashion": "👗", "Pop-up Store": "🛍️" };
     return icons[category] || "📍";
 }
 
-// Graphic Marker Configuration
-const magentaIcon = L.divIcon({
-    className: 'custom-magenta-marker',
-    html: `<div></div>`, iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -10]
-});
+const magentaIcon = L.divIcon({ className: 'custom-magenta-marker', html: `<div></div>`, iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -10] });
 
-// Dynamic Filtering Elements
+// DOM Elements
 const groupSelect = document.getElementById('group-select');
 const memberSelect = document.getElementById('member-select');
 const yearSelect = document.getElementById('year-select');
+const searchInput = document.getElementById('search-input');
 const categoryButtonsContainer = document.getElementById('category-buttons');
 
-// Update UI based on selected Group
-groupSelect.addEventListener('change', function() {
-    const selectedGroup = this.value;
-    
-    // Reset Member dropdown
+// Initialization function for dynamic filters
+function initializeFilters() {
+    const selectedGroup = groupSelect.value;
     memberSelect.innerHTML = '<option value="All">All Members</option>';
-    // Reset Category Buttons
-    categoryButtonsContainer.innerHTML = '';
+    categoryButtonsContainer.innerHTML = '<button class="filter-btn active" data-cat="All">All Categories</button>';
     activeCategory = "All";
     
     if (selectedGroup !== "All" && filterData[selectedGroup]) {
-        // Populate Members
         filterData[selectedGroup].members.forEach(member => {
             memberSelect.innerHTML += `<option value="${member}">${member}</option>`;
         });
         
-        // Populate Category Buttons
-        // Add an "All Categories" button first
-        categoryButtonsContainer.innerHTML += `<button class="filter-btn active" data-cat="All">All</button>`;
         filterData[selectedGroup].categories.forEach(cat => {
             categoryButtonsContainer.innerHTML += `<button class="filter-btn" data-cat="${cat}">${cat}</button>`;
         });
-
-        // Add event listeners to new buttons
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remove active class from all buttons
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                this.classList.add('active');
-                // Update active category
-                activeCategory = this.getAttribute('data-cat');
-                renderLocations();
-            });
-        });
-    } else {
-        // If "All Groups" is selected, just show a generic "All" button
-        categoryButtonsContainer.innerHTML = `<button class="filter-btn active" data-cat="All">All Categories</button>`;
     }
-    renderLocations();
-});
 
-// Trigger rendering on other filters
+    // Attach click events to category buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            activeCategory = this.getAttribute('data-cat');
+            renderLocations();
+        });
+    });
+}
+
+// Event Listeners
+groupSelect.addEventListener('change', () => { initializeFilters(); renderLocations(); });
 memberSelect.addEventListener('change', renderLocations);
 yearSelect.addEventListener('change', renderLocations);
+searchInput.addEventListener('input', renderLocations);
 
 // Main Render Function
 function renderLocations() {
@@ -210,30 +183,36 @@ function renderLocations() {
     const fGroup = groupSelect.value;
     const fMember = memberSelect.value;
     const fYear = yearSelect.value;
+    const searchTerm = searchInput.value.toLowerCase();
 
     const filteredLocations = celebLocations.filter(loc => {
         const matchGroup = (fGroup === "All" || loc.group === fGroup);
-        // If a specific member is selected, show their solo spots AND spots where "All" members were present
+        // Important: If a specific member is selected, show their solo spots OR spots where "All" members were present
         const matchMember = (fMember === "All" || loc.member === fMember || loc.member === "All");
         const matchCategory = (activeCategory === "All" || loc.category === activeCategory);
         const matchYear = (fYear === "All" || loc.year === fYear);
-        return matchGroup && matchMember && matchCategory && matchYear;
+        
+        // Search logic (checks name, city, and context)
+        const matchSearch = loc.name.toLowerCase().includes(searchTerm) || 
+                            loc.city.toLowerCase().includes(searchTerm) || 
+                            loc.context.toLowerCase().includes(searchTerm);
+                            
+        return matchGroup && matchMember && matchCategory && matchYear && matchSearch;
     });
 
-    // Update Stats
+    // Update Stats on UI
     document.getElementById('location-count-sidebar').textContent = filteredLocations.length;
     document.getElementById('stat-locations').textContent = filteredLocations.length;
     const uniqueCountries = new Set(filteredLocations.map(l => l.country)).size;
     document.getElementById('stat-countries').textContent = uniqueCountries;
 
-    // Generate Markers and Sidebar Cards
     filteredLocations.forEach(loc => {
-        // 1. Map Marker & Popup
+        // 1. Map Marker
         const marker = L.marker([loc.lat, loc.lng], { icon: magentaIcon }).addTo(markerGroup);
 
-        // Build Extra Meta HTML (Episode & Date)
-        let metaHtml = `<strong>📅 Year:</strong> ${loc.year}`;
-        if(loc.episode) { metaHtml += ` | <strong>📺 ${loc.episode}</strong>`; }
+        // Build Extra Meta HTML for Popup
+        let metaHtml = `<strong>Year:</strong> ${loc.year}`;
+        if(loc.episode) { metaHtml += ` <br><strong>Ep:</strong> ${loc.episode}`; }
 
         const popupContent = `
             <div class="popup-title" onclick="openModal(${loc.id})">${loc.name} ↗️</div>
@@ -250,8 +229,7 @@ function renderLocations() {
         // 2. Sidebar Card
         const card = document.createElement('div');
         card.className = 'location-card';
-        
-        let membersDisplay = loc.member === "All" ? `${loc.group} (All Members)` : loc.member;
+        let membersDisplay = loc.member === "All" ? `All Members` : loc.member;
 
         card.innerHTML = `
             <div class="card-title-row">
@@ -259,13 +237,13 @@ function renderLocations() {
                 <span class="card-title">${loc.name}</span>
             </div>
             <div class="card-desc">📍 ${loc.address.split(',').pop().trim()}</div>
-            <div class="card-desc" style="margin-top: 6px; font-weight: 600; color: #D94680;">${membersDisplay}</div>
+            <div class="card-desc" style="margin-top: 6px; font-weight: 600; color: #D94680;">${loc.group} • ${membersDisplay}</div>
         `;
 
         card.addEventListener('click', () => {
             document.querySelectorAll('.location-card').forEach(c => c.style.borderColor = '#F5D0DF');
             card.style.borderColor = '#D94680';
-            map.flyTo([loc.lat, loc.lng], 16, { duration: 1.5 });
+            map.flyTo([loc.lat, loc.lng], 15, { duration: 1.5 });
             setTimeout(() => marker.openPopup(), 1500);
         });
 
@@ -273,10 +251,11 @@ function renderLocations() {
     });
 }
 
-// Initial render
+// Initial Load
+initializeFilters();
 renderLocations();
 
-// Modal Window Functions
+// Modal Functions
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
@@ -286,7 +265,7 @@ window.openModal = function(id) {
     document.getElementById('modal-directions').textContent = loc.directions;
     
     document.getElementById('modal-group').textContent = loc.group;
-    document.getElementById('modal-member').textContent = loc.member === "All" ? `${loc.group} (All Members)` : loc.member;
+    document.getElementById('modal-member').textContent = loc.member === "All" ? `All Members` : loc.member;
     document.getElementById('modal-country').textContent = loc.country;
     document.getElementById('modal-city').textContent = loc.city;
     document.getElementById('modal-full-address').textContent = loc.address;
