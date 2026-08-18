@@ -102,7 +102,7 @@ const celebLocations = [
         lat: 37.5113,
         lng: 127.0980,
         img: "images/RunLotte1.jpg",
-        gallery: ["images/RunLotte1.jpg", "images/RunLotte2.jpg", "images/RunLotte3.jpg", "images/RunLotte4.jpg", "images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.jpg"],
+        gallery: ["images/RunLotte1.jpg", "images/RunLotte2.jpg", "images/RunLotte3.png", "images/RunLotte4.jpg", "images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.png"],
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
