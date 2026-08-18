@@ -39,7 +39,7 @@ const celebLocations = [
         lat: 37.5255,
         lng: 127.0375,
         img: "images/Camptong1.jpg", 
-        gallery: ["images/Camptong1.jpg", "images/Camptong2.jpg"],
+        gallery: ["images/Camptong1.jpg", "images/Camptong2.jpg", "images/Camptong3.jpg", "images/Camptong4.jpg", "images/Camptong5.jpg", "images/Camptong6.jpg", "images/Camptong7.jpg", "images/Camptong8.jpg", "images/Camptong9.jpg", "images/Camptong10.jpg", "images/Camptong11.jpg", "images/Camptong12.jpg", "images/Camptong13.jpg"],
         fullDescription: "This large, multi-story cafe was rented out for the filming of the Run BTS! show. The members played a game searching for hidden sticky notes throughout the building to score points.",
         directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes."
     },
