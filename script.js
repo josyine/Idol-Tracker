@@ -455,6 +455,33 @@ const celebLocations = [
         fullDescription: "Located in the historic Belém district, the Museu de Marinha (Navy Museum) is housed in the spectacular west wing of the iconic Jerónimos Monastery. It is one of the most important and visited museums in Portugal, dedicated to the country's rich history of maritime exploration and naval power. The museum's vast halls display over 17,000 historical items, ranging from intricate 15th-century ship models and celestial navigation instruments to spectacular, full-sized royal barges adorned with gold leaf. The grand architecture and fascinating artifacts create a majestic and deeply historical atmosphere.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"Swim\" Music Video)</h3>Continuing their stunning 2026 visual era in Portugal, BTS selected the majestic halls of the Museu de Marinha as a key filming location for their \"Swim\" music video. The grandiose naval backdrop perfectly complements the conceptual depths of the track. Fans can spot the members performing striking choreography and moody solo shots surrounded by centuries-old maritime artifacts, massive antique globes, and the museum's famous beautifully decorated royal galleys. The setting bridges the gap between historical exploration and their own artistic journey.",
         tip: "Belém is an absolute must-visit neighborhood when traveling to Lisbon. After exploring the Museu de Marinha to see the MV filming spots, you can easily walk to the famous Pastéis de Belém bakery right down the street to try Portugal's legendary, original custard tarts. As a bonus, the museum is physically attached to the Jerónimos Monastery, meaning you can marvel at some of the best architecture in the country all in one afternoon.",
         directions: "The museum is very easily accessible from central Lisbon. The most scenic and popular route is to take Tram 15E or Bus 728 from the central Praça do Comércio directly to the \"Mosteiro dos Jerónimos\" stop. The ride takes about 20 to 30 minutes along the beautiful Tagus riverfront."
+    },
+    {
+        id: 18, // Identifiant unique
+        name: "In the SOOP Estate (Chuncheon)",
+        group: "BTS",
+        member: "All", 
+        country: "South Korea",
+        city: "Chuncheon (Gangwon-do)",
+        category: "Bon Voyage",
+        year: "2021",
+        episode: "In the SOOP BTS ver. Season 2",
+        episodeLink: "https://www.youtube.com/watch?v=6qB8Nb_WO_Y",
+        context: "The luxurious private mountain estate custom-built by HYBE for BTS's healing reality show.",
+        address: "Chuncheon, Gangwon-do (Restricted access via official tours only)",
+        lat: 37.8813, // Coordonnées globales de Chuncheon (le lieu exact étant privé)
+        lng: 127.7298,
+        img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg", // Miniature officielle de la vidéo
+        videoEmbeds: [
+            "https://www.youtube.com/embed/6qB8Nb_WO_Y" // Vidéo intégrée
+        ],
+        gallery: [
+            "images/Soop1.jpg", 
+            "images/Soop2.jpg"
+        ],
+        fullDescription: "Hidden deep within the lush, forested mountains of Chuncheon, this sprawling private estate is not your average vacation rental. It was completely customized, renovated, and expanded by HYBE specifically for the filming of the show. The expansive property features a stunning modern main house, separate private guest cabins, an outdoor swimming pool, a private tennis and basketball court, and a camper van area. Surrounded by thick trees and a quiet valley, it is the ultimate luxury retreat designed for pure relaxation and disconnection from the outside world.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (In the SOOP Season 2)</h3>For the second season of their healing reality show, BTS spent several days resting, cooking, painting, and playing together in this serene environment. The show highlights the members enjoying peaceful, ordinary moments away from their global superstar schedules. Fans can easily picture the iconic scenes: RM reading quietly in the study, Suga playing the acoustic guitar in the camper van, Jungkook and Jin's chaotic late-night cooking sessions, and the entire group laughing through rain-soaked foot-volleyball games on the outdoor court.",
+        tip: "Because this estate is privately owned by the agency and hidden in the mountains, you cannot drive there yourself or look it up on a standard GPS. However, HYBE regularly partners with the Phoenix Pyeongchang Resort to offer official \"In the SOOP Stay\" packages and guided viewing tours. If you book an official ticket, a dedicated shuttle bus will take you directly to the estate. You are allowed to walk through the houses, take photos in the exact spots where the members relaxed, and even buy exclusive merchandise at the hidden on-site store!",
+        directions: "The location is strictly inaccessible by personal car or public transport to prevent trespassing. You must book the official tour package through Weverse or Phoenix Pyeongchang. Tours typically depart via private shuttle from the Phoenix Pyeongchang Resort. To reach the resort, take the KTX high-speed train from Seoul to Pyeongchang Station, and then hop on the resort's free shuttle."
     }
 ];
 
