@@ -29,7 +29,7 @@ h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-
 }
 #search-input:focus { border-color: var(--primary-magenta); }
 
-/* --- NOUVEAU : Zone de défilement globale de la barre latérale --- */
+/* --- Zone de défilement globale de la barre latérale --- */
 .sidebar-scroll-area {
     flex: 1;
     overflow-y: auto;
@@ -37,11 +37,8 @@ h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-
     display: flex;
     flex-direction: column;
 }
-
-/* Style de la nouvelle barre de défilement */
 .sidebar-scroll-area::-webkit-scrollbar { width: 6px; }
 .sidebar-scroll-area::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
-
 
 /* Filters container */
 .filters-container {
@@ -178,44 +175,11 @@ h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-
 .action-btn:hover { background: #bd336b; }
 
 /* --- Style des sections Médias (Vidéos et Galerie) --- */
-.media-section {
-    margin: 30px 0;
-}
-
-.media-section h3 {
-    color: var(--primary-magenta);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
-}
-
-.media-section.hidden {
-    display: none !important;
-}
+.media-section { margin: 30px 0; }
+.media-section h3 { color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+.media-section.hidden { display: none !important; }
 
 /* Multiples Embeds */
-.modal-videos {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.video-wrapper {
-    position: relative;
-    padding-bottom: 56.25%; /* Ratio 16:9 de YouTube */
-    height: 0;
-    overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
+.modal-videos { display: flex; flex-direction: column; gap: 15px; }
+.video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
