@@ -428,6 +428,33 @@ const celebLocations = [
         fullDescription: "Sunhyewon (often referenced or misspelled as Seo Hyewon) is a breathtaking traditional Korean architectural estate. Characterized by its sweeping tiled roofs (giwa), exposed natural woodwork, expansive open-air courtyards, and tranquil surrounding greenery, the estate serves as a pristine example of classical Hanok heritage. Its design harmoniously blends traditional living quarters with the natural landscape, making it an exceptional venue for cultural exhibitions, artistic showcases, and traditional ceremonies.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"NORMAL\" Live Clip)</h3>For the live version of their track \"NORMAL,\" BTS chose Sunhyewon as the backdrop to deliver an intimate and grounded performance. In contrast to the European vintage aesthetic of the official music video, this live clip showcases the seven members performing against the quiet elegance of Korean traditional architecture. The wooden corridors, stone verandas, and open courtyards of the estate provide a soulful, organic atmosphere that highlights the vocal performance and the introspective mood of the song.",
         tip: "When visiting traditional heritage estates like Sunhyewon, keep in mind that many functions on the grounds are designed to preserve the original wood and stone structures. Visitors are often expected to remove their footwear before stepping onto elevated wooden platforms (daecheongmaru). It is always best to check visiting hours or event booking requirements in advance, as these cultural properties frequently host private viewings or seasonal cultural programs.",
         directions: "Depending on your starting point in the Seoul metropolitan area, traditional estates outside the city center are typically accessed via regional commuter rail followed by a short local bus or taxi ride."
+    },
+    {
+        id: 17, // Identifiant unique
+        name: "Museu de Marinha",
+        group: "BTS",
+        member: "All", 
+        country: "Portugal",
+        city: "Lisbon",
+        category: "MV Location",
+        year: "2026",
+        episode: "\"Swim\" Official Music Video",
+        episodeLink: "https://www.youtube.com/watch?v=b4iVv91Z6lY",
+        context: "The historic naval museum serving as the grandiose backdrop for the 'Swim' music video.",
+        address: "Praça do Império, 1400-206 Lisboa, Portugal",
+        lat: 38.6976, // Coordonnées GPS du musée à Belém, Lisbonne
+        lng: -9.2082,
+        img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg", // Miniature officielle du MV
+        videoEmbeds: [
+            "https://www.youtube.com/embed/b4iVv91Z6lY" // Vidéo intégrée du MV "Swim"
+        ],
+        gallery: [
+            "images/Marinha1.jpg", 
+            "images/Marinha2.jpg"
+        ],
+        fullDescription: "Located in the historic Belém district, the Museu de Marinha (Navy Museum) is housed in the spectacular west wing of the iconic Jerónimos Monastery. It is one of the most important and visited museums in Portugal, dedicated to the country's rich history of maritime exploration and naval power. The museum's vast halls display over 17,000 historical items, ranging from intricate 15th-century ship models and celestial navigation instruments to spectacular, full-sized royal barges adorned with gold leaf. The grand architecture and fascinating artifacts create a majestic and deeply historical atmosphere.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"Swim\" Music Video)</h3>Continuing their stunning 2026 visual era in Portugal, BTS selected the majestic halls of the Museu de Marinha as a key filming location for their \"Swim\" music video. The grandiose naval backdrop perfectly complements the conceptual depths of the track. Fans can spot the members performing striking choreography and moody solo shots surrounded by centuries-old maritime artifacts, massive antique globes, and the museum's famous beautifully decorated royal galleys. The setting bridges the gap between historical exploration and their own artistic journey.",
+        tip: "Belém is an absolute must-visit neighborhood when traveling to Lisbon. After exploring the Museu de Marinha to see the MV filming spots, you can easily walk to the famous Pastéis de Belém bakery right down the street to try Portugal's legendary, original custard tarts. As a bonus, the museum is physically attached to the Jerónimos Monastery, meaning you can marvel at some of the best architecture in the country all in one afternoon.",
+        directions: "The museum is very easily accessible from central Lisbon. The most scenic and popular route is to take Tram 15E or Bus 728 from the central Praça do Comércio directly to the \"Mosteiro dos Jerónimos\" stop. The ride takes about 20 to 30 minutes along the beautiful Tagus riverfront."
     }
 ];
 
