@@ -482,6 +482,33 @@ const celebLocations = [
         fullDescription: "Hidden deep within the lush, forested mountains of Chuncheon, this sprawling private estate is not your average vacation rental. It was completely customized, renovated, and expanded by HYBE specifically for the filming of the show. The expansive property features a stunning modern main house, separate private guest cabins, an outdoor swimming pool, a private tennis and basketball court, and a camper van area. Surrounded by thick trees and a quiet valley, it is the ultimate luxury retreat designed for pure relaxation and disconnection from the outside world.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (In the SOOP Season 2)</h3>For the second season of their healing reality show, BTS spent several days resting, cooking, painting, and playing together in this serene environment. The show highlights the members enjoying peaceful, ordinary moments away from their global superstar schedules. Fans can easily picture the iconic scenes: RM reading quietly in the study, Suga playing the acoustic guitar in the camper van, Jungkook and Jin's chaotic late-night cooking sessions, and the entire group laughing through rain-soaked foot-volleyball games on the outdoor court.",
         tip: "Because this estate is privately owned by the agency and hidden in the mountains, you cannot drive there yourself or look it up on a standard GPS. However, HYBE regularly partners with the Phoenix Pyeongchang Resort to offer official \"In the SOOP Stay\" packages and guided viewing tours. If you book an official ticket, a dedicated shuttle bus will take you directly to the estate. You are allowed to walk through the houses, take photos in the exact spots where the members relaxed, and even buy exclusive merchandise at the hidden on-site store!",
         directions: "The location is strictly inaccessible by personal car or public transport to prevent trespassing. You must book the official tour package through Weverse or Phoenix Pyeongchang. Tours typically depart via private shuttle from the Phoenix Pyeongchang Resort. To reach the resort, take the KTX high-speed train from Seoul to Pyeongchang Station, and then hop on the resort's free shuttle."
+    },
+    {
+        id: 19, // Identifiant unique
+        name: "Happy Meadow Ranch (Happy Chowon Farm)",
+        group: "BTS",
+        member: "All", 
+        country: "South Korea",
+        city: "Chuncheon (Gangwon-do)",
+        category: "Bon Voyage", // Ou "Restaurants" / "Cafe" si tu préfères cibler le burger
+        year: "2020",
+        episode: "In the SOOP BTS ver. Season 1 (Associated Area)",
+        episodeLink: "https://www.youtube.com/watch?v=F14vk9qPRM0",
+        context: "Experience the ultimate In the SOOP vibe by eating a premium Hanwoo burger overlooking the pristine Chuncheon Lake.",
+        address: "330-48 Chunhwa-ro, Sabuk-myeon, Chuncheon-si, Gangwon-do",
+        lat: 37.9547, // Coordonnées GPS approximatives du Happy Chowon Farm
+        lng: 127.6975,
+        img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg", // Miniature de la vidéo
+        videoEmbeds: [
+            "https://www.youtube.com/embed/F14vk9qPRM0" // Vidéo intégrée
+        ],
+        gallery: [
+            "images/HappyMeadow1.jpg", 
+            "images/HappyMeadow2.jpg"
+        ],
+        fullDescription: "Often referred to as the \"Switzerland of Korea,\" Happy Meadow Ranch is a sprawling 70,000-square-meter farm perched high on the mountainsides of Chuncheon. The estate offers breathtaking, panoramic views of the pristine Chuncheon Lake, surrounded by rolling green hills and dense forests. Visitors can interact with free-roaming sheep, feed the local cattle, and take in the quiet alpine atmosphere. Beyond its stunning scenery, the ranch is incredibly famous across Korea for its on-site café, which serves a signature, high-end Hanwoo (premium Korean beef) burger made fresh from local, top-tier ingredients.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (The Chuncheon Hanwoo Experience)</h3>While the members stayed at the nearby \"Lake 192\" property for the filming of In the SOOP BTS ver. Season 1, Happy Meadow Ranch is located in the exact same picturesque valley. During their healing vacation, the members famously treated themselves to premium local Chuncheon Hanwoo beef, cooking massive feasts together outdoors. For fans visiting the Chuncheon area, coming to this ranch to eat the famous Hanwoo Burger while looking out over the exact same lake that BTS woke up to has become the ultimate In the SOOP culinary pilgrimage. It perfectly captures the essence of the show: premium food, nature, and relaxation.",
+        tip: "The legendary Hanwoo burgers at the ranch café are made in limited quantities each day and are extremely popular with both locals and tourists. It is highly recommended to arrive early in the day to secure yours before they sell out! After enjoying your burger, take the 15-minute uphill walking trail to reach the main \"photo zone.\" The viewpoint at the top offers one of the most spectacular, unobstructed views of the lake in all of South Korea. Be sure to wear comfortable walking shoes!",
+        directions: "Because the ranch is located high in the mountains, public transportation is very limited. The easiest and most convenient way to reach Happy Meadow Ranch is to take the ITX train from Seoul to Chuncheon Station, and then take a 30-minute taxi ride directly to the farm's entrance."
     }
 ];
 
