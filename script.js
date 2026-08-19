@@ -268,23 +268,23 @@ const celebLocations = [
         directions: "Take Metro Line 9 to Iéna or Alma-Marceau station. The museum is directly facing the Eiffel Tower across the river."
     },
     {
-        id: 11, // Nouvel ID, j'ai mis 11 en supposant qu'il suit le Palais de Tokyo
+        id: 11,
         name: "Cheonggu Building",
         group: "BTS",
         member: "All",
         country: "South Korea",
         city: "Seoul",
-        category: "Landmarks", // Ou "Run BTS" / "Museums" selon ce qui te semble le plus logique
-        year: "2013", // L'année de leurs débuts semble la plus appropriée
+        category: "Landmarks",
+        year: "2013 - 2017",
         episode: "Early Debut Era & Training Days",
-        episodeLink: "https://www.youtube.com/watch?v=hoTBL39iSIg", // Lien d'un vieux Dance Practice dans ce bâtiment
+        episodeLink: "https://www.youtube.com/watch?v=vJwHIpEogEY",
         context: "The legendary former Big Hit Entertainment building and basement practice room.",
         address: "16 Hakdong-ro 30-gil, Gangnam-gu",
-        lat: 37.5144, // Coordonnées GPS approximatives de Nonhyeon-dong/Hakdong
+        lat: 37.5144,
         lng: 127.0315,
-        img: "https://img.youtube.com/vi/hoTBL39iSIg/hqdefault.jpg", // Miniature de la vidéo
+        img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg",
         videoEmbeds: [
-            "https://www.youtube.com/embed/hoTBL39iSIg" // Vidéo intégrée de leurs débuts
+            "https://www.youtube.com/embed/vJwHIpEogEY"
         ],
         gallery: [
             "images/Cheonggu1.jpg", 
