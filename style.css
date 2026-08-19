@@ -29,6 +29,20 @@ h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-
 }
 #search-input:focus { border-color: var(--primary-magenta); }
 
+/* --- NOUVEAU : Zone de défilement globale de la barre latérale --- */
+.sidebar-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Style de la nouvelle barre de défilement */
+.sidebar-scroll-area::-webkit-scrollbar { width: 6px; }
+.sidebar-scroll-area::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
+
+
 /* Filters container */
 .filters-container {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
@@ -62,9 +76,12 @@ h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-
 .locations-header { margin-bottom: 12px; }
 
 /* Locations List Cards */
-.location-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; }
-.location-list::-webkit-scrollbar { width: 6px; }
-.location-list::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
+.location-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    padding-bottom: 20px; 
+}
 
 .location-card {
     border: 1px solid var(--border-color); border-radius: 16px; padding: 12px;
