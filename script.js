@@ -68,7 +68,7 @@ const celebLocations = [
             "images/Camptong13.jpg"
         ],
         fullDescription: "Cafe Camptong is a massive, multi-story industrial-chic cafe located in the bustling streets of Gangnam. It gained legendary status among ARMYs when it was entirely rented out for Episodes 118 and 119 of Run BTS! Beyond its pop-culture fame, the cafe is an architectural marvel featuring high ceilings, exposed concrete walls, and large windows that bathe the interior in natural light. Visitors can enjoy a wide selection of artisanal pastries, freshly roasted coffee, and unique seasonal beverages.<br><br>Inside this huge space, the members ran around wildly, playing an intense game of finding hidden sticky notes to score points. The cafe has lovingly kept many traces of BTS's visit, making it a perfect pilgrimage spot. You can see the actual spots where the members hid, strategized, and playfully betrayed each other! Whether you are here to retrace your favorite idols' footsteps or simply to enjoy a quiet afternoon with a delicious dessert, Cafe Camptong offers an unforgettable Seoul cafe experience.",
-        tip: "", // Pas de tip pour l'instant
+        tip: "", 
         directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes through the upscale neighborhood."
     },
     {
@@ -420,14 +420,13 @@ function renderLocations() {
 initializeFilters();
 renderLocations();
 
-// Modal Functions
+// Modal Functions (Secured with Try/Catch and explicit media sections)
 window.openModal = function(id) {
     try {
         const loc = celebLocations.find(l => l.id === id);
         if(!loc) return;
 
         document.getElementById('modal-title').textContent = loc.name;
-        // On utilise direct l'HTML défini dans la base de données
         document.getElementById('modal-desc').innerHTML = loc.fullDescription; 
         document.getElementById('modal-directions').textContent = loc.directions;
         
@@ -459,7 +458,7 @@ window.openModal = function(id) {
             tipSection.classList.add('hidden');
         }
 
-        // GALLERY (Avant les vidéos)
+        // 1. GALLERY
         const gallerySection = document.getElementById('modal-gallery-section');
         const galleryContainer = document.getElementById('modal-gallery');
         if (galleryContainer) {
@@ -479,7 +478,7 @@ window.openModal = function(id) {
             }
         }
 
-        // VIDEOS
+        // 2. VIDEOS
         const videoSection = document.getElementById('modal-video-section');
         const videoContainer = document.getElementById('modal-video-container');
         if (videoContainer) {
