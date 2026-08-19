@@ -80,8 +80,6 @@ const celebLocations = [
         city: "Seoul",
         category: "Restaurants",
         year: "2018",
-        episode: "N/A (Member-affiliated business)",
-        episodeLink: "",
         context: "A premium Japanese steamed cuisine restaurant famously co-owned by Jin and his brother.",
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu",
         lat: 37.5105,
