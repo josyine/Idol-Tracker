@@ -49,10 +49,10 @@ const celebLocations = [
         city: "Seoul",
         category: "Run BTS",
         year: "2020",
-        episode: "Episodes 118-119",
+        episode: "Episodes 118 & 119 (Photo Story)",
         episodeLink: "https://weverse.io/bts/media/3-104694116",
         context: "The boys played an energetic game searching for hidden sticky notes in this massive cafe.",
-        address: "40 Apgujeong-ro 42-gil, Gangnam-gu",
+        address: "27 Apgujeong-ro 42-gil, Gangnam-gu",
         lat: 37.5255,
         lng: 127.0375,
         img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", 
@@ -67,9 +67,9 @@ const celebLocations = [
             "images/Camptong10.jpg", "images/Camptong11.jpg", "images/Camptong12.jpg",
             "images/Camptong13.jpg"
         ],
-        fullDescription: "Cafe Camptong is a massive, multi-story industrial-chic cafe located in the bustling streets of Gangnam. It gained legendary status among ARMYs when it was entirely rented out for Episodes 118 and 119 of Run BTS! Beyond its pop-culture fame, the cafe is an architectural marvel featuring high ceilings, exposed concrete walls, and large windows that bathe the interior in natural light. Visitors can enjoy a wide selection of artisanal pastries, freshly roasted coffee, and unique seasonal beverages.<br><br>Inside this huge space, the members ran around wildly, playing an intense game of finding hidden sticky notes to score points. The cafe has lovingly kept many traces of BTS's visit, making it a perfect pilgrimage spot. You can see the actual spots where the members hid, strategized, and playfully betrayed each other! Whether you are here to retrace your favorite idols' footsteps or simply to enjoy a quiet afternoon with a delicious dessert, Cafe Camptong offers an unforgettable Seoul cafe experience.",
-        tip: "", 
-        directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes through the upscale neighborhood."
+        fullDescription: "Located in the trendy Apgujeong neighborhood, Cafe Camptong was a massive, multi-level establishment. Known for its industrial architecture, the venue offered coworking spaces, large lounge areas, and themed meeting rooms. Its maze-like layout and numerous hidden corners made it not only a huge cafe but also an ideal filming location for television shows.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (Run BTS! - Episodes 118 & 119)</h3>The group took over the entire building for a giant photographic scavenger hunt. The goal was to find sticky notes hidden across the different floors and recreate the exact scenes requested in the photos to earn points. The episodes feature the members throughout the cafe:<ul style='margin-top:10px; margin-left:20px; line-height:1.6;'><li><strong>Racing through the floors:</strong> The members frantically running up and down the metal stairs and industrial hallways in search of the hidden notes.</li><li><strong>Impromptu photo spots:</strong> The various spaces in the cafe (sofas, glass rooms, mirrors) used as backdrops for hilarious photoshoots and secret alliances to unmask the game's spy.</li></ul>",
+        tip: "Although the original Cafe Camptong has permanently closed, the street and the building's facade remain a historical landmark for fans. The Apgujeong Rodeo area is a must-visit anyway: take advantage of being in this neighborhood to explore the surrounding alleys, which are full of other iconic spots from the group's early days.",
+        directions: "Take the Suin-Bundang Line to Apgujeong Rodeo Station (Exit 5). Walk for about 10 minutes towards the Apgujeong cafe street area."
     },
     {
         id: 2,
