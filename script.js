@@ -266,6 +266,33 @@ const celebLocations = [
         fullDescription: "This contemporary art museum frequently hosts major Paris Fashion Week events. Jimin, as a global ambassador for Dior, made a highly anticipated appearance here, drawing thousands of fans to the museum's striking brutalist exterior.",
         tip: "",
         directions: "Take Metro Line 9 to Iéna or Alma-Marceau station. The museum is directly facing the Eiffel Tower across the river."
+    },
+    {
+        id: 11, // Nouvel ID, j'ai mis 11 en supposant qu'il suit le Palais de Tokyo
+        name: "Cheonggu Building",
+        group: "BTS",
+        member: "All",
+        country: "South Korea",
+        city: "Seoul",
+        category: "Landmarks", // Ou "Run BTS" / "Museums" selon ce qui te semble le plus logique
+        year: "2013", // L'année de leurs débuts semble la plus appropriée
+        episode: "Early Debut Era & Training Days",
+        episodeLink: "https://www.youtube.com/watch?v=hoTBL39iSIg", // Lien d'un vieux Dance Practice dans ce bâtiment
+        context: "The legendary former Big Hit Entertainment building and basement practice room.",
+        address: "16 Hakdong-ro 30-gil, Gangnam-gu",
+        lat: 37.5144, // Coordonnées GPS approximatives de Nonhyeon-dong/Hakdong
+        lng: 127.0315,
+        img: "https://img.youtube.com/vi/hoTBL39iSIg/hqdefault.jpg", // Miniature de la vidéo
+        videoEmbeds: [
+            "https://www.youtube.com/embed/hoTBL39iSIg" // Vidéo intégrée de leurs débuts
+        ],
+        gallery: [
+            "images/Cheonggu1.jpg", 
+            "images/Cheonggu2.jpg"
+        ],
+        fullDescription: "Tucked away in the quiet residential and commercial streets of Nonhyeon-dong, the Cheonggu Building is an ordinary-looking brick and concrete structure that holds extraordinary history. While it currently houses various everyday businesses and private offices, its exterior walls tell a completely different story. The bricks and surrounding walls are famously covered in thousands of heartfelt messages, signatures, and drawings left by fans from all over the globe, transforming this humble facade into a living monument of pop culture history.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (The Beginning)</h3>Long before the massive HYBE headquarters in Yongsan existed, this modest building was the cradle of BTS's career. Big Hit Entertainment operated from a small office on the second floor, while the basement housed the group's legendary, cramped practice room. This is the exact place where the seven members spent countless sleepless nights perfecting their earliest choreographies, writing their first albums, and filming their very first vlog entries. It represents the grit, sweat, and humble beginnings of their journey to global stardom.",
+        tip: "While this is a must-visit pilgrimage site for any fan, it is important to remember that the Cheonggu Building is now a private workspace for other companies. It is perfectly fine to admire the fan graffiti and take photos of the exterior walls, but please respect the current tenants by not entering the building itself. After visiting, take a short 5-minute walk to nearby Hakdong Park—a quiet public park where the members frequently went to sit on the swings, rest, and talk about their dreams during their trainee days.",
+        directions: "Take Subway Line 7 to Hakdong Station and go out of Exit 7. The building is about a 10-minute walk through the quiet, hilly streets of the Nonhyeon-dong neighborhood."
     }
 ];
 
