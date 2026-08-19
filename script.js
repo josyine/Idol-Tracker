@@ -401,6 +401,33 @@ const celebLocations = [
         fullDescription: "Located very close to Lisbon's Humberto Delgado Airport, Quinta da Francelha de Cima is a magnificent 18th-century historic Portuguese estate. Characterized by its traditional architecture, grand majestic halls, and manicured gardens, it perfectly reflects the aristocratic charm of its era. This elegant property is typically used as a venue for private events, offering a romantic and timeless setting steeped in classic Portuguese aesthetics.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"NORMAL\" Music Video)</h3>To accompany the release of their highly anticipated comeback album, ARIRANG, BTS chose this historic estate to film the music video for their track \"NORMAL,\" released in the summer of 2026. Directed by Tanu Muiño, the cinematic visual explores a deeply personal side of the group's life away from the spotlight. Fans can distinctly recognize several spaces within the Quinta, including its grand reception rooms, bedrooms, lush gardens, and iconic Portuguese entrance, creating a striking contrast between the historical venue and modern pop.",
         tip: "Because Quinta da Francelha de Cima operates primarily as a private event venue, it is not open for casual, everyday walk-ins like a traditional museum. However, since the property is only a 4-minute drive from Lisbon Airport, it is incredibly easy to swing by and admire the entrance and exterior facade if you have a flight to catch or are just arriving in Portugal!",
         directions: "The estate is extremely accessible for travelers. The easiest and fastest way to get there is to take a taxi or a ride-share app (like Uber or Bolt) directly from Lisbon Humberto Delgado Airport. The ride takes barely 4 to 5 minutes."
+    },
+    {
+        id: 16, // Identifiant unique
+        name: "Sunhyewon",
+        group: "BTS",
+        member: "All", 
+        country: "South Korea",
+        city: "Seoul Area",
+        category: "MV Location",
+        year: "2026",
+        episode: "\"NORMAL\" Live Clip (Sunhyewon ver.)",
+        episodeLink: "https://www.youtube.com/watch?v=Hb06Iem3FWg",
+        context: "BTS delivered an intimate and grounded live performance of 'NORMAL' against the quiet elegance of this traditional estate.",
+        address: "Sunhyewon Estate, South Korea",
+        lat: 37.5826, // Coordonnées approximatives d'un domaine traditionnel en périphérie
+        lng: 126.9856,
+        img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg", // Miniature officielle du Live Clip
+        videoEmbeds: [
+            "https://www.youtube.com/embed/Hb06Iem3FWg" // Vidéo intégrée
+        ],
+        gallery: [
+            "images/Sunhyewon1.jpg", 
+            "images/Sunhyewon2.jpg"
+        ],
+        fullDescription: "Sunhyewon (often referenced or misspelled as Seo Hyewon) is a breathtaking traditional Korean architectural estate. Characterized by its sweeping tiled roofs (giwa), exposed natural woodwork, expansive open-air courtyards, and tranquil surrounding greenery, the estate serves as a pristine example of classical Hanok heritage. Its design harmoniously blends traditional living quarters with the natural landscape, making it an exceptional venue for cultural exhibitions, artistic showcases, and traditional ceremonies.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"NORMAL\" Live Clip)</h3>For the live version of their track \"NORMAL,\" BTS chose Sunhyewon as the backdrop to deliver an intimate and grounded performance. In contrast to the European vintage aesthetic of the official music video, this live clip showcases the seven members performing against the quiet elegance of Korean traditional architecture. The wooden corridors, stone verandas, and open courtyards of the estate provide a soulful, organic atmosphere that highlights the vocal performance and the introspective mood of the song.",
+        tip: "When visiting traditional heritage estates like Sunhyewon, keep in mind that many functions on the grounds are designed to preserve the original wood and stone structures. Visitors are often expected to remove their footwear before stepping onto elevated wooden platforms (daecheongmaru). It is always best to check visiting hours or event booking requirements in advance, as these cultural properties frequently host private viewings or seasonal cultural programs.",
+        directions: "Depending on your starting point in the Seoul metropolitan area, traditional estates outside the city center are typically accessed via regional commuter rail followed by a short local bus or taxi ride."
     }
 ];
 
