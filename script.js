@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Elegant SVG Icons Library
+// 2. Elegant SVG Icons Library (Replaces Emojis)
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
     "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
@@ -107,7 +107,9 @@ const celebLocations = [
         lat: 37.5113,
         lng: 127.0980,
         img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
-        videoEmbeds: ["https://www.youtube.com/embed/d--MDCCJ3jg"],
+        videoEmbeds: [
+            "https://www.youtube.com/embed/d--MDCCJ3jg"
+        ],
         gallery: ["images/RunLotte1.jpg", "images/RunLotte2.png", "images/RunLotte3.jpg", "images/RunLotte4.jpg","images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.png"], 
         fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
@@ -416,7 +418,6 @@ window.openModal = function(id) {
         const loc = celebLocations.find(l => l.id === id);
         if(!loc) return;
 
-        // Note: Using innerHTML for fullDescription so we can use line breaks (\n\n) converted to <br> if needed
         document.getElementById('modal-title').textContent = loc.name;
         document.getElementById('modal-desc').innerHTML = loc.fullDescription.replace(/\n/g, '<br>');
         document.getElementById('modal-directions').textContent = loc.directions;
