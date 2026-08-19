@@ -284,7 +284,7 @@ const celebLocations = [
         lng: 127.0315,
         img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg",
         videoEmbeds: [
-            "https://www.youtube.com/embed/vJwHIpEogEY"
+            "https://www.youtube.com/embed/vJwHIpEogEY" 
         ],
         gallery: [
             "images/Cheonggu1.jpg", 
@@ -295,7 +295,7 @@ const celebLocations = [
         directions: "Take Subway Line 7 to Hakdong Station and go out of Exit 7. The building is about a 10-minute walk through the quiet, hilly streets of the Nonhyeon-dong neighborhood."
     },
     {
-        id: 12, // Identifiant unique
+        id: 12,
         name: "The First BTS Dorm",
         group: "BTS",
         member: "All",
@@ -304,14 +304,14 @@ const celebLocations = [
         category: "Landmarks", 
         year: "2013 - 2015",
         episode: "[EPISODE] 1st BTS Birthday Party",
-        episodeLink: "https://www.youtube.com/watch?v=1b-iE1153Qc", // Lien du 1st Birthday Party
+        episodeLink: "https://www.youtube.com/watch?v=RhJqNFQCU_Q", // Nouveau lien
         context: "The original cramped dorm where all 7 members lived together and celebrated their 1st anniversary.",
         address: "29 Nonhyeon-ro 119-gil, Gangnam-gu",
-        lat: 37.5133, // Coordonnées approximatives pour Nonhyeon-dong
+        lat: 37.5133,
         lng: 127.0321,
-        img: "https://img.youtube.com/vi/1b-iE1153Qc/hqdefault.jpg", // Miniature de la vidéo anniversaire
+        img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg", // Nouvelle miniature
         videoEmbeds: [
-            "https://www.youtube.com/embed/1b-iE1153Qc" // Vidéo intégrée de l'anniversaire
+            "https://www.youtube.com/embed/RhJqNFQCU_Q" // Nouvelle vidéo intégrée
         ],
         gallery: [
             "images/Dorm1.jpg", 
