@@ -23,70 +23,64 @@
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
             
-            <!-- DÉBUT DE LA ZONE DE DÉFILEMENT GLOBALE -->
-            <div class="sidebar-scroll-area">
-                
-                <!-- Filters Section -->
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <label for="group-select">Group</label>
-                        <select id="group-select" class="filter-select">
-                            <option value="All">All Groups</option>
-                            <option value="BTS">BTS</option>
-                            <option value="Blackpink">Blackpink</option>
-                            <option value="Twice">Twice</option>
-                            <option value="Seventeen">Seventeen</option>
-                            <option value="Katseye">Katseye</option>
-                            <option value="TXT">TXT</option>
-                            <option value="Enhypen">Enhypen</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label for="member-select">Member</label>
-                        <select id="member-select" class="filter-select">
-                            <option value="All">All Members</option>
-                        </select>
-                    </div>
-
-                    <!-- Area / Country Filter -->
-                    <div class="filter-group">
-                        <label for="country-select">Area</label>
-                        <select id="country-select" class="filter-select">
-                            <option value="All">All Areas</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label for="year-select">Year</label>
-                        <select id="year-select" class="filter-select">
-                            <option value="All">All Years</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                            <option value="2021">2021</option>
-                            <option value="2020">2020</option>
-                            <option value="2019">2019</option>
-                            <option value="2018">2018</option>
-                        </select>
-                    </div>
+            <!-- Filters Section -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="group-select">Group</label>
+                    <select id="group-select" class="filter-select">
+                        <option value="All">All Groups</option>
+                        <option value="BTS">BTS</option>
+                        <option value="Blackpink">Blackpink</option>
+                        <option value="Twice">Twice</option>
+                        <option value="Seventeen">Seventeen</option>
+                        <option value="Katseye">Katseye</option>
+                        <option value="TXT">TXT</option>
+                        <option value="Enhypen">Enhypen</option>
+                    </select>
                 </div>
 
-                <!-- Dynamic Category Buttons -->
-                <div class="category-filter-section">
-                    <label>Categories</label>
-                    <div id="category-buttons" class="category-buttons"></div>
+                <div class="filter-group">
+                    <label for="member-select">Member</label>
+                    <select id="member-select" class="filter-select">
+                        <option value="All">All Members</option>
+                    </select>
                 </div>
 
-                <!-- Location list header -->
-                <div class="locations-header">
-                    <label>Locations (<span id="location-count-sidebar">0</span>)</label>
+                <!-- Area / Country Filter -->
+                <div class="filter-group">
+                    <label for="country-select">Area</label>
+                    <select id="country-select" class="filter-select">
+                        <option value="All">All Areas</option>
+                    </select>
                 </div>
-                
-                <!-- Location list -->
-                <div class="location-list" id="location-list"></div>
-                
+
+                <div class="filter-group">
+                    <label for="year-select">Year</label>
+                    <select id="year-select" class="filter-select">
+                        <option value="All">All Years</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                        <option value="2019">2019</option>
+                        <option value="2018">2018</option>
+                    </select>
+                </div>
             </div>
-            <!-- FIN DE LA ZONE DE DÉFILEMENT GLOBALE -->
+
+            <!-- Dynamic Category Buttons -->
+            <div class="category-filter-section">
+                <label>Categories</label>
+                <div id="category-buttons" class="category-buttons"></div>
+            </div>
+
+            <!-- Location list header -->
+            <div class="locations-header">
+                <label>Locations (<span id="location-count-sidebar">0</span>)</label>
+            </div>
+            
+            <!-- Location list -->
+            <div class="location-list" id="location-list"></div>
         </aside>
 
         <!-- Map Area -->
@@ -127,7 +121,8 @@
             <!-- 1. THE STORY -->
             <div class="modal-info" style="margin-top: 25px;">
                 <h3>The story of this place</h3>
-                <p id="modal-desc"></p>
+                <!-- Changé en 'div' pour accepter des listes à puces via JavaScript -->
+                <div id="modal-desc" style="line-height: 1.6;"></div> 
             </div>
 
             <!-- 2. THE PHOTOS -->
@@ -140,6 +135,12 @@
             <div id="modal-video-section" class="media-section hidden">
                 <h3>Watch the Episode</h3>
                 <div id="modal-video-container" class="modal-videos"></div>
+            </div>
+
+            <!-- NOUVEAU : THE TIP SECTION -->
+            <div id="modal-tip-section" class="media-section hidden" style="background-color: #f9f9f9; padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary-magenta);">
+                <h3 style="border-bottom: none; padding-bottom: 0; margin-bottom: 8px;">💡 The "Screen to Street" Tip:</h3>
+                <p id="modal-tip" style="font-size: 0.95rem; font-style: italic;"></p>
             </div>
             
             <!-- 4. THE DIRECTIONS -->
