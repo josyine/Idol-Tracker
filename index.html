@@ -23,64 +23,70 @@
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
             
-            <!-- Filters Section -->
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label for="group-select">Group</label>
-                    <select id="group-select" class="filter-select">
-                        <option value="All">All Groups</option>
-                        <option value="BTS">BTS</option>
-                        <option value="Blackpink">Blackpink</option>
-                        <option value="Twice">Twice</option>
-                        <option value="Seventeen">Seventeen</option>
-                        <option value="Katseye">Katseye</option>
-                        <option value="TXT">TXT</option>
-                        <option value="Enhypen">Enhypen</option>
-                    </select>
+            <!-- DÉBUT DE LA ZONE DE DÉFILEMENT GLOBALE -->
+            <div class="sidebar-scroll-area">
+                
+                <!-- Filters Section -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="group-select">Group</label>
+                        <select id="group-select" class="filter-select">
+                            <option value="All">All Groups</option>
+                            <option value="BTS">BTS</option>
+                            <option value="Blackpink">Blackpink</option>
+                            <option value="Twice">Twice</option>
+                            <option value="Seventeen">Seventeen</option>
+                            <option value="Katseye">Katseye</option>
+                            <option value="TXT">TXT</option>
+                            <option value="Enhypen">Enhypen</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="member-select">Member</label>
+                        <select id="member-select" class="filter-select">
+                            <option value="All">All Members</option>
+                        </select>
+                    </div>
+
+                    <!-- Area / Country Filter -->
+                    <div class="filter-group">
+                        <label for="country-select">Area</label>
+                        <select id="country-select" class="filter-select">
+                            <option value="All">All Areas</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="year-select">Year</label>
+                        <select id="year-select" class="filter-select">
+                            <option value="All">All Years</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="filter-group">
-                    <label for="member-select">Member</label>
-                    <select id="member-select" class="filter-select">
-                        <option value="All">All Members</option>
-                    </select>
+                <!-- Dynamic Category Buttons -->
+                <div class="category-filter-section">
+                    <label>Categories</label>
+                    <div id="category-buttons" class="category-buttons"></div>
                 </div>
 
-                <!-- Area / Country Filter -->
-                <div class="filter-group">
-                    <label for="country-select">Area</label>
-                    <select id="country-select" class="filter-select">
-                        <option value="All">All Areas</option>
-                    </select>
+                <!-- Location list header -->
+                <div class="locations-header">
+                    <label>Locations (<span id="location-count-sidebar">0</span>)</label>
                 </div>
-
-                <div class="filter-group">
-                    <label for="year-select">Year</label>
-                    <select id="year-select" class="filter-select">
-                        <option value="All">All Years</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                        <option value="2019">2019</option>
-                        <option value="2018">2018</option>
-                    </select>
-                </div>
+                
+                <!-- Location list -->
+                <div class="location-list" id="location-list"></div>
+                
             </div>
-
-            <!-- Dynamic Category Buttons -->
-            <div class="category-filter-section">
-                <label>Categories</label>
-                <div id="category-buttons" class="category-buttons"></div>
-            </div>
-
-            <!-- Location list header -->
-            <div class="locations-header">
-                <label>Locations (<span id="location-count-sidebar">0</span>)</label>
-            </div>
-            
-            <!-- Location list -->
-            <div class="location-list" id="location-list"></div>
+            <!-- FIN DE LA ZONE DE DÉFILEMENT GLOBALE -->
         </aside>
 
         <!-- Map Area -->
