@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 const markerGroup = L.layerGroup().addTo(map);
 
-// 2. Elegant SVG Icons Library (Replaces Emojis)
+// 2. Elegant SVG Icons Library
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
     "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
@@ -67,7 +67,8 @@ const celebLocations = [
             "images/Camptong10.jpg", "images/Camptong11.jpg", "images/Camptong12.jpg",
             "images/Camptong13.jpg"
         ],
-        fullDescription: "Cafe Camptong is a massive, multi-story industrial-chic cafe located in the bustling streets of Gangnam. It gained legendary status among ARMYs when it was entirely rented out for Episodes 118 and 119 of Run BTS! Beyond its pop-culture fame, the cafe is an architectural marvel featuring high ceilings, exposed concrete walls, and large windows that bathe the interior in natural light. Visitors can enjoy a wide selection of artisanal pastries, freshly roasted coffee, and unique seasonal beverages.\n\nInside this huge space, the members ran around wildly, playing an intense game of finding hidden sticky notes to score points. The cafe has lovingly kept many traces of BTS's visit, making it a perfect pilgrimage spot. You can see the actual spots where the members hid, strategized, and playfully betrayed each other! Whether you are here to retrace your favorite idols' footsteps or simply to enjoy a quiet afternoon with a delicious dessert, Cafe Camptong offers an unforgettable Seoul cafe experience.",
+        fullDescription: "Cafe Camptong is a massive, multi-story industrial-chic cafe located in the bustling streets of Gangnam. It gained legendary status among ARMYs when it was entirely rented out for Episodes 118 and 119 of Run BTS! Beyond its pop-culture fame, the cafe is an architectural marvel featuring high ceilings, exposed concrete walls, and large windows that bathe the interior in natural light. Visitors can enjoy a wide selection of artisanal pastries, freshly roasted coffee, and unique seasonal beverages.<br><br>Inside this huge space, the members ran around wildly, playing an intense game of finding hidden sticky notes to score points. The cafe has lovingly kept many traces of BTS's visit, making it a perfect pilgrimage spot. You can see the actual spots where the members hid, strategized, and playfully betrayed each other! Whether you are here to retrace your favorite idols' footsteps or simply to enjoy a quiet afternoon with a delicious dessert, Cafe Camptong offers an unforgettable Seoul cafe experience.",
+        tip: "", // Pas de tip pour l'instant
         directions: "Take the Suin-Bundang Line (Yellow) to Apgujeongrodeo Station. Take Exit 5 and walk for about 10 minutes through the upscale neighborhood."
     },
     {
@@ -89,6 +90,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/Otsu1.jpg"],
         fullDescription: "Opened in 2018 by Jin's older brother, Jin is a co-director. The restaurant specializes in traditional Japanese wooden steamer dishes featuring sliced beef, pork, and fresh vegetables.",
+        tip: "",
         directions: "Take Line 8 to Seokchon Station or Line 9 to Songpanaru Station. It's a short 5-minute walk from Songpanaru Exit 1."
     },
     {
@@ -107,11 +109,10 @@ const celebLocations = [
         lat: 37.5113,
         lng: 127.0980,
         img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
-        videoEmbeds: [
-            "https://www.youtube.com/embed/d--MDCCJ3jg"
-        ],
+        videoEmbeds: ["https://www.youtube.com/embed/d--MDCCJ3jg"],
         gallery: ["images/RunLotte1.jpg", "images/RunLotte2.png", "images/RunLotte3.jpg", "images/RunLotte4.jpg","images/RunLotte5.jpg", "images/RunLotte6.jpg", "images/RunLotte7.jpg", "images/RunLotte8.jpg", "images/RunLotte9.jpg", "images/RunLotte10.png"], 
-        fullDescription: "The group rented out Lotte World after hours to film Run BTS! They wore cute headbands and played games while riding the famous Viking ship and French Revolution rollercoaster.",
+        fullDescription: "Opened in 1989 in the Jamsil neighborhood, Lotte World is a must-visit entertainment complex in Seoul. Its layout is divided into two distinct areas. On one side, <strong>\"Adventure\"</strong> houses the world's largest indoor theme park, allowing year-round operation under a massive glass dome. On the other, <strong>\"Magic Island\"</strong> features outdoor rides on an artificial peninsula built in the middle of Seokchon Lake.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (Run BTS! - Episode 51)</h3>The group rented out the amusement park after hours to film their nighttime challenges. Wearing cute animal headbands, they turned the park into a giant playground, competing on three major attractions:<ul style='margin-top:10px; margin-left:20px; line-height:1.6;'><li><strong>The Pirate Ship (Viking):</strong> The location of the first challenge, showcasing how some members handled their fear of heights.</li><li><strong>The Flume Ride:</strong> The classic water attraction where the group had to keep a bubblegum bubble intact during the final drop.</li><li><strong>French Revolution:</strong> The famous indoor roller coaster, setting the stage for a high-speed memorization challenge.</li></ul>",
+        tip: "The animal headbands worn by the BTS members aren't just for the show; it's a real tradition in South Korean amusement parks. You will see visitors of all ages wearing them. Souvenir shops are scattered everywhere, allowing you to easily pick out your own before hitting the rides.",
         directions: "Take Line 2 or Line 8 directly to Jamsil Station. The park is connected underground to the station."
     },
     {
@@ -133,6 +134,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/Ahwon1.jpg"],
         fullDescription: "A gorgeous Hanok (traditional Korean house) turned into a modern art museum and boutique hotel. BTS shot the breathtaking photos for their 2019 Summer Package here, surrounded by mountains.",
+        tip: "",
         directions: "Located in Wanju-gun, Jeollabuk-do. Best accessed by car or taxi from Jeonju city center (about 30 mins)."
     },
     {
@@ -154,6 +156,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/Kitsune1.jpg"],
         fullDescription: "A chic French-Japanese aesthetic cafe located in the trendy Garosu-gil area. Jennie was spotted here enjoying a drink and taking pictures by the famous bamboo entrance.",
+        tip: "",
         directions: "Take Line 3 (Orange) to Sinsa Station. Exit 8 and walk about 8 minutes."
     },
     {
@@ -175,6 +178,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/Pozzetto1.jpg"],
         fullDescription: "During BTS's time in Paris in 2019, Jimin visited Pozzetto, a highly rated artisanal Italian gelato and espresso shop located in the historic Marais district.",
+        tip: "",
         directions: "Take Metro Line 1 or 11 to Hôtel de Ville, then walk about 5 minutes into the Le Marais neighborhood."
     },
     {
@@ -196,6 +200,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/Nissim1.jpg"],
         fullDescription: "This elegant museum, a fully preserved 20th-century aristocratic mansion, served as the breathtaking backdrop for Jimin's Dior Men Spring 2024 global campaign. Its opulent interiors perfectly matched his sophisticated look.",
+        tip: "",
         directions: "Take Metro Line 2 to Villiers or Monceau station. The museum is a short walk from Parc Monceau."
     },
     {
@@ -217,6 +222,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/MontmartreStairs1.jpg"],
         fullDescription: "During his free time in Paris, Jimin wandered around the historic Montmartre neighborhood. He shared photos posing gracefully on these steep, picturesque stairs leading up to the Sacré-Cœur basilica, capturing the authentic Parisian vibe.",
+        tip: "",
         directions: "Take Metro Line 2 to Anvers. Walk up the hill towards the Sacré-Cœur; the famous stairs run right alongside the funicular."
     },
     {
@@ -238,6 +244,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/WallOfLove1.jpg"],
         fullDescription: "Located in the heart of Montmartre, this beautiful art installation features the phrase 'I love you' in 250 languages. Jimin visited this romantic spot during his personal vacation in Paris.",
+        tip: "",
         directions: "Take Metro Line 12 and get off at Abbesses station. The wall is located in the small park right outside the metro exit."
     },
     {
@@ -259,6 +266,7 @@ const celebLocations = [
         videoEmbeds: [],
         gallery: ["images/PalaisTokyo1.jpg"],
         fullDescription: "This contemporary art museum frequently hosts major Paris Fashion Week events. Jimin, as a global ambassador for Dior, made a highly anticipated appearance here, drawing thousands of fans to the museum's striking brutalist exterior.",
+        tip: "",
         directions: "Take Metro Line 9 to Iéna or Alma-Marceau station. The museum is directly facing the Eiffel Tower across the river."
     }
 ];
@@ -412,14 +420,15 @@ function renderLocations() {
 initializeFilters();
 renderLocations();
 
-// Modal Functions (Secured with Try/Catch and explicit media sections)
+// Modal Functions
 window.openModal = function(id) {
     try {
         const loc = celebLocations.find(l => l.id === id);
         if(!loc) return;
 
         document.getElementById('modal-title').textContent = loc.name;
-        document.getElementById('modal-desc').innerHTML = loc.fullDescription.replace(/\n/g, '<br>');
+        // On utilise direct l'HTML défini dans la base de données
+        document.getElementById('modal-desc').innerHTML = loc.fullDescription; 
         document.getElementById('modal-directions').textContent = loc.directions;
         
         document.getElementById('modal-group').textContent = loc.group;
@@ -440,9 +449,17 @@ window.openModal = function(id) {
         document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
         document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-        // MEDIA SECTIONS LOGIC: Gallery First, Videos Second
+        // THE TIP
+        const tipSection = document.getElementById('modal-tip-section');
+        const tipText = document.getElementById('modal-tip');
+        if (loc.tip) {
+            tipText.textContent = loc.tip;
+            tipSection.classList.remove('hidden');
+        } else {
+            tipSection.classList.add('hidden');
+        }
 
-        // 1. GALLERY
+        // GALLERY (Avant les vidéos)
         const gallerySection = document.getElementById('modal-gallery-section');
         const galleryContainer = document.getElementById('modal-gallery');
         if (galleryContainer) {
@@ -462,7 +479,7 @@ window.openModal = function(id) {
             }
         }
 
-        // 2. VIDEOS
+        // VIDEOS
         const videoSection = document.getElementById('modal-video-section');
         const videoContainer = document.getElementById('modal-video-container');
         if (videoContainer) {
