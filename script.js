@@ -369,7 +369,7 @@ function renderLocations() {
         if(loc.episode) { metaHtml += ` <br><strong>Ep:</strong> ${loc.episode}`; }
 
         const popupContent = `
-            <div class="popup-title" onclick="window.openModal(${loc.id}); event.stopPropagation();">${loc.name} ↗️</div>
+            <div class="popup-title" onclick="window.openModal(${loc.id}); event.stopPropagation();">${loc.name} </div>
             <span class="popup-tag">${catIconSvg} ${loc.category}</span>
             <img src="${loc.img}" alt="${loc.name}" class="popup-img" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
             <div class="popup-context">"${loc.context}"</div>
