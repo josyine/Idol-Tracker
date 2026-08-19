@@ -374,6 +374,33 @@ const celebLocations = [
         fullDescription: "Iryeong Station is a rustic, decommissioned railway station located on the Seoul Suburban Line, just north of the capital. Originally opened in the 1960s, the station eventually ceased its passenger operations in 2004. Today, it stands quietly abandoned. With its faded station signs, rusted tracks, and vintage architecture, the location exudes a hauntingly beautiful and nostalgic atmosphere, frozen in time.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"Spring Day\" Music Video)</h3>This abandoned station serves as the breathtaking opening shot for BTS's masterpiece music video, \"Spring Day.\" The video begins with V stepping off a desolate platform onto the snow-covered tracks. He kneels down in the quiet, wintery landscape to listen to the rails, waiting for a train that seems like it will never arrive. This specific location perfectly captures the visual essence of the song: a deep sense of longing, distance, and the painful wait for the winter to pass.",
         tip: "While the station no longer serves regular passenger trains, please be aware that cargo or maintenance trains do occasionally pass through the area. For your safety, do not walk far down the active rail lines. The best time to visit and recreate the exact mood of the music video is, of course, after a fresh snowfall in winter, but the vintage charm of the station makes for beautiful, moody photography year-round.",
         directions: "Located about an hour north of central Seoul, the easiest way to reach the station via public transit is to take Subway Line 3 to Yeonsinnae Station, go out of Exit 3, and catch local Bus 360. Ride the bus for about 25 minutes and get off at the Iryeong Station bus stop. The station is a short walk from the road."
+    },
+    {
+        id: 15, // Identifiant unique
+        name: "Quinta da Francelha de Cima",
+        group: "BTS",
+        member: "All", 
+        country: "Portugal",
+        city: "Prior Velho (near Lisbon)",
+        category: "MV Location",
+        year: "2026",
+        episode: "\"NORMAL\" Official Music Video (ARIRANG Album)",
+        episodeLink: "https://www.youtube.com/watch?v=GEk4jHwfFTA",
+        context: "The breathtaking historic Portuguese estate featured in the 'NORMAL' music video.",
+        address: "R. da Francelha de Cima, 2685-332 Prior Velho, Portugal",
+        lat: 38.7844, // Coordonnées approximatives de Prior Velho près de l'aéroport
+        lng: -9.1238,
+        img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg", // Miniature officielle du MV
+        videoEmbeds: [
+            "https://www.youtube.com/embed/GEk4jHwfFTA" // Vidéo intégrée du MV "NORMAL"
+        ],
+        gallery: [
+            "images/Quinta1.jpg", 
+            "images/Quinta2.jpg"
+        ],
+        fullDescription: "Located very close to Lisbon's Humberto Delgado Airport, Quinta da Francelha de Cima is a magnificent 18th-century historic Portuguese estate. Characterized by its traditional architecture, grand majestic halls, and manicured gardens, it perfectly reflects the aristocratic charm of its era. This elegant property is typically used as a venue for private events, offering a romantic and timeless setting steeped in classic Portuguese aesthetics.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"NORMAL\" Music Video)</h3>To accompany the release of their highly anticipated comeback album, ARIRANG, BTS chose this historic estate to film the music video for their track \"NORMAL,\" released in the summer of 2026. Directed by Tanu Muiño, the cinematic visual explores a deeply personal side of the group's life away from the spotlight. Fans can distinctly recognize several spaces within the Quinta, including its grand reception rooms, bedrooms, lush gardens, and iconic Portuguese entrance, creating a striking contrast between the historical venue and modern pop.",
+        tip: "Because Quinta da Francelha de Cima operates primarily as a private event venue, it is not open for casual, everyday walk-ins like a traditional museum. However, since the property is only a 4-minute drive from Lisbon Airport, it is incredibly easy to swing by and admire the entrance and exterior facade if you have a flight to catch or are just arriving in Portugal!",
+        directions: "The estate is extremely accessible for travelers. The easiest and fastest way to get there is to take a taxi or a ride-share app (like Uber or Bolt) directly from Lisbon Humberto Delgado Airport. The ride takes barely 4 to 5 minutes."
     }
 ];
 
