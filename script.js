@@ -293,6 +293,33 @@ const celebLocations = [
         fullDescription: "Tucked away in the quiet residential and commercial streets of Nonhyeon-dong, the Cheonggu Building is an ordinary-looking brick and concrete structure that holds extraordinary history. While it currently houses various everyday businesses and private offices, its exterior walls tell a completely different story. The bricks and surrounding walls are famously covered in thousands of heartfelt messages, signatures, and drawings left by fans from all over the globe, transforming this humble facade into a living monument of pop culture history.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (The Beginning)</h3>Long before the massive HYBE headquarters in Yongsan existed, this modest building was the cradle of BTS's career. Big Hit Entertainment operated from a small office on the second floor, while the basement housed the group's legendary, cramped practice room. This is the exact place where the seven members spent countless sleepless nights perfecting their earliest choreographies, writing their first albums, and filming their very first vlog entries. It represents the grit, sweat, and humble beginnings of their journey to global stardom.",
         tip: "While this is a must-visit pilgrimage site for any fan, it is important to remember that the Cheonggu Building is now a private workspace for other companies. It is perfectly fine to admire the fan graffiti and take photos of the exterior walls, but please respect the current tenants by not entering the building itself. After visiting, take a short 5-minute walk to nearby Hakdong Park—a quiet public park where the members frequently went to sit on the swings, rest, and talk about their dreams during their trainee days.",
         directions: "Take Subway Line 7 to Hakdong Station and go out of Exit 7. The building is about a 10-minute walk through the quiet, hilly streets of the Nonhyeon-dong neighborhood."
+    },
+    {
+        id: 12, // Identifiant unique
+        name: "The First BTS Dorm",
+        group: "BTS",
+        member: "All",
+        country: "South Korea",
+        city: "Seoul",
+        category: "Landmarks", 
+        year: "2013 - 2015",
+        episode: "[EPISODE] 1st BTS Birthday Party",
+        episodeLink: "https://www.youtube.com/watch?v=1b-iE1153Qc", // Lien du 1st Birthday Party
+        context: "The original cramped dorm where all 7 members lived together and celebrated their 1st anniversary.",
+        address: "29 Nonhyeon-ro 119-gil, Gangnam-gu",
+        lat: 37.5133, // Coordonnées approximatives pour Nonhyeon-dong
+        lng: 127.0321,
+        img: "https://img.youtube.com/vi/1b-iE1153Qc/hqdefault.jpg", // Miniature de la vidéo anniversaire
+        videoEmbeds: [
+            "https://www.youtube.com/embed/1b-iE1153Qc" // Vidéo intégrée de l'anniversaire
+        ],
+        gallery: [
+            "images/Dorm1.jpg", 
+            "images/Dorm2.jpg"
+        ],
+        fullDescription: "Located in the quiet streets of Nonhyeon-dong, this unassuming residential building houses the very first apartment shared by BTS during their pre-debut and rookie days. All seven members famously lived in this cramped space, sharing a single bedroom packed with bunk beds, one tiny bathroom, and a small kitchen. This dorm is a powerful symbol for the ARMY community, representing the group's humble beginnings, their early struggles, and the incredibly tight family bond they formed while dreaming of making it big.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (1st BTS Birthday Party)</h3>In the provided YouTube video, the members celebrate their very first anniversary as a group in this exact dorm. The chaotic but heartwarming vlog captures the reality of their domestic life. You can see RM and the others cleaning up their small living room, Suga and Jimin hilariously struggling to decorate a homemade cake, and Jin taking on his role as the \"chef\" of the group by cooking a massive feast—including seaweed soup and spicy webfoot octopus with pork belly—in their tiny kitchen.",
+        tip: "Crucial Legal & Respect Tip: Please remember that this building is currently a private residence where ordinary citizens live today. You can respectfully walk by to see the neighborhood where BTS grew up, but do not enter the building, ring the doorbell, or disturb the current tenants. To complete your historical tour, walk just a few streets down to Yoojung Sikdang (the restaurant where they ate every day as trainees) or Hakdong Park, where the members used to go when their dorm felt too crowded.",
+        directions: "Take Subway Line 7 to Hakdong Station and go out of Exit 7. The dorm is about a 10-minute walk into the residential area, located very close to Hakdong Park."
     }
 ];
 
