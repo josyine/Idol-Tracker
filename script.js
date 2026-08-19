@@ -320,6 +320,33 @@ const celebLocations = [
         fullDescription: "Located in the quiet streets of Nonhyeon-dong, this unassuming residential building houses the very first apartment shared by BTS during their pre-debut and rookie days. All seven members famously lived in this cramped space, sharing a single bedroom packed with bunk beds, one tiny bathroom, and a small kitchen. This dorm is a powerful symbol for the ARMY community, representing the group's humble beginnings, their early struggles, and the incredibly tight family bond they formed while dreaming of making it big.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (1st BTS Birthday Party)</h3>In the provided YouTube video, the members celebrate their very first anniversary as a group in this exact dorm. The chaotic but heartwarming vlog captures the reality of their domestic life. You can see RM and the others cleaning up their small living room, Suga and Jimin hilariously struggling to decorate a homemade cake, and Jin taking on his role as the \"chef\" of the group by cooking a massive feast—including seaweed soup and spicy webfoot octopus with pork belly—in their tiny kitchen.",
         tip: "Crucial Legal & Respect Tip: Please remember that this building is currently a private residence where ordinary citizens live today. You can respectfully walk by to see the neighborhood where BTS grew up, but do not enter the building, ring the doorbell, or disturb the current tenants. To complete your historical tour, walk just a few streets down to Yoojung Sikdang (the restaurant where they ate every day as trainees) or Hakdong Park, where the members used to go when their dorm felt too crowded.",
         directions: "Take Subway Line 7 to Hakdong Station and go out of Exit 7. The dorm is about a 10-minute walk into the residential area, located very close to Hakdong Park."
+    },
+    {
+        id: 13, // Identifiant unique
+        name: "Hyangho Beach Bus Stop",
+        group: "BTS",
+        member: "All",
+        country: "South Korea",
+        city: "Gangneung",
+        category: "Landmarks",
+        year: "2017",
+        episode: "\"You Never Walk Alone\" Album Concept Photoshoot",
+        episodeLink: "https://www.youtube.com/watch?v=46qWWmnK4F0",
+        context: "The iconic standalone bus stop built on the beach for the 'You Never Walk Alone' album cover.",
+        address: "8-55 Hyangho-ri, Jumunjin-eup, Gangneung-si, Gangwon-do",
+        lat: 37.9048, // Coordonnées GPS exactes de l'arrêt de bus sur la plage
+        lng: 128.8266,
+        img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg", // Miniature de la vidéo
+        videoEmbeds: [
+            "https://www.youtube.com/embed/46qWWmnK4F0" // Vidéo intégrée du shooting
+        ],
+        gallery: [
+            "images/Hyangho1.jpg", 
+            "images/Hyangho2.jpg"
+        ],
+        fullDescription: "Located on the pristine white sands of Hyangho Beach (just north of Jumunjin Beach), this lone bus stop is not a real transit station, but rather one of the most famous pop culture landmarks in South Korea. Set directly against the backdrop of the East Sea, the structure perfectly captures the melancholic, nostalgic, and comforting vibe of BTS's legendary track, \"Spring Day.\"<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (You Never Walk Alone)</h3>In 2017, the agency built a temporary bus stop on this exact stretch of sand solely for the album jacket photoshoot of You Never Walk Alone. The members were photographed sitting together under the small roof, smiling against the winter ocean breeze. The original set was dismantled immediately after the shoot ended. However, due to the overwhelming number of fans traveling to the beach to find the location, the city of Gangneung permanently built an exact replica of the bus stop in 2018 for visitors to enjoy.",
+        tip: "Because this location is incredibly popular all year round, you will often find a small, organized queue of fans waiting to take photos. A beautiful unwritten rule here is that the people in line behind you will gladly help take your pictures so you can fit your whole group in the frame! After your photoshoot, take the time to walk along Jumunjin Beach, famous for its clear blue waters and peaceful pine tree forests.",
+        directions: "Take the KTX high-speed train from Seoul Station to Gangneung Station (about a 2-hour ride). From Gangneung Station, you can either take Bus 300 or 302 towards Jumunjin, or take a 20-minute taxi ride directly along the scenic coast to the bus stop."
     }
 ];
 
