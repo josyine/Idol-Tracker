@@ -347,6 +347,33 @@ const celebLocations = [
         fullDescription: "Located on the pristine white sands of Hyangho Beach (just north of Jumunjin Beach), this lone bus stop is not a real transit station, but rather one of the most famous pop culture landmarks in South Korea. Set directly against the backdrop of the East Sea, the structure perfectly captures the melancholic, nostalgic, and comforting vibe of BTS's legendary track, \"Spring Day.\"<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (You Never Walk Alone)</h3>In 2017, the agency built a temporary bus stop on this exact stretch of sand solely for the album jacket photoshoot of You Never Walk Alone. The members were photographed sitting together under the small roof, smiling against the winter ocean breeze. The original set was dismantled immediately after the shoot ended. However, due to the overwhelming number of fans traveling to the beach to find the location, the city of Gangneung permanently built an exact replica of the bus stop in 2018 for visitors to enjoy.",
         tip: "Because this location is incredibly popular all year round, you will often find a small, organized queue of fans waiting to take photos. A beautiful unwritten rule here is that the people in line behind you will gladly help take your pictures so you can fit your whole group in the frame! After your photoshoot, take the time to walk along Jumunjin Beach, famous for its clear blue waters and peaceful pine tree forests.",
         directions: "Take the KTX high-speed train from Seoul Station to Gangneung Station (about a 2-hour ride). From Gangneung Station, you can either take Bus 300 or 302 towards Jumunjin, or take a 20-minute taxi ride directly along the scenic coast to the bus stop."
+    },
+    {
+        id: 14, // Identifiant unique
+        name: "Iryeong Station",
+        group: "BTS",
+        member: "All", 
+        country: "South Korea",
+        city: "Yangju (Gyeonggi-do)",
+        category: "MV Location",
+        year: "2017",
+        episode: "\"Spring Day\" Official Music Video",
+        episodeLink: "https://www.youtube.com/watch?v=xEeFrLSkMm8",
+        context: "The abandoned railway station featured in the breathtaking opening scene of the 'Spring Day' music video.",
+        address: "327 Samsang-ri, Jangheung-myeon, Yangju-si, Gyeonggi-do",
+        lat: 37.7135, // Coordonnées GPS de la gare d'Iryeong
+        lng: 126.9329,
+        img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg", // Miniature officielle du MV
+        videoEmbeds: [
+            "https://www.youtube.com/embed/xEeFrLSkMm8" // Vidéo intégrée du MV
+        ],
+        gallery: [
+            "images/Iryeong1.jpg", 
+            "images/Iryeong2.jpg"
+        ],
+        fullDescription: "Iryeong Station is a rustic, decommissioned railway station located on the Seoul Suburban Line, just north of the capital. Originally opened in the 1960s, the station eventually ceased its passenger operations in 2004. Today, it stands quietly abandoned. With its faded station signs, rusted tracks, and vintage architecture, the location exudes a hauntingly beautiful and nostalgic atmosphere, frozen in time.<br><br><h3 style='color: var(--primary-magenta); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;'>Following in BTS's Footsteps (\"Spring Day\" Music Video)</h3>This abandoned station serves as the breathtaking opening shot for BTS's masterpiece music video, \"Spring Day.\" The video begins with V stepping off a desolate platform onto the snow-covered tracks. He kneels down in the quiet, wintery landscape to listen to the rails, waiting for a train that seems like it will never arrive. This specific location perfectly captures the visual essence of the song: a deep sense of longing, distance, and the painful wait for the winter to pass.",
+        tip: "While the station no longer serves regular passenger trains, please be aware that cargo or maintenance trains do occasionally pass through the area. For your safety, do not walk far down the active rail lines. The best time to visit and recreate the exact mood of the music video is, of course, after a fresh snowfall in winter, but the vintage charm of the station makes for beautiful, moody photography year-round.",
+        directions: "Located about an hour north of central Seoul, the easiest way to reach the station via public transit is to take Subway Line 3 to Yeonsinnae Station, go out of Exit 3, and catch local Bus 360. Ride the bus for about 25 minutes and get off at the Iryeong Station bus stop. The station is a short walk from the road."
     }
 ];
 
