@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Screen To Street</title>
+    <link rel="stylesheet" href="welcome-style.css">
+</head>
+<body>
+
+    <div class="welcome-container">
+        <div class="welcome-card">
+            
+            <div class="brand-header">
+                <h1>Screen To Street</h1>
+                <p>Following the footsteps of your favorite artists</p>
+            </div>
+
+            <form id="checkout-form">
+                
+                <!-- Étape 1 : Création de compte -->
+                <div class="form-section">
+                    <h2>1. Account Details</h2>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="fname">First Name</label>
+                            <input type="text" id="fname" required placeholder="Jane">
+                        </div>
+                        <div class="input-group">
+                            <label for="lname">Last Name</label>
+                            <input type="text" id="lname" required placeholder="Doe">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required placeholder="jane.doe@example.com">
+                    </div>
+                </div>
+
+                <!-- Étape 2 : Sélection des Pass (Prix dynamique) -->
+                <div class="form-section">
+                    <h2>2. Choose Your Passes</h2>
+                    <p class="section-desc">Select the groups you want to unlock. (4.99€ per group)</p>
+                    
+                    <div class="group-selection">
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="groups" value="BTS" class="group-checkbox">
+                            <span class="card-content">BTS</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="groups" value="Blackpink" class="group-checkbox">
+                            <span class="card-content">Blackpink</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="groups" value="Twice" class="group-checkbox">
+                            <span class="card-content">Twice</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="groups" value="Seventeen" class="group-checkbox">
+                            <span class="card-content">Seventeen</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="groups" value="Katseye" class="group-checkbox">
+                            <span class="card-content">Katseye</span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" name="groups" value="TXT" class="group-checkbox">
+                            <span class="card-content">TXT</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Étape 3 : Paiement -->
+                <div class="checkout-footer">
+                    <div class="total-price">
+                        <span>Total Due:</span>
+                        <strong id="price-display">0.00 €</strong>
+                    </div>
+                    
+                    <button type="submit" id="pay-btn" disabled>Select a group to pay</button>
+                </div>
+                
+                <div id="payment-loader" class="hidden">
+                    <div class="spinner"></div>
+                    <p>Processing payment securely...</p>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="welcome-script.js"></script>
+</body>
+</html>
