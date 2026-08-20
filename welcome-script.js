@@ -1,55 +1,62 @@
-// Configuration du prix
 const PRICE_PER_GROUP = 4.99;
+let currentLang = 'en';
 
-// Éléments du DOM
+const dict = {
+    en: {
+        subtitle: "Following the footsteps of your favorite artists",
+        step1: "1. Account Details", fname: "First Name", lname: "Last Name", email: "Email Address",
+        step2: "2. Choose Your Passes", passDesc: "Select the groups you want to unlock. (4.99€ per group)",
+        totalDue: "Total Due:", payBtnEmpty: "Select a group to pay", payBtnActive: "Pay {price} € & Unlock",
+        processing: "Processing payment securely..."
+    },
+    fr: {
+        subtitle: "Sur les traces de vos artistes préférés",
+        step1: "1. Détails du compte", fname: "Prénom", lname: "Nom", email: "Adresse Email",
+        step2: "2. Choisissez vos Pass", passDesc: "Sélectionnez les groupes à débloquer. (4.99€ par groupe)",
+        totalDue: "Total à payer :", payBtnEmpty: "Sélectionnez un groupe", payBtnActive: "Payer {price} € & Débloquer",
+        processing: "Traitement sécurisé du paiement..."
+    }
+};
+
+function updateLangUI() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if(dict[currentLang][key]) el.textContent = dict[currentLang][key];
+    });
+    document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+    document.getElementById('lang-fr').classList.toggle('active', currentLang === 'fr');
+    updatePrice(); // Met à jour le texte du bouton
+}
+
+document.getElementById('lang-en').addEventListener('click', () => { currentLang = 'en'; localStorage.setItem('lang', 'en'); updateLangUI(); });
+document.getElementById('lang-fr').addEventListener('click', () => { currentLang = 'fr'; localStorage.setItem('lang', 'fr'); updateLangUI(); });
+
 const checkboxes = document.querySelectorAll('.group-checkbox');
 const priceDisplay = document.getElementById('price-display');
 const payBtn = document.getElementById('pay-btn');
-const checkoutForm = document.getElementById('checkout-form');
-const paymentLoader = document.getElementById('payment-loader');
 
-// Fonction pour mettre à jour le prix dynamique
 function updatePrice() {
-    // Compte le nombre de checkboxes cochées
     const selectedCount = document.querySelectorAll('.group-checkbox:checked').length;
-    
-    // Calcul du prix total
     const totalPrice = selectedCount * PRICE_PER_GROUP;
-    
-    // Mise à jour de l'affichage
     priceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
-
-    // Activation / Désactivation du bouton
     if (selectedCount > 0) {
         payBtn.disabled = false;
-        payBtn.textContent = `Pay ${totalPrice.toFixed(2)} € & Unlock`;
+        payBtn.textContent = dict[currentLang].payBtnActive.replace('{price}', totalPrice.toFixed(2));
     } else {
         payBtn.disabled = true;
-        payBtn.textContent = `Select a group to pay`;
+        payBtn.textContent = dict[currentLang].payBtnEmpty;
     }
 }
+checkboxes.forEach(cb => cb.addEventListener('change', updatePrice));
 
-// Ajoute l'événement sur toutes les checkboxes
-checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', updatePrice);
-});
-
-// Gestion de la soumission du formulaire (Faux paiement et redirection)
-checkoutForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Empêche le rechargement de la page
-
-    // Vérifie qu'au moins un groupe est sélectionné (sécurité supplémentaire)
-    const selectedCount = document.querySelectorAll('.group-checkbox:checked').length;
-    if(selectedCount === 0) return;
-
-    // Cache le bouton et affiche le loader d'animation
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if(document.querySelectorAll('.group-checkbox:checked').length === 0) return;
     payBtn.style.display = 'none';
-    paymentLoader.classList.remove('hidden');
-
-    // Simulation du temps de traitement bancaire (2 secondes)
-    setTimeout(() => {
-        // Redirection vers la page de la carte
-        // ASSURE-TOI QUE TA CARTE S'APPELLE BIEN "map.html"
-        window.location.href = 'map.html'; 
-    }, 2000);
+    document.getElementById('payment-loader').classList.remove('hidden');
+    setTimeout(() => { window.location.href = 'map.html'; }, 2000);
 });
+
+// Init
+if(localStorage.getItem('lang')) currentLang = localStorage.getItem('lang');
+updateLangUI();
