@@ -1,13 +1,20 @@
 :root { --bg-color: #FDF8F9; --sidebar-bg: #FFFFFF; --accent-pink: #FCE7F0; --primary-magenta: #D94680; --text-main: #374151; --border-color: #F5D0DF; --muted-text: #9CA3AF; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-.top-nav { position: absolute; top: 15px; right: 20px; z-index: 1000; }
-.lang-switcher button { background: white; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border-color); cursor: pointer; font-weight: bold; color: var(--muted-text); }
-.lang-switcher button.active { color: var(--primary-magenta); border-color: var(--primary-magenta); background: var(--accent-pink); }
+
+/* Lang Dropdown CSS (Sidebar) */
+.lang-dropdown-container { position: relative; display: inline-block; z-index: 2000;}
+.lang-btn { background: white; border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: 0.2s;}
+.lang-btn:hover { background: var(--accent-pink); }
+.lang-menu { position: absolute; right: 0; top: 50px; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 120px; overflow: hidden; }
+.lang-menu.hidden { display: none; }
+.lang-option { padding: 10px 15px; cursor: pointer; font-size: 0.9rem; color: var(--text-main); transition: background 0.2s; }
+.lang-option:hover { background: var(--accent-pink); color: var(--primary-magenta); }
+
 .app-container { display: flex; flex: 1; overflow: hidden; }
 .sidebar { width: 420px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.03); z-index: 1000; }
 h1 { color: var(--primary-magenta); font-size: 1.5rem; margin-bottom: 5px; font-weight: 800;}
-.subtitle { font-size: 0.85rem; color: var(--muted-text); margin-bottom: 20px; }
+.subtitle { font-size: 0.85rem; color: var(--muted-text); margin-bottom: 10px; }
 .search-container { margin-bottom: 20px; }
 #search-input { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-color); font-size: 0.9rem; outline: none; }
 #search-input:focus { border-color: var(--primary-magenta); }
