@@ -8,86 +8,101 @@
 </head>
 <body>
 
-    <div class="welcome-container">
-        <div class="welcome-card">
-            
-            <div class="brand-header">
-                <h1>Screen To Street</h1>
-                <p>Following the footsteps of your favorite artists</p>
+    <!-- Nouveau conteneur principal pour séparer du footer -->
+    <div class="main-wrapper">
+        <div class="welcome-container">
+            <div class="welcome-card">
+                
+                <div class="brand-header">
+                    <h1>Screen To Street</h1>
+                    <p>Following the footsteps of your favorite artists</p>
+                </div>
+
+                <form id="checkout-form">
+                    
+                    <div class="form-section">
+                        <h2>1. Account Details</h2>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="fname">First Name</label>
+                                <input type="text" id="fname" required placeholder="Jane">
+                            </div>
+                            <div class="input-group">
+                                <label for="lname">Last Name</label>
+                                <input type="text" id="lname" required placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required placeholder="jane.doe@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>2. Choose Your Passes</h2>
+                        <p class="section-desc">Select the groups you want to unlock. (4.99€ per group)</p>
+                        
+                        <div class="group-selection">
+                            <label class="checkbox-card">
+                                <input type="checkbox" name="groups" value="BTS" class="group-checkbox">
+                                <span class="card-content">BTS</span>
+                            </label>
+                            <label class="checkbox-card">
+                                <input type="checkbox" name="groups" value="Blackpink" class="group-checkbox">
+                                <span class="card-content">Blackpink</span>
+                            </label>
+                            <label class="checkbox-card">
+                                <input type="checkbox" name="groups" value="Twice" class="group-checkbox">
+                                <span class="card-content">Twice</span>
+                            </label>
+                            <label class="checkbox-card">
+                                <input type="checkbox" name="groups" value="Seventeen" class="group-checkbox">
+                                <span class="card-content">Seventeen</span>
+                            </label>
+                            <label class="checkbox-card">
+                                <input type="checkbox" name="groups" value="Katseye" class="group-checkbox">
+                                <span class="card-content">Katseye</span>
+                            </label>
+                            <label class="checkbox-card">
+                                <input type="checkbox" name="groups" value="TXT" class="group-checkbox">
+                                <span class="card-content">TXT</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="checkout-footer">
+                        <div class="total-price">
+                            <span>Total Due:</span>
+                            <strong id="price-display">0.00 €</strong>
+                        </div>
+                        
+                        <button type="submit" id="pay-btn" disabled>Select a group to pay</button>
+                    </div>
+                    
+                    <div id="payment-loader" class="hidden">
+                        <div class="spinner"></div>
+                        <p>Processing payment securely...</p>
+                    </div>
+
+                </form>
             </div>
-
-            <form id="checkout-form">
-                
-                <!-- Étape 1 : Création de compte -->
-                <div class="form-section">
-                    <h2>1. Account Details</h2>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label for="fname">First Name</label>
-                            <input type="text" id="fname" required placeholder="Jane">
-                        </div>
-                        <div class="input-group">
-                            <label for="lname">Last Name</label>
-                            <input type="text" id="lname" required placeholder="Doe">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" required placeholder="jane.doe@example.com">
-                    </div>
-                </div>
-
-                <!-- Étape 2 : Sélection des Pass (Prix dynamique) -->
-                <div class="form-section">
-                    <h2>2. Choose Your Passes</h2>
-                    <p class="section-desc">Select the groups you want to unlock. (4.99€ per group)</p>
-                    
-                    <div class="group-selection">
-                        <label class="checkbox-card">
-                            <input type="checkbox" name="groups" value="BTS" class="group-checkbox">
-                            <span class="card-content">BTS</span>
-                        </label>
-                        <label class="checkbox-card">
-                            <input type="checkbox" name="groups" value="Blackpink" class="group-checkbox">
-                            <span class="card-content">Blackpink</span>
-                        </label>
-                        <label class="checkbox-card">
-                            <input type="checkbox" name="groups" value="Twice" class="group-checkbox">
-                            <span class="card-content">Twice</span>
-                        </label>
-                        <label class="checkbox-card">
-                            <input type="checkbox" name="groups" value="Seventeen" class="group-checkbox">
-                            <span class="card-content">Seventeen</span>
-                        </label>
-                        <label class="checkbox-card">
-                            <input type="checkbox" name="groups" value="Katseye" class="group-checkbox">
-                            <span class="card-content">Katseye</span>
-                        </label>
-                        <label class="checkbox-card">
-                            <input type="checkbox" name="groups" value="TXT" class="group-checkbox">
-                            <span class="card-content">TXT</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Étape 3 : Paiement -->
-                <div class="checkout-footer">
-                    <div class="total-price">
-                        <span>Total Due:</span>
-                        <strong id="price-display">0.00 €</strong>
-                    </div>
-                    
-                    <button type="submit" id="pay-btn" disabled>Select a group to pay</button>
-                </div>
-                
-                <div id="payment-loader" class="hidden">
-                    <div class="spinner"></div>
-                    <p>Processing payment securely...</p>
-                </div>
-
-            </form>
         </div>
     </div>
+
+    <!-- NOUVEAU FOOTER LÉGAL -->
+    <footer class="legal-footer">
+        <div class="footer-content">
+            <p class="disclaimer">
+                <strong>Disclaimer:</strong> Screen To Street is an independent fan-made guide. We are not affiliated with, endorsed by, or sponsored by HYBE, YG Entertainment, JYP Entertainment, or any other agency or artist. All trademarks belong to their respective owners.<br>
+                <strong>Avertissement :</strong> Screen To Street est un guide indépendant créé par des fans. Nous ne sommes ni affiliés, ni approuvés, ni sponsorisés par HYBE, YG, JYP, ou toute autre agence ou artiste. Toutes les marques appartiennent à leurs propriétaires respectifs.
+            </p>
+            <div class="footer-links">
+                <a href="#">Mentions Légales (Legal Notice)</a>
+                <a href="#">CGV (Terms of Sale)</a>
+                <a href="#">Politique de Confidentialité (Privacy Policy)</a>
+            </div>
+        </div>
+    </footer>
 
     <script src="welcome-script.js"></script>
 </body>
