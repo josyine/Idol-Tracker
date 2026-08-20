@@ -4,183 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Idol Tracker Map</title>
-    
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="top-nav">
+        <div class="lang-switcher">
+            <button id="lang-en" class="active">EN</button> | <button id="lang-fr">FR</button>
+        </div>
+    </div>
+
     <div class="app-container">
-        
         <!-- Sidebar -->
         <aside class="sidebar">
             <h1>Screen To Street</h1>
-            <p class="subtitle">Following the footsteps of your favorite artists</p>
+            <p class="subtitle" data-i18n="subtitle">Following the footsteps of your favorite artists</p>
             
-            <!-- Search Bar -->
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
+
+            <!-- BOUTON GÉNÉRATEUR D'ITINÉRAIRE -->
+            <button id="open-itinerary-btn" class="action-btn" style="width: 100%; margin-bottom: 20px; background: #1F2937;" data-i18n="btnGenerateIti">🗺️ Auto-Itinerary Generator</button>
             
-            <!-- DÉBUT DE LA ZONE DE DÉFILEMENT GLOBALE -->
             <div class="sidebar-scroll-area">
-                
-                <!-- Filters Section -->
                 <div class="filters-container">
                     <div class="filter-group">
-                        <label for="group-select">Group</label>
-                        <select id="group-select" class="filter-select">
-                            <option value="All">All Groups</option>
-                            <option value="BTS">BTS</option>
-                            <option value="Blackpink">Blackpink</option>
-                            <option value="Twice">Twice</option>
-                            <option value="Seventeen">Seventeen</option>
-                            <option value="Katseye">Katseye</option>
-                            <option value="TXT">TXT</option>
-                            <option value="Enhypen">Enhypen</option>
-                        </select>
+                        <label for="group-select" data-i18n="filterGroup">Group</label>
+                        <select id="group-select" class="filter-select"></select>
                     </div>
-
                     <div class="filter-group">
-                        <label for="member-select">Member</label>
-                        <select id="member-select" class="filter-select">
-                            <option value="All">All Members</option>
-                        </select>
+                        <label for="member-select" data-i18n="filterMember">Member</label>
+                        <select id="member-select" class="filter-select"></select>
                     </div>
-
-                    <!-- Area / Country Filter -->
                     <div class="filter-group">
-                        <label for="country-select">Area</label>
-                        <select id="country-select" class="filter-select">
-                            <option value="All">All Areas</option>
-                        </select>
+                        <label for="country-select" data-i18n="filterArea">Area</label>
+                        <select id="country-select" class="filter-select"></select>
                     </div>
-
                     <div class="filter-group">
-                        <label for="year-select">Year</label>
+                        <label for="year-select" data-i18n="filterYear">Year</label>
                         <select id="year-select" class="filter-select">
                             <option value="All">All Years</option>
-                            <option value="2026">2026</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                            <option value="2021">2021</option>
-                            <option value="2020">2020</option>
-                            <option value="2019">2019</option>
-                            <option value="2018">2018</option>
-                            <option value="2017">2017</option>
-                            <option value="2013 - 2015">2013 - 2015</option>
-                            <option value="2013 - 2017">2013 - 2017</option>
+                            <option value="2026">2026</option><option value="2023">2023</option>
+                            <option value="2021">2021</option><option value="2020">2020</option>
+                            <option value="2019">2019</option><option value="2018">2018</option>
+                            <option value="2017">2017</option><option value="2013 - 2017">2013 - 2017</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Dynamic Category Buttons -->
                 <div class="category-filter-section">
-                    <label>Categories</label>
+                    <label data-i18n="filterCategories">Categories</label>
                     <div id="category-buttons" class="category-buttons"></div>
                 </div>
 
-                <!-- Location list header -->
                 <div class="locations-header">
-                    <label>Locations (<span id="location-count-sidebar">0</span>)</label>
+                    <label><span data-i18n="locationsCount">Locations</span> (<span id="location-count-sidebar">0</span>)</label>
                 </div>
                 
-                <!-- Location list -->
                 <div class="location-list" id="location-list"></div>
-                
             </div>
-            <!-- FIN DE LA ZONE DE DÉFILEMENT GLOBALE -->
         </aside>
 
         <!-- Map Area -->
         <main class="map-container">
-            <!-- Elegant Map Stats Overlay -->
             <div class="map-stats">
-                <div class="stat-item">
-                    <span id="stat-locations">0</span> Locations
-                </div>
+                <div class="stat-item"><span id="stat-locations">0</span> <span data-i18n="statLocs">Locations</span></div>
                 <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <span id="stat-countries">0</span> Countries
-                </div>
+                <div class="stat-item"><span id="stat-countries">0</span> <span data-i18n="statCountries">Countries</span></div>
             </div>
             <div id="map"></div>
         </main>
     </div>
 
-    <!-- Modal Window (Details) -->
+    <!-- Modal Détails Lieu -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            
+            <span class="close-btn" onclick="closeModal('details-modal')">&times;</span>
             <h2 id="modal-title">Location Name</h2>
             <div id="modal-tags" class="modal-tags"></div>
-            
             <ul class="modal-metadata">
-                <li><strong>Group:</strong> <span id="modal-group"></span></li>
-                <li><strong>Members:</strong> <span id="modal-member"></span></li>
-                <li><strong>Country:</strong> <span id="modal-country"></span></li>
-                <li><strong>City:</strong> <span id="modal-city"></span></li>
-                <li><strong>Address:</strong> <span id="modal-full-address"></span></li>
-                <li><strong>Date:</strong> <span id="modal-date"></span></li>
-                <li id="modal-episode-container"><strong>Episode:</strong> <span id="modal-episode"></span></li>
-                <li id="modal-link-container"><strong>Watch:</strong> <a id="modal-episode-link" href="#" target="_blank">Official Link</a></li>
+                <li><strong data-i18n="mdlGroup">Group:</strong> <span id="modal-group"></span></li>
+                <li><strong data-i18n="mdlMember">Members:</strong> <span id="modal-member"></span></li>
+                <li><strong data-i18n="mdlCountry">Country:</strong> <span id="modal-country"></span></li>
+                <li><strong data-i18n="mdlCity">City:</strong> <span id="modal-city"></span></li>
+                <li><strong data-i18n="mdlAddress">Address:</strong> <span id="modal-full-address"></span></li>
+                <li><strong data-i18n="mdlDate">Date:</strong> <span id="modal-date"></span></li>
+                <li id="modal-episode-container"><strong data-i18n="mdlEpisode">Episode:</strong> <span id="modal-episode"></span></li>
+                <li id="modal-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="modal-episode-link" href="#" target="_blank" data-i18n="mdlLink">Official Link</a></li>
             </ul>
-            
-            <!-- 1. THE STORY -->
             <div class="modal-info" style="margin-top: 25px;">
-                <h3>The story of this place</h3>
+                <h3 data-i18n="mdlStoryTitle">The story of this place</h3>
                 <div id="modal-desc" style="line-height: 1.6;"></div> 
             </div>
-
-            <!-- 2. THE PHOTOS -->
             <div id="modal-gallery-section" class="media-section hidden">
-                <h3>Location Photos</h3>
+                <h3 data-i18n="mdlPhotosTitle">Location Photos</h3>
                 <div class="modal-gallery" id="modal-gallery"></div>
             </div>
-
-            <!-- 3. THE VIDEOS -->
             <div id="modal-video-section" class="media-section hidden">
-                <h3>Watch the Episode</h3>
+                <h3 data-i18n="mdlVideoTitle">Watch the Episode</h3>
                 <div id="modal-video-container" class="modal-videos"></div>
             </div>
-
-            <!-- THE TIP SECTION -->
             <div id="modal-tip-section" class="media-section hidden" style="background-color: #f9f9f9; padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary-magenta);">
-                <h3 style="border-bottom: none; padding-bottom: 0; margin-bottom: 8px;">💡 The "Screen to Street" Tip:</h3>
+                <h3 style="border-bottom: none; padding-bottom: 0; margin-bottom: 8px;">💡 <span data-i18n="mdlTipTitle">The "Screen to Street" Tip:</span></h3>
                 <p id="modal-tip" style="font-size: 0.95rem; font-style: italic;"></p>
             </div>
-            
-            <!-- 4. THE DIRECTIONS -->
             <div class="modal-info">
-                <h3>How to get there</h3>
+                <h3 data-i18n="mdlDirTitle">How to get there</h3>
                 <p id="modal-directions"></p>
                 <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
-                
-                <a id="modal-map-link" href="#" target="_blank" class="action-btn">Open in Google Maps</a>
+                <a id="modal-map-link" href="#" target="_blank" class="action-btn" data-i18n="mdlGoogleMap">Open in Google Maps</a>
             </div>
         </div>
     </div>
 
-    <!-- NOUVEAU FOOTER LÉGAL (En dessous de la carte) -->
+    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE -->
+    <div id="itinerary-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
+            <h2 style="color: var(--primary-magenta); margin-bottom: 10px;" data-i18n="itiTitle">🗺️ Auto-Itinerary Generator</h2>
+            <p style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 25px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay. We will generate a smart route for you!</p>
+            
+            <div id="iti-form">
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label data-i18n="itiGroup">Group</label>
+                    <select id="iti-group" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);"></select>
+                </div>
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label data-i18n="itiCountry">Country</label>
+                    <select id="iti-country" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);"></select>
+                </div>
+                <div class="input-group" style="margin-bottom:25px;">
+                    <label data-i18n="itiDays">Number of Days</label>
+                    <input type="number" id="iti-days" min="1" max="7" value="3" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);">
+                </div>
+                <button class="action-btn" onclick="generateItinerary()" style="width: 100%;" data-i18n="itiCreateBtn">Create My Guide</button>
+            </div>
+
+            <div id="iti-result" class="hidden">
+                <!-- Résultats insérés ici par JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- LEGAL FOOTER -->
     <footer class="legal-footer">
         <div class="footer-content">
             <p class="disclaimer">
                 <strong>Disclaimer:</strong> Screen To Street is an independent fan-made guide. We are not affiliated with, endorsed by, or sponsored by HYBE, YG Entertainment, JYP Entertainment, or any other agency or artist. All trademarks belong to their respective owners.<br>
-                <strong>Avertissement :</strong> Screen To Street est un guide indépendant créé par des fans. Nous ne sommes ni affiliés, ni approuvés, ni sponsorisés par HYBE, YG, JYP, ou toute autre agence ou artiste. Toutes les marques appartiennent à leurs propriétaires respectifs.
+                <strong>Avertissement :</strong> Screen To Street est un guide indépendant créé par des fans. Nous ne sommes ni affiliés, ni approuvés, ni sponsorisés par les agences. Toutes les marques appartiennent à leurs propriétaires respectifs.
             </p>
             <div class="footer-links">
-                <a href="#">Mentions Légales (Legal Notice)</a>
-                <a href="#">CGV (Terms of Sale)</a>
-                <a href="#">Politique de Confidentialité (Privacy Policy)</a>
+                <a href="legal.html#notice">Mentions Légales (Legal Notice)</a>
+                <a href="legal.html#cgv">CGV (Terms of Sale)</a>
+                <a href="legal.html#privacy">Politique de Confidentialité (Privacy Policy)</a>
             </div>
         </div>
     </footer>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Custom JS -->
     <script src="script.js"></script>
 </body>
 </html>
