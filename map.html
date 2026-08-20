@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idol</title>
+    <title>Idol Tracker Map</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -61,12 +61,16 @@
                         <label for="year-select">Year</label>
                         <select id="year-select" class="filter-select">
                             <option value="All">All Years</option>
+                            <option value="2026">2026</option>
                             <option value="2023">2023</option>
                             <option value="2022">2022</option>
                             <option value="2021">2021</option>
                             <option value="2020">2020</option>
                             <option value="2019">2019</option>
                             <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2013 - 2015">2013 - 2015</option>
+                            <option value="2013 - 2017">2013 - 2017</option>
                         </select>
                     </div>
                 </div>
@@ -158,6 +162,21 @@
             </div>
         </div>
     </div>
+
+    <!-- NOUVEAU FOOTER LÉGAL (En dessous de la carte) -->
+    <footer class="legal-footer">
+        <div class="footer-content">
+            <p class="disclaimer">
+                <strong>Disclaimer:</strong> Screen To Street is an independent fan-made guide. We are not affiliated with, endorsed by, or sponsored by HYBE, YG Entertainment, JYP Entertainment, or any other agency or artist. All trademarks belong to their respective owners.<br>
+                <strong>Avertissement :</strong> Screen To Street est un guide indépendant créé par des fans. Nous ne sommes ni affiliés, ni approuvés, ni sponsorisés par HYBE, YG, JYP, ou toute autre agence ou artiste. Toutes les marques appartiennent à leurs propriétaires respectifs.
+            </p>
+            <div class="footer-links">
+                <a href="#">Mentions Légales (Legal Notice)</a>
+                <a href="#">CGV (Terms of Sale)</a>
+                <a href="#">Politique de Confidentialité (Privacy Policy)</a>
+            </div>
+        </div>
+    </footer>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
