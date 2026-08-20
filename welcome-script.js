@@ -1,5 +1,5 @@
 const PRICE_PER_GROUP = 4.99;
-let currentLang = 'en';
+let currentLang = localStorage.getItem('lang') || 'en';
 
 const dict = {
     en: {
@@ -23,13 +23,23 @@ function updateLangUI() {
         const key = el.getAttribute('data-i18n');
         if(dict[currentLang][key]) el.textContent = dict[currentLang][key];
     });
-    document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
-    document.getElementById('lang-fr').classList.toggle('active', currentLang === 'fr');
-    updatePrice(); // Met à jour le texte du bouton
+    updatePrice();
 }
 
-document.getElementById('lang-en').addEventListener('click', () => { currentLang = 'en'; localStorage.setItem('lang', 'en'); updateLangUI(); });
-document.getElementById('lang-fr').addEventListener('click', () => { currentLang = 'fr'; localStorage.setItem('lang', 'fr'); updateLangUI(); });
+// Lang Dropdown Logic
+document.getElementById('lang-btn').addEventListener('click', (e) => {
+    document.getElementById('lang-menu').classList.toggle('hidden');
+    e.stopPropagation();
+});
+document.addEventListener('click', () => { document.getElementById('lang-menu').classList.add('hidden'); });
+
+document.querySelectorAll('.lang-option').forEach(opt => {
+    opt.addEventListener('click', function() {
+        currentLang = this.getAttribute('data-lang');
+        localStorage.setItem('lang', currentLang);
+        updateLangUI();
+    });
+});
 
 const checkboxes = document.querySelectorAll('.group-checkbox');
 const priceDisplay = document.getElementById('price-display');
@@ -51,12 +61,17 @@ checkboxes.forEach(cb => cb.addEventListener('change', updatePrice));
 
 document.getElementById('checkout-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    if(document.querySelectorAll('.group-checkbox:checked').length === 0) return;
+    const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
+    if(checkedBoxes.length === 0) return;
+
+    // SAUVEGARDE LES GROUPES SELECTIONNÉS DANS LE NAVIGATEUR
+    const selectedGroups = Array.from(checkedBoxes).map(cb => cb.value);
+    localStorage.setItem('unlockedGroups', JSON.stringify(selectedGroups));
+
     payBtn.style.display = 'none';
     document.getElementById('payment-loader').classList.remove('hidden');
+    
     setTimeout(() => { window.location.href = 'map.html'; }, 2000);
 });
 
-// Init
-if(localStorage.getItem('lang')) currentLang = localStorage.getItem('lang');
 updateLangUI();
