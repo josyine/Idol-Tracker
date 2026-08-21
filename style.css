@@ -13,7 +13,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .dropdown-option:last-child { border-bottom: none; }
 .dropdown-option:hover { background: #f1f5f9; color: var(--primary-magenta); }
 
-/* Sidebar & Structure (Légère touche de gris/bleu) */
+/* Sidebar & Structure */
 .app-container { display: flex; flex: 1; overflow: hidden; }
 .sidebar { width: 420px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.03); z-index: 1000; }
 .site-logo { width: 100%; max-width: 250px; height: auto; display: block; margin-bottom: 10px; }
@@ -33,7 +33,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .sidebar-footer-links a { color: var(--primary-magenta); text-decoration: none; opacity: 0.8; }
 .sidebar-footer-links a:hover { opacity: 1; text-decoration: underline; }
 
-/* Filters & Buttons (Gris/Bleu élégant) */
+/* Filters & Buttons */
 .filters-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
 .filter-group { display: flex; flex-direction: column; }
 .filter-group label, .category-filter-section label, .locations-header label { font-size: 0.75rem; font-weight: 700; color: #334e68; margin-bottom: 8px; text-transform: uppercase; }
