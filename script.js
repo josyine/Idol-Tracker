@@ -1,5 +1,5 @@
 // ==========================================
-// 1. MAP INITIALIZATION & ICONS
+// 1. INITIALISATION DE LA CARTE
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -11,6 +11,9 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     markerGroup = L.layerGroup().addTo(map);
 }
 
+// ==========================================
+// 2. DONNÉES (ICONES & LIEUX)
+// ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
     "Bon Voyage": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
@@ -189,7 +192,7 @@ let celebLocations = [
 ];
 
 // ==========================================
-// 5. TRANSLATION & UI UPDATE
+// 3. TRANSLATIONS & UI UPDATE
 // ==========================================
 let currentLang = localStorage.getItem('lang') || 'en';
 const translations = {
@@ -248,7 +251,149 @@ function updateUI() {
 }
 
 // ==========================================
-// 6. MAP LOGIC & FILTERING
+// 4. NAV MENUS (PROFILE, CART, LANG) - SÉCURISÉ
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const profileBtn = document.getElementById('profile-btn');
+    if (profileBtn) {
+        const savedPic = localStorage.getItem('userProfilePic');
+        const savedName = localStorage.getItem('userName') || 'User';
+
+        if(savedPic) {
+            profileBtn.style.backgroundImage = `url(${savedPic})`;
+            profileBtn.style.backgroundSize = 'cover';
+            profileBtn.style.backgroundPosition = 'center';
+            profileBtn.textContent = ''; 
+        } else {
+            profileBtn.textContent = savedName.charAt(0).toUpperCase();
+        }
+
+        profileBtn.addEventListener('click', (e) => {
+            const pMenu = document.getElementById('profile-menu');
+            const lMenu = document.getElementById('lang-menu');
+            if(pMenu) pMenu.classList.toggle('hidden');
+            if(lMenu) lMenu.classList.add('hidden');
+            e.stopPropagation();
+        });
+    }
+
+    const langBtn = document.getElementById('lang-btn');
+    if (langBtn) {
+        langBtn.addEventListener('click', (e) => {
+            const lMenu = document.getElementById('lang-menu');
+            const pMenu = document.getElementById('profile-menu');
+            if(lMenu) lMenu.classList.toggle('hidden');
+            if(pMenu) pMenu.classList.add('hidden');
+            e.stopPropagation();
+        });
+    }
+
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            currentLang = this.getAttribute('data-lang');
+            localStorage.setItem('lang', currentLang);
+            updateUI();
+        });
+    });
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('unlockedGroups');
+            window.location.href = 'index.html';
+        });
+    }
+
+    document.addEventListener('click', () => { 
+        const lMenu = document.getElementById('lang-menu');
+        const pMenu = document.getElementById('profile-menu');
+        if(lMenu) lMenu.classList.add('hidden'); 
+        if(pMenu) pMenu.classList.add('hidden');
+    });
+
+    // Cart Form event listener
+    const cartForm = document.getElementById('cart-form');
+    if (cartForm) {
+        cartForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const checkedBoxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
+            if(checkedBoxes.length === 0) return;
+
+            let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+            checkedBoxes.forEach(cb => {
+                if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value);
+            });
+            localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+            
+            const cartPayBtn = document.getElementById('cart-pay-btn');
+            if(cartPayBtn) cartPayBtn.textContent = "Processing...";
+            setTimeout(() => { window.location.reload(); }, 1500);
+        });
+    }
+});
+
+// CART FUNCTIONS (Globally accessible)
+window.openCartModal = function() {
+    const cartModal = document.getElementById('cart-modal');
+    if(!cartModal) return;
+    cartModal.classList.remove('hidden');
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    
+    document.querySelectorAll('.cart-checkbox').forEach(cb => {
+        cb.checked = false; 
+        const span = cb.nextElementSibling;
+        if(unlockedGroups.includes(cb.value)) {
+            cb.disabled = true;
+            span.style.background = "#f1f5f9";
+            span.style.color = "#94a3b8";
+            span.textContent = `${cb.value} (Purchased)`;
+        } else {
+            cb.disabled = false;
+            span.style.background = "white";
+            span.style.color = "#64748b";
+            span.textContent = cb.value;
+        }
+    });
+    updateCartPrice();
+}
+
+function updateCartPrice() {
+    const cartPriceDisplay = document.getElementById('cart-price');
+    const cartPayBtn = document.getElementById('cart-pay-btn');
+    if(!cartPriceDisplay || !cartPayBtn) return;
+
+    const selectedCount = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
+    const totalPrice = selectedCount * 14.99;
+    cartPriceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
+    
+    if (selectedCount > 0) {
+        cartPayBtn.disabled = false;
+        cartPayBtn.textContent = `Pay ${totalPrice.toFixed(2)} €`;
+    } else {
+        cartPayBtn.disabled = true;
+        cartPayBtn.textContent = `Select a group`;
+    }
+}
+
+document.querySelectorAll('.cart-checkbox').forEach(cb => {
+    cb.addEventListener('change', function() {
+        if(this.checked) {
+            this.nextElementSibling.style.background = "#FCE7F0";
+            this.nextElementSibling.style.borderColor = "#D94680";
+            this.nextElementSibling.style.color = "#D94680";
+        } else {
+            this.nextElementSibling.style.background = "white";
+            this.nextElementSibling.style.borderColor = "#cbd5e1";
+            this.nextElementSibling.style.color = "#64748b";
+        }
+        updateCartPrice();
+    });
+});
+
+
+// ==========================================
+// 5. MAP LOGIC & FILTERING
 // ==========================================
 const unlockedGroupsStr = localStorage.getItem('unlockedGroups');
 if (unlockedGroupsStr) {
@@ -413,7 +558,7 @@ if(document.getElementById('search-input')) {
 }
 
 // ==========================================
-// 7. MODALS (DETAILS & CART)
+// 6. DETAILS MODAL
 // ==========================================
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -461,7 +606,6 @@ window.openModal = function(id) {
         } else { videoSection.classList.add('hidden'); }
     }
     
-    // GESTION CHECKBOX "VISITÉ"
     const visitedCheckbox = document.getElementById('modal-visited');
     if(visitedCheckbox) {
         let visitedLocs = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
@@ -481,7 +625,6 @@ window.openModal = function(id) {
         };
     }
 
-    // GESTION CHECKBOX "WISHLIST"
     const wishlistCheckbox = document.getElementById('modal-wishlist');
     if (wishlistCheckbox) {
         let wishlistLocs = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
@@ -520,87 +663,8 @@ window.onclick = function(event) {
 };
 
 // ==========================================
-// 8. CART & ITINERARY LOGIC
+// 7. ITINERARY GENERATOR & EXPORT
 // ==========================================
-window.openCartModal = function() {
-    const cartModal = document.getElementById('cart-modal');
-    if(!cartModal) return;
-    cartModal.classList.remove('hidden');
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    
-    document.querySelectorAll('.cart-checkbox').forEach(cb => {
-        cb.checked = false; 
-        const span = cb.nextElementSibling;
-        if(unlockedGroups.includes(cb.value)) {
-            cb.disabled = true;
-            span.style.background = "#f1f5f9";
-            span.style.color = "#94a3b8";
-            span.textContent = `${cb.value} (Purchased)`;
-        } else {
-            cb.disabled = false;
-            span.style.background = "white";
-            span.style.color = "#64748b";
-            span.textContent = cb.value;
-        }
-    });
-    updateCartPrice();
-}
-
-function updateCartPrice() {
-    const cartPriceDisplay = document.getElementById('cart-price');
-    const cartPayBtn = document.getElementById('cart-pay-btn');
-    if(!cartPriceDisplay || !cartPayBtn) return;
-
-    const selectedCount = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
-    const totalPrice = selectedCount * 14.99;
-    cartPriceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
-    
-    if (selectedCount > 0) {
-        cartPayBtn.disabled = false;
-        cartPayBtn.textContent = `Pay ${totalPrice.toFixed(2)} €`;
-    } else {
-        cartPayBtn.disabled = true;
-        cartPayBtn.textContent = `Select a group`;
-    }
-}
-
-document.querySelectorAll('.cart-checkbox').forEach(cb => {
-    cb.addEventListener('change', function() {
-        if(this.checked) {
-            this.nextElementSibling.style.background = "#FCE7F0";
-            this.nextElementSibling.style.borderColor = "#D94680";
-            this.nextElementSibling.style.color = "#D94680";
-        } else {
-            this.nextElementSibling.style.background = "white";
-            this.nextElementSibling.style.borderColor = "#cbd5e1";
-            this.nextElementSibling.style.color = "#64748b";
-        }
-        updateCartPrice();
-    });
-});
-
-const cartForm = document.getElementById('cart-form');
-if (cartForm) {
-    cartForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const checkedBoxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
-        if(checkedBoxes.length === 0) return;
-
-        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        checkedBoxes.forEach(cb => {
-            if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value);
-        });
-        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
-        
-        document.getElementById('cart-pay-btn').textContent = "Processing...";
-        setTimeout(() => { window.location.reload(); }, 1500);
-    });
-}
-
-// ITINERARY
-let itiLeafletMap = null;
-let itiLayerGroup = null;
-
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
@@ -669,7 +733,6 @@ window.generateItinerary = function() {
         let dayHtml = `<div class="iti-day-card"><div class="iti-day-title">${t('day')} ${i + 1}</div>`;
         dayLocs.forEach((l, index) => { dayHtml += `<div class="iti-loc"><strong>${index+1}. ${l.name}</strong> <span style="color:#9CA3AF; font-size:0.8rem;">(${l.category})</span></div>`; });
         
-        // BOUTON GOOGLE MAPS ÉLÉGANT ET ALIGNÉ À GAUCHE
         dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">🗺️ ${t('openRouteMap')}</a></div></div>`;
         resultDiv.innerHTML += dayHtml;
     }
@@ -716,7 +779,7 @@ window.exportItineraryPDF = function() {
 };
 
 // ==========================================
-// 10. COOKIES LOGIC
+// 8. COOKIES LOGIC
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
@@ -729,3 +792,5 @@ const btnAccept = document.getElementById('cookie-accept');
 if(btnAccept) btnAccept.addEventListener('click', closeCookies);
 const btnReject = document.getElementById('cookie-reject');
 if(btnReject) btnReject.addEventListener('click', closeCookies);
+const btnManage = document.getElementById('cookie-manage');
+if(btnManage) btnManage.addEventListener('click', () => { window.location.href = 'settings.html'; });
