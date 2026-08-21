@@ -34,29 +34,19 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header" style="margin-bottom: 15px;">
-                <!-- NOUVEAU LOGO ORIGINAL -->
                 <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <style>
-                      .wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }
-                    </style>
-                  </defs>
-                  <!-- pin monogram -->
-                  <path d="M100,36
-                           C68,36 42,61 42,93
-                           C42,138 100,172 100,172
-                           C100,172 158,138 158,93
-                           C158,61 132,36 100,36 Z"
-                        fill="#34414C"/>
+                  <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+                  <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
                   <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
-                  <text x="188" y="118" class="wordmark">
-                    <tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan>
-                  </text>
+                  <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
                 </svg>
                 
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
             </div>
             
+            <!-- BOUTON POUR DÉBLOQUER D'AUTRES GROUPES -->
+            <button onclick="window.location.href='index.html'" class="action-btn" style="width: 100%; margin-bottom: 15px; background: var(--primary-magenta);" data-i18n="unlockMoreBtn">🔓 Unlock More Groups</button>
+
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
