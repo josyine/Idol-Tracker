@@ -5,47 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Screen To Street</title>
     <link rel="stylesheet" href="welcome-style.css">
-    <!-- FORCE LA CLASSE HIDDEN MÊME SI LE CACHE EST ACTIF -->
     <style>
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <!-- Fausse fenêtre Google Login (Forcée à être cachée au démarrage) -->
-    <div id="google-auth-popup" class="google-popup" style="display: none;">
+    <!-- Vraie simulation de la Pop-up de connexion Google -->
+    <div id="google-auth-popup" class="google-popup-overlay hidden">
         <div class="google-popup-box">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="50px" height="50px" style="margin-bottom: 15px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40px" height="40px" style="margin-bottom: 10px;">
                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
                 <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
                 <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
             </svg>
-            <h3 style="color: #374151;">Sign in with Google</h3>
-            <div class="spinner" style="margin-top:20px; border-top-color:#1976D2; border-left-color:#1976D2;"></div>
+            <h3 style="color: #34414C; margin-bottom: 5px;">Sign in with Google</h3>
+            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 20px;">Choose an account to continue to Screen To Street</p>
+            
+            <div class="google-account-mock" onclick="completeGoogleLogin()">
+                <div class="google-avatar">JD</div>
+                <div class="google-info">
+                    <strong>Jane Doe</strong>
+                    <span>jane.doe@gmail.com</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Navbar -->
     <nav class="top-navbar">
         <div class="logo-container">
-            <!-- NOUVEAU LOGO ORIGINAL -->
             <svg class="site-logo-nav" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <style>
-                  .wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }
-                </style>
-              </defs>
-              <!-- pin monogram -->
-              <path d="M100,36
-                       C68,36 42,61 42,93
-                       C42,138 100,172 100,172
-                       C100,172 158,138 158,93
-                       C158,61 132,36 100,36 Z"
-                    fill="#FFFFFF"/>
+              <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+              <rect width="620" height="200" fill="#FFFFFF"/>
+              <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
               <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
-              <text x="188" y="118" class="wordmark">
-                <tspan fill="#FFFFFF">Screen To Street</tspan>
-              </text>
+              <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
             </svg>
         </div>
         <div class="nav-actions">
@@ -73,14 +68,14 @@
             <span class="close-auth-btn" id="close-auth">&times;</span>
             
             <div class="auth-left">
-                <!-- STEP 1 : Choix de la méthode -->
+                <!-- STEP 1 -->
                 <div id="auth-step-1" class="auth-step">
                     <h2 data-i18n="authTitle">Log in or sign up</h2>
                     <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
                     
                     <div class="auth-buttons">
-                        <button class="social-btn" onclick="simulateGoogleLogin()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" style="margin-right: 15px;">
+                        <button class="social-btn" onclick="openGooglePopup()">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
                                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
                                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
                                 <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
@@ -89,13 +84,13 @@
                             <span data-i18n="authGoogle">Continue with Google</span>
                         </button>
                         <button class="social-btn" onclick="simulateFacebookLogin()">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" style="margin-right: 15px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
                                 <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"/><path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v13.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z"/>
                             </svg>
                             <span data-i18n="authFacebook">Continue with Facebook</span>
                         </button>
                         <button class="social-btn email-btn" id="btn-to-email">
-                            <span style="font-size: 1.2rem; margin-right: 10px;">✉️</span>
+                            <span style="font-size: 1.2rem; margin-right: 15px;">✉️</span>
                             <span data-i18n="authEmail">Continue with email</span>
                         </button>
                     </div>
@@ -107,7 +102,7 @@
                     </p>
                 </div>
 
-                <!-- STEP 2 : Saisie Email -->
+                <!-- STEP 2 -->
                 <div id="auth-step-2" class="auth-step hidden">
                     <button class="back-step-btn" id="btn-back-1">← <span data-i18n="authEmail">Continue with email</span></button>
                     <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
@@ -119,7 +114,7 @@
                     <button class="primary-btn" id="btn-to-details" data-i18n="btnContinue">Continue</button>
                 </div>
 
-                <!-- STEP 3 : Détails, Mot de passe & Paiement -->
+                <!-- STEP 3 -->
                 <div id="auth-step-3" class="auth-step hidden" style="overflow-y: auto; max-height: 70vh; padding-right: 10px;">
                     <button class="back-step-btn" id="btn-back-2">← <span data-i18n="stepBackAccount">Account Details</span></button>
                     
@@ -172,23 +167,11 @@
             
             <div class="auth-right">
                 <div class="auth-right-content">
-                    <!-- NOUVEAU LOGO ORIGINAL (DANS LA MODALE) -->
                     <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="width: 80%; max-width: 250px; margin-bottom: 20px;">
-                      <defs>
-                        <style>
-                          .wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }
-                        </style>
-                      </defs>
-                      <path d="M100,36
-                               C68,36 42,61 42,93
-                               C42,138 100,172 100,172
-                               C100,172 158,138 158,93
-                               C158,61 132,36 100,36 Z"
-                            fill="#FFFFFF"/>
+                      <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+                      <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#FFFFFF"/>
                       <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
-                      <text x="188" y="118" class="wordmark">
-                        <tspan fill="#FFFFFF">Screen To Street</tspan>
-                      </text>
+                      <text x="188" y="118" class="wordmark"><tspan fill="#FFFFFF">Screen To Street</tspan></text>
                     </svg>
                     <h3 data-i18n="authRightTitle" style="color: #34414C; font-size: 1.5rem; text-align: center;">Unlock the world of your idols.</h3>
                 </div>
