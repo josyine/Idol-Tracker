@@ -18,7 +18,7 @@
 <body>
     <div class="container">
         <a href="map.html" class="back-btn">← Back to Map</a>
-        <h1>👤 Your Account</h1>
+        <h1 data-i18n="menuAccount">Your Account</h1>
         
         <div class="info-group">
             <label>Name</label>
@@ -37,7 +37,6 @@
     </div>
 
     <script>
-        // Récupère les passes débloqués depuis la mémoire locale
         const unlocked = localStorage.getItem('unlockedGroups');
         if(unlocked) {
             const groups = JSON.parse(unlocked);
