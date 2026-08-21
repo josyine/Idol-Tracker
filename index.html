@@ -7,14 +7,21 @@
     <link rel="stylesheet" href="welcome-style.css">
 </head>
 <body>
+    <!-- Fausse fenêtre Google Login -->
+    <div id="google-auth-popup" class="hidden google-popup">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+        <h3>Sign in with Google</h3>
+        <div class="spinner google-spinner"></div>
+    </div>
+
     <!-- Navbar -->
     <nav class="top-navbar">
         <div class="logo-container">
             <svg class="site-logo-nav" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
                 <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
-                <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
-                <polygon points="88,51 88,97 126,74" fill="#FFFFFF"/>
-                <text x="188" y="118" class="wordmark"><tspan fill="#FFFFFF">Screen To Street</tspan></text>
+                <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="#34414C"/>
+                <path d="M108,58 C112,80 104,102 82,116 C78,90 88,68 108,58 Z" fill="#E1245C"/>
+                <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
             </svg>
         </div>
         <div class="nav-actions">
@@ -42,7 +49,7 @@
             <span class="close-auth-btn" id="close-auth">&times;</span>
             
             <div class="auth-left">
-                <!-- STEP 1 : Choix de la méthode de connexion -->
+                <!-- STEP 1 : Choix de la méthode -->
                 <div id="auth-step-1" class="auth-step">
                     <h2 data-i18n="authTitle">Log in or sign up</h2>
                     <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
@@ -51,10 +58,6 @@
                         <button class="social-btn" onclick="simulateGoogleLogin()">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
                             <span data-i18n="authGoogle">Continue with Google</span>
-                        </button>
-                        <button class="social-btn" onclick="simulateFacebookLogin()">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
-                            <span data-i18n="authFacebook">Continue with Facebook</span>
                         </button>
                         <button class="social-btn email-btn" id="btn-to-email">
                             <span style="font-size: 1.2rem; margin-right: 10px;">✉️</span>
@@ -69,7 +72,7 @@
                     </p>
                 </div>
 
-                <!-- STEP 2 : Saisie de l'Email -->
+                <!-- STEP 2 : Saisie Email -->
                 <div id="auth-step-2" class="auth-step hidden">
                     <button class="back-step-btn" id="btn-back-1">← <span data-i18n="authEmail">Continue with email</span></button>
                     <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
@@ -97,7 +100,6 @@
                             </div>
                         </div>
                         
-                        <!-- NOUVEAU : Champ Mot de passe -->
                         <div class="input-group">
                             <label data-i18n="password">Password</label>
                             <input type="password" id="user-password" required minlength="8" placeholder="••••••••">
@@ -134,15 +136,14 @@
 
             </div>
             <div class="auth-right">
-                <!-- Décoration graphique inspirée de Canva -->
                 <div class="auth-right-content">
                     <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="width: 80%; max-width: 250px; margin-bottom: 20px;">
                         <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
-                        <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
-                        <polygon points="88,51 88,97 126,74" fill="#FFFFFF"/>
-                        <text x="188" y="118" class="wordmark"><tspan fill="#FFFFFF">Screen To </tspan><tspan fill="#FFFFFF">Street</tspan></text>
+                        <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="#34414C"/>
+                        <path d="M108,58 C112,80 104,102 82,116 C78,90 88,68 108,58 Z" fill="#E1245C"/>
+                        <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
                     </svg>
-                    <h3 data-i18n="authRightTitle" style="color: white; font-size: 1.5rem; text-align: center;">Unlock the world of your idols.</h3>
+                    <h3 data-i18n="authRightTitle" style="color: #34414C; font-size: 1.5rem; text-align: center;">Unlock the world of your idols.</h3>
                 </div>
             </div>
         </div>
