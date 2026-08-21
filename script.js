@@ -46,7 +46,8 @@ const translations = {
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allCats: "All Categories",
         moreDetails: "More details", day: "Day", noLocationsFound: "Not enough locations found for this selection.", openRouteMap: "Open Route in Google Maps", searchPlaceholder: "Search a location, city, context...",
         menuAccount: "Your Account", menuSettings: "Settings", menuLogout: "Logout",
-        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
+        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
+        markVisited: "I have visited this place!"
     },
     fr: {
         subtitle: "Sur les traces de vos artistes préférés",
@@ -63,7 +64,8 @@ const translations = {
         allGroups: "Tous les Groupes", allMembers: "Tous les Membres", allAreas: "Toutes les Régions", allCats: "Toutes les Catégories",
         moreDetails: "Plus de détails", day: "Jour", noLocationsFound: "Pas assez de lieux trouvés pour cette sélection.", openRouteMap: "Ouvrir l'itinéraire Google Maps", searchPlaceholder: "Rechercher un lieu, une ville...",
         menuAccount: "Votre compte", menuSettings: "Paramètres", menuLogout: "Se déconnecter",
-        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
+        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
+        markVisited: "J'ai visité ce lieu !"
     }
 };
 
@@ -97,7 +99,7 @@ if(savedPic) {
     profileBtn.style.backgroundImage = `url(${savedPic})`;
     profileBtn.style.backgroundSize = 'cover';
     profileBtn.style.backgroundPosition = 'center';
-    profileBtn.textContent = ''; // Retire la lettre si y'a une image
+    profileBtn.textContent = ''; 
 } else {
     profileBtn.textContent = savedName.charAt(0).toUpperCase();
 }
@@ -355,7 +357,7 @@ window.openCartModal = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     
     document.querySelectorAll('.cart-checkbox').forEach(cb => {
-        cb.checked = false; // Reset
+        cb.checked = false; 
         const span = cb.nextElementSibling;
         if(unlockedGroups.includes(cb.value)) {
             cb.disabled = true;
@@ -528,16 +530,32 @@ function renderLocations() {
     document.getElementById('stat-countries').textContent = new Set(filteredLocations.map(l => l.country)).size;
 
     const mapMarkers = [];
+    
+    // Récupérer les lieux visités
+    const visitedGroups = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+
     filteredLocations.forEach(loc => {
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
-        const customIcon = L.divIcon({ className: 'custom-category-marker', html: `<div>${catIconSvg}</div>`, iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -16] });
+        
+        // Change la couleur si visité
+        const isVisited = visitedGroups.includes(loc.id);
+        const iconColorStyle = isVisited ? `style="border-color: #10b981; color: #10b981;"` : '';
+        
+        const customIcon = L.divIcon({ 
+            className: 'custom-category-marker', 
+            html: `<div ${iconColorStyle}>${catIconSvg}</div>`, 
+            iconSize: [32, 32], 
+            iconAnchor: [16, 16], 
+            popupAnchor: [0, -16] 
+        });
+        
         const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(markerGroup);
         mapMarkers.push(marker);
 
         let metaHtml = `<strong>Year:</strong> ${loc.year}`;
         if(loc.episode) { metaHtml += ` <br><strong>Ep:</strong> ${loc.episode}`; }
         const popupContent = `
-            <div class="popup-title" onclick="window.openModal(${loc.id}); event.stopPropagation();">${loc.name} ↗️</div>
+            <div class="popup-title" onclick="window.openModal(${loc.id}); event.stopPropagation();">${loc.name}</div>
             <span class="popup-tag">${catIconSvg} ${loc.category}</span>
             <img src="${loc.img}" alt="${loc.name}" class="popup-img" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
             <div class="popup-context">"${getLocText(loc.context)}"</div>
@@ -567,7 +585,7 @@ if(document.getElementById('search-input')) {
 }
 
 // ==========================================
-// 8. DETAILS MODAL
+// 8. DETAILS MODAL (WITH VISITED CHECKBOX)
 // ==========================================
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -611,6 +629,23 @@ window.openModal = function(id) {
             document.getElementById('modal-video-section').classList.remove('hidden');
         } else { document.getElementById('modal-video-section').classList.add('hidden'); }
     }
+    
+    // GESTION CHECKBOX "VISITÉ"
+    const visitedCheckbox = document.getElementById('modal-visited');
+    let visitedLocs = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    visitedCheckbox.checked = visitedLocs.includes(loc.id);
+    
+    visitedCheckbox.onchange = function() {
+        let vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        if(this.checked) {
+            if(!vList.includes(loc.id)) vList.push(loc.id);
+        } else {
+            vList = vList.filter(vId => vId !== loc.id);
+        }
+        localStorage.setItem('visitedLocs', JSON.stringify(vList));
+        renderLocations(); // Mets à jour la couleur du pin en live
+    };
+
     document.getElementById('details-modal').classList.remove('hidden');
 };
 
