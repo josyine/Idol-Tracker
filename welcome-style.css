@@ -1,6 +1,9 @@
 :root { --card-bg: #FFFFFF; --accent-pink: #FCE7F0; --primary-magenta: #D94680; --text-main: #374151; --border-color: #F5D0DF; --muted-text: #9CA3AF; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
+/* RÈGLE GLOBALE CORRIGÉE : Cache tous les éléments avec la classe "hidden" */
+.hidden { display: none !important; }
+
 /* Dynamic Background using Brand Colors */
 body { 
     background: linear-gradient(135deg, #FDF8F9, #FCE7F0, #F5D0DF, #FCE7F0); 
@@ -25,7 +28,6 @@ body {
 .lang-btn { background: white; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
 .lang-btn:hover { background: var(--accent-pink); }
 .lang-menu { position: absolute; right: 0; top: 50px; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 120px; overflow: hidden; }
-.lang-menu.hidden { display: none; }
 .lang-option { padding: 10px 15px; cursor: pointer; font-size: 0.9rem; color: var(--text-main); transition: background 0.2s; }
 .lang-option:hover { background: var(--accent-pink); color: var(--primary-magenta); }
 
@@ -38,7 +40,6 @@ body {
 
 /* Auth Modal */
 .auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-.auth-modal.hidden { display: none; }
 .auth-modal-content { background: white; width: 90%; max-width: 900px; height: 600px; border-radius: 16px; display: flex; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
 .close-auth-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: var(--muted-text); cursor: pointer; z-index: 10; line-height: 1;}
 .close-auth-btn:hover { color: var(--text-main); }
@@ -49,12 +50,10 @@ body {
 
 /* Auth Steps */
 .auth-step { width: 100%; animation: fadeIn 0.3s ease; }
-.auth-step.hidden { display: none; }
 .auth-step h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--text-main); }
 .auth-step p { font-size: 0.95rem; color: var(--muted-text); margin-bottom: 25px; line-height: 1.5;}
 
 .social-btn { display: flex; align-items: center; width: 100%; padding: 12px 20px; margin-bottom: 15px; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; color: var(--text-main); }
-.social-btn img { width: 24px; height: 24px; margin-right: 15px; }
 .social-btn:hover { background: #f9fafb; border-color: var(--border-color);}
 .email-btn { justify-content: center; margin-top: 10px;}
 .auth-terms { font-size: 0.75rem !important; margin-top: 25px !important; text-align: center; }
@@ -89,13 +88,11 @@ body {
 
 /* Fausse Popup Google */
 .google-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 40px 30px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10000; text-align: center; width: 320px; }
-.google-popup img { width: 50px; margin-bottom: 15px; }
 .google-popup h3 { color: #374151; margin-bottom: 10px; font-size: 1.2rem;}
 .google-spinner { border-color: #f3f3f3; border-top-color: #4285F4; border-left-color: #4285F4; margin: 20px auto 0 auto; }
 
 /* Cookie Banner */
 .cookie-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; width: 90%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; color: var(--text-main);}
-.cookie-banner.hidden { display: none; }
 .cookie-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
 .cookie-content p { font-size: 0.9rem; margin: 0; }
 .cookie-content a { color: var(--primary-magenta); font-weight: bold; }
