@@ -9,7 +9,6 @@
 </head>
 <body>
     
-    <!-- Top Nav pour Langue et Profil (ne chevauche plus la carte) -->
     <div class="top-nav">
         <div class="dropdown-container">
             <button id="lang-btn" class="nav-btn">🌐</button>
@@ -21,8 +20,9 @@
         <div class="dropdown-container" style="margin-left: 10px;">
             <button id="profile-btn" class="nav-btn">👤</button>
             <div id="profile-menu" class="dropdown-menu hidden">
-                <div class="dropdown-option" data-i18n="menuAccount">Your Account</div>
-                <div class="dropdown-option" data-i18n="menuSettings">Settings</div>
+                <!-- LIENS VERS LES NOUVELLES PAGES DE PROFIL -->
+                <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuAccount">Your Account</a>
+                <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuSettings">Settings</a>
                 <div class="dropdown-option" id="logout-btn" data-i18n="menuLogout" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
             </div>
         </div>
@@ -32,6 +32,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header" style="margin-bottom: 15px;">
+                <!-- LOGO SVG -->
                 <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
                     <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
                     <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
@@ -145,13 +146,14 @@
             <div class="modal-info">
                 <h3 data-i18n="mdlDirTitle">How to get there</h3>
                 <p id="modal-directions"></p>
-                <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px;"></p>
+                <!-- CORRECTION : Espace augmenté (margin-bottom: 25px) -->
+                <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px; margin-bottom: 25px;"></p>
                 <a id="modal-map-link" href="#" target="_blank" class="action-btn" data-i18n="mdlGoogleMap">Open in Google Maps</a>
             </div>
         </div>
     </div>
 
-    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE (Avec la Mini-Map) -->
+    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE -->
     <div id="itinerary-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 650px;">
             <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
@@ -171,10 +173,11 @@
                     <label data-i18n="itiDays" style="margin-bottom:5px; font-weight:bold; color:var(--primary-magenta); text-transform:uppercase; font-size:0.8rem;">Number of Days</label>
                     <input type="number" id="iti-days" min="1" max="7" value="3" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);">
                 </div>
-                <button class="action-btn" onclick="generateItinerary()" style="width: 100%; border:none; cursor:pointer;" data-i18n="itiCreateBtn">Create My Guide</button>
+                <button class="action-btn" onclick="generateItinerary()" style="width: 100%; border:none; cursor:pointer; margin-bottom: 20px;" data-i18n="itiCreateBtn">Create My Guide</button>
             </div>
 
-            <div id="iti-result" class="hidden">
+            <!-- La carte est maintenant masquée tant que l'itinéraire n'est pas généré ! -->
+            <div id="iti-result" class="hidden" style="border-top: 2px solid var(--border-color); padding-top: 25px;">
                 <div id="iti-map-container" style="width: 100%; height: 250px; background: #e5e5e5; border-radius: 12px; margin-bottom: 20px; overflow: hidden;"></div>
                 <div id="iti-days-list"></div>
             </div>
