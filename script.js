@@ -538,12 +538,11 @@ document.getElementById('open-itinerary-btn').addEventListener('click', () => {
     itiGroup.innerHTML = ''; availableGroups.forEach(g => { itiGroup.innerHTML += `<option value="${g}">${g}</option>`; });
     itiCountry.innerHTML = ''; [...new Set(celebLocations.map(l => l.country))].sort().forEach(c => { itiCountry.innerHTML += `<option value="${c}">${c}</option>`; });
     
-    document.getElementById('iti-result').classList.add('hidden');
-    document.getElementById('iti-form').classList.remove('hidden');
+    document.getElementById('iti-result').classList.add('hidden'); // Map hidden initially
     document.getElementById('itinerary-modal').classList.remove('hidden');
 });
 
-// Simple Nearest Neighbor Algorithm to minimize travel time
+// Algorithme "Plus proche voisin" pour optimiser les distances géographiques
 function optimizeRoute(locations) {
     if(locations.length <= 1) return locations;
     let unvisited = [...locations];
@@ -570,6 +569,7 @@ window.generateItinerary = function() {
     let validLocs = celebLocations.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert(t('noLocationsFound')); return; }
 
+    // Tri spatial pour un voyage logique
     validLocs = optimizeRoute(validLocs);
 
     const resultDiv = document.getElementById('iti-days-list');
@@ -600,7 +600,7 @@ window.generateItinerary = function() {
         resultDiv.innerHTML += dayHtml;
     }
 
-    document.getElementById('iti-form').classList.add('hidden');
+    // Affiche le résultat ET la map EN DESSOUS (le formulaire reste visible en haut pour pouvoir relancer)
     document.getElementById('iti-result').classList.remove('hidden');
 
     // Init or update mini map
@@ -618,11 +618,21 @@ window.generateItinerary = function() {
     });
     L.polyline(coordsForMap, { color: '#D94680', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
 
+    // Important pour que la map Leaflet ne soit pas grise !
     setTimeout(() => {
         itiLeafletMap.invalidateSize();
         itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20] });
     }, 300);
 };
+
+// ==========================================
+// 8. COOKIES LOGIC (Map page)
+// ==========================================
+if(!localStorage.getItem('cookiesAccepted')) { document.getElementById('cookie-banner').classList.remove('hidden'); }
+function closeCookies() { localStorage.setItem('cookiesAccepted', 'true'); document.getElementById('cookie-banner').classList.add('hidden'); }
+document.getElementById('cookie-accept').addEventListener('click', closeCookies);
+document.getElementById('cookie-reject').addEventListener('click', closeCookies);
+document.getElementById('cookie-manage').addEventListener('click', () => { window.location.href = 'settings.html'; });
 
 // ==========================================
 // 8. COOKIES LOGIC (Map page)
