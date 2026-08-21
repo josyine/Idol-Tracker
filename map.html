@@ -6,6 +6,9 @@
     <title>Idol Tracker Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
+    <style>
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
     
@@ -31,11 +34,12 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header" style="margin-bottom: 15px;">
-                <!-- NOUVEAU LOGO -->
-                <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- NOUVEAU LOGO GRIS AVEC PLAY ROSE (VIEWBOX MODIFIÉE POUR ÊTRE PLUS COURT) -->
+                <svg class="site-logo" viewBox="0 15 620 150" xmlns="http://www.w3.org/2000/svg">
                   <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
-                  <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="#34414C"/>
-                  <path d="M108,58 C112,80 104,102 82,116 C78,90 88,68 108,58 Z" fill="#E1245C"/>
+                  <rect width="620" height="200" fill="#FFFFFF"/>
+                  <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="none" stroke="#34414C" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+                  <polygon points="88,51 88,97 126,74" fill="#E1245C"/>
                   <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
                 </svg>
                 
@@ -143,7 +147,6 @@
             <div class="modal-info">
                 <h3 data-i18n="mdlDirTitle">How to get there</h3>
                 <p id="modal-directions"></p>
-                <!-- MARGE AJOUTÉE ICI -->
                 <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px; margin-bottom: 40px;"></p>
                 <a id="modal-map-link" href="#" target="_blank" class="action-btn" data-i18n="mdlGoogleMap">Open in Google Maps</a>
             </div>
@@ -170,7 +173,6 @@
                     <label data-i18n="itiDays" style="margin-bottom:5px; font-weight:bold; color:var(--primary-magenta); text-transform:uppercase; font-size:0.8rem;">Number of Days</label>
                     <input type="number" id="iti-days" min="1" max="7" value="3" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);">
                 </div>
-                <!-- BOUTON MARGE CORRIGÉE ICI -->
                 <button class="action-btn" onclick="generateItinerary()" style="width: 100%; border:none; cursor:pointer; margin-bottom: 40px;" data-i18n="itiCreateBtn">Create My Guide</button>
             </div>
 
