@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Account - Screen To Street</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; background-color: #FDF8F9; color: #374151; padding: 40px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 15px rgba(217, 70, 128, 0.05); border: 1px solid #F5D0DF; }
+        h1 { color: #D94680; text-align: center; border-bottom: 2px solid #FCE7F0; padding-bottom: 15px; margin-bottom: 30px;}
+        .info-group { margin-bottom: 20px; }
+        .info-group label { display: block; font-size: 0.8rem; text-transform: uppercase; color: #9CA3AF; font-weight: bold; margin-bottom: 5px; }
+        .info-group p { font-size: 1.1rem; font-weight: 600; margin: 0; padding: 12px; background: #FDF8F9; border-radius: 8px; border: 1px solid #F5D0DF;}
+        a.back-btn { display: inline-block; margin-bottom: 20px; color: #D94680; text-decoration: none; font-weight: bold; }
+        a.back-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="map.html" class="back-btn">← Back to Map</a>
+        <h1>👤 Your Account</h1>
+        
+        <div class="info-group">
+            <label>Name</label>
+            <p>Jane Doe</p>
+        </div>
+        
+        <div class="info-group">
+            <label>Email Address</label>
+            <p>jane.doe@example.com</p>
+        </div>
+
+        <div class="info-group">
+            <label>Unlocked Passes (Groups)</label>
+            <p id="unlocked-passes">Loading...</p>
+        </div>
+    </div>
+
+    <script>
+        // Récupère les passes débloqués depuis la mémoire locale
+        const unlocked = localStorage.getItem('unlockedGroups');
+        if(unlocked) {
+            const groups = JSON.parse(unlocked);
+            document.getElementById('unlocked-passes').textContent = groups.join(', ');
+        } else {
+            document.getElementById('unlocked-passes').textContent = 'No active passes.';
+        }
+    </script>
+</body>
+</html>
