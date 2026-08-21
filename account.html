@@ -9,15 +9,21 @@
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 15px rgba(217, 70, 128, 0.05); border: 1px solid #F5D0DF; }
         h1 { color: #D94680; text-align: center; border-bottom: 2px solid #FCE7F0; padding-bottom: 15px; margin-bottom: 30px;}
         .profile-pic-container { text-align: center; margin-bottom: 30px; }
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #D94680; margin-bottom: 10px; background: #e2e8f0; display: inline-block; }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #D94680; margin-bottom: 10px; background: #e2e8f0; display: inline-flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #D94680; font-weight: bold; }
         .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; cursor: pointer; color: #D94680; font-weight: bold; font-size: 0.9rem;}
         .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
         .info-group { margin-bottom: 20px; }
         .info-group label { display: block; font-size: 0.8rem; text-transform: uppercase; color: #9CA3AF; font-weight: bold; margin-bottom: 5px; }
-        .info-group input { width: 100%; font-size: 1.1rem; font-weight: 600; margin: 0; padding: 12px; background: #FDF8F9; border-radius: 8px; border: 1px solid #F5D0DF; outline: none;}
-        .info-group input:focus { border-color: #D94680; }
-        .save-btn { background: #D94680; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;}
-        .save-btn:hover { background: #bd336b; }
+        
+        /* Styles dynamiques des champs */
+        .info-group input { width: 100%; font-size: 1.1rem; font-weight: 600; margin: 0; padding: 12px; border-radius: 8px; outline: none; transition: 0.3s; }
+        .input-readonly { background: #f1f5f9; border: 1px solid transparent; color: #64748b; cursor: default; }
+        .input-editable { background: #ffffff; border: 2px solid #D94680; color: #1e293b; box-shadow: 0 0 8px rgba(217, 70, 128, 0.2); }
+        
+        .action-btn { background: #e2e8f0; color: #475569; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.3s;}
+        .action-btn.edit-mode { background: #D94680; color: white; }
+        .action-btn.saved-mode { background: #10b981; color: white; } /* Vert quand sauvegardé */
+        
         a.back-btn { display: inline-block; margin-bottom: 20px; color: #D94680; text-decoration: none; font-weight: bold; }
         a.back-btn:hover { text-decoration: underline; }
     </style>
@@ -28,7 +34,8 @@
         <h1 data-i18n="menuAccount">Your Account</h1>
         
         <div class="profile-pic-container">
-            <img id="profile-preview" class="profile-img" src="https://via.placeholder.com/100?text=Avatar" alt="Profile">
+            <!-- La photo ou l'initiale s'affichera ici -->
+            <div id="profile-preview" class="profile-img"></div>
             <div>
                 <div class="upload-btn-wrapper">
                     <span>Change Profile Picture</span>
@@ -39,31 +46,42 @@
         
         <div class="info-group">
             <label>Name</label>
-            <input type="text" id="user-name-input" value="Jane Doe">
+            <input type="text" id="user-name-input" class="input-readonly" readonly>
         </div>
         
         <div class="info-group">
             <label>Email Address</label>
-            <input type="email" id="user-email-input" value="jane.doe@example.com" readonly style="background: #e9ecef; cursor: not-allowed;">
+            <input type="email" id="user-email-input" class="input-readonly" readonly style="cursor: not-allowed;" title="Email cannot be changed">
         </div>
 
         <div class="info-group">
             <label>Unlocked Passes (Groups)</label>
-            <p id="unlocked-passes" style="margin: 0; padding: 12px; background: #FDF8F9; border-radius: 8px; border: 1px solid #F5D0DF; font-weight:600;">Loading...</p>
+            <p id="unlocked-passes" style="margin: 0; padding: 12px; background: #FDF8F9; border-radius: 8px; border: 1px solid #F5D0DF; font-weight:600; color: #374151;">Loading...</p>
         </div>
 
-        <button class="save-btn" onclick="saveAccountChanges()">Save Changes</button>
+        <button id="toggle-action-btn" class="action-btn" onclick="toggleEditMode()">Edit Profile</button>
     </div>
 
     <script>
-        // Charger les données sauvegardées
-        const savedName = localStorage.getItem('userName');
-        const savedEmail = localStorage.getItem('userEmail');
+        // Charger les données du compte créées dans index.html
+        const savedName = localStorage.getItem('userName') || 'Jane Doe';
+        const savedEmail = localStorage.getItem('userEmail') || 'jane.doe@example.com';
         const savedPic = localStorage.getItem('userProfilePic');
 
-        if(savedName) document.getElementById('user-name-input').value = savedName;
-        if(savedEmail) document.getElementById('user-email-input').value = savedEmail;
-        if(savedPic) document.getElementById('profile-preview').src = savedPic;
+        const nameInput = document.getElementById('user-name-input');
+        const emailInput = document.getElementById('user-email-input');
+        const profilePreview = document.getElementById('profile-preview');
+        const actionBtn = document.getElementById('toggle-action-btn');
+
+        nameInput.value = savedName;
+        emailInput.value = savedEmail;
+
+        if(savedPic) {
+            profilePreview.style.backgroundImage = `url(${savedPic})`;
+            profilePreview.style.backgroundSize = 'cover';
+        } else {
+            profilePreview.textContent = savedName.charAt(0).toUpperCase();
+        }
 
         const unlocked = localStorage.getItem('unlockedGroups');
         if(unlocked) {
@@ -73,23 +91,58 @@
             document.getElementById('unlocked-passes').textContent = 'No active passes.';
         }
 
-        // Gérer l'upload d'image
+        // Upload Image
         document.getElementById('upload-pic').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    document.getElementById('profile-preview').src = event.target.result;
+                    profilePreview.style.backgroundImage = `url(${event.target.result})`;
+                    profilePreview.style.backgroundSize = 'cover';
+                    profilePreview.textContent = '';
                     localStorage.setItem('userProfilePic', event.target.result);
                 }
                 reader.readAsDataURL(file);
             }
         });
 
-        function saveAccountChanges() {
-            const newName = document.getElementById('user-name-input').value;
-            localStorage.setItem('userName', newName);
-            alert("Changes saved successfully!");
+        // Gestion du mode Edition / Sauvegarde
+        let isEditing = false;
+        function toggleEditMode() {
+            if(!isEditing) {
+                // Passage en mode édition
+                isEditing = true;
+                nameInput.removeAttribute('readonly');
+                nameInput.classList.remove('input-readonly');
+                nameInput.classList.add('input-editable');
+                nameInput.focus();
+                
+                actionBtn.textContent = 'Save Changes';
+                actionBtn.classList.add('edit-mode');
+            } else {
+                // Sauvegarde
+                isEditing = false;
+                nameInput.setAttribute('readonly', true);
+                nameInput.classList.remove('input-editable');
+                nameInput.classList.add('input-readonly');
+                
+                localStorage.setItem('userName', nameInput.value);
+                
+                // Si pas de photo, mettre à jour l'initiale
+                if(!localStorage.getItem('userProfilePic')) {
+                    profilePreview.textContent = nameInput.value.charAt(0).toUpperCase();
+                }
+
+                // Animation visuelle du bouton
+                actionBtn.classList.remove('edit-mode');
+                actionBtn.classList.add('saved-mode');
+                actionBtn.textContent = '✓ Saved Successfully';
+                
+                setTimeout(() => {
+                    actionBtn.classList.remove('saved-mode');
+                    actionBtn.textContent = 'Edit Profile';
+                }, 2000);
+            }
         }
     </script>
 </body>
