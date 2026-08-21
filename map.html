@@ -6,6 +6,9 @@
     <title>Idol Tracker Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
+    <style>
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
     
@@ -24,7 +27,7 @@
             <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">🛒</button>
         </div>
 
-        <!-- PROFIL SANS EMOJIS -->
+        <!-- PROFIL -->
         <div class="dropdown-container">
             <button id="profile-btn" class="nav-btn"></button>
             <div id="profile-menu" class="dropdown-menu hidden">
@@ -199,7 +202,7 @@
         </div>
     </div>
 
-    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE -->
+    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE (AJOUT DU BOUTON EXPORT PDF) -->
     <div id="itinerary-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 650px;">
             <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
@@ -219,17 +222,34 @@
                     <label data-i18n="itiDays" style="margin-bottom:5px; font-weight:bold; color:var(--primary-magenta); text-transform:uppercase; font-size:0.8rem;">Number of Days</label>
                     <input type="number" id="iti-days" min="1" max="7" value="3" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);">
                 </div>
-                <button class="action-btn" onclick="generateItinerary()" style="width: 100%; border:none; cursor:pointer; margin-bottom: 40px;" data-i18n="itiCreateBtn">Create My Guide</button>
+                <button class="action-btn" onclick="generateItinerary()" style="width: 100%; border:none; cursor:pointer;" data-i18n="itiCreateBtn">Create My Guide</button>
             </div>
 
-            <div id="iti-result" class="hidden" style="border-top: 2px solid var(--border-color); padding-top: 25px;">
+            <!-- RESULTAT DE L'ITINERAIRE (Form reste visible en haut) -->
+            <div id="iti-result" class="hidden" style="border-top: 2px solid var(--border-color); padding-top: 25px; margin-top: 20px;">
                 <div id="iti-map-container" style="width: 100%; height: 250px; background: #e5e5e5; border-radius: 12px; margin-bottom: 20px; overflow: hidden;"></div>
                 <div id="iti-days-list"></div>
+                <!-- BOUTON EXPORT PDF -->
+                <button id="export-pdf-btn" class="action-btn" onclick="exportItineraryPDF()" style="width: 100%; margin-top: 20px; background: #10b981;">📥 Export Guide as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BANNIÈRE COOKIES -->
+    <div id="cookie-banner" class="cookie-banner hidden">
+        <div class="cookie-content">
+            <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#privacy" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
+            <div class="cookie-actions">
+                <button id="cookie-manage" class="filter-btn" data-i18n="cookieManage">Manage</button>
+                <button id="cookie-reject" class="filter-btn" data-i18n="cookieReject">Reject</button>
+                <button id="cookie-accept" class="action-btn" data-i18n="cookieAccept">Accept</button>
             </div>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- IMPORT DE LA LIBRAIRIE POUR L'EXPORT PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
