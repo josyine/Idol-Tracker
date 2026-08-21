@@ -10,37 +10,16 @@
     </style>
 </head>
 <body>
-    <!-- Vraie simulation de la Pop-up de connexion Google -->
-    <div id="google-auth-popup" class="google-popup-overlay hidden">
-        <div class="google-popup-box">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40px" height="40px" style="margin-bottom: 10px;">
-                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-            </svg>
-            <h3 style="color: #34414C; margin-bottom: 5px;">Sign in with Google</h3>
-            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 20px;">Choose an account to continue to Screen To Street</p>
-            
-            <div class="google-account-mock" onclick="completeGoogleLogin()">
-                <div class="google-avatar">JD</div>
-                <div class="google-info">
-                    <strong>Jane Doe</strong>
-                    <span>jane.doe@gmail.com</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Navbar -->
     <nav class="top-navbar">
         <div class="logo-container">
+            <!-- LOGO TRANSPARENT -->
             <svg class="site-logo-nav" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
               <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
-              <rect width="620" height="200" fill="#FFFFFF"/>
-              <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
+              <rect width="620" height="200" fill="none"/>
+              <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#FFFFFF"/>
               <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
-              <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
+              <text x="188" y="118" class="wordmark"><tspan fill="#FFFFFF">Screen To Street</tspan></text>
             </svg>
         </div>
         <div class="nav-actions">
@@ -74,7 +53,7 @@
                     <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
                     
                     <div class="auth-buttons">
-                        <button class="social-btn" onclick="openGooglePopup()">
+                        <button class="social-btn" onclick="simulateGoogleLogin()">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
                                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
                                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
@@ -89,7 +68,7 @@
                             </svg>
                             <span data-i18n="authFacebook">Continue with Facebook</span>
                         </button>
-                        <button class="social-btn email-btn" id="btn-to-email">
+                        <button class="social-btn" id="btn-to-email">
                             <span style="font-size: 1.2rem; margin-right: 15px;">✉️</span>
                             <span data-i18n="authEmail">Continue with email</span>
                         </button>
@@ -149,6 +128,7 @@
                             <label class="checkbox-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox"><span class="card-content">TXT</span></label>
                         </div>
 
+                        <!-- TOTAL ET BOUTON EN DESSOUS -->
                         <div class="checkout-footer">
                             <div class="total-price">
                                 <span data-i18n="totalDue">Total Due:</span>
@@ -169,11 +149,13 @@
                 <div class="auth-right-content">
                     <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="width: 80%; max-width: 250px; margin-bottom: 20px;">
                       <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+                      <rect width="620" height="200" fill="none"/>
                       <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#FFFFFF"/>
                       <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
                       <text x="188" y="118" class="wordmark"><tspan fill="#FFFFFF">Screen To Street</tspan></text>
                     </svg>
-                    <h3 data-i18n="authRightTitle" style="color: #34414C; font-size: 1.5rem; text-align: center;">Unlock the world of your idols.</h3>
+                    <!-- TEXTE EN BLANC -->
+                    <h3 data-i18n="authRightTitle" style="color: #FFFFFF; font-size: 1.5rem; text-align: center;">Unlock the world of your idols.</h3>
                 </div>
             </div>
         </div>
