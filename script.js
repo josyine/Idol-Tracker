@@ -633,12 +633,3 @@ function closeCookies() { localStorage.setItem('cookiesAccepted', 'true'); docum
 document.getElementById('cookie-accept').addEventListener('click', closeCookies);
 document.getElementById('cookie-reject').addEventListener('click', closeCookies);
 document.getElementById('cookie-manage').addEventListener('click', () => { window.location.href = 'settings.html'; });
-
-// ==========================================
-// 8. COOKIES LOGIC (Map page)
-// ==========================================
-if(!localStorage.getItem('cookiesAccepted')) { document.getElementById('cookie-banner').classList.remove('hidden'); }
-function closeCookies() { localStorage.setItem('cookiesAccepted', 'true'); document.getElementById('cookie-banner').classList.add('hidden'); }
-document.getElementById('cookie-accept').addEventListener('click', closeCookies);
-document.getElementById('cookie-reject').addEventListener('click', closeCookies);
-document.getElementById('cookie-manage').addEventListener('click', () => { window.location.href = 'legal.html#privacy'; });
