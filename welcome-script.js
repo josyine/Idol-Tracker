@@ -10,7 +10,7 @@ const dict = {
         emailCheck: "We will check if you have an account, and if not, we will help you create one.", emailLabel: "Email address", btnContinue: "Continue",
         stepBackAccount: "Account Details", fname: "First Name", lname: "Last Name", password: "Password",
         step2: "2. Choose Your Passes", passDesc: "Select the groups you want to unlock. (14.99€ per group)",
-        totalDue: "Total Due:", payBtnEmpty: "Select a group", payBtnActive: "Pay {price} € & Unlock", processing: "Processing securely...",
+        totalDue: "Total Due:", payBtnEmpty: "Select a group", payBtnActive: "Proceed to payment ({price} €)", processing: "Processing securely...",
         authRightTitle: "Unlock the world of your idols.",
         cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
     },
@@ -22,7 +22,7 @@ const dict = {
         emailCheck: "Nous vérifierons que vous avez déjà un compte, et dans le cas contraire, nous vous aiderons à en créer un.", emailLabel: "Adresse e-mail", btnContinue: "Continuer",
         stepBackAccount: "Détails du compte", fname: "Prénom", lname: "Nom", password: "Mot de passe",
         step2: "2. Choisissez vos Pass", passDesc: "Sélectionnez les groupes à débloquer. (14.99€ par groupe)",
-        totalDue: "Total à payer :", payBtnEmpty: "Sélectionnez un groupe", payBtnActive: "Payer {price} €", processing: "Traitement sécurisé...",
+        totalDue: "Total à payer :", payBtnEmpty: "Sélectionnez un groupe", payBtnActive: "Passer au paiement ({price} €)", processing: "Traitement sécurisé...",
         authRightTitle: "Débloquez le monde de vos idoles.",
         cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
     }
@@ -36,7 +36,6 @@ function updateLangUI() {
     updatePrice();
 }
 
-// Lang Dropdown
 document.getElementById('lang-btn').addEventListener('click', (e) => {
     document.getElementById('lang-menu').classList.toggle('hidden');
     e.stopPropagation();
@@ -58,10 +57,7 @@ const step2 = document.getElementById('auth-step-2');
 const step3 = document.getElementById('auth-step-3');
 
 document.querySelectorAll('.open-auth-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-        showStep(1);
-    });
+    btn.addEventListener('click', () => { modal.classList.remove('hidden'); showStep(1); });
 });
 document.getElementById('close-auth').addEventListener('click', () => { modal.classList.add('hidden'); });
 
@@ -80,17 +76,17 @@ document.getElementById('btn-to-details').addEventListener('click', () => {
 });
 document.getElementById('btn-back-2').addEventListener('click', () => { showStep(2); });
 
-// Mock Social Logins
+// Simulation Google Login
 window.simulateGoogleLogin = function() {
-    alert("Simulation: Google Login Popup opens here.");
-    showStep(3); // On skip l'email et on va direct au paiement
-};
-window.simulateFacebookLogin = function() {
-    alert("Simulation: Facebook Login Popup opens here.");
-    showStep(3);
+    const popup = document.getElementById('google-auth-popup');
+    popup.classList.remove('hidden');
+    setTimeout(() => {
+        popup.classList.add('hidden');
+        showStep(3); // Passe directement à l'étape des détails et du paiement
+    }, 1800);
 };
 
-// Price & Payment Logic
+// Price & Payment
 const checkboxes = document.querySelectorAll('.group-checkbox');
 const priceDisplay = document.getElementById('price-display');
 const payBtn = document.getElementById('pay-btn');
