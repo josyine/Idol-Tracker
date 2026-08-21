@@ -6,13 +6,11 @@
     <title>Idol Tracker Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
-    <style>
-        .hidden { display: none !important; }
-    </style>
 </head>
 <body>
     
     <div class="top-nav">
+        <!-- LANG -->
         <div class="dropdown-container">
             <button id="lang-btn" class="nav-btn">🌐</button>
             <div id="lang-menu" class="dropdown-menu hidden">
@@ -20,8 +18,15 @@
                 <div class="dropdown-option lang-option" data-lang="fr">Français</div>
             </div>
         </div>
-        <div class="dropdown-container" style="margin-left: 10px;">
-            <button id="profile-btn" class="nav-btn" style="font-weight:bold; font-size:1rem; color:var(--text-main);">P</button>
+        
+        <!-- NOUVEAU BOUTON : CADDIE (Pour racheter des groupes sans quitter la page) -->
+        <div class="dropdown-container">
+            <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">🛒</button>
+        </div>
+
+        <!-- PROFIL -->
+        <div class="dropdown-container">
+            <button id="profile-btn" class="nav-btn"></button> <!-- Contenu géré en JS -->
             <div id="profile-menu" class="dropdown-menu hidden">
                 <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuAccount">Your Account</a>
                 <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuSettings">Settings</a>
@@ -34,19 +39,16 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header" style="margin-bottom: 15px;">
-                <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
+                <svg class="site-logo" viewBox="0 15 620 150" xmlns="http://www.w3.org/2000/svg">
                   <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+                  <rect width="620" height="200" fill="none"/>
                   <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
-                  <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
+                  <polygon points="86,71 86,115 125,93" fill="#E1245C"/>
                   <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
                 </svg>
-                
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
             </div>
             
-            <!-- BOUTON POUR DÉBLOQUER D'AUTRES GROUPES -->
-            <button onclick="window.location.href='index.html'" class="action-btn" style="width: 100%; margin-bottom: 15px; background: var(--primary-magenta);" data-i18n="unlockMoreBtn">🔓 Unlock More Groups</button>
-
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
@@ -113,7 +115,35 @@
         </main>
     </div>
 
-    <!-- Modal Détails Lieu -->
+    <!-- NOUVEAU MODAL : PANIER (Acheter de nouveaux groupes) -->
+    <div id="cart-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
+            <h2 style="color: var(--text-main); margin-bottom: 5px;">Unlock New Passes</h2>
+            <p style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 25px;">Select the groups you want to unlock. (14.99€ per group)</p>
+            
+            <form id="cart-form">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
+                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">BTS</span></label>
+                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Blackpink</span></label>
+                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Twice</span></label>
+                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Seventeen</span></label>
+                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Katseye" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Katseye</span></label>
+                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="TXT" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">TXT</span></label>
+                </div>
+                
+                <div style="display:flex; flex-direction:column; border-top:1px solid #cbd5e1; padding-top:20px; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:bold; text-transform:uppercase; font-size:0.85rem; color:#64748b;">Total Due:</span>
+                        <strong id="cart-price" style="font-size:1.5rem; color:var(--primary-magenta);">0.00 €</strong>
+                    </div>
+                    <button type="submit" id="cart-pay-btn" class="action-btn" disabled style="width:100%; padding:14px; font-size:1rem;">Select a group</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AUTRES MODALS IDENTIQUES (Details, Itinerary, Cookies) -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('details-modal')">&times;</span>
@@ -154,7 +184,7 @@
         </div>
     </div>
 
-    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE -->
+    <!-- MODAL ITINERAIRE -->
     <div id="itinerary-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 650px;">
             <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
