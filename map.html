@@ -6,9 +6,6 @@
     <title>Idol Tracker Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
-    <style>
-        .hidden { display: none !important; }
-    </style>
 </head>
 <body>
     
@@ -27,13 +24,16 @@
             <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">🛒</button>
         </div>
 
-        <!-- PROFIL -->
+        <!-- PROFIL AVEC NOUVEAUX LIENS -->
         <div class="dropdown-container">
             <button id="profile-btn" class="nav-btn"></button>
             <div id="profile-menu" class="dropdown-menu hidden">
-                <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuAccount">Your Account</a>
-                <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuSettings">Settings</a>
-                <div class="dropdown-option" id="logout-btn" data-i18n="menuLogout" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
+                <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Your Account</a>
+                <!-- NOUVEAUX LIENS -->
+                <a href="visited.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">📍 My Visited Places</a>
+                <a href="wishlist.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">⭐ My Wishlist</a>
+                <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Settings</a>
+                <div class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
             </div>
         </div>
     </div>
@@ -42,7 +42,8 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header" style="margin-bottom: 15px;">
-                <svg class="site-logo" viewBox="0 15 620 150" xmlns="http://www.w3.org/2000/svg">
+                <!-- LOGO RÉPARÉ (viewBox="0 0 620 200") POUR NE PLUS ÊTRE COUPÉ -->
+                <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
                   <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
                   <rect width="620" height="200" fill="none"/>
                   <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
@@ -52,8 +53,6 @@
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
             </div>
             
-            <!-- LE BOUTON UNLOCK MORE GROUPS A ÉTÉ SUPPRIMÉ ICI ! -->
-
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
@@ -148,15 +147,23 @@
         </div>
     </div>
 
-    <!-- Modal Détails Lieu (Avec la case Visité) -->
+    <!-- Modal Détails Lieu (Avec Visité + Wishlist) -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('details-modal')">&times;</span>
-            <h2 id="modal-title" style="margin-bottom: 5px;">Location Name</h2>
+            <h2 id="modal-title" style="margin-bottom: 10px;">Location Name</h2>
             
-            <div id="modal-visited-container" style="display:inline-flex; align-items:center; gap:8px; padding: 6px 12px; background: #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
-                <input type="checkbox" id="modal-visited" style="width: 16px; height: 16px; cursor:pointer;">
-                <label for="modal-visited" style="font-weight: bold; font-size: 0.85rem; color: #334e68; cursor:pointer;" data-i18n="markVisited">I have visited this place!</label>
+            <!-- CHECKBOXES VISITED & WISHLIST -->
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 15px;">
+                <div id="modal-visited-container" style="display:inline-flex; align-items:center; gap:8px; padding: 6px 12px; background: #e2e8f0; border-radius: 8px;">
+                    <input type="checkbox" id="modal-visited" style="width: 16px; height: 16px; cursor:pointer;">
+                    <label for="modal-visited" style="font-weight: bold; font-size: 0.85rem; color: #10b981; cursor:pointer;">📍 I visited this</label>
+                </div>
+                
+                <div id="modal-wishlist-container" style="display:inline-flex; align-items:center; gap:8px; padding: 6px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;">
+                    <input type="checkbox" id="modal-wishlist" style="width: 16px; height: 16px; cursor:pointer;">
+                    <label for="modal-wishlist" style="font-weight: bold; font-size: 0.85rem; color: #d97706; cursor:pointer;">⭐ Add to Wishlist</label>
+                </div>
             </div>
 
             <div id="modal-tags" class="modal-tags"></div>
