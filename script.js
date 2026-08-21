@@ -34,6 +34,7 @@ const translations = {
     en: {
         subtitle: "Following the footsteps of your favorite artists",
         btnGenerateIti: "Auto-Itinerary Generator",
+        unlockMoreBtn: "Unlock More Groups",
         filterGroup: "Group", filterMember: "Member", filterArea: "Area", filterYear: "Year", filterCategories: "Categories",
         locationsCount: "Locations", statLocs: "Locations", statCountries: "Countries",
         mdlGroup: "Group:", mdlMember: "Members:", mdlCountry: "Country:", mdlCity: "City:", mdlAddress: "Address:", mdlDate: "Date:",
@@ -50,6 +51,7 @@ const translations = {
     fr: {
         subtitle: "Sur les traces de vos artistes préférés",
         btnGenerateIti: "Générateur d'Itinéraire",
+        unlockMoreBtn: "Débloquer d'autres groupes",
         filterGroup: "Groupe", filterMember: "Membre", filterArea: "Région/Pays", filterYear: "Année", filterCategories: "Catégories",
         locationsCount: "Lieux", statLocs: "Lieux", statCountries: "Pays",
         mdlGroup: "Groupe :", mdlMember: "Membres :", mdlCountry: "Pays :", mdlCity: "Ville :", mdlAddress: "Adresse :", mdlDate: "Date :",
@@ -75,7 +77,7 @@ function getLocText(field) {
 function updateUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        el.innerHTML = translations[currentLang][key];
+        if(translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
     });
     document.getElementById('search-input').placeholder = translations[currentLang].searchPlaceholder;
     if(groupSelect.options.length > 0) groupSelect.options[0].text = t('allGroups');
@@ -538,11 +540,11 @@ document.getElementById('open-itinerary-btn').addEventListener('click', () => {
     itiGroup.innerHTML = ''; availableGroups.forEach(g => { itiGroup.innerHTML += `<option value="${g}">${g}</option>`; });
     itiCountry.innerHTML = ''; [...new Set(celebLocations.map(l => l.country))].sort().forEach(c => { itiCountry.innerHTML += `<option value="${c}">${c}</option>`; });
     
-    document.getElementById('iti-result').classList.add('hidden'); // Map hidden initially
+    document.getElementById('iti-result').classList.add('hidden');
+    document.getElementById('iti-form').classList.remove('hidden');
     document.getElementById('itinerary-modal').classList.remove('hidden');
 });
 
-// Algorithme "Plus proche voisin" pour optimiser les distances géographiques
 function optimizeRoute(locations) {
     if(locations.length <= 1) return locations;
     let unvisited = [...locations];
@@ -569,7 +571,6 @@ window.generateItinerary = function() {
     let validLocs = celebLocations.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert(t('noLocationsFound')); return; }
 
-    // Tri spatial pour un voyage logique
     validLocs = optimizeRoute(validLocs);
 
     const resultDiv = document.getElementById('iti-days-list');
@@ -600,10 +601,9 @@ window.generateItinerary = function() {
         resultDiv.innerHTML += dayHtml;
     }
 
-    // Affiche le résultat ET la map EN DESSOUS (le formulaire reste visible en haut pour pouvoir relancer)
+    document.getElementById('iti-form').classList.add('hidden');
     document.getElementById('iti-result').classList.remove('hidden');
 
-    // Init or update mini map
     if(!itiLeafletMap) {
         itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(itiLeafletMap);
@@ -618,7 +618,6 @@ window.generateItinerary = function() {
     });
     L.polyline(coordsForMap, { color: '#D94680', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
 
-    // Important pour que la map Leaflet ne soit pas grise !
     setTimeout(() => {
         itiLeafletMap.invalidateSize();
         itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20] });
