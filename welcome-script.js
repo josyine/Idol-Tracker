@@ -71,30 +71,56 @@ document.getElementById('close-auth').addEventListener('click', () => { modal.cl
 document.getElementById('btn-to-email').addEventListener('click', () => { showStep(2); });
 document.getElementById('btn-back-1').addEventListener('click', () => { showStep(1); });
 
-// ==========================================
-// RÉINITIALISATION DES DONNÉES UTILISATEUR ICI
-// ==========================================
+// =======================================================
+// LOGIQUE INTELLIGENTE : CONNEXION vs CRÉATION DE COMPTE
+// =======================================================
 document.getElementById('btn-to-details').addEventListener('click', () => { 
-    const emailVal = document.getElementById('user-email').value;
-    if(document.getElementById('user-email').checkValidity()) {
-        localStorage.removeItem('userProfilePic'); // Supprime l'ancienne photo
-        localStorage.setItem('userEmail', emailVal);
-        showStep(3);
+    const emailInput = document.getElementById('user-email');
+    const emailVal = emailInput.value.trim().toLowerCase();
+    
+    if(emailInput.checkValidity()) {
+        const savedEmail = localStorage.getItem('userEmail');
+        
+        // Si l'email correspond à celui déjà sauvegardé et qu'il a déjà des groupes débloqués
+        if (savedEmail && emailVal === savedEmail.toLowerCase() && localStorage.getItem('unlockedGroups')) {
+            // L'utilisateur existe déjà : Connexion directe !
+            document.getElementById('btn-to-details').textContent = "Logging in...";
+            setTimeout(() => {
+                window.location.href = 'map.html';
+            }, 800);
+        } else {
+            // Nouvel utilisateur : Passe à l'étape 3 (Paiement)
+            localStorage.removeItem('userProfilePic'); // Nettoie au cas où
+            localStorage.setItem('userEmail', emailVal);
+            showStep(3);
+        }
     } else {
-        document.getElementById('user-email').reportValidity();
+        emailInput.reportValidity();
     }
 });
 document.getElementById('btn-back-2').addEventListener('click', () => { showStep(2); });
 
-window.simulateGoogleLogin = function() {
-    localStorage.removeItem('userProfilePic'); // Reset
-    localStorage.setItem('userEmail', 'user.google@gmail.com');
-    localStorage.setItem('userName', 'User Google');
-    showStep(3);
+
+// Google Popup Simulation
+window.openGooglePopup = function() {
+    document.getElementById('google-auth-popup').classList.remove('hidden');
+};
+
+window.completeGoogleLogin = function() {
+    document.getElementById('google-auth-popup').classList.add('hidden');
+    
+    // Si c'est un compte existant via Google, on le connecte direct
+    if(localStorage.getItem('userEmail') === 'jane.doe@gmail.com' && localStorage.getItem('unlockedGroups')) {
+        window.location.href = 'map.html';
+    } else {
+        // Sinon, création de compte
+        localStorage.setItem('userEmail', 'jane.doe@gmail.com');
+        localStorage.setItem('userName', 'Jane Doe');
+        showStep(3);
+    }
 };
 
 window.simulateFacebookLogin = function() {
-    localStorage.removeItem('userProfilePic'); // Reset
     localStorage.setItem('userEmail', 'user.facebook@fb.com');
     localStorage.setItem('userName', 'User Facebook');
     showStep(3);
@@ -124,7 +150,6 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
     const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
     if(checkedBoxes.length === 0) return;
 
-    // Enregistre le nom (qui remplacera l'ancien)
     const fname = document.getElementById('fname').value;
     const lname = document.getElementById('lname').value;
     if(fname) localStorage.setItem('userName', `${fname} ${lname}`);
@@ -141,6 +166,7 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
     setTimeout(() => { window.location.href = 'map.html'; }, 2000);
 });
 
+// Cookies
 if(!localStorage.getItem('cookiesAccepted')) { document.getElementById('cookie-banner').classList.remove('hidden'); }
 function closeCookies() { localStorage.setItem('cookiesAccepted', 'true'); document.getElementById('cookie-banner').classList.add('hidden'); }
 document.getElementById('cookie-accept').addEventListener('click', closeCookies);
