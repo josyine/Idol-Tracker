@@ -81,12 +81,16 @@ window.simulateGoogleLogin = function() {
     const popup = document.getElementById('google-auth-popup');
     if(popup) {
         popup.classList.remove('hidden');
-        // Force la fermeture après 1.5s et passe à l'étape du paiement
         setTimeout(() => {
             popup.classList.add('hidden');
-            showStep(3);
+            showStep(3); // Passe directement à l'étape des détails et du paiement
         }, 1500);
     }
+};
+
+window.simulateFacebookLogin = function() {
+    alert("Facebook Login API pending...");
+    showStep(3);
 };
 
 // Price & Payment
