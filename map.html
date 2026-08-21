@@ -8,34 +8,47 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
+    <!-- Top Nav pour Langue et Profil (ne chevauche plus la carte) -->
+    <div class="top-nav">
+        <div class="dropdown-container">
+            <button id="lang-btn" class="nav-btn">🌐</button>
+            <div id="lang-menu" class="dropdown-menu hidden">
+                <div class="dropdown-option lang-option" data-lang="en">English</div>
+                <div class="dropdown-option lang-option" data-lang="fr">Français</div>
+            </div>
+        </div>
+        <div class="dropdown-container" style="margin-left: 10px;">
+            <button id="profile-btn" class="nav-btn">👤</button>
+            <div id="profile-menu" class="dropdown-menu hidden">
+                <div class="dropdown-option" data-i18n="menuAccount">Your Account</div>
+                <div class="dropdown-option" data-i18n="menuSettings">Settings</div>
+                <div class="dropdown-option" id="logout-btn" data-i18n="menuLogout" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 15px;">
-                <div>
-                    <h1>Screen To Street</h1>
-                    <p class="subtitle" data-i18n="subtitle">Following the footsteps of your favorite artists</p>
-                </div>
-                
-                <!-- Nouveau bouton de langue -->
-                <div class="lang-dropdown-container">
-                    <button id="lang-btn" class="lang-btn">🌐</button>
-                    <div id="lang-menu" class="lang-menu hidden">
-                        <div class="lang-option" data-lang="en">English</div>
-                        <div class="lang-option" data-lang="fr">Français</div>
-                    </div>
-                </div>
+            <div class="sidebar-header" style="margin-bottom: 15px;">
+                <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+                    <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
+                    <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
+                    <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
+                </svg>
+                <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
             </div>
             
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
             
-            <!-- DÉBUT DE LA ZONE DE DÉFILEMENT GLOBALE -->
+            <!-- Zone de défilement (inclut le footer à la fin) -->
             <div class="sidebar-scroll-area">
                 
-                <!-- BOUTON GÉNÉRATEUR D'ITINÉRAIRE (Déplacé ici) -->
-                <button id="open-itinerary-btn" class="action-btn" style="width: 100%; margin-top:0; margin-bottom: 20px; background: #1F2937;" data-i18n="btnGenerateIti">🗺️ Auto-Itinerary Generator</button>
+                <button id="open-itinerary-btn" class="action-btn" style="width: 100%; margin-top:0; margin-bottom: 20px; background: #1F2937;" data-i18n="btnGenerateIti">Auto-Itinerary Generator</button>
 
                 <!-- Filters Section -->
                 <div class="filters-container">
@@ -74,6 +87,15 @@
                 
                 <div class="location-list" id="location-list"></div>
                 
+                <!-- FOOTER LÉGAL DÉPLACÉ ICI (Scrolle avec la barre) -->
+                <div class="sidebar-footer">
+                    <p>Screen To Street is an independent fan-made guide. Not affiliated with agencies.</p>
+                    <div class="sidebar-footer-links">
+                        <a href="legal.html#notice">Legal Notice</a>
+                        <a href="legal.html#cgv">Terms of Sale</a>
+                        <a href="legal.html#privacy">Privacy Policy</a>
+                    </div>
+                </div>
             </div>
         </aside>
 
@@ -129,12 +151,12 @@
         </div>
     </div>
 
-    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE -->
+    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE (Avec la Mini-Map) -->
     <div id="itinerary-modal" class="modal hidden">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 650px;">
             <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
-            <h2 style="color: var(--primary-magenta); margin-bottom: 10px;" data-i18n="itiTitle">🗺️ Auto-Itinerary Generator</h2>
-            <p style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 25px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay. We will generate a smart route for you!</p>
+            <h2 style="color: var(--primary-magenta); margin-bottom: 10px;" data-i18n="itiTitle">Auto-Itinerary Generator</h2>
+            <p style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 25px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay. We will generate an optimized route for you!</p>
             
             <div id="iti-form">
                 <div class="input-group" style="margin-bottom:15px; display: flex; flex-direction: column;">
@@ -152,23 +174,24 @@
                 <button class="action-btn" onclick="generateItinerary()" style="width: 100%; border:none; cursor:pointer;" data-i18n="itiCreateBtn">Create My Guide</button>
             </div>
 
-            <div id="iti-result" class="hidden"></div>
+            <div id="iti-result" class="hidden">
+                <div id="iti-map-container" style="width: 100%; height: 250px; background: #e5e5e5; border-radius: 12px; margin-bottom: 20px; overflow: hidden;"></div>
+                <div id="iti-days-list"></div>
+            </div>
         </div>
     </div>
 
-    <!-- LEGAL FOOTER -->
-    <footer class="legal-footer">
-        <div class="footer-content">
-            <p class="disclaimer">
-                <strong>Disclaimer:</strong> Screen To Street is an independent fan-made guide. We are not affiliated with, endorsed by, or sponsored by HYBE, YG Entertainment, JYP Entertainment, or any other agency or artist. All trademarks belong to their respective owners.
-            </p>
-            <div class="footer-links">
-                <a href="legal.html#notice">Mentions Légales (Legal Notice)</a>
-                <a href="legal.html#cgv">CGV (Terms of Sale)</a>
-                <a href="legal.html#privacy">Politique de Confidentialité (Privacy Policy)</a>
+    <!-- BANNIÈRE COOKIES -->
+    <div id="cookie-banner" class="cookie-banner hidden">
+        <div class="cookie-content">
+            <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#privacy" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
+            <div class="cookie-actions">
+                <button id="cookie-manage" class="filter-btn" data-i18n="cookieManage">Manage</button>
+                <button id="cookie-reject" class="filter-btn" data-i18n="cookieReject">Reject</button>
+                <button id="cookie-accept" class="action-btn" data-i18n="cookieAccept">Accept</button>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
