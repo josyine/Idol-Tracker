@@ -56,17 +56,17 @@ const step1 = document.getElementById('auth-step-1');
 const step2 = document.getElementById('auth-step-2');
 const step3 = document.getElementById('auth-step-3');
 
-document.querySelectorAll('.open-auth-btn').forEach(btn => {
-    btn.addEventListener('click', () => { modal.classList.remove('hidden'); showStep(1); });
-});
-document.getElementById('close-auth').addEventListener('click', () => { modal.classList.add('hidden'); });
-
 function showStep(step) {
     step1.classList.add('hidden'); step2.classList.add('hidden'); step3.classList.add('hidden');
     if(step === 1) step1.classList.remove('hidden');
     if(step === 2) step2.classList.remove('hidden');
     if(step === 3) step3.classList.remove('hidden');
 }
+
+document.querySelectorAll('.open-auth-btn').forEach(btn => {
+    btn.addEventListener('click', () => { modal.classList.remove('hidden'); showStep(1); });
+});
+document.getElementById('close-auth').addEventListener('click', () => { modal.classList.add('hidden'); });
 
 document.getElementById('btn-to-email').addEventListener('click', () => { showStep(2); });
 document.getElementById('btn-back-1').addEventListener('click', () => { showStep(1); });
@@ -76,14 +76,17 @@ document.getElementById('btn-to-details').addEventListener('click', () => {
 });
 document.getElementById('btn-back-2').addEventListener('click', () => { showStep(2); });
 
-// Simulation Google Login
+// CORRECTION GOOGLE LOGIN
 window.simulateGoogleLogin = function() {
     const popup = document.getElementById('google-auth-popup');
-    popup.classList.remove('hidden');
-    setTimeout(() => {
-        popup.classList.add('hidden');
-        showStep(3); // Passe directement à l'étape des détails et du paiement
-    }, 1800);
+    if(popup) {
+        popup.classList.remove('hidden');
+        // Force la fermeture après 1.5s et passe à l'étape du paiement
+        setTimeout(() => {
+            popup.classList.add('hidden');
+            showStep(3);
+        }, 1500);
+    }
 };
 
 // Price & Payment
