@@ -86,7 +86,22 @@ function updateUI() {
     renderLocations();
 }
 
-// Nav Menus Events
+// ==========================================
+// 3. PROFILE LOGIC & NAV EVENTS
+// ==========================================
+const profileBtn = document.getElementById('profile-btn');
+const savedPic = localStorage.getItem('userProfilePic');
+const savedName = localStorage.getItem('userName') || 'User';
+
+if(savedPic) {
+    profileBtn.style.backgroundImage = `url(${savedPic})`;
+    profileBtn.style.backgroundSize = 'cover';
+    profileBtn.style.backgroundPosition = 'center';
+    profileBtn.textContent = ''; // Retire la lettre si y'a une image
+} else {
+    profileBtn.textContent = savedName.charAt(0).toUpperCase();
+}
+
 document.getElementById('lang-btn').addEventListener('click', (e) => {
     document.getElementById('lang-menu').classList.toggle('hidden');
     document.getElementById('profile-menu').classList.add('hidden');
@@ -116,7 +131,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 });
 
 // ==========================================
-// 3. LOCATIONS DATABASE (ALL 19 LOCATIONS)
+// 4. LOCATIONS DATABASE (ALL 19 LOCATIONS)
 // ==========================================
 let celebLocations = [
     {
@@ -333,7 +348,87 @@ let celebLocations = [
 ];
 
 // ==========================================
-// 4. PAYWALL / FILTER LOGIC
+// 5. CART & UNLOCK LOGIC
+// ==========================================
+window.openCartModal = function() {
+    document.getElementById('cart-modal').classList.remove('hidden');
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    
+    document.querySelectorAll('.cart-checkbox').forEach(cb => {
+        cb.checked = false; // Reset
+        const span = cb.nextElementSibling;
+        if(unlockedGroups.includes(cb.value)) {
+            cb.disabled = true;
+            span.style.background = "#f1f5f9";
+            span.style.color = "#94a3b8";
+            span.textContent = `${cb.value} (Purchased)`;
+        } else {
+            cb.disabled = false;
+            span.style.background = "white";
+            span.style.color = "#64748b";
+            span.textContent = cb.value;
+        }
+    });
+    updateCartPrice();
+}
+
+const cartCheckboxes = document.querySelectorAll('.cart-checkbox');
+const cartPriceDisplay = document.getElementById('cart-price');
+const cartPayBtn = document.getElementById('cart-pay-btn');
+
+function updateCartPrice() {
+    if(!cartPriceDisplay || !cartPayBtn) return;
+    const selectedCount = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
+    const totalPrice = selectedCount * 14.99;
+    cartPriceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
+    
+    if (selectedCount > 0) {
+        cartPayBtn.disabled = false;
+        cartPayBtn.textContent = `Pay ${totalPrice.toFixed(2)} €`;
+    } else {
+        cartPayBtn.disabled = true;
+        cartPayBtn.textContent = `Select a group`;
+    }
+}
+
+cartCheckboxes.forEach(cb => {
+    cb.addEventListener('change', function() {
+        if(this.checked) {
+            this.nextElementSibling.style.background = "#FCE7F0";
+            this.nextElementSibling.style.borderColor = "#D94680";
+            this.nextElementSibling.style.color = "#D94680";
+        } else {
+            this.nextElementSibling.style.background = "white";
+            this.nextElementSibling.style.borderColor = "#cbd5e1";
+            this.nextElementSibling.style.color = "#64748b";
+        }
+        updateCartPrice();
+    });
+});
+
+const cartForm = document.getElementById('cart-form');
+if (cartForm) {
+    cartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const checkedBoxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
+        if(checkedBoxes.length === 0) return;
+
+        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        checkedBoxes.forEach(cb => {
+            if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value);
+        });
+        
+        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+        
+        cartPayBtn.textContent = "Processing...";
+        setTimeout(() => {
+            window.location.reload(); 
+        }, 1500);
+    });
+}
+
+// ==========================================
+// 6. PAYWALL & FILTER LOGIC
 // ==========================================
 const unlockedGroupsStr = localStorage.getItem('unlockedGroups');
 if (unlockedGroupsStr) {
@@ -354,6 +449,7 @@ const categoryButtonsContainer = document.getElementById('category-buttons');
 let activeCategory = "All"; 
 
 function populateGroupDropdown() {
+    if(!groupSelect) return;
     const availableGroups = [...new Set(celebLocations.map(l => l.group))].sort();
     groupSelect.innerHTML = `<option value="All">${t('allGroups')}</option>`;
     availableGroups.forEach(g => {
@@ -363,6 +459,7 @@ function populateGroupDropdown() {
 populateGroupDropdown();
 
 function initializeFilters() {
+    if(!groupSelect) return;
     const selectedGroup = groupSelect.value;
     if(groupSelect.options.length > 0) groupSelect.options[0].text = t('allGroups');
 
@@ -395,16 +492,17 @@ function initializeFilters() {
     });
 }
 
-groupSelect.addEventListener('change', () => { initializeFilters(); renderLocations(); });
-memberSelect.addEventListener('change', renderLocations);
-yearSelect.addEventListener('change', renderLocations);
-countrySelect.addEventListener('change', renderLocations);
-searchInput.addEventListener('input', renderLocations);
+if(groupSelect) groupSelect.addEventListener('change', () => { initializeFilters(); renderLocations(); });
+if(memberSelect) memberSelect.addEventListener('change', renderLocations);
+if(yearSelect) yearSelect.addEventListener('change', renderLocations);
+if(countrySelect) countrySelect.addEventListener('change', renderLocations);
+if(searchInput) searchInput.addEventListener('input', renderLocations);
 
 // ==========================================
-// 5. MAP RENDERING
+// 7. MAP RENDERING
 // ==========================================
 function renderLocations() {
+    if(!groupSelect) return;
     markerGroup.clearLayers();
     const locationListElement = document.getElementById('location-list');
     locationListElement.innerHTML = '';
@@ -452,7 +550,7 @@ function renderLocations() {
         card.className = 'location-card';
         card.innerHTML = `<div class="card-icon-box">${catIconSvg}</div><div class="card-content"><div class="card-meta-top">${loc.category} • ${loc.city}</div><div class="card-title">${loc.name}</div><div class="card-address">${mapPinSvg} ${loc.city}</div></div>`;
         card.addEventListener('click', () => {
-            document.querySelectorAll('.location-card').forEach(c => c.style.borderColor = '#F5D0DF');
+            document.querySelectorAll('.location-card').forEach(c => c.style.borderColor = '#cbd5e1');
             card.style.borderColor = '#D94680';
             map.flyTo([loc.lat, loc.lng], 16, { duration: 1.5 });
             setTimeout(() => marker.openPopup(), 1500);
@@ -463,10 +561,13 @@ function renderLocations() {
     if (mapMarkers.length > 0) map.fitBounds(new L.featureGroup(mapMarkers).getBounds(), { padding: [50, 50], maxZoom: 16 });
 }
 
-updateUI();
+// Initial UI Setup for Map page
+if(document.getElementById('search-input')) {
+    updateUI();
+}
 
 // ==========================================
-// 6. DETAILS MODAL
+// 8. DETAILS MODAL
 // ==========================================
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -524,26 +625,30 @@ window.closeModal = function(id) {
 window.onclick = function(event) { 
     if (event.target === document.getElementById('details-modal')) window.closeModal('details-modal'); 
     if (event.target === document.getElementById('itinerary-modal')) window.closeModal('itinerary-modal'); 
+    if (event.target === document.getElementById('cart-modal')) window.closeModal('cart-modal'); 
 };
 
 // ==========================================
-// 7. ITINERARY GENERATOR (OPTIMIZED) & MINI-MAP
+// 9. ITINERARY GENERATOR (OPTIMIZED) & MINI-MAP
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
 
-document.getElementById('open-itinerary-btn').addEventListener('click', () => {
-    const itiGroup = document.getElementById('iti-group');
-    const itiCountry = document.getElementById('iti-country');
-    
-    const availableGroups = [...new Set(celebLocations.map(l => l.group))].sort();
-    itiGroup.innerHTML = ''; availableGroups.forEach(g => { itiGroup.innerHTML += `<option value="${g}">${g}</option>`; });
-    itiCountry.innerHTML = ''; [...new Set(celebLocations.map(l => l.country))].sort().forEach(c => { itiCountry.innerHTML += `<option value="${c}">${c}</option>`; });
-    
-    document.getElementById('iti-result').classList.add('hidden');
-    document.getElementById('iti-form').classList.remove('hidden');
-    document.getElementById('itinerary-modal').classList.remove('hidden');
-});
+const btnOpenIti = document.getElementById('open-itinerary-btn');
+if(btnOpenIti) {
+    btnOpenIti.addEventListener('click', () => {
+        const itiGroup = document.getElementById('iti-group');
+        const itiCountry = document.getElementById('iti-country');
+        
+        const availableGroups = [...new Set(celebLocations.map(l => l.group))].sort();
+        itiGroup.innerHTML = ''; availableGroups.forEach(g => { itiGroup.innerHTML += `<option value="${g}">${g}</option>`; });
+        itiCountry.innerHTML = ''; [...new Set(celebLocations.map(l => l.country))].sort().forEach(c => { itiCountry.innerHTML += `<option value="${c}">${c}</option>`; });
+        
+        document.getElementById('iti-result').classList.add('hidden');
+        document.getElementById('iti-form').classList.remove('hidden');
+        document.getElementById('itinerary-modal').classList.remove('hidden');
+    });
+}
 
 function optimizeRoute(locations) {
     if(locations.length <= 1) return locations;
@@ -625,10 +730,18 @@ window.generateItinerary = function() {
 };
 
 // ==========================================
-// 8. COOKIES LOGIC (Map page)
+// 10. COOKIES LOGIC
 // ==========================================
-if(!localStorage.getItem('cookiesAccepted')) { document.getElementById('cookie-banner').classList.remove('hidden'); }
-function closeCookies() { localStorage.setItem('cookiesAccepted', 'true'); document.getElementById('cookie-banner').classList.add('hidden'); }
-document.getElementById('cookie-accept').addEventListener('click', closeCookies);
-document.getElementById('cookie-reject').addEventListener('click', closeCookies);
-document.getElementById('cookie-manage').addEventListener('click', () => { window.location.href = 'settings.html'; });
+if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
+    document.getElementById('cookie-banner').classList.remove('hidden'); 
+}
+function closeCookies() { 
+    localStorage.setItem('cookiesAccepted', 'true'); 
+    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
+}
+const btnAccept = document.getElementById('cookie-accept');
+if(btnAccept) btnAccept.addEventListener('click', closeCookies);
+const btnReject = document.getElementById('cookie-reject');
+if(btnReject) btnReject.addEventListener('click', closeCookies);
+const btnManage = document.getElementById('cookie-manage');
+if(btnManage) btnManage.addEventListener('click', () => { window.location.href = 'settings.html'; });
