@@ -28,39 +28,31 @@
 <body>
     <div class="container">
         <a href="map.html" class="back-btn">← Back to Map</a>
-        <h1>📍 My Visited Places</h1>
+        <h1>My Visited Places</h1>
         
-        <div id="progress-container" class="progress-section">
-            <!-- Les barres de progression s'afficheront ici -->
-        </div>
+        <div id="progress-container" class="progress-section"></div>
 
         <h3 style="color: #334e68; margin-bottom: 15px;">Visited Locations</h3>
-        <ul id="visited-list" class="visited-list">
-            <!-- La liste s'affichera ici -->
-        </ul>
+        <ul id="visited-list" class="visited-list"></ul>
     </div>
 
-    <script src="script.js"></script> <!-- On importe script.js pour avoir accès à celebLocations -->
+    <!-- On charge Leaflet juste pour éviter les erreurs de script.js, puis le script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script> 
     <script>
-        setTimeout(() => {
-            // Récupère et nettoie les données
+        document.addEventListener("DOMContentLoaded", () => {
             let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-            // Conversion si ancien format (juste des IDs) vers nouveau format (objets avec date)
             visitedData = visitedData.map(v => typeof v === 'number' ? {id: v, date: "Unknown Date"} : v);
 
             const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-            
             const progressContainer = document.getElementById('progress-container');
             const listContainer = document.getElementById('visited-list');
 
             if(visitedData.length === 0) {
                 listContainer.innerHTML = "<p style='color:#64748b; text-align:center;'>You haven't visited any places yet.</p>";
             } else {
-                // 1. Calculer les pourcentages par groupe débloqué
                 unlockedGroups.forEach(group => {
                     const totalLocsInGroup = celebLocations.filter(loc => loc.group === group).length;
-                    
-                    // Trouver combien de lieux de ce groupe sont dans visitedData
                     const visitedCount = visitedData.filter(v => {
                         const loc = celebLocations.find(l => l.id === v.id);
                         return loc && loc.group === group;
@@ -68,7 +60,6 @@
 
                     if(totalLocsInGroup > 0) {
                         const percentage = Math.round((visitedCount / totalLocsInGroup) * 100);
-                        
                         progressContainer.innerHTML += `
                             <div class="group-progress">
                                 <div class="group-header">
@@ -83,7 +74,6 @@
                     }
                 });
 
-                // 2. Afficher la liste
                 visitedData.forEach(v => {
                     const loc = celebLocations.find(l => l.id === v.id);
                     if(loc) {
@@ -99,7 +89,7 @@
                     }
                 });
             }
-        }, 100); // Petit délai pour laisser le script.js se charger
+        });
     </script>
 </body>
 </html>
