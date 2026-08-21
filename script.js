@@ -34,7 +34,6 @@ const translations = {
     en: {
         subtitle: "Following the footsteps of your favorite artists",
         btnGenerateIti: "Auto-Itinerary Generator",
-        unlockMoreBtn: "Unlock More Groups",
         filterGroup: "Group", filterMember: "Member", filterArea: "Area", filterYear: "Year", filterCategories: "Categories",
         locationsCount: "Locations", statLocs: "Locations", statCountries: "Countries",
         mdlGroup: "Group:", mdlMember: "Members:", mdlCountry: "Country:", mdlCity: "City:", mdlAddress: "Address:", mdlDate: "Date:",
@@ -45,14 +44,11 @@ const translations = {
         itiGroup: "Group", itiCountry: "Country", itiDays: "Number of Days", itiCreateBtn: "Create My Guide",
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allCats: "All Categories",
         moreDetails: "More details", day: "Day", noLocationsFound: "Not enough locations found for this selection.", openRouteMap: "Open Route in Google Maps", searchPlaceholder: "Search a location, city, context...",
-        menuAccount: "Your Account", menuSettings: "Settings", menuLogout: "Logout",
-        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
-        markVisited: "I have visited this place!"
+        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
     },
     fr: {
         subtitle: "Sur les traces de vos artistes préférés",
         btnGenerateIti: "Générateur d'Itinéraire",
-        unlockMoreBtn: "Débloquer d'autres groupes",
         filterGroup: "Groupe", filterMember: "Membre", filterArea: "Région/Pays", filterYear: "Année", filterCategories: "Catégories",
         locationsCount: "Lieux", statLocs: "Lieux", statCountries: "Pays",
         mdlGroup: "Groupe :", mdlMember: "Membres :", mdlCountry: "Pays :", mdlCity: "Ville :", mdlAddress: "Adresse :", mdlDate: "Date :",
@@ -63,9 +59,7 @@ const translations = {
         itiGroup: "Groupe", itiCountry: "Pays", itiDays: "Nombre de Jours", itiCreateBtn: "Créer Mon Guide",
         allGroups: "Tous les Groupes", allMembers: "Tous les Membres", allAreas: "Toutes les Régions", allCats: "Toutes les Catégories",
         moreDetails: "Plus de détails", day: "Jour", noLocationsFound: "Pas assez de lieux trouvés pour cette sélection.", openRouteMap: "Ouvrir l'itinéraire Google Maps", searchPlaceholder: "Rechercher un lieu, une ville...",
-        menuAccount: "Votre compte", menuSettings: "Paramètres", menuLogout: "Se déconnecter",
-        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
-        markVisited: "J'ai visité ce lieu !"
+        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
     }
 };
 
@@ -350,7 +344,7 @@ let celebLocations = [
 ];
 
 // ==========================================
-// 5. CART & UNLOCK LOGIC
+// 5. CART LOGIC
 // ==========================================
 window.openCartModal = function() {
     document.getElementById('cart-modal').classList.remove('hidden');
@@ -531,15 +525,21 @@ function renderLocations() {
 
     const mapMarkers = [];
     
-    // Récupérer les lieux visités
-    const visitedGroups = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    let wishlistData = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
 
     filteredLocations.forEach(loc => {
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
         
-        // Change la couleur si visité
-        const isVisited = visitedGroups.includes(loc.id);
-        const iconColorStyle = isVisited ? `style="border-color: #10b981; color: #10b981;"` : '';
+        const isVisited = visitedData.some(v => v.id === loc.id || v === loc.id);
+        const isWishlist = wishlistData.some(w => w.id === loc.id || w === loc.id);
+        
+        let iconColorStyle = '';
+        if(isVisited) {
+            iconColorStyle = `style="border-color: #10b981; color: #10b981;"`;
+        } else if (isWishlist) {
+            iconColorStyle = `style="border-color: #d97706; color: #d97706;"`;
+        }
         
         const customIcon = L.divIcon({ 
             className: 'custom-category-marker', 
@@ -579,13 +579,12 @@ function renderLocations() {
     if (mapMarkers.length > 0) map.fitBounds(new L.featureGroup(mapMarkers).getBounds(), { padding: [50, 50], maxZoom: 16 });
 }
 
-// Initial UI Setup for Map page
 if(document.getElementById('search-input')) {
     updateUI();
 }
 
 // ==========================================
-// 8. DETAILS MODAL (WITH VISITED CHECKBOX)
+// 8. DETAILS MODAL (WITH CHECKBOXES)
 // ==========================================
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -633,17 +632,37 @@ window.openModal = function(id) {
     // GESTION CHECKBOX "VISITÉ"
     const visitedCheckbox = document.getElementById('modal-visited');
     let visitedLocs = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-    visitedCheckbox.checked = visitedLocs.includes(loc.id);
+    visitedCheckbox.checked = visitedLocs.some(v => v.id === loc.id || v === loc.id);
     
     visitedCheckbox.onchange = function() {
         let vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
         if(this.checked) {
-            if(!vList.includes(loc.id)) vList.push(loc.id);
+            if(!vList.some(v => v.id === loc.id || v === loc.id)) {
+                vList.push({id: loc.id, date: new Date().toLocaleDateString()});
+            }
         } else {
-            vList = vList.filter(vId => vId !== loc.id);
+            vList = vList.filter(v => v.id !== loc.id && v !== loc.id);
         }
         localStorage.setItem('visitedLocs', JSON.stringify(vList));
-        renderLocations(); // Mets à jour la couleur du pin en live
+        renderLocations(); 
+    };
+
+    // GESTION CHECKBOX "WISHLIST"
+    const wishlistCheckbox = document.getElementById('modal-wishlist');
+    let wishlistLocs = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    wishlistCheckbox.checked = wishlistLocs.some(w => w.id === loc.id || w === loc.id);
+    
+    wishlistCheckbox.onchange = function() {
+        let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+        if(this.checked) {
+            if(!wList.some(w => w.id === loc.id || w === loc.id)) {
+                wList.push({id: loc.id, date: new Date().toLocaleDateString()});
+            }
+        } else {
+            wList = wList.filter(w => w.id !== loc.id && w !== loc.id);
+        }
+        localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+        renderLocations();
     };
 
     document.getElementById('details-modal').classList.remove('hidden');
@@ -664,7 +683,7 @@ window.onclick = function(event) {
 };
 
 // ==========================================
-// 9. ITINERARY GENERATOR (OPTIMIZED) & MINI-MAP
+// 9. ITINERARY GENERATOR
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
