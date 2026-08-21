@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Visited Places - Screen To Street</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 40px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #cbd5e1; }
+        h1 { color: #D94680; text-align: center; border-bottom: 2px solid #FCE7F0; padding-bottom: 15px; margin-bottom: 30px;}
+        a.back-btn { display: inline-block; margin-bottom: 20px; color: #D94680; text-decoration: none; font-weight: bold; }
+        a.back-btn:hover { text-decoration: underline; }
+        
+        .progress-section { margin-bottom: 30px; }
+        .group-progress { margin-bottom: 15px; }
+        .group-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #334e68;}
+        .progress-bar-bg { width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background-color: #10b981; border-radius: 10px; transition: width 0.5s ease; }
+        
+        .visited-list { list-style: none; padding: 0; }
+        .visited-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        .visited-item:last-child { border-bottom: none; }
+        .loc-name { font-weight: bold; color: #D94680; font-size: 1.1rem;}
+        .loc-group { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold;}
+        .loc-date { font-size: 0.85rem; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="map.html" class="back-btn">← Back to Map</a>
+        <h1>📍 My Visited Places</h1>
+        
+        <div id="progress-container" class="progress-section">
+            <!-- Les barres de progression s'afficheront ici -->
+        </div>
+
+        <h3 style="color: #334e68; margin-bottom: 15px;">Visited Locations</h3>
+        <ul id="visited-list" class="visited-list">
+            <!-- La liste s'affichera ici -->
+        </ul>
+    </div>
+
+    <script src="script.js"></script> <!-- On importe script.js pour avoir accès à celebLocations -->
+    <script>
+        setTimeout(() => {
+            // Récupère et nettoie les données
+            let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+            // Conversion si ancien format (juste des IDs) vers nouveau format (objets avec date)
+            visitedData = visitedData.map(v => typeof v === 'number' ? {id: v, date: "Unknown Date"} : v);
+
+            const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+            
+            const progressContainer = document.getElementById('progress-container');
+            const listContainer = document.getElementById('visited-list');
+
+            if(visitedData.length === 0) {
+                listContainer.innerHTML = "<p style='color:#64748b; text-align:center;'>You haven't visited any places yet.</p>";
+            } else {
+                // 1. Calculer les pourcentages par groupe débloqué
+                unlockedGroups.forEach(group => {
+                    const totalLocsInGroup = celebLocations.filter(loc => loc.group === group).length;
+                    
+                    // Trouver combien de lieux de ce groupe sont dans visitedData
+                    const visitedCount = visitedData.filter(v => {
+                        const loc = celebLocations.find(l => l.id === v.id);
+                        return loc && loc.group === group;
+                    }).length;
+
+                    if(totalLocsInGroup > 0) {
+                        const percentage = Math.round((visitedCount / totalLocsInGroup) * 100);
+                        
+                        progressContainer.innerHTML += `
+                            <div class="group-progress">
+                                <div class="group-header">
+                                    <span>${group}</span>
+                                    <span>${percentage}% (${visitedCount}/${totalLocsInGroup})</span>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                // 2. Afficher la liste
+                visitedData.forEach(v => {
+                    const loc = celebLocations.find(l => l.id === v.id);
+                    if(loc) {
+                        listContainer.innerHTML += `
+                            <li class="visited-item">
+                                <div>
+                                    <div class="loc-name">${loc.name}</div>
+                                    <div class="loc-group">${loc.group} • ${loc.city}</div>
+                                </div>
+                                <div class="loc-date">Visited: ${v.date}</div>
+                            </li>
+                        `;
+                    }
+                });
+            }
+        }, 100); // Petit délai pour laisser le script.js se charger
+    </script>
+</body>
+</html>
