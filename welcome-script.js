@@ -76,16 +76,14 @@ document.getElementById('btn-to-details').addEventListener('click', () => {
 });
 document.getElementById('btn-back-2').addEventListener('click', () => { showStep(2); });
 
-// CORRECTION GOOGLE LOGIN
-window.simulateGoogleLogin = function() {
-    const popup = document.getElementById('google-auth-popup');
-    if(popup) {
-        popup.classList.remove('hidden');
-        setTimeout(() => {
-            popup.classList.add('hidden');
-            showStep(3); // Passe directement à l'étape des détails et du paiement
-        }, 1500);
-    }
+// GESTION GOOGLE POP-UP
+window.openGooglePopup = function() {
+    document.getElementById('google-auth-popup').classList.remove('hidden');
+};
+
+window.completeGoogleLogin = function() {
+    document.getElementById('google-auth-popup').classList.add('hidden');
+    showStep(3); // Passe à l'étape du choix des passes et paiement
 };
 
 window.simulateFacebookLogin = function() {
