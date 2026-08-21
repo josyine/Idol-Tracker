@@ -1,11 +1,11 @@
-const PRICE_PER_GROUP = 4.99;
+const PRICE_PER_GROUP = 14.99;
 let currentLang = localStorage.getItem('lang') || 'en';
 
 const dict = {
     en: {
         subtitle: "Following the footsteps of your favorite artists",
         step1: "1. Account Details", fname: "First Name", lname: "Last Name", email: "Email Address",
-        step2: "2. Choose Your Passes", passDesc: "Select the groups you want to unlock. (4.99€ per group)",
+        step2: "2. Choose Your Passes", passDesc: "Select the groups you want to unlock. (14.99€ per group)",
         totalDue: "Total Due:", payBtnEmpty: "Select a group to pay", payBtnActive: "Pay {price} € & Unlock",
         processing: "Processing payment securely...",
         cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
@@ -13,7 +13,7 @@ const dict = {
     fr: {
         subtitle: "Sur les traces de vos artistes préférés",
         step1: "1. Détails du compte", fname: "Prénom", lname: "Nom", email: "Adresse Email",
-        step2: "2. Choisissez vos Pass", passDesc: "Sélectionnez les groupes à débloquer. (4.99€ par groupe)",
+        step2: "2. Choisissez vos Pass", passDesc: "Sélectionnez les groupes à débloquer. (14.99€ par groupe)",
         totalDue: "Total à payer :", payBtnEmpty: "Sélectionnez un groupe", payBtnActive: "Payer {price} € & Débloquer",
         processing: "Traitement sécurisé du paiement...",
         cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
@@ -28,7 +28,6 @@ function updateLangUI() {
     updatePrice();
 }
 
-// Lang Menu
 document.getElementById('lang-btn').addEventListener('click', (e) => {
     document.getElementById('lang-menu').classList.toggle('hidden');
     e.stopPropagation();
@@ -43,7 +42,6 @@ document.querySelectorAll('.lang-option').forEach(opt => {
     });
 });
 
-// Price Logic
 const checkboxes = document.querySelectorAll('.group-checkbox');
 const priceDisplay = document.getElementById('price-display');
 const payBtn = document.getElementById('pay-btn');
@@ -62,7 +60,6 @@ function updatePrice() {
 }
 checkboxes.forEach(cb => cb.addEventListener('change', updatePrice));
 
-// Payment
 document.getElementById('checkout-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
@@ -77,7 +74,6 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
     setTimeout(() => { window.location.href = 'map.html'; }, 2000);
 });
 
-// Cookies
 if(!localStorage.getItem('cookiesAccepted')) {
     document.getElementById('cookie-banner').classList.remove('hidden');
 }
