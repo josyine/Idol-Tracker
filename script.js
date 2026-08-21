@@ -206,8 +206,7 @@ const translations = {
         itiGroup: "Group", itiCountry: "Country", itiDays: "Number of Days", itiCreateBtn: "Create My Guide",
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allCats: "All Categories",
         moreDetails: "More details", day: "Day", noLocationsFound: "Not enough locations found for this selection.", openRouteMap: "Open Route in Google Maps", searchPlaceholder: "Search a location, city, context...",
-        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
-        markVisited: "I visited this place"
+        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
     },
     fr: {
         subtitle: "Sur les traces de vos artistes préférés",
@@ -222,8 +221,7 @@ const translations = {
         itiGroup: "Groupe", itiCountry: "Pays", itiDays: "Nombre de Jours", itiCreateBtn: "Créer Mon Guide",
         allGroups: "Tous les Groupes", allMembers: "Tous les Membres", allAreas: "Toutes les Régions", allCats: "Toutes les Catégories",
         moreDetails: "Plus de détails", day: "Jour", noLocationsFound: "Pas assez de lieux trouvés pour cette sélection.", openRouteMap: "Ouvrir l'itinéraire Google Maps", searchPlaceholder: "Rechercher un lieu, une ville...",
-        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
-        markVisited: "J'ai visité ce lieu"
+        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
     }
 };
 
@@ -368,7 +366,7 @@ function renderLocations() {
             iconColorStyle = `style="border-color: #10b981; color: #10b981;"`;
             extraClass = 'visited-marker-div';
         } else if (isWishlist) {
-            iconColorStyle = `style="border-color: #d97706; color: #d97706;"`;
+            iconColorStyle = `style="border-color: #f59e0b; color: #f59e0b;"`;
             extraClass = 'wishlist-marker-div';
         }
         
@@ -415,7 +413,7 @@ if(document.getElementById('search-input')) {
 }
 
 // ==========================================
-// 8. DETAILS MODAL
+// 7. MODALS (DETAILS & CART)
 // ==========================================
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -463,6 +461,7 @@ window.openModal = function(id) {
         } else { videoSection.classList.add('hidden'); }
     }
     
+    // GESTION CHECKBOX "VISITÉ"
     const visitedCheckbox = document.getElementById('modal-visited');
     if(visitedCheckbox) {
         let visitedLocs = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
@@ -482,6 +481,7 @@ window.openModal = function(id) {
         };
     }
 
+    // GESTION CHECKBOX "WISHLIST"
     const wishlistCheckbox = document.getElementById('modal-wishlist');
     if (wishlistCheckbox) {
         let wishlistLocs = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
@@ -520,8 +520,87 @@ window.onclick = function(event) {
 };
 
 // ==========================================
-// 9. ITINERARY GENERATOR & EXPORT
+// 8. CART & ITINERARY LOGIC
 // ==========================================
+window.openCartModal = function() {
+    const cartModal = document.getElementById('cart-modal');
+    if(!cartModal) return;
+    cartModal.classList.remove('hidden');
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    
+    document.querySelectorAll('.cart-checkbox').forEach(cb => {
+        cb.checked = false; 
+        const span = cb.nextElementSibling;
+        if(unlockedGroups.includes(cb.value)) {
+            cb.disabled = true;
+            span.style.background = "#f1f5f9";
+            span.style.color = "#94a3b8";
+            span.textContent = `${cb.value} (Purchased)`;
+        } else {
+            cb.disabled = false;
+            span.style.background = "white";
+            span.style.color = "#64748b";
+            span.textContent = cb.value;
+        }
+    });
+    updateCartPrice();
+}
+
+function updateCartPrice() {
+    const cartPriceDisplay = document.getElementById('cart-price');
+    const cartPayBtn = document.getElementById('cart-pay-btn');
+    if(!cartPriceDisplay || !cartPayBtn) return;
+
+    const selectedCount = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
+    const totalPrice = selectedCount * 14.99;
+    cartPriceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
+    
+    if (selectedCount > 0) {
+        cartPayBtn.disabled = false;
+        cartPayBtn.textContent = `Pay ${totalPrice.toFixed(2)} €`;
+    } else {
+        cartPayBtn.disabled = true;
+        cartPayBtn.textContent = `Select a group`;
+    }
+}
+
+document.querySelectorAll('.cart-checkbox').forEach(cb => {
+    cb.addEventListener('change', function() {
+        if(this.checked) {
+            this.nextElementSibling.style.background = "#FCE7F0";
+            this.nextElementSibling.style.borderColor = "#D94680";
+            this.nextElementSibling.style.color = "#D94680";
+        } else {
+            this.nextElementSibling.style.background = "white";
+            this.nextElementSibling.style.borderColor = "#cbd5e1";
+            this.nextElementSibling.style.color = "#64748b";
+        }
+        updateCartPrice();
+    });
+});
+
+const cartForm = document.getElementById('cart-form');
+if (cartForm) {
+    cartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const checkedBoxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
+        if(checkedBoxes.length === 0) return;
+
+        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        checkedBoxes.forEach(cb => {
+            if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value);
+        });
+        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+        
+        document.getElementById('cart-pay-btn').textContent = "Processing...";
+        setTimeout(() => { window.location.reload(); }, 1500);
+    });
+}
+
+// ITINERARY
+let itiLeafletMap = null;
+let itiLayerGroup = null;
+
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
@@ -590,7 +669,7 @@ window.generateItinerary = function() {
         let dayHtml = `<div class="iti-day-card"><div class="iti-day-title">${t('day')} ${i + 1}</div>`;
         dayLocs.forEach((l, index) => { dayHtml += `<div class="iti-loc"><strong>${index+1}. ${l.name}</strong> <span style="color:#9CA3AF; font-size:0.8rem;">(${l.category})</span></div>`; });
         
-        // BOUTON GOOGLE MAPS PLUS PETIT, SUBTIL ET ALIGNÉ À GAUCHE
+        // BOUTON GOOGLE MAPS ÉLÉGANT ET ALIGNÉ À GAUCHE
         dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">🗺️ ${t('openRouteMap')}</a></div></div>`;
         resultDiv.innerHTML += dayHtml;
     }
@@ -635,3 +714,18 @@ window.exportItineraryPDF = function() {
         exportBtn.style.display = 'block';
     });
 };
+
+// ==========================================
+// 10. COOKIES LOGIC
+// ==========================================
+if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
+    document.getElementById('cookie-banner').classList.remove('hidden'); 
+}
+function closeCookies() { 
+    localStorage.setItem('cookiesAccepted', 'true'); 
+    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
+}
+const btnAccept = document.getElementById('cookie-accept');
+if(btnAccept) btnAccept.addEventListener('click', closeCookies);
+const btnReject = document.getElementById('cookie-reject');
+if(btnReject) btnReject.addEventListener('click', closeCookies);
