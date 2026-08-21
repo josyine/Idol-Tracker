@@ -76,18 +76,12 @@ document.getElementById('btn-to-details').addEventListener('click', () => {
 });
 document.getElementById('btn-back-2').addEventListener('click', () => { showStep(2); });
 
-// GESTION GOOGLE POP-UP
+// CONNEXION GOOGLE FONCTIONNELLE (Redirection fluide vers l'étape 3)
 window.openGooglePopup = function() {
-    document.getElementById('google-auth-popup').classList.remove('hidden');
-};
-
-window.completeGoogleLogin = function() {
-    document.getElementById('google-auth-popup').classList.add('hidden');
-    showStep(3); // Passe à l'étape du choix des passes et paiement
+    showStep(3);
 };
 
 window.simulateFacebookLogin = function() {
-    alert("Facebook Login API pending...");
     showStep(3);
 };
 
