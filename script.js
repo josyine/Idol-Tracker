@@ -192,7 +192,7 @@ let celebLocations = [
 ];
 
 // ==========================================
-// 3. TRANSLATIONS & UI UPDATE
+// 5. TRANSLATION & UI UPDATE
 // ==========================================
 let currentLang = localStorage.getItem('lang') || 'en';
 const translations = {
@@ -251,7 +251,7 @@ function updateUI() {
 }
 
 // ==========================================
-// 4. NAV MENUS (PROFILE, CART, LANG) - SÉCURISÉ
+// 6. NAV MENUS (PROFILE, CART, LANG)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// CART FUNCTIONS (Globally accessible)
+// CART FUNCTIONS
 window.openCartModal = function() {
     const cartModal = document.getElementById('cart-modal');
     if(!cartModal) return;
@@ -391,9 +391,8 @@ document.querySelectorAll('.cart-checkbox').forEach(cb => {
     });
 });
 
-
 // ==========================================
-// 5. MAP LOGIC & FILTERING
+// 7. MAP LOGIC & FILTERING
 // ==========================================
 const unlockedGroupsStr = localStorage.getItem('unlockedGroups');
 if (unlockedGroupsStr) {
@@ -464,7 +463,7 @@ if(countrySelect) countrySelect.addEventListener('change', renderLocations);
 if(searchInput) searchInput.addEventListener('input', renderLocations);
 
 function renderLocations() {
-    if(!groupSelect || !map) return; 
+    if(!groupSelect || !map || !markerGroup) return; 
     markerGroup.clearLayers();
     const locationListElement = document.getElementById('location-list');
     if(!locationListElement) return;
@@ -558,7 +557,7 @@ if(document.getElementById('search-input')) {
 }
 
 // ==========================================
-// 6. DETAILS MODAL
+// 8. DETAILS MODAL
 // ==========================================
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -663,8 +662,11 @@ window.onclick = function(event) {
 };
 
 // ==========================================
-// 7. ITINERARY GENERATOR & EXPORT
+// 9. ITINERARY GENERATOR & EXPORT
 // ==========================================
+let itiLeafletMap = null;
+let itiLayerGroup = null;
+
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
@@ -733,11 +735,12 @@ window.generateItinerary = function() {
         let dayHtml = `<div class="iti-day-card"><div class="iti-day-title">${t('day')} ${i + 1}</div>`;
         dayLocs.forEach((l, index) => { dayHtml += `<div class="iti-loc"><strong>${index+1}. ${l.name}</strong> <span style="color:#9CA3AF; font-size:0.8rem;">(${l.category})</span></div>`; });
         
+        // BOUTON GOOGLE MAPS ÉLÉGANT ET ALIGNÉ À GAUCHE (DANS LE SCRIPT)
         dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">🗺️ ${t('openRouteMap')}</a></div></div>`;
         resultDiv.innerHTML += dayHtml;
     }
 
-    document.getElementById('iti-form').classList.add('hidden');
+    document.getElementById('iti-form').classList.add('hidden'); // Optionnel, on peut le garder ou l'enlever.
     document.getElementById('iti-result').classList.remove('hidden');
 
     if(!itiLeafletMap) {
@@ -779,7 +782,7 @@ window.exportItineraryPDF = function() {
 };
 
 // ==========================================
-// 8. COOKIES LOGIC
+// 10. COOKIES LOGIC
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
