@@ -663,8 +663,10 @@ window.onclick = function(event) {
     if (event.target === document.getElementById('cart-modal')) window.closeModal('cart-modal'); 
 };
 
+// ... [GARDE TOUT LE CODE AVANT CETTE PARTIE EXACTEMENT PAREIL JUSQU'A LA LIGNE "9. ITINERARY GENERATOR"] ...
+
 // ==========================================
-// 9. ITINERARY GENERATOR
+// 9. ITINERARY GENERATOR & EXPORT PDF
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -740,7 +742,7 @@ window.generateItinerary = function() {
         resultDiv.innerHTML += dayHtml;
     }
 
-    document.getElementById('iti-form').classList.add('hidden');
+    // MODIFICATION ICI : On NE CACHE PLUS le formulaire 'iti-form' !
     document.getElementById('iti-result').classList.remove('hidden');
 
     if(!itiLeafletMap) {
@@ -761,6 +763,30 @@ window.generateItinerary = function() {
         itiLeafletMap.invalidateSize();
         itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20] });
     }, 300);
+};
+
+// NOUVELLE FONCTION POUR L'EXPORT PDF
+window.exportItineraryPDF = function() {
+    const element = document.getElementById('iti-result');
+    const exportBtn = document.getElementById('export-pdf-btn');
+    
+    // On cache le bouton "Export PDF" pour ne pas qu'il apparaisse sur le PDF généré
+    exportBtn.style.display = 'none';
+
+    // Options du PDF
+    const opt = {
+      margin:       10,
+      filename:     'ScreenToStreet_Guide.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Génération et téléchargement
+    html2pdf().set(opt).from(element).save().then(() => {
+        // Une fois téléchargé, on réaffiche le bouton
+        exportBtn.style.display = 'block';
+    });
 };
 
 // ==========================================
