@@ -10,7 +10,6 @@
 <body>
     
     <div class="top-nav">
-        <!-- LANG -->
         <div class="dropdown-container">
             <button id="lang-btn" class="nav-btn">🌐</button>
             <div id="lang-menu" class="dropdown-menu hidden">
@@ -19,14 +18,12 @@
             </div>
         </div>
         
-        <!-- NOUVEAU BOUTON : CADDIE (Pour racheter des groupes sans quitter la page) -->
         <div class="dropdown-container">
             <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">🛒</button>
         </div>
 
-        <!-- PROFIL -->
         <div class="dropdown-container">
-            <button id="profile-btn" class="nav-btn"></button> <!-- Contenu géré en JS -->
+            <button id="profile-btn" class="nav-btn"></button>
             <div id="profile-menu" class="dropdown-menu hidden">
                 <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuAccount">Your Account</a>
                 <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;" data-i18n="menuSettings">Settings</a>
@@ -39,9 +36,8 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header" style="margin-bottom: 15px;">
-                <svg class="site-logo" viewBox="0 15 620 150" xmlns="http://www.w3.org/2000/svg">
+                <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
                   <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
-                  <rect width="620" height="200" fill="none"/>
                   <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
                   <polygon points="86,71 86,115 125,93" fill="#E1245C"/>
                   <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
@@ -49,6 +45,8 @@
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
             </div>
             
+            <button onclick="window.location.href='index.html'" class="action-btn" style="width: 100%; margin-bottom: 15px; background: var(--primary-magenta);" data-i18n="unlockMoreBtn">🔓 Unlock More Groups</button>
+
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="Search a location, city, context...">
             </div>
@@ -115,7 +113,7 @@
         </main>
     </div>
 
-    <!-- NOUVEAU MODAL : PANIER (Acheter de nouveaux groupes) -->
+    <!-- CART MODAL -->
     <div id="cart-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 500px;">
             <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
@@ -143,11 +141,18 @@
         </div>
     </div>
 
-    <!-- AUTRES MODALS IDENTIQUES (Details, Itinerary, Cookies) -->
+    <!-- Modal Détails Lieu (Avec la case Visité) -->
     <div id="details-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('details-modal')">&times;</span>
-            <h2 id="modal-title">Location Name</h2>
+            <h2 id="modal-title" style="margin-bottom: 5px;">Location Name</h2>
+            
+            <!-- NOUVEAU : CASE VISITÉ -->
+            <div id="modal-visited-container" style="display:inline-flex; align-items:center; gap:8px; padding: 6px 12px; background: #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
+                <input type="checkbox" id="modal-visited" style="width: 16px; height: 16px; cursor:pointer;">
+                <label for="modal-visited" style="font-weight: bold; font-size: 0.85rem; color: #334e68; cursor:pointer;" data-i18n="markVisited">I have visited this place!</label>
+            </div>
+
             <div id="modal-tags" class="modal-tags"></div>
             <ul class="modal-metadata">
                 <li><strong data-i18n="mdlGroup">Group:</strong> <span id="modal-group"></span></li>
@@ -184,7 +189,7 @@
         </div>
     </div>
 
-    <!-- MODAL ITINERAIRE -->
+    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE -->
     <div id="itinerary-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 650px;">
             <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
