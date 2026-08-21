@@ -3,57 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Screen To Street</title>
+    <title>Screen To Street</title>
     <link rel="stylesheet" href="welcome-style.css">
 </head>
 <body>
-    
-    <div class="lang-dropdown-container">
-        <button id="lang-btn" class="lang-btn">🌐</button>
-        <div id="lang-menu" class="lang-menu hidden">
-            <div class="lang-option" data-lang="en">English</div>
-            <div class="lang-option" data-lang="fr">Français</div>
+    <!-- Navbar -->
+    <nav class="top-navbar">
+        <div class="logo-container">
+            <svg class="site-logo-nav" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
+                <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+                <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+                <polygon points="88,51 88,97 126,74" fill="#FFFFFF"/>
+                <text x="188" y="118" class="wordmark"><tspan fill="#FFFFFF">Screen To Street</tspan></text>
+            </svg>
         </div>
-    </div>
+        <div class="nav-actions">
+            <div class="lang-dropdown-container">
+                <button id="lang-btn" class="lang-btn">🌐</button>
+                <div id="lang-menu" class="lang-menu hidden">
+                    <div class="lang-option" data-lang="en">English</div>
+                    <div class="lang-option" data-lang="fr">Français</div>
+                </div>
+            </div>
+            <button class="login-btn open-auth-btn" data-i18n="navLogin">Log in</button>
+        </div>
+    </nav>
 
-    <div class="main-wrapper">
-        <div class="welcome-container">
-            <div class="welcome-card">
-                
-                <div class="brand-header">
-                    <!-- LOGO SVG -->
-                    <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
-                      <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
-                      <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
-                      <path d="M78,112 C78,90 88,68 108,58 C112,80 104,102 82,116 Z" fill="#E1245C"/>
-                      <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
-                    </svg>
-                    <p data-i18n="subtitle">Following the footsteps of your favorite artists</p>
+    <!-- Hero Section -->
+    <main class="hero-section">
+        <h1 data-i18n="heroTitle">You have a destination. We have the guide.</h1>
+        <p data-i18n="heroSubtitle">Create custom routes instantly, with tools designed to follow your favorite artists.</p>
+        <button class="cta-btn open-auth-btn" data-i18n="heroCta">Generate my guide</button>
+    </main>
+
+    <!-- Modal d'Authentification (Façon Canva) -->
+    <div id="auth-modal" class="auth-modal hidden">
+        <div class="auth-modal-content">
+            <span class="close-auth-btn" id="close-auth">&times;</span>
+            
+            <div class="auth-left">
+                <!-- STEP 1 : Choix de la méthode de connexion -->
+                <div id="auth-step-1" class="auth-step">
+                    <h2 data-i18n="authTitle">Log in or sign up</h2>
+                    <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
+                    
+                    <div class="auth-buttons">
+                        <button class="social-btn" onclick="simulateGoogleLogin()">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+                            <span data-i18n="authGoogle">Continue with Google</span>
+                        </button>
+                        <button class="social-btn" onclick="simulateFacebookLogin()">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+                            <span data-i18n="authFacebook">Continue with Facebook</span>
+                        </button>
+                        <button class="social-btn email-btn" id="btn-to-email">
+                            <span style="font-size: 1.2rem; margin-right: 10px;">✉️</span>
+                            <span data-i18n="authEmail">Continue with email</span>
+                        </button>
+                    </div>
+                    <p class="auth-terms">
+                        <span data-i18n="authTerms">By continuing, you agree to Screen To Street's</span>
+                        <a href="legal.html#cgv" target="_blank" data-i18n="linkTerms">Terms of Use</a>. 
+                        <span data-i18n="authPrivacy">Read our</span> 
+                        <a href="legal.html#privacy" target="_blank" data-i18n="linkPrivacy">Privacy Policy</a>.
+                    </p>
                 </div>
 
-                <form id="checkout-form">
-                    <div class="form-section">
-                        <h2 data-i18n="step1">1. Account Details</h2>
+                <!-- STEP 2 : Saisie de l'Email -->
+                <div id="auth-step-2" class="auth-step hidden">
+                    <button class="back-step-btn" id="btn-back-1">← <span data-i18n="authEmail">Continue with email</span></button>
+                    <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
+                    
+                    <div class="input-group">
+                        <label data-i18n="emailLabel">Email address</label>
+                        <input type="email" id="user-email" placeholder="jane.doe@example.com" required>
+                    </div>
+                    <button class="primary-btn" id="btn-to-details" data-i18n="btnContinue">Continue</button>
+                </div>
+
+                <!-- STEP 3 : Détails, Mot de passe & Paiement -->
+                <div id="auth-step-3" class="auth-step hidden" style="overflow-y: auto; max-height: 70vh; padding-right: 10px;">
+                    <button class="back-step-btn" id="btn-back-2">← <span data-i18n="stepBackAccount">Account Details</span></button>
+                    
+                    <form id="checkout-form">
                         <div class="input-row">
                             <div class="input-group">
-                                <label for="fname" data-i18n="fname">First Name</label>
-                                <input type="text" id="fname" required placeholder="Jane">
+                                <label data-i18n="fname">First Name</label>
+                                <input type="text" id="fname" required>
                             </div>
                             <div class="input-group">
-                                <label for="lname" data-i18n="lname">Last Name</label>
-                                <input type="text" id="lname" required placeholder="Doe">
+                                <label data-i18n="lname">Last Name</label>
+                                <input type="text" id="lname" required>
                             </div>
                         </div>
+                        
+                        <!-- NOUVEAU : Champ Mot de passe -->
                         <div class="input-group">
-                            <label for="email" data-i18n="email">Email Address</label>
-                            <input type="email" id="email" required placeholder="jane.doe@example.com">
+                            <label data-i18n="password">Password</label>
+                            <input type="password" id="user-password" required minlength="8" placeholder="••••••••">
                         </div>
-                    </div>
 
-                    <div class="form-section">
-                        <h2 data-i18n="step2">2. Choose Your Passes</h2>
-                        <!-- LE PRIX A ÉTÉ MODIFIÉ ICI -->
-                        <p class="section-desc" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
+                        <div class="form-divider"></div>
+
+                        <h3 data-i18n="step2" style="font-size: 1rem; margin-bottom: 10px; color: var(--primary-magenta);">2. Choose Your Passes</h3>
+                        <p class="section-desc" data-i18n="passDesc" style="margin-bottom: 15px;">Select the groups you want to unlock. (14.99€ per group)</p>
                         
                         <div class="group-selection">
                             <label class="checkbox-card"><input type="checkbox" name="groups" value="BTS" class="group-checkbox"><span class="card-content">BTS</span></label>
@@ -63,21 +116,34 @@
                             <label class="checkbox-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox"><span class="card-content">Katseye</span></label>
                             <label class="checkbox-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox"><span class="card-content">TXT</span></label>
                         </div>
-                    </div>
 
-                    <div class="checkout-footer">
-                        <div class="total-price">
-                            <span data-i18n="totalDue">Total Due:</span>
-                            <strong id="price-display">0.00 €</strong>
+                        <div class="checkout-footer">
+                            <div class="total-price">
+                                <span data-i18n="totalDue">Total Due:</span>
+                                <strong id="price-display">0.00 €</strong>
+                            </div>
+                            <button type="submit" id="pay-btn" class="primary-btn" disabled data-i18n="payBtnEmpty" style="margin-top: 0; width: auto; padding: 12px 25px;">Select a group</button>
                         </div>
-                        <button type="submit" id="pay-btn" disabled data-i18n="payBtnEmpty">Select a group to pay</button>
-                    </div>
-                    
-                    <div id="payment-loader" class="hidden">
-                        <div class="spinner"></div>
-                        <p data-i18n="processing">Processing payment securely...</p>
-                    </div>
-                </form>
+                        
+                        <div id="payment-loader" class="hidden">
+                            <div class="spinner"></div>
+                            <p data-i18n="processing" style="text-align: center; color: var(--primary-magenta); margin-top: 10px;">Processing securely...</p>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            <div class="auth-right">
+                <!-- Décoration graphique inspirée de Canva -->
+                <div class="auth-right-content">
+                    <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="width: 80%; max-width: 250px; margin-bottom: 20px;">
+                        <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
+                        <path d="M100,22 C71,22 48,45 48,74 C48,114 100,176 100,176 C100,176 152,114 152,74 C152,45 129,22 100,22 Z" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polygon points="88,51 88,97 126,74" fill="#FFFFFF"/>
+                        <text x="188" y="118" class="wordmark"><tspan fill="#FFFFFF">Screen To </tspan><tspan fill="#FFFFFF">Street</tspan></text>
+                    </svg>
+                    <h3 data-i18n="authRightTitle" style="color: white; font-size: 1.5rem; text-align: center;">Unlock the world of your idols.</h3>
+                </div>
             </div>
         </div>
     </div>
@@ -94,18 +160,6 @@
         </div>
     </div>
 
-    <footer class="legal-footer">
-        <div class="footer-content">
-            <p class="disclaimer">
-                <strong>Disclaimer:</strong> Screen To Street is an independent fan-made guide. We are not affiliated with, endorsed by, or sponsored by HYBE, YG Entertainment, JYP Entertainment, or any other agency or artist. All trademarks belong to their respective owners.
-            </p>
-            <div class="footer-links">
-                <a href="legal.html#notice">Mentions Légales (Legal Notice)</a>
-                <a href="legal.html#cgv">CGV (Terms of Sale)</a>
-                <a href="legal.html#privacy">Politique de Confidentialité (Privacy Policy)</a>
-            </div>
-        </div>
-    </footer>
     <script src="welcome-script.js"></script>
 </body>
 </html>
