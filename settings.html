@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Screen To Street</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; background-color: #FDF8F9; color: #374151; padding: 40px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 15px rgba(217, 70, 128, 0.05); border: 1px solid #F5D0DF; }
+        h1 { color: #D94680; text-align: center; border-bottom: 2px solid #FCE7F0; padding-bottom: 15px; margin-bottom: 30px;}
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
+        .setting-item strong { font-size: 1rem; }
+        .setting-item span { color: #9CA3AF; font-size: 0.9rem; cursor: pointer; }
+        .action-btn { background: #D94680; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .danger-btn { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; width: 100%;}
+        a.back-btn { display: inline-block; margin-bottom: 20px; color: #D94680; text-decoration: none; font-weight: bold; }
+        a.back-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="map.html" class="back-btn">← Back to Map</a>
+        <h1>⚙️ Settings</h1>
+        
+        <div class="setting-item">
+            <strong>Language</strong>
+            <button class="action-btn" onclick="alert('Change language from the map interface.')">Change</button>
+        </div>
+        
+        <div class="setting-item">
+            <strong>Email Notifications</strong>
+            <span>Enabled</span>
+        </div>
+
+        <div class="setting-item">
+            <strong>Cookie Preferences</strong>
+            <button class="action-btn" onclick="localStorage.removeItem('cookiesAccepted'); alert('Cookie banner reset. Go back to map.');">Reset</button>
+        </div>
+
+        <button class="danger-btn" onclick="alert('Are you sure? This action cannot be undone.')">Delete Account</button>
+    </div>
+</body>
+</html>
