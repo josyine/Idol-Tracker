@@ -22,16 +22,14 @@
 <body>
     <div class="container">
         <a href="map.html" class="back-btn">← Back to Map</a>
-        <h1>⭐ My Wishlist</h1>
-        
-        <ul id="wishlist-list" class="wishlist-list">
-            <!-- La liste s'affichera ici -->
-        </ul>
+        <h1>My Wishlist</h1>
+        <ul id="wishlist-list" class="wishlist-list"></ul>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
     <script>
-        setTimeout(() => {
+        document.addEventListener("DOMContentLoaded", () => {
             let wishlistData = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
             wishlistData = wishlistData.map(w => typeof w === 'number' ? {id: w, date: "Added recently"} : w);
 
@@ -55,7 +53,7 @@
                     }
                 });
             }
-        }, 100);
+        });
     </script>
 </body>
 </html>
