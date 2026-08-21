@@ -4,7 +4,6 @@
 let map = null;
 let markerGroup = null;
 
-// SÉCURITÉ : Ne charge la carte Leaflet QUE si la div #map existe
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -32,128 +31,6 @@ const filterData = {
     "Blackpink": { members: ["Jisoo", "Jennie", "Rosé", "Lisa"], categories: ["Cafe", "Restaurants", "MV Location", "Pop-up Store", "Concerts", "Fashion"] }
 };
 
-// ==========================================
-// 2. TRANSLATION DICTIONARY
-// ==========================================
-let currentLang = localStorage.getItem('lang') || 'en';
-const translations = {
-    en: {
-        subtitle: "Following the footsteps of your favorite artists",
-        btnGenerateIti: "Auto-Itinerary Generator",
-        filterGroup: "Group", filterMember: "Member", filterArea: "Area", filterYear: "Year", filterCategories: "Categories",
-        locationsCount: "Locations", statLocs: "Locations", statCountries: "Countries",
-        mdlGroup: "Group:", mdlMember: "Members:", mdlCountry: "Country:", mdlCity: "City:", mdlAddress: "Address:", mdlDate: "Date:",
-        mdlEpisode: "Episode:", mdlWatch: "Watch:", mdlLink: "Official Link", mdlStoryTitle: "The story of this place",
-        mdlPhotosTitle: "Location Photos", mdlVideoTitle: "Watch the Episode", mdlTipTitle: "The 'Screen to Street' Tip:",
-        mdlDirTitle: "How to get there", mdlGoogleMap: "Open in Google Maps",
-        itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay. We will generate an optimized route for you!",
-        itiGroup: "Group", itiCountry: "Country", itiDays: "Number of Days", itiCreateBtn: "Create My Guide",
-        allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allCats: "All Categories",
-        moreDetails: "More details", day: "Day", noLocationsFound: "Not enough locations found for this selection.", openRouteMap: "Open Route in Google Maps", searchPlaceholder: "Search a location, city, context...",
-        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
-    },
-    fr: {
-        subtitle: "Sur les traces de vos artistes préférés",
-        btnGenerateIti: "Générateur d'Itinéraire",
-        filterGroup: "Groupe", filterMember: "Membre", filterArea: "Région/Pays", filterYear: "Année", filterCategories: "Catégories",
-        locationsCount: "Lieux", statLocs: "Lieux", statCountries: "Pays",
-        mdlGroup: "Groupe :", mdlMember: "Membres :", mdlCountry: "Pays :", mdlCity: "Ville :", mdlAddress: "Adresse :", mdlDate: "Date :",
-        mdlEpisode: "Épisode :", mdlWatch: "Voir :", mdlLink: "Lien Officiel", mdlStoryTitle: "L'histoire de ce lieu",
-        mdlPhotosTitle: "Photos du lieu", mdlVideoTitle: "Regarder l'épisode", mdlTipTitle: "Le conseil 'Screen to Street' :",
-        mdlDirTitle: "Comment s'y rendre", mdlGoogleMap: "Ouvrir dans Google Maps",
-        itiTitle: "Générateur d'Itinéraire", itiDesc: "Choisissez un groupe, un pays, et le nombre de jours. Nous vous créons un parcours optimisé !",
-        itiGroup: "Groupe", itiCountry: "Pays", itiDays: "Nombre de Jours", itiCreateBtn: "Créer Mon Guide",
-        allGroups: "Tous les Groupes", allMembers: "Tous les Membres", allAreas: "Toutes les Régions", allCats: "Toutes les Catégories",
-        moreDetails: "Plus de détails", day: "Jour", noLocationsFound: "Pas assez de lieux trouvés pour cette sélection.", openRouteMap: "Ouvrir l'itinéraire Google Maps", searchPlaceholder: "Rechercher un lieu, une ville...",
-        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
-    }
-};
-
-function t(key) { return translations[currentLang][key] || key; }
-function getLocText(field) {
-    if (!field) return "";
-    if (typeof field === "string") return field;
-    return field[currentLang] || field.en || "";
-}
-
-function updateUI() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if(translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
-    });
-    const searchInput = document.getElementById('search-input');
-    if(searchInput) searchInput.placeholder = translations[currentLang].searchPlaceholder;
-    
-    const groupSelect = document.getElementById('group-select');
-    if(groupSelect && groupSelect.options.length > 0) groupSelect.options[0].text = t('allGroups');
-    
-    initializeFilters();
-    renderLocations();
-}
-
-// ==========================================
-// 3. PROFILE LOGIC & NAV EVENTS (SÉCURISÉ)
-// ==========================================
-const profileBtn = document.getElementById('profile-btn');
-if (profileBtn) {
-    const savedPic = localStorage.getItem('userProfilePic');
-    const savedName = localStorage.getItem('userName') || 'User';
-
-    if(savedPic) {
-        profileBtn.style.backgroundImage = `url(${savedPic})`;
-        profileBtn.style.backgroundSize = 'cover';
-        profileBtn.style.backgroundPosition = 'center';
-        profileBtn.textContent = ''; 
-    } else {
-        profileBtn.textContent = savedName.charAt(0).toUpperCase();
-    }
-
-    profileBtn.addEventListener('click', (e) => {
-        const pMenu = document.getElementById('profile-menu');
-        const lMenu = document.getElementById('lang-menu');
-        if(pMenu) pMenu.classList.toggle('hidden');
-        if(lMenu) lMenu.classList.add('hidden');
-        e.stopPropagation();
-    });
-}
-
-const langBtn = document.getElementById('lang-btn');
-if (langBtn) {
-    langBtn.addEventListener('click', (e) => {
-        const lMenu = document.getElementById('lang-menu');
-        const pMenu = document.getElementById('profile-menu');
-        if(lMenu) lMenu.classList.toggle('hidden');
-        if(pMenu) pMenu.classList.add('hidden');
-        e.stopPropagation();
-    });
-}
-
-document.addEventListener('click', () => { 
-    const lMenu = document.getElementById('lang-menu');
-    const pMenu = document.getElementById('profile-menu');
-    if(lMenu) lMenu.classList.add('hidden'); 
-    if(pMenu) pMenu.classList.add('hidden');
-});
-
-document.querySelectorAll('.lang-option').forEach(opt => {
-    opt.addEventListener('click', function() {
-        currentLang = this.getAttribute('data-lang');
-        localStorage.setItem('lang', currentLang);
-        updateUI();
-    });
-});
-
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('unlockedGroups');
-        window.location.href = 'index.html';
-    });
-}
-
-// ==========================================
-// 4. LOCATIONS DATABASE (ALL 19 LOCATIONS)
-// ==========================================
 let celebLocations = [
     {
         id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020",
@@ -312,89 +189,68 @@ let celebLocations = [
 ];
 
 // ==========================================
-// 5. CART LOGIC
+// 5. TRANSLATION & UI UPDATE
 // ==========================================
-window.openCartModal = function() {
-    const cartModal = document.getElementById('cart-modal');
-    if(!cartModal) return;
-    cartModal.classList.remove('hidden');
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    
-    document.querySelectorAll('.cart-checkbox').forEach(cb => {
-        cb.checked = false; 
-        const span = cb.nextElementSibling;
-        if(unlockedGroups.includes(cb.value)) {
-            cb.disabled = true;
-            span.style.background = "#f1f5f9";
-            span.style.color = "#94a3b8";
-            span.textContent = `${cb.value} (Purchased)`;
-        } else {
-            cb.disabled = false;
-            span.style.background = "white";
-            span.style.color = "#64748b";
-            span.textContent = cb.value;
-        }
-    });
-    updateCartPrice();
-}
-
-const cartCheckboxes = document.querySelectorAll('.cart-checkbox');
-const cartPriceDisplay = document.getElementById('cart-price');
-const cartPayBtn = document.getElementById('cart-pay-btn');
-
-function updateCartPrice() {
-    if(!cartPriceDisplay || !cartPayBtn) return;
-    const selectedCount = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
-    const totalPrice = selectedCount * 14.99;
-    cartPriceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
-    
-    if (selectedCount > 0) {
-        cartPayBtn.disabled = false;
-        cartPayBtn.textContent = `Pay ${totalPrice.toFixed(2)} €`;
-    } else {
-        cartPayBtn.disabled = true;
-        cartPayBtn.textContent = `Select a group`;
+let currentLang = localStorage.getItem('lang') || 'en';
+const translations = {
+    en: {
+        subtitle: "Following the footsteps of your favorite artists",
+        btnGenerateIti: "Auto-Itinerary Generator",
+        filterGroup: "Group", filterMember: "Member", filterArea: "Area", filterYear: "Year", filterCategories: "Categories",
+        locationsCount: "Locations", statLocs: "Locations", statCountries: "Countries",
+        mdlGroup: "Group:", mdlMember: "Members:", mdlCountry: "Country:", mdlCity: "City:", mdlAddress: "Address:", mdlDate: "Date:",
+        mdlEpisode: "Episode:", mdlWatch: "Watch:", mdlLink: "Official Link", mdlStoryTitle: "The story of this place",
+        mdlPhotosTitle: "Location Photos", mdlVideoTitle: "Watch the Episode", mdlTipTitle: "The 'Screen to Street' Tip:",
+        mdlDirTitle: "How to get there", mdlGoogleMap: "Open in Google Maps",
+        itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay. We will generate an optimized route for you!",
+        itiGroup: "Group", itiCountry: "Country", itiDays: "Number of Days", itiCreateBtn: "Create My Guide",
+        allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allCats: "All Categories",
+        moreDetails: "More details", day: "Day", noLocationsFound: "Not enough locations found for this selection.", openRouteMap: "Open Route in Google Maps", searchPlaceholder: "Search a location, city, context...",
+        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
+        markVisited: "I visited this place"
+    },
+    fr: {
+        subtitle: "Sur les traces de vos artistes préférés",
+        btnGenerateIti: "Générateur d'Itinéraire",
+        filterGroup: "Groupe", filterMember: "Membre", filterArea: "Région/Pays", filterYear: "Année", filterCategories: "Catégories",
+        locationsCount: "Lieux", statLocs: "Lieux", statCountries: "Pays",
+        mdlGroup: "Groupe :", mdlMember: "Membres :", mdlCountry: "Pays :", mdlCity: "Ville :", mdlAddress: "Adresse :", mdlDate: "Date :",
+        mdlEpisode: "Épisode :", mdlWatch: "Voir :", mdlLink: "Lien Officiel", mdlStoryTitle: "L'histoire de ce lieu",
+        mdlPhotosTitle: "Photos du lieu", mdlVideoTitle: "Regarder l'épisode", mdlTipTitle: "Le conseil 'Screen to Street' :",
+        mdlDirTitle: "Comment s'y rendre", mdlGoogleMap: "Ouvrir dans Google Maps",
+        itiTitle: "Générateur d'Itinéraire", itiDesc: "Choisissez un groupe, un pays, et le nombre de jours. Nous vous créons un parcours optimisé !",
+        itiGroup: "Groupe", itiCountry: "Pays", itiDays: "Nombre de Jours", itiCreateBtn: "Créer Mon Guide",
+        allGroups: "Tous les Groupes", allMembers: "Tous les Membres", allAreas: "Toutes les Régions", allCats: "Toutes les Catégories",
+        moreDetails: "Plus de détails", day: "Jour", noLocationsFound: "Pas assez de lieux trouvés pour cette sélection.", openRouteMap: "Ouvrir l'itinéraire Google Maps", searchPlaceholder: "Rechercher un lieu, une ville...",
+        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
+        markVisited: "J'ai visité ce lieu"
     }
+};
+
+function t(key) { return translations[currentLang][key] || key; }
+function getLocText(field) {
+    if (!field) return "";
+    if (typeof field === "string") return field;
+    return field[currentLang] || field.en || "";
 }
 
-cartCheckboxes.forEach(cb => {
-    cb.addEventListener('change', function() {
-        if(this.checked) {
-            this.nextElementSibling.style.background = "#FCE7F0";
-            this.nextElementSibling.style.borderColor = "#D94680";
-            this.nextElementSibling.style.color = "#D94680";
-        } else {
-            this.nextElementSibling.style.background = "white";
-            this.nextElementSibling.style.borderColor = "#cbd5e1";
-            this.nextElementSibling.style.color = "#64748b";
-        }
-        updateCartPrice();
+function updateUI() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if(translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
     });
-});
-
-const cartForm = document.getElementById('cart-form');
-if (cartForm) {
-    cartForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const checkedBoxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
-        if(checkedBoxes.length === 0) return;
-
-        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        checkedBoxes.forEach(cb => {
-            if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value);
-        });
-        
-        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
-        
-        if (cartPayBtn) cartPayBtn.textContent = "Processing...";
-        setTimeout(() => {
-            window.location.reload(); 
-        }, 1500);
-    });
+    const searchInput = document.getElementById('search-input');
+    if(searchInput) searchInput.placeholder = translations[currentLang].searchPlaceholder;
+    
+    const groupSelect = document.getElementById('group-select');
+    if(groupSelect && groupSelect.options.length > 0) groupSelect.options[0].text = t('allGroups');
+    
+    initializeFilters();
+    renderLocations();
 }
 
 // ==========================================
-// 6. PAYWALL & FILTER LOGIC
+// 6. MAP LOGIC & FILTERING
 // ==========================================
 const unlockedGroupsStr = localStorage.getItem('unlockedGroups');
 if (unlockedGroupsStr) {
@@ -464,12 +320,9 @@ if(yearSelect) yearSelect.addEventListener('change', renderLocations);
 if(countrySelect) countrySelect.addEventListener('change', renderLocations);
 if(searchInput) searchInput.addEventListener('input', renderLocations);
 
-// ==========================================
-// 7. MAP RENDERING
-// ==========================================
 function renderLocations() {
-    if(!groupSelect || !map) return;
-    if(markerGroup) markerGroup.clearLayers();
+    if(!groupSelect || !map) return; 
+    markerGroup.clearLayers();
     const locationListElement = document.getElementById('location-list');
     if(!locationListElement) return;
     locationListElement.innerHTML = '';
@@ -510,15 +363,18 @@ function renderLocations() {
         const isWishlist = wishlistData.some(w => w.id === loc.id || w === loc.id);
         
         let iconColorStyle = '';
+        let extraClass = '';
         if(isVisited) {
             iconColorStyle = `style="border-color: #10b981; color: #10b981;"`;
+            extraClass = 'visited-marker-div';
         } else if (isWishlist) {
             iconColorStyle = `style="border-color: #d97706; color: #d97706;"`;
+            extraClass = 'wishlist-marker-div';
         }
         
         const customIcon = L.divIcon({ 
             className: 'custom-category-marker', 
-            html: `<div ${iconColorStyle}>${catIconSvg}</div>`, 
+            html: `<div class="${extraClass}" ${iconColorStyle}>${catIconSvg}</div>`, 
             iconSize: [32, 32], 
             iconAnchor: [16, 16], 
             popupAnchor: [0, -16] 
@@ -559,7 +415,7 @@ if(document.getElementById('search-input')) {
 }
 
 // ==========================================
-// 8. DETAILS MODAL (WITH CHECKBOXES)
+// 8. DETAILS MODAL
 // ==========================================
 window.openModal = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -663,14 +519,9 @@ window.onclick = function(event) {
     if (event.target === document.getElementById('cart-modal')) window.closeModal('cart-modal'); 
 };
 
-// ... [GARDE TOUT LE CODE AVANT CETTE PARTIE EXACTEMENT PAREIL JUSQU'A LA LIGNE "9. ITINERARY GENERATOR"] ...
-
 // ==========================================
-// 9. ITINERARY GENERATOR & EXPORT PDF
+// 9. ITINERARY GENERATOR & EXPORT
 // ==========================================
-let itiLeafletMap = null;
-let itiLayerGroup = null;
-
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
@@ -738,11 +589,13 @@ window.generateItinerary = function() {
 
         let dayHtml = `<div class="iti-day-card"><div class="iti-day-title">${t('day')} ${i + 1}</div>`;
         dayLocs.forEach((l, index) => { dayHtml += `<div class="iti-loc"><strong>${index+1}. ${l.name}</strong> <span style="color:#9CA3AF; font-size:0.8rem;">(${l.category})</span></div>`; });
-        dayHtml += `<a href="${mapLink}" target="_blank" class="action-btn" style="display:block; padding:10px; margin-top:15px; font-size:0.9rem;">${t('openRouteMap')}</a></div>`;
+        
+        // BOUTON GOOGLE MAPS PLUS PETIT, SUBTIL ET ALIGNÉ À GAUCHE
+        dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">🗺️ ${t('openRouteMap')}</a></div></div>`;
         resultDiv.innerHTML += dayHtml;
     }
 
-    // MODIFICATION ICI : On NE CACHE PLUS le formulaire 'iti-form' !
+    document.getElementById('iti-form').classList.add('hidden');
     document.getElementById('iti-result').classList.remove('hidden');
 
     if(!itiLeafletMap) {
@@ -765,15 +618,11 @@ window.generateItinerary = function() {
     }, 300);
 };
 
-// NOUVELLE FONCTION POUR L'EXPORT PDF
 window.exportItineraryPDF = function() {
     const element = document.getElementById('iti-result');
     const exportBtn = document.getElementById('export-pdf-btn');
-    
-    // On cache le bouton "Export PDF" pour ne pas qu'il apparaisse sur le PDF généré
     exportBtn.style.display = 'none';
 
-    // Options du PDF
     const opt = {
       margin:       10,
       filename:     'ScreenToStreet_Guide.pdf',
@@ -782,26 +631,7 @@ window.exportItineraryPDF = function() {
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // Génération et téléchargement
     html2pdf().set(opt).from(element).save().then(() => {
-        // Une fois téléchargé, on réaffiche le bouton
         exportBtn.style.display = 'block';
     });
 };
-
-// ==========================================
-// 10. COOKIES LOGIC
-// ==========================================
-if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
-    document.getElementById('cookie-banner').classList.remove('hidden'); 
-}
-function closeCookies() { 
-    localStorage.setItem('cookiesAccepted', 'true'); 
-    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
-}
-const btnAccept = document.getElementById('cookie-accept');
-if(btnAccept) btnAccept.addEventListener('click', closeCookies);
-const btnReject = document.getElementById('cookie-reject');
-if(btnReject) btnReject.addEventListener('click', closeCookies);
-const btnManage = document.getElementById('cookie-manage');
-if(btnManage) btnManage.addEventListener('click', () => { window.location.href = 'settings.html'; });
