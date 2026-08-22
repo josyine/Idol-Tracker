@@ -1,130 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idol Tracker Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen To Street - Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<div class="app-container">
     
-    <div class="top-nav">
-        <!-- MENU HAMBURGER (MOBILE UNIQUEMENT) -->
-        <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
+    <!-- Sidebar Gauche -->
+    <aside class="sidebar" id="app-sidebar">
+        <!-- Effets visuels -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
 
-        <div class="nav-right-actions">
-            <!-- LANGUE -->
-            <div class="dropdown-container">
-                <button id="lang-btn" class="nav-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                </button>
-                <div id="lang-menu" class="dropdown-menu hidden">
-                    <div class="dropdown-option lang-option" data-lang="en">English</div>
-                    <div class="dropdown-option lang-option" data-lang="fr">Français</div>
-                </div>
-            </div>
-            
-            <!-- CADDIE (ICONE SVG ÉLÉGANTE) -->
-            <div class="dropdown-container">
-                <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                </button>
-            </div>
-
-            <!-- PROFIL -->
-            <div class="dropdown-container">
-                <button id="profile-btn" class="nav-btn"></button>
-                <div id="profile-menu" class="dropdown-menu hidden">
-                    <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Your Account</a>
-                    <a href="visited.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">My Visited Places</a>
-                    <a href="wishlist.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">My Wishlist</a>
-                    <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Settings</a>
-                    <div class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="app-sidebar">
-            <div class="sidebar-header" style="margin-bottom: 15px;">
-                <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
-                  <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
-                  <rect width="620" height="200" fill="none"/>
-                  <path d="M100,36 C68,36 42,61 42,93 C42,138 100,172 100,172 C100,172 158,138 158,93 C158,61 132,36 100,36 Z" fill="#34414C"/>
-                  <polygon points="86,71 86,115 125,93" fill="#E1245C"/>
-                  <text x="188" y="118" class="wordmark"><tspan fill="#34414C">Screen To </tspan><tspan fill="#E1245C">Street</tspan></text>
+        <div class="sidebar-content">
+            <!-- Header avec Logo -->
+            <div class="brand-row">
+                <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
+                    <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+                    <circle cx="200" cy="150" r="26" fill="#D42759"/>
                 </svg>
-                <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
+                <div>
+                    <div class="brand-text">Screen To <b>Street</b></div>
+                    <div class="tagline" data-i18n="subtitle">Following the footsteps of your favorite artists</div>
+                </div>
             </div>
 
-            <!-- VUE PRINCIPALE -->
+            <!-- VUE 1 : RECHERCHE ET LISTE -->
             <div id="sidebar-main" class="sidebar-scroll-area">
-                <div class="search-container">
-                    <input type="text" id="search-input" placeholder="Search a location, city, context...">
-                </div>
-                
-                <button id="open-itinerary-btn" class="action-btn" style="width: 100%; margin-top:0; margin-bottom: 25px; background: #1F2937;" data-i18n="btnGenerateIti">Auto-Itinerary Generator</button>
-
-                <div class="filters-container">
-                    <div class="filter-group">
-                        <label for="group-select" data-i18n="filterGroup">Group</label>
-                        <select id="group-select" class="filter-select"></select>
+                <!-- Bloc Recherche et Iti -->
+                <div class="card-box">
+                    <div style="position:relative;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:14px; top:12px;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="search-input" class="input-field" style="padding-left:36px;" placeholder="Search a location...">
                     </div>
-                    <div class="filter-group">
-                        <label for="member-select" data-i18n="filterMember">Member</label>
-                        <select id="member-select" class="filter-select"></select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="country-select" data-i18n="filterArea">Area</label>
-                        <select id="country-select" class="filter-select"></select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="year-select" data-i18n="filterYear">Year</label>
-                        <select id="year-select" class="filter-select">
-                            <option value="All">All Years</option>
-                            <option value="2026">2026</option><option value="2023">2023</option>
-                            <option value="2021">2021</option><option value="2020">2020</option>
-                            <option value="2019">2019</option><option value="2018">2018</option>
-                            <option value="2017">2017</option><option value="2013 - 2017">2013 - 2017</option>
-                        </select>
-                    </div>
+                    <button id="open-itinerary-btn" class="cta-primary">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8 19h6a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4h-1"/></svg> 
+                        <span data-i18n="btnGenerateIti">Auto-Itinerary Generator</span>
+                    </button>
                 </div>
 
-                <div class="category-filter-section">
-                    <label data-i18n="filterCategories">Categories</label>
+                <!-- Bloc Filtres -->
+                <div class="card-box">
+                    <div class="filters-grid">
+                        <div>
+                            <div class="filter-item-label" data-i18n="filterGroup">GROUP</div>
+                            <select id="group-select" class="filter-select"></select>
+                        </div>
+                        <div>
+                            <div class="filter-item-label" data-i18n="filterMember">MEMBER</div>
+                            <select id="member-select" class="filter-select"></select>
+                        </div>
+                        <div>
+                            <div class="filter-item-label" data-i18n="filterArea">AREA</div>
+                            <select id="country-select" class="filter-select"></select>
+                        </div>
+                        <div>
+                            <div class="filter-item-label" data-i18n="filterYear">YEAR</div>
+                            <select id="year-select" class="filter-select">
+                                <option value="All">All Years</option>
+                                <option value="2026">2026</option><option value="2023">2023</option>
+                                <option value="2021">2021</option><option value="2020">2020</option>
+                                <option value="2019">2019</option><option value="2018">2018</option>
+                                <option value="2017">2017</option><option value="2013 - 2017">2013 - 2017</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bloc Résultats -->
+                <div class="card-box" style="flex:1;">
+                    <div class="section-title" data-i18n="filterCategories">CATEGORIES</div>
                     <div id="category-buttons" class="category-buttons"></div>
-                </div>
 
-                <div class="locations-header">
-                    <label><span data-i18n="locationsCount">Locations</span> (<span id="location-count-sidebar">0</span>)</label>
-                </div>
-                
-                <div class="location-list" id="location-list"></div>
-                
-                <div class="sidebar-footer">
-                    <p>Screen To Street is an independent fan-made guide.</p>
-                    <div class="sidebar-footer-links">
-                        <a href="legal.html#notice">Legal Notice</a>
-                        <a href="legal.html#cgv">Terms of Sale</a>
-                        <a href="legal.html#privacy">Privacy Policy</a>
+                    <div class="section-title" style="margin-top:10px;"><span data-i18n="locationsCount">LOCATIONS</span> (<span id="location-count-sidebar">0</span>)</div>
+                    <div class="location-list" id="location-list">
+                        <!-- Rempli par le JS -->
                     </div>
                 </div>
             </div>
 
-            <!-- VUE DETAILS (AVEC BOUTON FIXE) -->
-            <div id="sidebar-details" class="sidebar-scroll-area hidden">
+            <!-- VUE 2 : DÉTAILS D'UN LIEU -->
+            <div id="sidebar-details" class="card-box hidden" style="flex:1; overflow-y:auto; overflow-x: hidden;">
                 <div class="sidebar-details-header">
-                    <button class="back-details-btn" onclick="closeDetailsPanel()">← Back to list</button>
+                    <button class="back-details-btn" onclick="closeDetailsPanel()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to list
+                    </button>
                 </div>
                 
-                <h2 id="details-title" style="margin-bottom: 15px; font-size: 1.5rem; color: var(--primary-magenta);">Location Name</h2>
+                <h2 id="details-title" style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 10px;">Location Name</h2>
                 
-                <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 20px; padding-bottom: 15px;">
+                <div style="display:flex; gap:15px; flex-wrap:wrap; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9;">
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="details-visited" class="custom-checkbox">
                         <label for="details-visited">I visited this place</label>
@@ -143,110 +115,123 @@
                     <li><strong data-i18n="mdlAddress">Address:</strong> <span id="details-full-address"></span></li>
                     <li><strong data-i18n="mdlDate">Date:</strong> <span id="details-date"></span></li>
                     <li id="details-episode-container"><strong data-i18n="mdlEpisode">Episode:</strong> <span id="details-episode"></span></li>
-                    <li id="details-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="details-episode-link" href="#" target="_blank" data-i18n="mdlLink">Official Link</a></li>
+                    <li id="details-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="details-episode-link" href="#" target="_blank" style="color:var(--primary-magenta); font-weight:600;">Official Link</a></li>
                 </ul>
 
-                <div id="details-gallery-section" class="media-section hidden" style="margin-top: 25px;">
-                    <h3 style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px; text-transform: uppercase;">Location Photos</h3>
+                <div id="details-gallery-section" class="media-section hidden">
+                    <h3 data-i18n="mdlPhotosTitle">Location Photos</h3>
                     <div class="modal-gallery" id="details-gallery"></div>
                 </div>
 
-                <div class="modal-info" style="margin-top: 15px;">
-                    <h3 data-i18n="mdlStoryTitle" style="color: #334e68; font-size: 1rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;">The story of this place</h3>
-                    <div id="details-desc" style="line-height: 1.6; font-size: 0.95rem; color: #475569;"></div> 
+                <div class="media-section" style="margin-top:0;">
+                    <h3 data-i18n="mdlStoryTitle">The story of this place</h3>
+                    <div id="details-desc" style="line-height: 1.6; font-size: 12px; color: #5B6472;"></div> 
                 </div>
 
                 <div id="details-video-section" class="media-section hidden">
                     <h3 data-i18n="mdlVideoTitle">Watch the Episode</h3>
-                    <div id="details-video-container" class="modal-videos"></div>
+                    <div id="details-video-container" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
 
-                <div id="details-tip-section" class="media-section hidden" style="background-color: #f9f9f9; padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary-magenta);">
-                    <h3 style="border-bottom: none; padding-bottom: 0; margin-bottom: 8px;">💡 <span data-i18n="mdlTipTitle">The "Screen to Street" Tip:</span></h3>
-                    <p id="details-tip" style="font-size: 0.95rem; font-style: italic; color: #475569;"></p>
+                <div id="details-tip-section" class="media-section hidden" style="background:#faf9fc; padding:12px; border-radius:8px; border-left:3px solid var(--primary-magenta);">
+                    <h3 style="border:none; padding:0; margin-bottom:5px; color:#D42759;">Tip</h3>
+                    <p id="details-tip" style="font-size:11.5px; font-style:italic; color:#5B6472;"></p>
                 </div>
 
-                <div class="modal-info" style="margin-bottom: 30px;">
-                    <h3 data-i18n="mdlDirTitle" style="color: #334e68; font-size: 1rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;">How to get there</h3>
-                    <p id="details-directions" style="font-size: 0.95rem; color: #475569;"></p>
-                    <a id="details-map-link" href="#" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 16px; margin-top:15px; font-size:0.9rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;" data-i18n="mdlGoogleMap">Open in Google Maps</a>
+                <div class="media-section" style="margin-bottom:20px;">
+                    <h3 data-i18n="mdlDirTitle">How to get there</h3>
+                    <p id="details-directions" style="font-size:12px; color:#5B6472; margin-bottom:10px;"></p>
+                    <a id="details-map-link" href="#" target="_blank" style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:#2E3644; border:1px solid #cbd5e1; padding:6px 12px; border-radius:6px; background:#fff; transition:0.2s;">Open in Google Maps</a>
                 </div>
-            </div>
-        </aside>
-
-        <!-- Map Area -->
-        <main class="map-container">
-            <div id="mobile-overlay" class="hidden" onclick="toggleMobileMenu()"></div>
-            
-            <div class="map-stats">
-                <div class="stat-item"><span id="stat-locations">0</span> <span data-i18n="statLocs">Locations</span></div>
-                <div class="stat-divider"></div>
-                <div class="stat-item"><span id="stat-countries">0</span> <span data-i18n="statCountries">Countries</span></div>
-            </div>
-            <div id="map"></div>
-        </main>
-    </div>
-
-    <!-- CART MODAL -->
-    <div id="cart-modal" class="modal hidden">
-        <div class="modal-content" style="max-width: 500px;">
-            <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-            <h2 style="color: var(--text-main); margin-bottom: 5px;">Unlock New Passes</h2>
-            <p style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 25px;">Select the groups you want to unlock. (14.99€ per group)</p>
-            
-            <form id="cart-form">
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">BTS</span></label>
-                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Blackpink</span></label>
-                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Twice</span></label>
-                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Seventeen</span></label>
-                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Katseye" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Katseye</span></label>
-                    <label style="position:relative; cursor:pointer;"><input type="checkbox" value="TXT" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">TXT</span></label>
-                </div>
-                <div style="display:flex; flex-direction:column; border-top:1px solid #cbd5e1; padding-top:20px; gap:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:bold; text-transform:uppercase; font-size:0.85rem; color:#64748b;">Total Due:</span>
-                        <strong id="cart-price" style="font-size:1.5rem; color:var(--primary-magenta);">0.00 €</strong>
-                    </div>
-                    <button type="submit" id="cart-pay-btn" class="action-btn" disabled style="width:100%; padding:14px; font-size:1rem;">Select a group</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL GÉNÉRATEUR ITINÉRAIRE -->
-    <div id="itinerary-modal" class="modal hidden">
-        <div class="modal-content" style="max-width: 650px;">
-            <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
-            <h2 style="color: var(--primary-magenta); margin-bottom: 10px;" data-i18n="itiTitle">Auto-Itinerary Generator</h2>
-            <p style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 25px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay. We will generate an optimized route for you!</p>
-            
-            <div id="iti-form">
-                <div class="input-group" style="margin-bottom:15px; display: flex; flex-direction: column;">
-                    <label data-i18n="itiGroup" style="margin-bottom:5px; font-weight:bold; color:var(--primary-magenta); text-transform:uppercase; font-size:0.8rem;">Group</label>
-                    <select id="iti-group" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);"></select>
-                </div>
-                <div class="input-group" style="margin-bottom:15px; display: flex; flex-direction: column;">
-                    <label data-i18n="itiCountry" style="margin-bottom:5px; font-weight:bold; color:var(--primary-magenta); text-transform:uppercase; font-size:0.8rem;">Country</label>
-                    <select id="iti-country" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);"></select>
-                </div>
-                <div class="input-group" style="margin-bottom:30px; display: flex; flex-direction: column;">
-                    <label data-i18n="itiDays" style="margin-bottom:5px; font-weight:bold; color:var(--primary-magenta); text-transform:uppercase; font-size:0.8rem;">Number of Days</label>
-                    <input type="number" id="iti-days" min="1" max="7" value="3" style="padding: 10px; border-radius:8px; border:1px solid var(--border-color);">
-                </div>
-                <button class="action-btn" onclick="generateItinerary()" style="width: 100%; border:none; cursor:pointer;" data-i18n="itiCreateBtn">Create My Guide</button>
-            </div>
-
-            <div id="iti-result" class="hidden" style="border-top: 2px solid var(--border-color); padding-top: 25px; margin-top: 25px;">
-                <div id="iti-map-container" style="width: 100%; height: 250px; background: #e5e5e5; border-radius: 12px; margin-bottom: 20px; overflow: hidden;"></div>
-                <div id="iti-days-list"></div>
-                <button id="export-pdf-btn" class="action-btn" onclick="exportItineraryPDF()" style="width: 100%; margin-top: 20px; background: #34414C; color: white;">Export Guide as PDF</button>
             </div>
         </div>
-    </div>
+    </aside>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="script.js"></script>
+    <!-- Zone Carte à Droite -->
+    <main class="map-container">
+        <div class="top-nav">
+            <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div class="dropdown-container">
+                <button id="lang-btn" class="nav-btn" title="Langue">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </button>
+                <div id="lang-menu" class="dropdown-menu hidden">
+                    <div class="dropdown-option lang-option" data-lang="en">English</div>
+                    <div class="dropdown-option lang-option" data-lang="fr">Français</div>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock Passes">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </button>
+            </div>
+            <div class="dropdown-container">
+                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover;"></button>
+                <div id="profile-menu" class="dropdown-menu hidden">
+                    <a href="account.html" class="dropdown-option">Your Account</a>
+                    <a href="visited.html" class="dropdown-option">My Visited Places</a>
+                    <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
+                    <a href="settings.html" class="dropdown-option">Settings</a>
+                    <div class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-pill"><span class="n1" id="stat-locations">0</span> LOCATIONS <span class="sep">|</span> <span id="stat-countries">0</span> COUNTRIES</div>
+        
+        <div id="map"></div>
+    </main>
+</div>
+
+<!-- Modal Itinéraire -->
+<div id="itinerary-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 650px;">
+        <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
+        <h2 style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 5px;" data-i18n="itiTitle">Auto-Itinerary Generator</h2>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay.</p>
+        
+        <div id="iti-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
+            <select id="iti-group" class="filter-select" style="padding:12px;"></select>
+            <select id="iti-country" class="filter-select" style="padding:12px;"></select>
+            <input type="number" id="iti-days" min="1" max="7" value="3" class="filter-select" style="padding:12px;">
+            <button class="cta-primary" onclick="generateItinerary()" style="padding:14px; font-size:14px;" data-i18n="itiCreateBtn">Create My Guide</button>
+        </div>
+
+        <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
+            <div id="iti-map-container" style="width: 100%; height: 250px; background: #e5e5e5; border-radius: 12px; margin-bottom: 15px;"></div>
+            <div id="iti-days-list"></div>
+            <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="margin-top: 15px; background: #2E3644;">Export Guide as PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Panier -->
+<div id="cart-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
+        <h2 style="color: #1e293b; margin-bottom: 5px;">Unlock New Passes</h2>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select the groups you want to unlock. (14.99€ per group)</p>
+        
+        <form id="cart-form">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
+                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
+                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
+            </div>
+            <button type="submit" id="cart-pay-btn" class="cta-primary" disabled style="padding:14px;">Select a group</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
