@@ -332,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(pMenu) pMenu.classList.add('hidden');
     });
 
-    // Cart Form event listener
     const cartForm = document.getElementById('cart-form');
     if (cartForm) {
         cartForm.addEventListener('submit', function(e) {
@@ -353,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// CART FUNCTIONS (Globally accessible)
+// CART MODAL LOGIC
 window.openCartModal = function() {
     const cartModal = document.getElementById('cart-modal');
     if(!cartModal) return;
@@ -533,17 +532,12 @@ function renderLocations() {
         
         const baseColor = groupColors[loc.group] || '#334e68';
         
-        // LA LOGIQUE DE COULEUR EXACTE DEMANDÉE ICI :
         let inlineStyle = `border-color: ${baseColor}; --marker-color: ${baseColor};`;
         if (isVisited) {
-            // Si visité, rempli avec la couleur du groupe, texte blanc
             inlineStyle += ` background-color: ${baseColor}; color: white;`;
         } else {
-            // Sinon, fond blanc et icone couleur du groupe
             inlineStyle += ` background-color: white; color: ${baseColor};`;
         }
-        
-        // Wishlist ne change pas l'apparence
         
         const customIcon = L.divIcon({ 
             className: 'custom-category-marker', 
@@ -588,7 +582,7 @@ if(document.getElementById('search-input')) {
 }
 
 // ==========================================
-// 7. PANNEAU DE DÉTAILS LATÉRAL (DETAILS)
+// 7. PANNEAU DE DÉTAILS LATÉRAL
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -667,11 +661,9 @@ window.openDetailsPanel = function(id) {
         };
     }
 
-    // Basculer l'affichage (Masque liste, affiche détails)
     document.getElementById('sidebar-main').classList.add('hidden');
     document.getElementById('sidebar-details').classList.remove('hidden');
     
-    // Elargit la sidebar
     const sidebar = document.getElementById('app-sidebar');
     const overlay = document.getElementById('mobile-overlay');
     if(sidebar) {
@@ -691,10 +683,25 @@ window.closeDetailsPanel = function() {
     if(sidebar) sidebar.classList.remove('expanded'); 
 }
 
-
 // ==========================================
 // 8. ITINERARY GENERATOR & EXPORT
 // ==========================================
+const btnOpenIti = document.getElementById('open-itinerary-btn');
+if(btnOpenIti) {
+    btnOpenIti.addEventListener('click', () => {
+        const itiGroup = document.getElementById('iti-group');
+        const itiCountry = document.getElementById('iti-country');
+        
+        const availableGroups = [...new Set(celebLocations.map(l => l.group))].sort();
+        itiGroup.innerHTML = ''; availableGroups.forEach(g => { itiGroup.innerHTML += `<option value="${g}">${g}</option>`; });
+        itiCountry.innerHTML = ''; [...new Set(celebLocations.map(l => l.country))].sort().forEach(c => { itiCountry.innerHTML += `<option value="${c}">${c}</option>`; });
+        
+        document.getElementById('iti-result').classList.add('hidden');
+        document.getElementById('iti-form').classList.remove('hidden');
+        document.getElementById('itinerary-modal').classList.remove('hidden');
+    });
+}
+
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
     const country = document.getElementById('iti-country').value;
@@ -703,7 +710,6 @@ window.generateItinerary = function() {
     let validLocs = celebLocations.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert(t('noLocationsFound')); return; }
 
-    // Optimization basique route
     let unvisited = [...validLocs];
     let route = [unvisited.shift()]; 
     while(unvisited.length > 0) {
@@ -742,7 +748,6 @@ window.generateItinerary = function() {
         let dayHtml = `<div class="iti-day-card"><div class="iti-day-title">${t('day')} ${i + 1}</div>`;
         dayLocs.forEach((l, index) => { dayHtml += `<div class="iti-loc"><strong>${index+1}. ${l.name}</strong> <span style="color:#9CA3AF; font-size:0.8rem;">(${l.category})</span></div>`; });
         
-        // BOUTON GOOGLE MAPS SANS EMOJI ET ALIGNÉ À GAUCHE
         dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">Open in Google Maps</a></div></div>`;
         resultDiv.innerHTML += dayHtml;
     }
@@ -779,7 +784,6 @@ window.exportItineraryPDF = function() {
     html2pdf().set(opt).from(element).save().then(() => { exportBtn.style.display = 'block'; });
 };
 
-// CLOSING MODALS LOGIC SÉCURISÉE
 window.closeModal = function(id) { 
     if(document.getElementById(id)) document.getElementById(id).classList.add('hidden'); 
 };
@@ -805,7 +809,7 @@ const btnReject = document.getElementById('cookie-reject');
 if(btnReject) btnReject.addEventListener('click', closeCookies);
 
 // ==========================================
-// 11. REDIRECTION DEPUIS VISITED / WISHLIST
+// 10. REDIRECTION DEPUIS VISITED / WISHLIST
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -813,9 +817,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (locId && document.getElementById('map')) {
         setTimeout(() => {
             window.openDetailsPanel(parseInt(locId));
-            // Optionnel: Centrer la carte sur ce lieu
             const loc = celebLocations.find(l => l.id === parseInt(locId));
             if(loc && map) map.flyTo([loc.lat, loc.lng], 16, { duration: 1.5 });
-        }, 800); // Délai pour laisser la carte se charger
+        }, 800); 
     }
 });
