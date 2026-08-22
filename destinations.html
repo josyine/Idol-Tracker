@@ -8,9 +8,12 @@
 <link rel="stylesheet" href="welcome-style.css">
 <style>
   a { text-decoration: none !important; }
+  body { overflow-y: scroll; } /* Empêche le saut de page dû à la scrollbar */
 
-  /* Ajustement de la largeur pour être identique à Artists */
-  .page-container { position: relative; z-index: 10; max-width: 960px; margin: 0 auto; padding: 20px 6% 80px 6%; }
+  /* ALIGNEMENT PARFAIT : Largeur fixe centrée pour la Navbar et le Contenu */
+  .nav { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1000px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 10; }
+  .page-container { position: relative; z-index: 10; width: 100%; max-width: 1000px; margin: 0 auto; padding: 10px 20px 80px 20px; }
+  
   h1.pg-title { font-size: 42px; font-weight: 700; color: #212832; margin-bottom: 24px; text-shadow: 0 2px 10px rgba(255,255,255,0.6); letter-spacing: -1px; }
 
   .stats-bar { display: flex; margin-bottom: 34px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 16px; padding: 18px 0; box-shadow: 0 10px 30px rgba(80,60,120,.05); }
@@ -92,7 +95,7 @@
       <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 
-    <!-- Navbar -->
+    <!-- Navbar Alignée -->
     <div class="nav">
       <a href="index.html" class="brand">
         <svg class="pin" viewBox="0 0 400 400">
@@ -180,6 +183,7 @@
           </div>
         </div>
 
+        <!-- PORTUGAL AJOUTÉ ICI -->
         <div class="row" onclick="openDetail('portugal')">
           <div class="row-photo" style="background-image:url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=700');">
             <div class="row-photo-badge">2 locations</div>
