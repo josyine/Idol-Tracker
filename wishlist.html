@@ -12,9 +12,9 @@
         a.back-btn:hover { text-decoration: underline; }
         
         .wishlist-list { list-style: none; padding: 0; }
-        .wishlist-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; }
-        .wishlist-item:last-child { border-bottom: none; }
-        .loc-name { font-weight: bold; color: #334e68; font-size: 1.1rem;}
+        .wishlist-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; transition: 0.2s; border-radius: 8px;}
+        .wishlist-item:hover { background: #f8fafc; }
+        .loc-name { font-weight: bold; color: #334e68; font-size: 1.1rem; text-decoration: underline;}
         .loc-group { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold;}
         .loc-date { font-size: 0.85rem; color: #94a3b8; }
     </style>
@@ -42,7 +42,7 @@
                     const loc = celebLocations.find(l => l.id === w.id);
                     if(loc) {
                         listContainer.innerHTML += `
-                            <li class="wishlist-item">
+                            <li class="wishlist-item" style="cursor: pointer;" onclick="window.location.href='map.html?locId=${loc.id}'">
                                 <div>
                                     <div class="loc-name">${loc.name}</div>
                                     <div class="loc-group">${loc.group} • ${loc.city}</div>
