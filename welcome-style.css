@@ -2,9 +2,9 @@
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 .hidden { display: none !important; }
 
-/* DÉGRADÉ BLEU VOYAGE (Dynamique et lumineux) */
+/* DÉGRADÉ LAVANDE / VIOLET CLAIR DYNAMIQUE */
 body { 
-    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 30%, #38bdf8 70%, #0284c7 100%); 
+    background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); 
     background-size: 200% 200%;
     animation: gradientShift 10s ease infinite;
     color: var(--text-main); 
@@ -54,7 +54,7 @@ body {
 
 .auth-left { flex: 1; padding: 60px 50px; background: white; color: var(--text-main); position: relative; display: flex; flex-direction: column; justify-content: center;}
 
-/* FOND FONCÉ POUR LA PARTIE DROITE (Pour lire le texte blanc) */
+/* FOND FONCÉ POUR LA PARTIE DROITE */
 .auth-right { flex: 1; background: #34414C; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; position: relative;}
 .auth-right-content { z-index: 1; display: flex; flex-direction: column; align-items: center;}
 
