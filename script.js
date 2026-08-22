@@ -9,9 +9,11 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
     markerGroup = L.layerGroup().addTo(map);
+    
+    // Assurer que la carte se redimensionne bien quand le navigateur est en plein écran
+    setTimeout(() => { map.invalidateSize(); }, 200);
 }
 
-// Menu Mobile
 window.toggleMobileMenu = function() {
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) sidebar.classList.toggle('open');
@@ -53,8 +55,21 @@ let celebLocations = [
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "images/Otsu1.jpg",
         fullDescription: { en: "Opened in 2018, Ossu Seiromushi is a popular dining establishment near Seokchon Lake.", fr: "Ouvert en 2018, Ossu Seiromushi est un restaurant populaire près du lac Seokchon." },
         directions: { en: "Take Line 8 or Line 9 to Songpanaru Station (Exit 1).", fr: "Prenez la ligne 8 ou 9 jusqu'à la station Songpanaru (Sortie 1)." }
+    },
+    {
+        id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51",
+        context: { en: "The members went on the pirate ship.", fr: "Les membres sont montés sur le bateau pirate." },
+        address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
+        fullDescription: { en: "Opened in 1989 in the Jamsil neighborhood, Lotte World is a must-visit entertainment complex.", fr: "Ouvert en 1989, Lotte World est un complexe incontournable." },
+        directions: { en: "Take Line 2 or Line 8 directly to Jamsil Station.", fr: "Prenez la ligne 2 ou 8 directement jusqu'à la station Jamsil." }
+    },
+    {
+        id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "Default", year: "2026",
+        context: { en: "The historic naval museum serving as the grandiose backdrop.", fr: "Le musée naval historique servant de décor." },
+        address: "Praça do Império, 1400-206 Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg",
+        fullDescription: { en: "Housed in the Jerónimos Monastery, the Navy Museum displays over 17,000 historical items.", fr: "Situé dans le monastère des Hiéronymites." },
+        directions: { en: "Take Tram 15E or Bus 728 from Praça do Comércio.", fr: "Prenez le tram 15E ou le bus 728." }
     }
-    // Note: Pour garder le code propre, ajoute ici le reste de tes lieux depuis tes fichiers précédents.
 ];
 
 // ==========================================
@@ -65,19 +80,18 @@ const translations = {
     en: { btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", locationsCount: "LOCATIONS" },
     fr: { btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", locationsCount: "LIEUX" }
 };
-function t(key) { return translations[currentLang][key] || key; }
+function t(key) { return translations[currentLang] ? (translations[currentLang][key] || key) : key; }
 function getLocText(field) { return field ? (field[currentLang] || field.en || "") : ""; }
 
 function updateUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if(translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
+        if(translations[currentLang] && translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
     });
     initializeFilters();
     renderLocations();
 }
 
-// Menus Nav
 document.addEventListener('DOMContentLoaded', () => {
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
@@ -148,6 +162,7 @@ function initializeFilters() {
         });
     });
 }
+
 if(groupSelect) {
     [groupSelect, memberSelect, yearSelect, countrySelect].forEach(el => el.addEventListener('change', () => { if(el===groupSelect) initializeFilters(); renderLocations(); }));
     searchInput.addEventListener('input', renderLocations);
@@ -171,12 +186,17 @@ function renderLocations() {
     const filteredLocations = availableLocs.filter(loc => {
         return (fGroup === "All" || loc.group === fGroup) && (fMember === "All" || loc.member === fMember || loc.member === "All") && 
                (activeCategory === "All" || loc.category === activeCategory) && (fYear === "All" || loc.year === fYear) &&
-               (fCountry === "All" || loc.country === fCountry) && (loc.name.toLowerCase().includes(searchTerm) || loc.city.toLowerCase().includes(searchTerm));
+               (fCountry === "All" || loc.country === fCountry) && (loc.name.toLowerCase().includes(searchTerm) || (loc.city && loc.city.toLowerCase().includes(searchTerm)));
     });
 
-    document.getElementById('location-count-sidebar').textContent = filteredLocations.length;
-    document.getElementById('stat-locations').textContent = filteredLocations.length;
-    document.getElementById('stat-countries').textContent = new Set(filteredLocations.map(l => l.country)).size;
+    const cSidebar = document.getElementById('location-count-sidebar');
+    if(cSidebar) cSidebar.textContent = filteredLocations.length;
+    
+    const sLocations = document.getElementById('stat-locations');
+    if(sLocations) sLocations.textContent = filteredLocations.length;
+    
+    const sCountries = document.getElementById('stat-countries');
+    if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
     const mapMarkers = [];
     let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
@@ -195,15 +215,14 @@ function renderLocations() {
 
         marker.on('click', () => window.openDetailsPanel(loc.id));
 
-        // Création carte dans la liste avec style V2
-        const cardBgColor = isVisited ? `${baseColor}15` : '#faf9fc'; // Léger fond coloré si visité
+        const cardBgColor = isVisited ? `${baseColor}15` : '#faf9fc';
         const card = document.createElement('div');
         card.className = 'loc-item';
         card.style.background = cardBgColor;
         card.innerHTML = `
             <div class="loc-icon-box" style="color:${baseColor}; background:${baseColor}1A;">${catIconSvg}</div>
             <div class="loc-info">
-                <div class="loc-cat">${loc.category} &middot; ${loc.city}</div>
+                <div class="loc-cat">${loc.category} &middot; ${loc.city || ''}</div>
                 <div class="loc-name">${loc.name}</div>
             </div>
         `;
@@ -223,31 +242,54 @@ window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
     
-    document.getElementById('details-title').textContent = loc.name;
-    document.getElementById('details-desc').innerHTML = getLocText(loc.fullDescription); 
-    document.getElementById('details-directions').textContent = getLocText(loc.directions);
-    document.getElementById('details-group').textContent = loc.group;
-    document.getElementById('details-member').textContent = loc.member === "All" ? "All" : loc.member;
-    document.getElementById('details-country').textContent = loc.country;
-    document.getElementById('details-city').textContent = loc.city;
-    document.getElementById('details-full-address').textContent = loc.address;
-    document.getElementById('details-date').textContent = loc.year;
+    const dTitle = document.getElementById('details-title');
+    if(dTitle) dTitle.textContent = loc.name;
+    
+    const dDesc = document.getElementById('details-desc');
+    if(dDesc) dDesc.innerHTML = getLocText(loc.fullDescription); 
+    
+    const dDir = document.getElementById('details-directions');
+    if(dDir) dDir.textContent = getLocText(loc.directions);
+    
+    const dGroup = document.getElementById('details-group');
+    if(dGroup) dGroup.textContent = loc.group;
+    
+    const dMember = document.getElementById('details-member');
+    if(dMember) dMember.textContent = loc.member === "All" ? "All" : loc.member;
+    
+    const dCountry = document.getElementById('details-country');
+    if(dCountry) dCountry.textContent = loc.country;
+    
+    const dCity = document.getElementById('details-city');
+    if(dCity) dCity.textContent = loc.city;
+    
+    const dAddr = document.getElementById('details-full-address');
+    if(dAddr) dAddr.textContent = loc.address;
+    
+    const dDate = document.getElementById('details-date');
+    if(dDate) dDate.textContent = loc.year;
 
-    if (loc.episode) { document.getElementById('details-episode').textContent = loc.episode; document.getElementById('details-episode-container').style.display = 'block'; } else { document.getElementById('details-episode-container').style.display = 'none'; }
-    if (loc.episodeLink) { document.getElementById('details-episode-link').href = loc.episodeLink; document.getElementById('details-link-container').style.display = 'block'; } else { document.getElementById('details-link-container').style.display = 'none'; }
-    document.getElementById('details-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+    const dEpi = document.getElementById('details-episode');
+    const dEpiCont = document.getElementById('details-episode-container');
+    if (dEpi && dEpiCont) { if(loc.episode) { dEpi.textContent = loc.episode; dEpiCont.style.display = 'block'; } else { dEpiCont.style.display = 'none'; } }
+    
+    const dLink = document.getElementById('details-episode-link');
+    const dLinkCont = document.getElementById('details-link-container');
+    if (dLink && dLinkCont) { if(loc.episodeLink) { dLink.href = loc.episodeLink; dLinkCont.style.display = 'block'; } else { dLinkCont.style.display = 'none'; } }
+    
+    const mapLink = document.getElementById('details-map-link');
+    if(mapLink) mapLink.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-    // Media
     const galleryContainer = document.getElementById('details-gallery');
-    if (galleryContainer) {
+    const gallerySection = document.getElementById('details-gallery-section');
+    if (galleryContainer && gallerySection) {
         galleryContainer.innerHTML = ""; 
         if(loc.gallery && loc.gallery.length > 0) {
             loc.gallery.forEach(p => { galleryContainer.innerHTML += `<img src="${p}" onerror="this.src='https://via.placeholder.com/300x250'">`; });
-            document.getElementById('details-gallery-section').classList.remove('hidden');
-        } else { document.getElementById('details-gallery-section').classList.add('hidden'); }
+            gallerySection.classList.remove('hidden');
+        } else { gallerySection.classList.add('hidden'); }
     }
 
-    // Checkboxes
     const vCheck = document.getElementById('details-visited');
     if(vCheck) {
         let vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
@@ -277,26 +319,37 @@ window.openDetailsPanel = function(id) {
     document.getElementById('sidebar-main').classList.add('hidden');
     document.getElementById('sidebar-details').classList.remove('hidden');
     
-    // Elargit la sidebar
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) { sidebar.classList.add('open'); sidebar.classList.add('expanded'); }
+    
+    // Forcer le redimensionnement de la carte après expansion de la barre
+    setTimeout(() => { if(map) map.invalidateSize(); }, 450);
 };
 
 window.closeDetailsPanel = function() {
-    document.getElementById('sidebar-details').classList.add('hidden');
-    document.getElementById('sidebar-main').classList.remove('hidden');
+    const dDetails = document.getElementById('sidebar-details');
+    if(dDetails) dDetails.classList.add('hidden');
+    const dMain = document.getElementById('sidebar-main');
+    if(dMain) dMain.classList.remove('hidden');
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) sidebar.classList.remove('expanded'); 
+    
+    setTimeout(() => { if(map) map.invalidateSize(); }, 450);
 }
 
 // ==========================================
 // 7. ITINERARY & CART MODALS
 // ==========================================
+let itiLeafletMap = null;
+let itiLayerGroup = null;
+
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
         const itiGroup = document.getElementById('iti-group');
         const itiCountry = document.getElementById('iti-country');
+        if(!itiGroup || !itiCountry) return;
+
         const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
         let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
         if(unlockedGroups.length === 0) availableLocs = celebLocations;
@@ -336,32 +389,65 @@ window.generateItinerary = function() {
     const resultDiv = document.getElementById('iti-days-list');
     resultDiv.innerHTML = "";
     const locsPerDay = Math.ceil(validLocs.length / days);
+    let coordsForMap = [];
     
     for(let i = 0; i < days; i++) {
         const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
         if(dayLocs.length === 0) continue;
         
-        let waypoints = dayLocs.map(l => `${l.lat},${l.lng}`).join('|');
-        let mapLink = `https://www.google.com/maps/dir/?api=1&origin=${dayLocs[0].lat},${dayLocs[0].lng}&destination=${dayLocs[dayLocs.length-1].lat},${dayLocs[dayLocs.length-1].lng}&waypoints=${waypoints}&travelmode=driving`;
+        let mapLink = "";
+        if(dayLocs.length === 1) {
+            mapLink = `https://www.google.com/maps/search/?api=1&query=${dayLocs[0].lat},${dayLocs[0].lng}`;
+            coordsForMap.push([dayLocs[0].lat, dayLocs[0].lng]);
+        } else {
+            let waypoints = dayLocs.map(l => `${l.lat},${l.lng}`).join('|');
+            mapLink = `https://www.google.com/maps/dir/?api=1&origin=${dayLocs[0].lat},${dayLocs[0].lng}&destination=${dayLocs[dayLocs.length-1].lat},${dayLocs[dayLocs.length-1].lng}&waypoints=${waypoints}&travelmode=driving`;
+            dayLocs.forEach(l => coordsForMap.push([l.lat, l.lng]));
+        }
         
         let html = `<div class="iti-day-card"><div class="iti-day-title">Day ${i + 1}</div>`;
-        dayLocs.forEach((l, idx) => html += `<div class="iti-loc"><strong>${idx+1}. ${l.name}</strong></div>`);
+        dayLocs.forEach((l, idx) => html += `<div class="iti-loc" style="font-size:12px; margin-bottom:5px;"><strong>${idx+1}. ${l.name}</strong></div>`);
         html += `<a href="${mapLink}" target="_blank" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:11.5px; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; background:white;">Open in Google Maps</a></div>`;
         resultDiv.innerHTML += html;
     }
     
     document.getElementById('iti-result').classList.remove('hidden');
+
+    const modalContent = document.querySelector('#itinerary-modal .modal-content');
+    if(modalContent) modalContent.scrollTo({ top: modalContent.scrollHeight, behavior: 'smooth' });
+
+    setTimeout(() => {
+        if(!itiLeafletMap) {
+            itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(itiLeafletMap);
+            itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
+        } else {
+            itiLayerGroup.clearLayers();
+        }
+
+        coordsForMap.forEach((c, idx) => {
+            L.circleMarker(c, { color: '#D42759', radius: 6, fillOpacity: 1 }).addTo(itiLayerGroup)
+             .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
+        });
+        L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
+
+        itiLeafletMap.invalidateSize();
+        if(coordsForMap.length > 0) itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
+    }, 250);
 }
 
 window.exportItineraryPDF = function() {
     const el = document.getElementById('iti-result');
     const btn = document.getElementById('export-pdf-btn');
+    if(!el || !btn) return;
     btn.style.display = 'none';
     html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' } }).from(el).save().then(() => btn.style.display = 'block');
 };
 
 window.openCartModal = function() {
-    document.getElementById('cart-modal').classList.remove('hidden');
+    const modal = document.getElementById('cart-modal');
+    if(!modal) return;
+    modal.classList.remove('hidden');
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     document.querySelectorAll('.cart-checkbox').forEach(cb => {
         cb.checked = false; 
@@ -374,9 +460,13 @@ window.openCartModal = function() {
 
 function updateCartPrice() {
     const selected = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
-    document.getElementById('cart-price').textContent = `${(selected * 14.99).toFixed(2)} €`;
+    const priceDisplay = document.getElementById('cart-price');
+    if(priceDisplay) priceDisplay.textContent = `${(selected * 14.99).toFixed(2)} €`;
     const btn = document.getElementById('cart-pay-btn');
-    if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; } else { btn.disabled = true; btn.textContent = `Select a group`; }
+    if(btn) {
+        if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; } 
+        else { btn.disabled = true; btn.textContent = `Select a group`; }
+    }
 }
 
 document.querySelectorAll('.cart-checkbox').forEach(cb => {
@@ -388,15 +478,36 @@ document.querySelectorAll('.cart-checkbox').forEach(cb => {
     });
 });
 
-document.getElementById('cart-form')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
-    localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
-    setTimeout(() => window.location.reload(), 1500);
-});
+const cartForm = document.getElementById('cart-form');
+if(cartForm) {
+    cartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
+        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+        setTimeout(() => window.location.reload(), 1000);
+    });
+}
 
-window.closeModal = function(id) { document.getElementById(id)?.classList.add('hidden'); };
+window.closeModal = function(id) { 
+    const el = document.getElementById(id);
+    if(el) el.classList.add('hidden'); 
+};
 window.onclick = function(e) { 
     if (e.target.classList.contains('modal')) e.target.classList.add('hidden'); 
 };
+
+// ==========================================
+// 8. REDIRECTION DEPUIS VISITED / WISHLIST
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const locId = urlParams.get('locId');
+    if (locId && document.getElementById('map')) {
+        setTimeout(() => {
+            window.openDetailsPanel(parseInt(locId));
+            const loc = celebLocations.find(l => l.id === parseInt(locId));
+            if(loc && map) map.flyTo([loc.lat, loc.lng], 16, { duration: 1.5 });
+        }, 800); 
+    }
+});
