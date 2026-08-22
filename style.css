@@ -38,13 +38,14 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .filters-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
 .filter-group { display: flex; flex-direction: column; }
 
-/* CORRECTION DES MARGES : labels et espacements harmonisés */
-.filter-group label, .category-filter-section label, .locations-header label { font-size: 0.75rem; font-weight: 700; color: #334e68; margin-bottom: 15px; text-transform: uppercase; display: block;}
+/* CORRECTION DES MARGES : On réduit margin-bottom à 8px sous les titres */
+.filter-group label, .category-filter-section label, .locations-header label { font-size: 0.75rem; font-weight: 700; color: #334e68; margin-bottom: 8px; text-transform: uppercase; display: block;}
 .filter-select { padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: white; font-size: 0.85rem; outline: none; cursor: pointer; color: var(--text-main);}
 .filter-select:focus { border-color: var(--primary-magenta); }
 
-.category-filter-section { margin-top: 15px; margin-bottom: 15px; }
-.locations-header { margin-top: 15px; margin-bottom: 12px; }
+/* On garde un espace correct au dessus des titres (margin-top) */
+.category-filter-section { margin-top: 20px; margin-bottom: 10px; }
+.locations-header { margin-top: 20px; margin-bottom: 10px; }
 
 .category-buttons { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; scrollbar-width: none; }
 .category-buttons::-webkit-scrollbar { display: none; }
@@ -153,7 +154,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 /* MOBILE RESPONSIVENESS */
 .hamburger-btn { display: none; pointer-events: auto;}
 @media (max-width: 800px) {
-    .sidebar.expanded { width: 100%; } /* Sur mobile, l'expanded prend toute la place possible */
+    .sidebar.expanded { width: 100%; }
     .hamburger-btn { display: flex; }
     .top-nav { width: calc(100% - 20px); left: 10px; right: auto;}
     .sidebar { position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; width: 340px; max-width: 85vw; transition: 0.3s ease-in-out; border-right: none; box-shadow: 5px 0 25px rgba(0,0,0,0.2);}
