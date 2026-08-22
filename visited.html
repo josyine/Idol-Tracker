@@ -10,7 +10,6 @@
   *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
   a{text-decoration:none;}
   
-  /* C'EST ICI QUE J'AI ENLEVÉ LE FOND NOIR */
   body{background:#E7E9EC;padding:50px 0 100px 0; min-height: 100vh;}
   .hidden { display: none !important; }
 
@@ -76,13 +75,16 @@
 document.addEventListener("DOMContentLoaded", () => {
     // 1. Récupération des données locales
     let visitedDataRaw = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-    // Compatibilité : Si le format était juste un array d'IDs, on le convertit
     let visitedData = visitedDataRaw.map(v => typeof v === 'number' ? {id: v, date: "Unknown Date"} : v);
     
-    // On inverse pour avoir du plus récent au plus ancien
+    // Inverser pour avoir du plus récent au plus ancien
     visitedData = visitedData.reverse();
 
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    // Récupération des groupes (Si vide = Mode démo = on prend tous les groupes de celebLocations)
+    let unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    if(unlockedGroups.length === 0) {
+        unlockedGroups = [...new Set(celebLocations.map(l => l.group))];
+    }
     
     const progressContainer = document.getElementById('progress-container');
     const listContainer = document.getElementById('visited-list');
@@ -96,43 +98,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 2. GÉNÉRATION DES BARRES DE PROGRESSION
     let hasProgress = false;
-    unlockedGroups.forEach(group => {
+    
+    // On va seulement afficher les groupes pour lesquels on a au moins 1 visite 
+    // ou qui font partie des groupes explicitement débloqués.
+    let groupsToDisplay = unlockedGroups;
+
+    groupsToDisplay.forEach(group => {
         const totalLocsInGroup = celebLocations.filter(loc => loc.group === group).length;
-        const visitedCount = visitedData.filter(v => {
-            const loc = celebLocations.find(l => l.id === v.id);
-            return loc && loc.group === group;
-        }).length;
-
+        
         if(totalLocsInGroup > 0) {
-            hasProgress = true;
-            const percentage = Math.round((visitedCount / totalLocsInGroup) * 100);
-            const gColor = groupColors[group] || '#10b981'; 
+            const visitedCount = visitedData.filter(v => {
+                const loc = celebLocations.find(l => l.id === v.id);
+                return loc && loc.group === group;
+            }).length;
 
-            progressContainer.innerHTML += `
-                <div class="progress-item">
-                    <div class="progress-header">
-                        <span>${group}</span>
-                        <span>${percentage}% (${visitedCount}/${totalLocsInGroup})</span>
+            // On affiche le groupe que si l'utilisateur y a fait au moins 1 visite, 
+            // OU s'il l'a acheté (pour qu'il voie sa progression démarrer à 0%)
+            if (visitedCount > 0 || JSON.parse(localStorage.getItem('unlockedGroups') || '[]').includes(group)) {
+                hasProgress = true;
+                const percentage = Math.round((visitedCount / totalLocsInGroup) * 100);
+                const gColor = groupColors[group] || '#10b981'; 
+
+                progressContainer.innerHTML += `
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>${group}</span>
+                            <span>${percentage}% (${visitedCount}/${totalLocsInGroup})</span>
+                        </div>
+                        <div class="progress-bg">
+                            <div class="progress-fill" style="width: ${percentage}%; background-color: ${gColor};"></div>
+                        </div>
                     </div>
-                    <div class="progress-bg">
-                        <div class="progress-fill" style="width: ${percentage}%; background-color: ${gColor};"></div>
-                    </div>
-                </div>
-            `;
+                `;
+            }
         }
     });
 
-    if(!hasProgress) document.getElementById('progress-section').classList.add('hidden');
+    if(!hasProgress) {
+        document.getElementById('progress-section').classList.add('hidden');
+    }
 
     // 3. GÉNÉRATION DE LA LISTE DES LIEUX VISITÉS
     visitedData.forEach(v => {
         const loc = celebLocations.find(l => l.id === v.id);
         if(loc) {
-            // Récupère l'icône SVG du lieu (défini dans script.js)
             const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
             const baseColor = groupColors[loc.group] || '#8b5cf6';
             
-            // On manipule l'icône SVG pour qu'elle prenne la couleur du groupe
             const coloredIcon = catIconSvg.replace('stroke="currentColor"', `stroke="${baseColor}"`);
 
             listContainer.innerHTML += `
