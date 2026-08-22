@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Screen To Street — Artists</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+  a{text-decoration:none;cursor:pointer;}
+  body{background:#fff;}
+
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:24px 6%;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand span{font-weight:600;font-size:17px;color:#2E3644;}
+  .brand span b{color:#D42759;}
+  .nav-right{display:flex;align-items:center;gap:26px;}
+  .nav-link{font-size:13px;font-weight:500;color:#4A5262;}
+  .nav-link.active{color:#D42759;font-weight:700;}
+  .icon-btn{width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:#2E3644;box-shadow:0 4px 12px rgba(80,60,120,.08);}
+  .login-btn{border:1.5px solid #2E3644;color:#2E3644;font-size:12.5px;font-weight:600;padding:8px 18px;border-radius:100px; transition: 0.2s;}
+  .login-btn:hover{background: #2E3644; color: white;}
+
+  .hero{padding:6px 6% 0 6%;}
+  h1.pg-title{font-size:32px;font-weight:700;color:#212832;margin-bottom:8px;}
+  .pg-sub{font-size:13.5px;color:#5B6472;}
+
+  .stats-bar{display:flex;margin:26px 6% 34px 6%;background:linear-gradient(150deg,#FAF8FE,#F1EBFA);border-radius:16px;padding:18px 0;}
+  .stat{flex:1;text-align:center;border-right:1px solid #E3DEF0;}
+  .stat:last-child{border-right:none;}
+  .stat-num{font-size:22px;font-weight:800;color:#D42759;}
+  .stat-label{font-size:10.5px;font-weight:700;color:#5B6472;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+
+  .content{padding:0 6% 70px 6%;}
+
+  /* Featured BTS */
+  .featured{
+    border-radius:22px;padding:34px 36px;margin-bottom:36px;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,#8B5CF6 0%,#5B4A8A 45%,#2E3644 100%);
+  }
+  .featured-blob{position:absolute;border-radius:50%;filter:blur(30px);pointer-events:none;}
+  .fb1{top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%);}
+  .fb2{bottom:-70px;left:20%;width:180px;height:180px;background:radial-gradient(circle,rgba(212,39,89,.35),transparent 70%);}
+  .featured-tag{position:relative;font-size:10.5px;font-weight:700;color:#e9e2fb;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
+  .featured-name{position:relative;font-size:30px;font-weight:700;color:#fff;margin-bottom:10px;}
+  .featured-blurb{position:relative;font-size:13px;color:#ede7fb;max-width:520px;line-height:1.65;margin-bottom:18px;}
+  .featured-meta{position:relative;display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap;}
+  .fm-item{font-size:12px;color:#fff;font-weight:600;}
+  .fm-sep{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.5);}
+  .explore-btn{
+    position:relative;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#5B4A8A;
+    font-size:13px;font-weight:700;padding:11px 20px;border-radius:100px;
+  }
+
+  /* Compact list */
+  .list-label{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;}
+  .row{display:flex;align-items:center;gap:16px;padding:16px 18px;border:1px solid #ECE7F3;border-radius:14px;margin-bottom:10px;}
+  .row-dot{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;}
+  .row-name{font-size:14px;font-weight:700;color:#212832;}
+  .row-meta{font-size:11.5px;color:#94a3b8;margin-top:2px;}
+  .row-cats{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+  .cat-chip{font-size:9.5px;font-weight:700;color:#4A5262;background:#f8fafc;border-radius:100px;padding:3px 9px;}
+  .row-explore{
+    font-size:12px;font-weight:700;color:#2E3644;border:1.5px solid #2E3644;padding:8px 16px;border-radius:100px;
+    white-space:nowrap;flex-shrink:0;
+  }
+
+  /* Detail overlay (acts as a "new window") */
+  .overlay{position:fixed;inset:0;background:rgba(20,16,30,.55);backdrop-filter:blur(4px);z-index:999;display:none;align-items:center;justify-content:center;padding:30px;}
+  .overlay.open{display:flex;}
+  .detail-window{
+    width:100%;max-width:640px;max-height:88vh;overflow-y:auto;background:#fff;border-radius:22px;
+    box-shadow:0 30px 70px rgba(0,0,0,.35);position:relative;
+  }
+  .detail-hero{padding:34px 36px 26px 36px;position:relative;overflow:hidden;}
+  .detail-close{position:absolute;top:16px;right:18px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:2;}
+  .detail-tag{position:relative;font-size:10.5px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.7px;opacity:.85;margin-bottom:8px;}
+  .detail-name{position:relative;font-size:26px;font-weight:700;color:#fff;}
+  .detail-body{padding:28px 36px 34px 36px;}
+  .detail-section-label{font-size:10.5px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+  .detail-blurb{font-size:13px;color:#334155;line-height:1.7;margin-bottom:22px;}
+  .members-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+  .member-chip{display:flex;align-items:center;gap:7px;background:#f8fafc;border-radius:100px;padding:6px 12px 6px 6px;}
+  .member-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;}
+  .member-name{font-size:11.5px;font-weight:600;color:#334155;}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;}
+  .stat-card{background:#faf9fc;border-radius:12px;padding:14px 16px;}
+  .stat-card .num{font-size:20px;font-weight:800;color:#212832;}
+  .stat-card .lab{font-size:10.5px;color:#94a3b8;font-weight:600;margin-top:2px;}
+  .detail-cta{display:block;text-align:center;background:#D42759;color:#fff;font-size:13px;font-weight:700;padding:13px;border-radius:12px;box-shadow:0 10px 22px rgba(212,39,89,.25);}
+</style>
+</head>
+<body>
+
+  <div class="nav">
+    <a href="index.html" class="brand">
+      <svg width="26" height="26" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
+      <span>Screen To <b>Street</b></span>
+    </a>
+    <div class="nav-right">
+      <a class="nav-link" href="map.html">Destinations</a>
+      <a class="nav-link active" href="artists.html">Artists</a>
+      <div class="icon-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/></svg></div>
+      <a href="index.html" class="login-btn">Log in</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1 class="pg-title">Artists</h1>
+    <p class="pg-sub">Every group on Screen To Street, and how far their map already goes.</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Groups</div></div>
+    <div class="stat"><div class="stat-num">44</div><div class="stat-label">Members</div></div>
+    <div class="stat"><div class="stat-num">13</div><div class="stat-label">Locations mapped</div></div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== BTS FEATURED ===== -->
+    <div class="featured">
+      <div class="featured-blob fb1"></div><div class="featured-blob fb2"></div>
+      <div class="featured-tag">Most mapped group</div>
+      <div class="featured-name">BTS</div>
+      <p class="featured-blurb">From a cramped Gangnam practice room to a custom-built mountain retreat in Chuncheon — BTS is the most extensively mapped group on Screen To Street, spanning three countries and nine years of history.</p>
+      <div class="featured-meta">
+        <div class="fm-item">7 members</div><div class="fm-sep"></div>
+        <div class="fm-item">12 locations</div><div class="fm-sep"></div>
+        <div class="fm-item">South Korea, France, Portugal</div>
+      </div>
+      <a class="explore-btn" onclick="openDetail('bts')">Explore BTS →</a>
+    </div>
+
+    <!-- ===== COMPACT LIST ===== -->
+    <div class="list-label">Other groups</div>
+
+    <div class="row">
+      <div class="row-dot" style="background:#D42759;">BP</div>
+      <div style="flex:1;">
+        <div class="row-name">Blackpink</div>
+        <div class="row-meta">4 members · 1 location mapped</div>
+        <div class="row-cats"><span class="cat-chip">Cafe</span><span class="cat-chip">Restaurants</span><span class="cat-chip">Fashion</span></div>
+      </div>
+      <a class="row-explore" onclick="openDetail('blackpink')">Explore</a>
+    </div>
+
+    <div class="row">
+      <div class="row-dot" style="background:#2E3644;">TW</div>
+      <div style="flex:1;">
+        <div class="row-name">Twice</div>
+        <div class="row-meta">9 members · 0 locations mapped yet</div>
+      </div>
+      <a class="row-explore" onclick="openDetail('twice')">Explore</a>
+    </div>
+
+    <div class="row">
+      <div class="row-dot" style="background:#C97A9A;">SV</div>
+      <div style="flex:1;">
+        <div class="row-name">Seventeen</div>
+        <div class="row-meta">13 members · 0 locations mapped yet</div>
+      </div>
+      <a class="row-explore" onclick="openDetail('seventeen')">Explore</a>
+    </div>
+
+    <div class="row">
+      <div class="row-dot" style="background:#5B6472;">KE</div>
+      <div style="flex:1;">
+        <div class="row-name">Katseye</div>
+        <div class="row-meta">6 members · 0 locations mapped yet</div>
+      </div>
+      <a class="row-explore" onclick="openDetail('katseye')">Explore</a>
+    </div>
+
+    <div class="row">
+      <div class="row-dot" style="background:#A78BFA;">TX</div>
+      <div style="flex:1;">
+        <div class="row-name">TXT</div>
+        <div class="row-meta">5 members · 0 locations mapped yet</div>
+      </div>
+      <a class="row-explore" onclick="openDetail('txt')">Explore</a>
+    </div>
+
+  </div>
+
+  <!-- ===== DETAIL OVERLAY (acts as a "new window") ===== -->
+  <div class="overlay" id="overlay" onclick="if(event.target===this) closeDetail()">
+    <div class="detail-window" id="detail-window"></div>
+  </div>
+
+<script>
+const GROUPS = {
+  bts: {
+    name: "BTS", gradient: "linear-gradient(135deg,#8B5CF6,#5B4A8A 60%,#2E3644)", accent:"#8B5CF6",
+    blurb: "From a cramped Gangnam practice room to a custom-built mountain retreat in Chuncheon, BTS's map spans nine years and three countries — the most complete journey on Screen To Street.",
+    members: [["RM","#8B5CF6"],["Jin","#7C4FE0"],["Suga","#8B5CF6"],["J-Hope","#7C4FE0"],["Jimin","#8B5CF6"],["V","#7C4FE0"],["Jungkook","#8B5CF6"]],
+    locations: 12, countries: 3, categories: "Run BTS, Bon Voyage, MV Location, Museums, Restaurants, Cafe, Concerts, Fashion, Landmarks",
+    since: "2013"
+  },
+  blackpink: {
+    name: "Blackpink", gradient: "linear-gradient(135deg,#D42759,#8a1d3c 60%,#2E3644)", accent:"#D42759",
+    blurb: "Just getting started — the first stop on Blackpink's map is a chic Gangnam cafe spotted on Jennie's Instagram. More locations are added as they're confirmed.",
+    members: [["Jisoo","#D42759"],["Jennie","#B23554"],["Rosé","#D42759"],["Lisa","#B23554"]],
+    locations: 1, countries: 1, categories: "Cafe, Restaurants, MV Location, Pop-up Store, Concerts, Fashion",
+    since: "2016"
+  },
+  twice: {
+    name: "Twice", gradient: "linear-gradient(135deg,#4A5568,#2E3644 60%,#1c232c)", accent:"#2E3644",
+    blurb: "Nine members, no shortage of stories — Twice's map is next in line to be built. Their filming locations and favorite spots are being researched.",
+    members: [["Nayeon","#2E3644"],["Jeongyeon","#5B6472"],["Momo","#2E3644"],["Sana","#5B6472"],["Jihyo","#2E3644"],["Mina","#5B6472"],["Dahyun","#2E3644"],["Chaeyoung","#5B6472"],["Tzuyu","#2E3644"]],
+    locations: 0, countries: 0, categories: "Cafe, Concerts, Fashion",
+    since: "2015"
+  },
+  seventeen: {
+    name: "Seventeen", gradient: "linear-gradient(135deg,#C97A9A,#8a4f66 60%,#2E3644)", accent:"#C97A9A",
+    blurb: "Thirteen members and a world tour's worth of stages — Seventeen's footprint on Screen To Street is on the way.",
+    members: [["S.Coups","#C97A9A"],["Jeonghan","#D9A5BE"],["Joshua","#C97A9A"],["Jun","#D9A5BE"],["Hoshi","#C97A9A"],["Wonwoo","#D9A5BE"],["Woozi","#C97A9A"],["DK","#D9A5BE"],["Mingyu","#C97A9A"],["The8","#D9A5BE"],["Seungkwan","#C97A9A"],["Vernon","#D9A5BE"],["Dino","#C97A9A"]],
+    locations: 0, countries: 0, categories: "Concerts, Landmarks",
+    since: "2015"
+  },
+  katseye: {
+    name: "Katseye", gradient: "linear-gradient(135deg,#5B6472,#3a414c 60%,#1c232c)", accent:"#5B6472",
+    blurb: "The newest addition to the roster — pop-up stores and fashion moments are next on the map as Katseye's presence grows.",
+    members: [["Sophia","#5B6472"],["Lara","#8996A3"],["Manon","#5B6472"],["Daniela","#8996A3"],["Yoonchae","#5B6472"],["Megan","#8996A3"]],
+    locations: 0, countries: 0, categories: "Pop-up Store, Fashion",
+    since: "2024"
+  },
+  txt: {
+    name: "TXT", gradient: "linear-gradient(135deg,#A78BFA,#6d56b8 60%,#2E3644)", accent:"#A78BFA",
+    blurb: "Five members, one story about to begin — TXT's first mapped location is in the works.",
+    members: [["Soobin","#A78BFA"],["Yeonjun","#C4B5FD"],["Beomgyu","#A78BFA"],["Taehyun","#C4B5FD"],["Huening Kai","#A78BFA"]],
+    locations: 0, countries: 0, categories: "MV Location, Concerts",
+    since: "2019"
+  }
+};
+
+function openDetail(key) {
+  const g = GROUPS[key];
+  const membersHtml = g.members.map(([name,color]) =>
+    `<div class="member-chip"><div class="member-avatar" style="background:${color};">${name.slice(0,2).toUpperCase()}</div><span class="member-name">${name}</span></div>`
+  ).join('');
+
+  document.getElementById('detail-window').innerHTML = `
+    <div class="detail-hero" style="background:${g.gradient};">
+      <div class="detail-close" onclick="closeDetail()">✕</div>
+      <div class="detail-tag">Since ${g.since}</div>
+      <div class="detail-name">${g.name}</div>
+    </div>
+    <div class="detail-body">
+      <p class="detail-blurb">${g.blurb}</p>
+
+      <div class="detail-section-label">Members (${g.members.length})</div>
+      <div class="members-grid">${membersHtml}</div>
+
+      <div class="detail-section-label">At a glance</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="num">${g.locations}</div><div class="lab">Locations mapped</div></div>
+        <div class="stat-card"><div class="num">${g.countries}</div><div class="lab">Countries covered</div></div>
+      </div>
+
+      ${g.locations > 0 ? `
+      <div class="detail-section-label">Content categories</div>
+      <p class="detail-blurb">${g.categories}</p>
+      ` : ''}
+    </div>
+  `;
+  document.getElementById('overlay').classList.add('open');
+}
+function closeDetail() {
+  document.getElementById('overlay').classList.remove('open');
+}
+</script>
+
+</body>
+</html>
