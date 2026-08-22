@@ -2,191 +2,187 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Screen To Street — Artists</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="welcome-style.css">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
-  a{text-decoration:none;cursor:pointer;}
-  body{background:#fff;}
-
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:24px 6%;}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand span{font-weight:600;font-size:17px;color:#2E3644;}
-  .brand span b{color:#D42759;}
-  .nav-right{display:flex;align-items:center;gap:26px;}
-  .nav-link{font-size:13px;font-weight:500;color:#4A5262;}
-  .nav-link.active{color:#D42759;font-weight:700;}
-  .icon-btn{width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:#2E3644;box-shadow:0 4px 12px rgba(80,60,120,.08);}
-  .login-btn{border:1.5px solid #2E3644;color:#2E3644;font-size:12.5px;font-weight:600;padding:8px 18px;border-radius:100px; transition: 0.2s;}
-  .login-btn:hover{background: #2E3644; color: white;}
-
-  .hero{padding:6px 6% 0 6%;}
-  h1.pg-title{font-size:32px;font-weight:700;color:#212832;margin-bottom:8px;}
-  .pg-sub{font-size:13.5px;color:#5B6472;}
-
-  .stats-bar{display:flex;margin:26px 6% 34px 6%;background:linear-gradient(150deg,#FAF8FE,#F1EBFA);border-radius:16px;padding:18px 0;}
-  .stat{flex:1;text-align:center;border-right:1px solid #E3DEF0;}
-  .stat:last-child{border-right:none;}
-  .stat-num{font-size:22px;font-weight:800;color:#D42759;}
-  .stat-label{font-size:10.5px;font-weight:700;color:#5B6472;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
-
-  .content{padding:0 6% 70px 6%;}
+  /* Surcharges spécifiques pour la page Artists */
+  .page-container { position: relative; z-index: 10; max-width: 900px; margin: 0 auto; padding: 20px 6% 80px 6%; }
+  h1.pg-title { font-size: 42px; font-weight: 700; color: #212832; margin-bottom: 24px; text-shadow: 0 2px 10px rgba(255,255,255,0.6); letter-spacing: -1px; }
+  
+  .stats-bar { display: flex; margin-bottom: 34px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 16px; padding: 18px 0; box-shadow: 0 10px 30px rgba(80,60,120,.05); }
+  .stat { flex: 1; text-align: center; border-right: 1px solid rgba(148, 163, 184, 0.3); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-size: 22px; font-weight: 800; color: #D42759; }
+  .stat-label { font-size: 10.5px; font-weight: 700; color: #5B6472; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
 
   /* Featured BTS */
-  .featured{
-    border-radius:22px;padding:34px 36px;margin-bottom:36px;position:relative;overflow:hidden;
-    background:linear-gradient(135deg,#8B5CF6 0%,#5B4A8A 45%,#2E3644 100%);
-  }
-  .featured-blob{position:absolute;border-radius:50%;filter:blur(30px);pointer-events:none;}
-  .fb1{top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%);}
-  .fb2{bottom:-70px;left:20%;width:180px;height:180px;background:radial-gradient(circle,rgba(212,39,89,.35),transparent 70%);}
-  .featured-tag{position:relative;font-size:10.5px;font-weight:700;color:#e9e2fb;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
-  .featured-name{position:relative;font-size:30px;font-weight:700;color:#fff;margin-bottom:10px;}
-  .featured-blurb{position:relative;font-size:13px;color:#ede7fb;max-width:520px;line-height:1.65;margin-bottom:18px;}
-  .featured-meta{position:relative;display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap;}
-  .fm-item{font-size:12px;color:#fff;font-weight:600;}
-  .fm-sep{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.5);}
-  .explore-btn{
-    position:relative;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#5B4A8A;
-    font-size:13px;font-weight:700;padding:11px 20px;border-radius:100px;
-  }
+  .featured { border-radius: 22px; padding: 34px 36px; margin-bottom: 36px; position: relative; overflow: hidden; background: linear-gradient(135deg,#8B5CF6 0%,#5B4A8A 45%,#2E3644 100%); box-shadow: 0 16px 40px rgba(139, 92, 246, 0.2); }
+  .featured-blob { position: absolute; border-radius: 50%; filter: blur(30px); pointer-events: none; }
+  .fb1 { top: -60px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle,rgba(255,255,255,.2),transparent 70%); }
+  .fb2 { bottom: -70px; left: 20%; width: 180px; height: 180px; background: radial-gradient(circle,rgba(212,39,89,.35),transparent 70%); }
+  .featured-tag { position: relative; font-size: 10.5px; font-weight: 700; color: #e9e2fb; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 10px; }
+  .featured-name { position: relative; font-size: 30px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .featured-blurb { position: relative; font-size: 13px; color: #ede7fb; max-width: 520px; line-height: 1.65; margin-bottom: 18px; }
+  .featured-meta { position: relative; display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+  .fm-item { font-size: 12px; color: #fff; font-weight: 600; }
+  .fm-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.5); }
+  .explore-btn { position: relative; display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #5B4A8A; font-size: 13px; font-weight: 700; padding: 11px 20px; border-radius: 100px; cursor: pointer; transition: 0.2s;}
+  .explore-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 
   /* Compact list */
-  .list-label{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;}
-  .row{display:flex;align-items:center;gap:16px;padding:16px 18px;border:1px solid #ECE7F3;border-radius:14px;margin-bottom:10px;}
-  .row-dot{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;}
-  .row-name{font-size:14px;font-weight:700;color:#212832;}
-  .row-meta{font-size:11.5px;color:#94a3b8;margin-top:2px;}
-  .row-cats{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
-  .cat-chip{font-size:9.5px;font-weight:700;color:#4A5262;background:#f8fafc;border-radius:100px;padding:3px 9px;}
-  .row-explore{
-    font-size:12px;font-weight:700;color:#2E3644;border:1.5px solid #2E3644;padding:8px 16px;border-radius:100px;
-    white-space:nowrap;flex-shrink:0;
-  }
+  .list-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 14px; }
+  .row { display: flex; align-items: center; gap: 16px; padding: 16px 18px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 14px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(80,60,120,.03); transition: 0.2s;}
+  .row:hover { background: #fff; box-shadow: 0 8px 25px rgba(80,60,120,.08); }
+  .row-dot { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 11px; }
+  .row-name { font-size: 14px; font-weight: 700; color: #212832; }
+  .row-meta { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+  .row-cats { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+  .cat-chip { font-size: 9.5px; font-weight: 700; color: #4A5262; background: #f1f5f9; border-radius: 100px; padding: 3px 9px; }
+  .row-explore { font-size: 12px; font-weight: 700; color: #2E3644; border: 1.5px solid #2E3644; padding: 8px 16px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; cursor: pointer; transition: 0.2s;}
+  .row-explore:hover { background: #2E3644; color: #fff; }
 
-  /* Detail overlay (acts as a "new window") */
-  .overlay{position:fixed;inset:0;background:rgba(20,16,30,.55);backdrop-filter:blur(4px);z-index:999;display:none;align-items:center;justify-content:center;padding:30px;}
-  .overlay.open{display:flex;}
-  .detail-window{
-    width:100%;max-width:640px;max-height:88vh;overflow-y:auto;background:#fff;border-radius:22px;
-    box-shadow:0 30px 70px rgba(0,0,0,.35);position:relative;
-  }
-  .detail-hero{padding:34px 36px 26px 36px;position:relative;overflow:hidden;}
-  .detail-close{position:absolute;top:16px;right:18px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:2;}
-  .detail-tag{position:relative;font-size:10.5px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.7px;opacity:.85;margin-bottom:8px;}
-  .detail-name{position:relative;font-size:26px;font-weight:700;color:#fff;}
-  .detail-body{padding:28px 36px 34px 36px;}
-  .detail-section-label{font-size:10.5px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
-  .detail-blurb{font-size:13px;color:#334155;line-height:1.7;margin-bottom:22px;}
-  .members-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
-  .member-chip{display:flex;align-items:center;gap:7px;background:#f8fafc;border-radius:100px;padding:6px 12px 6px 6px;}
-  .member-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;}
-  .member-name{font-size:11.5px;font-weight:600;color:#334155;}
-  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;}
-  .stat-card{background:#faf9fc;border-radius:12px;padding:14px 16px;}
-  .stat-card .num{font-size:20px;font-weight:800;color:#212832;}
-  .stat-card .lab{font-size:10.5px;color:#94a3b8;font-weight:600;margin-top:2px;}
-  .detail-cta{display:block;text-align:center;background:#D42759;color:#fff;font-size:13px;font-weight:700;padding:13px;border-radius:12px;box-shadow:0 10px 22px rgba(212,39,89,.25);}
+  /* Detail overlay */
+  .overlay { position: fixed; inset: 0; background: rgba(20,16,30,.55); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 30px; }
+  .overlay.open { display: flex; }
+  .detail-window { width: 100%; max-width: 640px; max-height: 88vh; overflow-y: auto; background: #fff; border-radius: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.35); position: relative; }
+  .detail-window::-webkit-scrollbar { width: 6px; }
+  .detail-window::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  .detail-hero { padding: 34px 36px 26px 36px; position: relative; overflow: hidden; }
+  .detail-close { position: absolute; top: 16px; right: 18px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; z-index: 2; transition: 0.2s;}
+  .detail-close:hover { background: rgba(255,255,255,.5); }
+  .detail-tag { position: relative; font-size: 10.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .7px; opacity: .85; margin-bottom: 8px; }
+  .detail-name { position: relative; font-size: 26px; font-weight: 700; color: #fff; }
+  .detail-body { padding: 28px 36px 34px 36px; }
+  .detail-section-label { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+  .detail-blurb { font-size: 13px; color: #334155; line-height: 1.7; margin-bottom: 22px; }
+  .members-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .member-chip { display: flex; align-items: center; gap: 7px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 100px; padding: 6px 12px 6px 6px; }
+  .member-avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 9px; font-weight: 700; }
+  .member-name { font-size: 11.5px; font-weight: 600; color: #334155; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+  .stat-card { background: #faf9fc; border-radius: 12px; padding: 14px 16px; border: 1px solid #e2e8f0;}
+  .stat-card .num { font-size: 20px; font-weight: 800; color: #212832; }
+  .stat-card .lab { font-size: 10.5px; color: #94a3b8; font-weight: 600; margin-top: 2px; }
 </style>
 </head>
 <body>
 
-  <div class="nav">
-    <a href="index.html" class="brand">
-      <svg width="26" height="26" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
-      <span>Screen To <b>Street</b></span>
-    </a>
-    <div class="nav-right">
-      <a class="nav-link" href="map.html">Destinations</a>
-      <a class="nav-link active" href="artists.html">Artists</a>
-      <div class="icon-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/></svg></div>
-      <a href="index.html" class="login-btn">Log in</a>
-    </div>
-  </div>
+<!-- LE DESIGN PLEIN ÉCRAN UNIFIÉ -->
+<div class="hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
 
-  <div class="hero">
-    <h1 class="pg-title">Artists</h1>
-    <p class="pg-sub">Every group on Screen To Street, and how far their map already goes.</p>
-  </div>
+    <svg class="bg-route" viewBox="0 0 1180 600" preserveAspectRatio="xMidYMid slice">
+      <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260" fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
+      <circle class="dot dot-a" cx="380" cy="340" r="6" fill="#B9A8DA"/>
+      <circle class="dot dot-b" cx="820" cy="300" r="6" fill="#B9A8DA"/>
+      <circle class="dot dot-c" cx="1040" cy="240" r="8" fill="#D42759"/>
+      <circle class="dot dot-d" cx="420" cy="150" r="5" fill="#C6B8E3"/>
+      <circle class="dot dot-e" cx="840" cy="140" r="6" fill="#B9A8DA"/>
+      <circle class="dot dot-f" cx="150" cy="240" r="5" fill="#D9CDEE"/>
+      <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
+    </svg>
 
-  <div class="stats-bar">
-    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Groups</div></div>
-    <div class="stat"><div class="stat-num">44</div><div class="stat-label">Members</div></div>
-    <div class="stat"><div class="stat-num">13</div><div class="stat-label">Locations mapped</div></div>
-  </div>
-
-  <div class="content">
-
-    <!-- ===== BTS FEATURED ===== -->
-    <div class="featured">
-      <div class="featured-blob fb1"></div><div class="featured-blob fb2"></div>
-      <div class="featured-tag">Most mapped group</div>
-      <div class="featured-name">BTS</div>
-      <p class="featured-blurb">From a cramped Gangnam practice room to a custom-built mountain retreat in Chuncheon — BTS is the most extensively mapped group on Screen To Street, spanning three countries and nine years of history.</p>
-      <div class="featured-meta">
-        <div class="fm-item">7 members</div><div class="fm-sep"></div>
-        <div class="fm-item">12 locations</div><div class="fm-sep"></div>
-        <div class="fm-item">South Korea, France, Portugal</div>
+    <!-- Navbar -->
+    <div class="nav">
+      <a href="index.html" class="brand">
+        <svg class="pin" viewBox="0 0 400 400">
+          <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+          <circle cx="200" cy="150" r="26" fill="#D42759"/>
+        </svg>
+        <span>Screen To Street</span>
+      </a>
+      <div class="nav-right">
+        <a class="nav-link" href="destinations.html">Destinations</a>
+        <a class="nav-link active" href="artists.html" style="color:#D42759; font-weight:700;">Artists</a>
+        <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/></svg></div>
+        <a href="index.html" class="login-btn-v5">Log in</a>
       </div>
-      <a class="explore-btn" onclick="openDetail('bts')">Explore BTS →</a>
     </div>
 
-    <!-- ===== COMPACT LIST ===== -->
-    <div class="list-label">Other groups</div>
+    <!-- Page Content -->
+    <div class="page-container">
+      <h1 class="pg-title">Artists</h1>
 
-    <div class="row">
-      <div class="row-dot" style="background:#D42759;">BP</div>
-      <div style="flex:1;">
-        <div class="row-name">Blackpink</div>
-        <div class="row-meta">4 members · 1 location mapped</div>
-        <div class="row-cats"><span class="cat-chip">Cafe</span><span class="cat-chip">Restaurants</span><span class="cat-chip">Fashion</span></div>
+      <div class="stats-bar">
+        <div class="stat"><div class="stat-num">6</div><div class="stat-label">Groups</div></div>
+        <div class="stat"><div class="stat-num">44</div><div class="stat-label">Members</div></div>
+        <div class="stat"><div class="stat-num">13</div><div class="stat-label">Locations mapped</div></div>
       </div>
-      <a class="row-explore" onclick="openDetail('blackpink')">Explore</a>
-    </div>
 
-    <div class="row">
-      <div class="row-dot" style="background:#2E3644;">TW</div>
-      <div style="flex:1;">
-        <div class="row-name">Twice</div>
-        <div class="row-meta">9 members · 0 locations mapped yet</div>
+      <!-- ===== BTS FEATURED ===== -->
+      <div class="featured">
+        <div class="featured-blob fb1"></div><div class="featured-blob fb2"></div>
+        <div class="featured-tag">Most mapped group</div>
+        <div class="featured-name">BTS</div>
+        <p class="featured-blurb">From a cramped Gangnam practice room to a custom-built mountain retreat in Chuncheon — BTS is the most extensively mapped group on Screen To Street, spanning three countries and nine years of history.</p>
+        <div class="featured-meta">
+          <div class="fm-item">7 members</div><div class="fm-sep"></div>
+          <div class="fm-item">12 locations</div><div class="fm-sep"></div>
+          <div class="fm-item">South Korea, France, Portugal</div>
+        </div>
+        <a class="explore-btn" onclick="openDetail('bts')">Explore BTS →</a>
       </div>
-      <a class="row-explore" onclick="openDetail('twice')">Explore</a>
-    </div>
 
-    <div class="row">
-      <div class="row-dot" style="background:#C97A9A;">SV</div>
-      <div style="flex:1;">
-        <div class="row-name">Seventeen</div>
-        <div class="row-meta">13 members · 0 locations mapped yet</div>
+      <!-- ===== COMPACT LIST ===== -->
+      <div class="list-label">Other groups</div>
+
+      <div class="row">
+        <div class="row-dot" style="background:#D42759;">BP</div>
+        <div style="flex:1;">
+          <div class="row-name">Blackpink</div>
+          <div class="row-meta">4 members · 1 location mapped</div>
+          <div class="row-cats"><span class="cat-chip">Cafe</span><span class="cat-chip">Restaurants</span><span class="cat-chip">Fashion</span></div>
+        </div>
+        <a class="row-explore" onclick="openDetail('blackpink')">Explore</a>
       </div>
-      <a class="row-explore" onclick="openDetail('seventeen')">Explore</a>
-    </div>
 
-    <div class="row">
-      <div class="row-dot" style="background:#5B6472;">KE</div>
-      <div style="flex:1;">
-        <div class="row-name">Katseye</div>
-        <div class="row-meta">6 members · 0 locations mapped yet</div>
+      <div class="row">
+        <div class="row-dot" style="background:#2E3644;">TW</div>
+        <div style="flex:1;">
+          <div class="row-name">Twice</div>
+          <div class="row-meta">9 members · 0 locations mapped yet</div>
+        </div>
+        <a class="row-explore" onclick="openDetail('twice')">Explore</a>
       </div>
-      <a class="row-explore" onclick="openDetail('katseye')">Explore</a>
-    </div>
 
-    <div class="row">
-      <div class="row-dot" style="background:#A78BFA;">TX</div>
-      <div style="flex:1;">
-        <div class="row-name">TXT</div>
-        <div class="row-meta">5 members · 0 locations mapped yet</div>
+      <div class="row">
+        <div class="row-dot" style="background:#C97A9A;">SV</div>
+        <div style="flex:1;">
+          <div class="row-name">Seventeen</div>
+          <div class="row-meta">13 members · 0 locations mapped yet</div>
+        </div>
+        <a class="row-explore" onclick="openDetail('seventeen')">Explore</a>
       </div>
-      <a class="row-explore" onclick="openDetail('txt')">Explore</a>
+
+      <div class="row">
+        <div class="row-dot" style="background:#5B6472;">KE</div>
+        <div style="flex:1;">
+          <div class="row-name">Katseye</div>
+          <div class="row-meta">6 members · 0 locations mapped yet</div>
+        </div>
+        <a class="row-explore" onclick="openDetail('katseye')">Explore</a>
+      </div>
+
+      <div class="row">
+        <div class="row-dot" style="background:#A78BFA;">TX</div>
+        <div style="flex:1;">
+          <div class="row-name">TXT</div>
+          <div class="row-meta">5 members · 0 locations mapped yet</div>
+        </div>
+        <a class="row-explore" onclick="openDetail('txt')">Explore</a>
+      </div>
     </div>
+</div>
 
-  </div>
-
-  <!-- ===== DETAIL OVERLAY (acts as a "new window") ===== -->
-  <div class="overlay" id="overlay" onclick="if(event.target===this) closeDetail()">
-    <div class="detail-window" id="detail-window"></div>
-  </div>
+<!-- ===== DETAIL OVERLAY ===== -->
+<div class="overlay" id="overlay" onclick="if(event.target===this) closeDetail()">
+  <div class="detail-window" id="detail-window"></div>
+</div>
 
 <script>
 const GROUPS = {
