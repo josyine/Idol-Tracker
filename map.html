@@ -27,7 +27,7 @@
                 </div>
             </div>
             
-            <!-- CADDIE (ICONE SVG ÉLÉGANTE) -->
+            <!-- CADDIE -->
             <div class="dropdown-container">
                 <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
@@ -62,7 +62,7 @@
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
             </div>
 
-            <!-- VUE PRINCIPALE (RECHERCHE + FILTRES + LISTE) -->
+            <!-- VUE PRINCIPALE -->
             <div id="sidebar-main" class="sidebar-scroll-area">
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="Search a location, city, context...">
@@ -144,14 +144,15 @@
                     <li id="details-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="details-episode-link" href="#" target="_blank" data-i18n="mdlLink">Official Link</a></li>
                 </ul>
 
-                <div class="modal-info" style="margin-top: 25px;">
-                    <h3 data-i18n="mdlStoryTitle">The story of this place</h3>
-                    <div id="details-desc" style="line-height: 1.6; font-size: 0.95rem; color: #475569;"></div> 
+                <!-- PHOTOS GOOGLE (PLACÉES AVANT L'HISTOIRE DU LIEU) -->
+                <div id="details-gallery-section" class="media-section hidden" style="margin-top: 25px;">
+                    <h3 style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px; text-transform: uppercase;">Location Photos</h3>
+                    <div class="modal-gallery" id="details-gallery"></div>
                 </div>
 
-                <div id="details-gallery-section" class="media-section hidden">
-                    <h3 data-i18n="mdlPhotosTitle">Location Photos</h3>
-                    <div class="modal-gallery" id="details-gallery"></div>
+                <div class="modal-info" style="margin-top: 15px;">
+                    <h3 data-i18n="mdlStoryTitle" style="color: #334e68; font-size: 1rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;">The story of this place</h3>
+                    <div id="details-desc" style="line-height: 1.6; font-size: 0.95rem; color: #475569;"></div> 
                 </div>
 
                 <div id="details-video-section" class="media-section hidden">
@@ -165,7 +166,7 @@
                 </div>
 
                 <div class="modal-info" style="margin-bottom: 30px;">
-                    <h3 data-i18n="mdlDirTitle">How to get there</h3>
+                    <h3 data-i18n="mdlDirTitle" style="color: #334e68; font-size: 1rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;">How to get there</h3>
                     <p id="details-directions" style="font-size: 0.95rem; color: #475569;"></p>
                     <a id="details-map-link" href="#" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 16px; margin-top:15px; font-size:0.9rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;" data-i18n="mdlGoogleMap">Open in Google Maps</a>
                 </div>
@@ -174,7 +175,6 @@
 
         <!-- Map Area -->
         <main class="map-container">
-            <!-- Couverture assombrie pour mobile quand menu ouvert -->
             <div id="mobile-overlay" class="hidden" onclick="toggleMobileMenu()"></div>
             
             <div class="map-stats">
