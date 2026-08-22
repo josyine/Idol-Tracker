@@ -15,13 +15,12 @@
     
     <!-- Sidebar Gauche -->
     <aside class="sidebar" id="app-sidebar">
-        <!-- Effets visuels -->
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
 
-        <div class="sidebar-content">
+        <div class="sidebar-content" style="height: 100%;">
             <!-- Header avec Logo -->
-            <div class="brand-row">
+            <div class="brand-row" style="padding-top: 10px; padding-left: 5px;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -33,7 +32,7 @@
             </div>
 
             <!-- VUE 1 : RECHERCHE ET LISTE -->
-            <div id="sidebar-main" class="sidebar-scroll-area">
+            <div id="sidebar-main" class="sidebar-scroll-area" style="padding: 0 5px 5px 5px;">
                 <div class="card-box">
                     <div style="position:relative;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:14px; top:12px;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -80,7 +79,6 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
-                <!-- PIED DE PAGE AVEC LIENS LÉGAUX -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -92,62 +90,72 @@
                 </div>
             </div>
 
-            <!-- VUE 2 : DÉTAILS D'UN LIEU -->
-            <div id="sidebar-details" class="card-box hidden" style="flex:1; overflow-y:auto; overflow-x: hidden;">
-                <div class="sidebar-details-header">
-                    <button class="back-details-btn" onclick="closeDetailsPanel()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to list
-                    </button>
-                </div>
-                
-                <h2 id="details-title" style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 10px;">Location Name</h2>
-                
-                <div style="display:flex; gap:15px; flex-wrap:wrap; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9;">
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="details-visited" class="custom-checkbox">
-                        <label for="details-visited">I visited this place</label>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="details-wishlist" class="custom-checkbox">
-                        <label for="details-wishlist">Add to Wishlist</label>
+            <!-- VUE 2 : NOUVEAU PANNEAU DE DÉTAILS TYPE IN THE SOOP -->
+            <div id="sidebar-details" class="hidden">
+                <div class="detail-hero" id="detail-hero-bg">
+                    <a class="detail-back-link" onclick="closeDetailsPanel()">← Back to list</a>
+                    <div class="detail-hero-bottom">
+                        <span class="detail-hero-badge" id="detail-badge">Category</span>
+                        <div class="detail-hero-title" id="details-title">Location Name</div>
+                        <div class="detail-hero-sub">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e6dff2" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <span id="details-location-sub">City, Country</span>
+                        </div>
                     </div>
                 </div>
 
-                <ul class="modal-metadata">
-                    <li><strong data-i18n="mdlGroup">Group:</strong> <span id="details-group"></span></li>
-                    <li><strong data-i18n="mdlMember">Members:</strong> <span id="details-member"></span></li>
-                    <li><strong data-i18n="mdlCountry">Country:</strong> <span id="details-country"></span></li>
-                    <li><strong data-i18n="mdlCity">City:</strong> <span id="details-city"></span></li>
-                    <li><strong data-i18n="mdlAddress">Address:</strong> <span id="details-full-address"></span></li>
-                    <li><strong data-i18n="mdlDate">Date:</strong> <span id="details-date"></span></li>
-                    <li id="details-episode-container"><strong data-i18n="mdlEpisode">Episode:</strong> <span id="details-episode"></span></li>
-                    <li id="details-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="details-episode-link" href="#" target="_blank" style="color:var(--primary-magenta); font-weight:600;">Official Link</a></li>
-                </ul>
-
-                <div id="details-gallery-section" class="media-section hidden">
-                    <h3 data-i18n="mdlPhotosTitle">Location Photos</h3>
-                    <div class="modal-gallery" id="details-gallery"></div>
+                <div class="check-row">
+                    <label class="check-item"><input type="checkbox" id="details-visited" class="custom-checkbox"> I visited this place</label>
+                    <label class="check-item"><input type="checkbox" id="details-wishlist" class="custom-checkbox"> Add to Wishlist</label>
                 </div>
 
-                <div class="media-section" style="margin-top:0;">
-                    <h3 data-i18n="mdlStoryTitle">The story of this place</h3>
-                    <div id="details-desc" style="line-height: 1.6; font-size: 12px; color: #5B6472;"></div> 
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="info">Info</button>
+                    <button class="tab-btn" data-tab="story">Story</button>
+                    <button class="tab-btn" data-tab="photos">Inspis</button>
                 </div>
 
-                <div id="details-video-section" class="media-section hidden">
-                    <h3 data-i18n="mdlVideoTitle">Watch the Episode</h3>
-                    <div id="details-video-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+                <!-- TAB INFO -->
+                <div class="tab-panel active" id="tab-info">
+                    <div class="meta-box">
+                        <b>Group:</b> <span id="details-group"></span><br>
+                        <b>Members:</b> <span id="details-member"></span><br>
+                        <b>Country:</b> <span id="details-country"></span><br>
+                        <b>City:</b> <span id="details-city"></span><br>
+                        <b>Address:</b> <span id="details-full-address"></span><br>
+                        <b>Date:</b> <span id="details-date"></span><br>
+                        <span id="details-episode-container"><b>Episode:</b> <span id="details-episode"></span></span>
+                        <span id="details-link-container"><br><b>Watch:</b> <a id="details-episode-link" href="#" target="_blank">Official Link</a></span>
+                    </div>
+
+                    <div id="details-video-section" class="media-section hidden">
+                        <span class="sub-label">Watch the Episode</span>
+                        <div class="video-wrapper" id="details-video-container"></div>
+                    </div>
+
+                    <div id="details-tip-section" class="tip-box hidden">
+                        <div class="tip-title">💡 The "Screen to Street" Tip</div>
+                        <p id="details-tip"></p>
+                    </div>
+
+                    <span class="sub-label">How to get there</span>
+                    <p class="directions-text" id="details-directions"></p>
+                    <a class="gmaps-btn" id="details-map-link" href="#" target="_blank">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Open in Google Maps
+                    </a>
                 </div>
 
-                <div id="details-tip-section" class="media-section hidden" style="background:#faf9fc; padding:12px; border-radius:8px; border-left:3px solid var(--primary-magenta);">
-                    <h3 style="border:none; padding:0; margin-bottom:5px; color:#D42759;">Tip</h3>
-                    <p id="details-tip" style="font-size:11.5px; font-style:italic; color:#5B6472;"></p>
+                <!-- TAB STORY -->
+                <div class="tab-panel" id="tab-story">
+                    <div class="story" id="details-desc"></div>
                 </div>
 
-                <div class="media-section" style="margin-bottom:20px;">
-                    <h3 data-i18n="mdlDirTitle">How to get there</h3>
-                    <p id="details-directions" style="font-size:12px; color:#5B6472; margin-bottom:10px;"></p>
-                    <a id="details-map-link" href="#" target="_blank" style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:#2E3644; border:1px solid #cbd5e1; padding:6px 12px; border-radius:6px; background:#fff; transition:0.2s;">Open in Google Maps</a>
+                <!-- TAB PHOTOS -->
+                <div class="tab-panel" id="tab-photos">
+                    <span class="sub-label">Location Gallery</span>
+                    <div class="gallery-grid" id="details-gallery"></div>
+                    <p class="photo-credit">Official assets and location references.</p>
                 </div>
             </div>
         </div>
@@ -207,7 +215,7 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <div id="iti-map-container" style="width: 100%; height: 250px; background: #e5e5e5; border-radius: 12px; margin-bottom: 15px;"></div>
+            <div id="iti-map-container"></div>
             <div id="iti-days-list"></div>
             <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="margin-top: 15px; background: #2E3644;">Export Guide as PDF</button>
         </div>
