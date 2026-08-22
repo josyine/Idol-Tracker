@@ -43,8 +43,8 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .filter-select { padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: white; font-size: 0.85rem; outline: none; cursor: pointer; color: var(--text-main);}
 .filter-select:focus { border-color: var(--primary-magenta); }
 
-.category-filter-section { margin-top: 25px; margin-bottom: 15px; }
-.locations-header { margin-top: 15px; margin-bottom: 15px; }
+.category-filter-section { margin-top: 15px; margin-bottom: 15px; }
+.locations-header { margin-top: 15px; margin-bottom: 12px; }
 
 .category-buttons { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; scrollbar-width: none; }
 .category-buttons::-webkit-scrollbar { display: none; }
