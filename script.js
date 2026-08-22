@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION DE LA CARTE PRINCIPALE
+// 1. INITIALISATION DE LA CARTE PRINCIPALE ET GESTION DU ZOOM
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -10,6 +10,18 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
     markerGroup = L.layerGroup().addTo(map);
     setTimeout(() => { map.invalidateSize(); }, 200);
+
+    // ÉCOUTEUR DE ZOOM : Ajuste dynamiquement la taille des marqueurs selon le niveau de zoom
+    map.on('zoomend', function() {
+        const zoom = map.getZoom();
+        let markerSize = 32; let iconSize = 16;
+        if(zoom < 5) { markerSize = 12; iconSize = 0; } // Discrets points éloignés
+        else if(zoom < 9) { markerSize = 20; iconSize = 10; } // Taille moyenne
+        else { markerSize = 32; iconSize = 16; } // Taille pleine
+        
+        document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
+        document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
+    });
 }
 
 window.toggleMobileMenu = function() {
@@ -21,7 +33,7 @@ window.toggleMobileMenu = function() {
 };
 
 // ==========================================
-// 2. DONNÉES : LES 19 LIEUX INTÉGRAUX AVEC TEXTES ET INSPIS #1-#5
+// 2. DONNÉES (LES 19 LIEUX)
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5h18"/><path d="M4 8.5 5.5 4h3L7 8.5"/><path d="M9.3 8.5 10.8 4h3l-1.5 4.5"/><path d="M14.7 8.5 16.2 4h3l-1.5 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.5"/></svg>`,
@@ -387,12 +399,13 @@ function renderLocations() {
 if(groupSelect) { initializeFilters(); renderLocations(); }
 
 // ==========================================
-// 6. PANNEAU DE DÉTAILS (STYLE IN THE SOOP + INSPIS #1-#5)
+// 6. PANNEAU DE DÉTAILS (STYLE IN THE SOOP)
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
     
+    // Remplissage des données d'en-tête (Hero)
     const heroBg = document.getElementById('detail-hero-bg');
     if(heroBg) {
         const bgImg = loc.ytId ? `https://img.youtube.com/vi/${loc.ytId}/maxresdefault.jpg` : loc.img;
@@ -457,7 +470,7 @@ window.openDetailsPanel = function(id) {
         } else { videoSection.classList.add('hidden'); }
     }
 
-    // Galerie photos + Inspis à poster (#1, #2, etc.)
+    // Galerie photos + Inspis
     const galleryContainer = document.getElementById('details-gallery');
     if (galleryContainer) {
         galleryContainer.innerHTML = ""; 
@@ -468,29 +481,29 @@ window.openDetailsPanel = function(id) {
             });
         }
         
-        // Ajout dynamique de la section "Inspis à poster" (#1 à #5)
+        // Ajout dynamique des Inspis
         galleryContainer.innerHTML += `
             <div style="grid-column: 1 / span 2; margin-top: 15px;">
                 <span class="sub-label">Inspis à poster</span>
                 <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;">
-                    <a href="https://share.google/9JeI2Qp6WkMOZmDoT" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px;">
+                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
                         <img src="${loc.img}" style="width:100%;height:100%;object-fit:cover;display:block;">
                         <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#1</div>
                     </a>
-                    <a href="https://share.google/5NH75MtKizvDYvZS3" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px;">
-                        <img src="https://picsum.photos/seed/inspi2/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
+                        <img src="https://picsum.photos/seed/${loc.id}2/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
                         <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#2</div>
                     </a>
-                    <a href="https://share.google/IwXXndlYkhvLx6uSD" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px;">
-                        <img src="https://picsum.photos/seed/inspi3/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
+                        <img src="https://picsum.photos/seed/${loc.id}3/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
                         <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#3</div>
                     </a>
-                    <a href="https://share.google/rBkRjzkNFSkDNal6s" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px;">
-                        <img src="https://picsum.photos/seed/inspi4/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
+                        <img src="https://picsum.photos/seed/${loc.id}4/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
                         <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#4</div>
                     </a>
-                    <a href="https://share.google/mlazCXtihGmPUeGy4" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px;">
-                        <img src="https://picsum.photos/seed/inspi5/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
+                        <img src="https://picsum.photos/seed/${loc.id}5/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
                         <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#5</div>
                     </a>
                 </div>
