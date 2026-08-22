@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="welcome-style.css">
 <style>
-  /* Surcharges spécifiques pour la page Destinations */
   a { text-decoration: none !important; }
 
-  .page-container { position: relative; z-index: 10; max-width: 900px; margin: 0 auto; padding: 20px 6% 80px 6%; }
+  /* Ajustement de la largeur pour être identique à Artists */
+  .page-container { position: relative; z-index: 10; max-width: 960px; margin: 0 auto; padding: 20px 6% 80px 6%; }
   h1.pg-title { font-size: 42px; font-weight: 700; color: #212832; margin-bottom: 24px; text-shadow: 0 2px 10px rgba(255,255,255,0.6); letter-spacing: -1px; }
 
   .stats-bar { display: flex; margin-bottom: 34px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 16px; padding: 18px 0; box-shadow: 0 10px 30px rgba(80,60,120,.05); }
@@ -76,7 +76,6 @@
 </head>
 <body>
 
-<!-- LE DESIGN PLEIN ÉCRAN UNIFIÉ -->
 <div class="hero">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -93,14 +92,14 @@
       <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 
-    <!-- Navbar 100% IDENTIQUE à index.html -->
+    <!-- Navbar -->
     <div class="nav">
       <a href="index.html" class="brand">
         <svg class="pin" viewBox="0 0 400 400">
           <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
           <circle cx="200" cy="150" r="26" fill="#D42759"/>
         </svg>
-        <span>Screen To Street</span>
+        <span>Screen To <b>Street</b></span>
       </a>
       <div class="nav-right">
         <a class="nav-link active" href="destinations.html" style="color:#D42759; font-weight:700;">Destinations</a>
@@ -141,7 +140,6 @@
               <div class="row-stat"><div class="n">12</div><div class="l">Locations</div></div>
               <div class="row-stat"><div class="n">4</div><div class="l">Cities</div></div>
               <div class="row-stat"><div class="n">2</div><div class="l">Groups mapped</div></div>
-              <div class="row-stat"><div class="n">9</div><div class="l">Years covered</div></div>
             </div>
             <div class="row-cities-grid">
               <div class="city-pill"><b>Seoul</b><span>8</span></div>
@@ -169,7 +167,6 @@
               <div class="row-stat"><div class="n">5</div><div class="l">Locations</div></div>
               <div class="row-stat"><div class="n">1</div><div class="l">City</div></div>
               <div class="row-stat"><div class="n">1</div><div class="l">Group mapped</div></div>
-              <div class="row-stat"><div class="n">3</div><div class="l">Years covered</div></div>
             </div>
             <div class="row-cities-grid">
               <div class="city-pill"><b>Paris</b><span>5</span></div>
@@ -184,7 +181,7 @@
         </div>
 
         <div class="row" onclick="openDetail('portugal')">
-          <div class="row-photo" style="background-image:url('https://images.unsplash.com/photo-1558000143-a6021eb19985?w=700');">
+          <div class="row-photo" style="background-image:url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=700');">
             <div class="row-photo-badge">2 locations</div>
           </div>
           <div class="row-content">
@@ -194,7 +191,6 @@
               <div class="row-stat"><div class="n">2</div><div class="l">Locations</div></div>
               <div class="row-stat"><div class="n">2</div><div class="l">Cities</div></div>
               <div class="row-stat"><div class="n">1</div><div class="l">Group mapped</div></div>
-              <div class="row-stat"><div class="n">1</div><div class="l">Years covered</div></div>
             </div>
             <div class="row-cities-grid">
               <div class="city-pill"><b>Lisbon</b><span>1</span></div>
@@ -213,7 +209,6 @@
     </div>
 </div>
 
-<!-- ===== DETAIL OVERLAY ===== -->
 <div class="overlay" id="overlay" onclick="if(event.target===this) closeDetail()">
   <div class="detail-window" id="detail-window"></div>
 </div>
@@ -233,7 +228,7 @@ const COUNTRIES = {
     stats: [["31%","of users' itineraries include France"],["2.5","average days planned for a Paris trip"],["1","city covered so far: Paris"]]
   },
   portugal: {
-    name: "Portugal", photo: "https://images.unsplash.com/photo-1558000143-a6021eb19985?w=900",
+    name: "Portugal", photo: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=900",
     history: "Portugal's spot on the map exists almost by accident of production choices — a historic estate near Lisbon Airport and the Navy Museum in Belém were both chosen as filming backdrops for a single music video shoot, putting the country on ARMY's radar for the first time.",
     locations: 2, cities: [["Lisbon",1],["Prior Velho",1]],
     stats: [["9%","of users' itineraries include Portugal"],["1.5","average days planned for a Portugal trip"],["2","cities covered: Lisbon, Prior Velho"]]
