@@ -9,9 +9,12 @@
 <link rel="stylesheet" href="welcome-style.css">
 <style>
   a { text-decoration: none !important; }
+  body { overflow-y: scroll; } /* Empêche le saut de page dû à la scrollbar */
   
-  /* Ajustement de la largeur pour être identique à Destinations */
-  .page-container { position: relative; z-index: 10; max-width: 960px; margin: 0 auto; padding: 20px 6% 80px 6%; }
+  /* ALIGNEMENT PARFAIT : Largeur fixe centrée pour la Navbar et le Contenu */
+  .nav { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1000px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 10; }
+  .page-container { position: relative; z-index: 10; width: 100%; max-width: 1000px; margin: 0 auto; padding: 10px 20px 80px 20px; }
+  
   h1.pg-title { font-size: 42px; font-weight: 700; color: #212832; margin-bottom: 24px; text-shadow: 0 2px 10px rgba(255,255,255,0.6); letter-spacing: -1px; }
   
   .stats-bar { display: flex; margin-bottom: 34px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 16px; padding: 18px 0; box-shadow: 0 10px 30px rgba(80,60,120,.05); }
@@ -46,17 +49,15 @@
   .row-explore { font-size: 12px; font-weight: 700; color: #2E3644; border: 1.5px solid #2E3644; padding: 8px 16px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; cursor: pointer; transition: 0.2s;}
   .row-explore:hover { background: #2E3644; color: #fff; }
 
-  /* Detail overlay (Fenêtre explorateur Artiste) */
+  /* Detail overlay */
   .overlay { position: fixed; inset: 0; background: rgba(20,16,30,.55); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 30px; }
   .overlay.open { display: flex; }
   .detail-window { width: 100%; max-width: 640px; max-height: 88vh; overflow-y: auto; background: #fff; border-radius: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.35); position: relative; }
   .detail-window::-webkit-scrollbar { width: 6px; }
   .detail-window::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
   
-  /* Ajout du support Image pour Detail Hero */
   .detail-hero { padding: 34px 36px 26px 36px; position: relative; overflow: hidden; height: 180px; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end;}
   .detail-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg,rgba(20,16,30,.1) 10%,rgba(20,16,30,.8)); z-index: 1;}
-  
   .detail-close { position: absolute; top: 16px; right: 18px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; z-index: 3; transition: 0.2s;}
   .detail-close:hover { background: rgba(255,255,255,.5); }
   .detail-tag { position: relative; font-size: 10.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .7px; opacity: .85; margin-bottom: 4px; z-index: 2;}
@@ -93,7 +94,7 @@
       <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 
-    <!-- Navbar -->
+    <!-- Navbar Alignée -->
     <div class="nav">
       <a href="index.html" class="brand">
         <svg class="pin" viewBox="0 0 400 400">
@@ -259,16 +260,13 @@ function openDetail(key) {
     </div>
     <div class="detail-body">
       <p class="detail-blurb">${g.blurb}</p>
-
       <div class="detail-section-label">Members (${g.members.length})</div>
       <div class="members-grid">${membersHtml}</div>
-
       <div class="detail-section-label">At a glance</div>
       <div class="stat-grid">
         <div class="stat-card"><div class="num">${g.locations}</div><div class="lab">Locations mapped</div></div>
         <div class="stat-card"><div class="num">${g.countries}</div><div class="lab">Countries covered</div></div>
       </div>
-
       ${g.locations > 0 ? `
       <div class="detail-section-label">Content categories</div>
       <p class="detail-blurb">${g.categories}</p>
