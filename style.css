@@ -1,24 +1,26 @@
-:root { --bg-color: #0e0e14; --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; }
+:root { --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
 a { text-decoration: none; }
-body { background: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 20px;}
+
+/* PLEIN ÉCRAN - PLUS DE FOND NOIR NI DE MARGES */
+body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw; display: flex; overflow: hidden; }
 .hidden { display: none !important; }
 
-/* Cadre de l'Application */
-.app-container { width: 1280px; max-width: 96vw; height: 740px; max-height: 90vh; margin: 0 auto; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.4); display: flex; background: #fff; position: relative; }
+/* Cadre de l'Application (100% de l'écran) */
+.app-container { width: 100%; height: 100%; display: flex; background: #fff; position: relative; }
 
 /* Top Nav sur la carte (Langue, Profil, Panier) */
 .top-nav { position: absolute; top: 20px; right: 20px; z-index: 2000; display: flex; gap: 9px; pointer-events: auto; }
 .dropdown-container { position: relative; display: inline-block; }
-.nav-btn { width: 38px; height: 38px; border-radius: 50%; background: #fff; box-shadow: 0 4px 14px rgba(80,60,120,.08); display: flex; align-items: center; justify-content: center; color: #2E3644; border: none; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px;}
+.nav-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 4px 14px rgba(80,60,120,.1); display: flex; align-items: center; justify-content: center; color: #2E3644; border: none; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px;}
 .nav-btn:hover { background: #f1f5f9; color: var(--primary-magenta); }
-.dropdown-menu { position: absolute; right: 0; top: 45px; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: auto; min-width: 160px; overflow: hidden; }
+.dropdown-menu { position: absolute; right: 0; top: 50px; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: auto; min-width: 160px; overflow: hidden; }
 .dropdown-option { padding: 10px 15px; cursor: pointer; font-size: 0.9rem; color: var(--text-main); transition: background 0.2s; border-bottom: 1px solid #f0f0f0; white-space: nowrap;}
 .dropdown-option:last-child { border-bottom: none; }
 .dropdown-option:hover { background: #f1f5f9; color: var(--primary-magenta); }
 
 /* Sidebar (Menu de gauche) */
-.sidebar { width: 340px; flex-shrink: 0; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: var(--sidebar-bg); position: relative; overflow: hidden; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 1000;}
+.sidebar { width: 360px; flex-shrink: 0; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--sidebar-bg); position: relative; overflow: hidden; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 1000; border-right: 1px solid rgba(0,0,0,0.05);}
 .sidebar.expanded { width: 500px; }
 
 /* Background Blobs pour la sidebar */
@@ -30,17 +32,17 @@ body { background: var(--bg-color); color: var(--text-main); height: 100vh; disp
 
 .sidebar-content { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; gap: 14px;}
 .sidebar-scroll-area { flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 14px; }
-.sidebar-scroll-area::-webkit-scrollbar { width: 4px; }
-.sidebar-scroll-area::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+.sidebar-scroll-area::-webkit-scrollbar { width: 5px; }
+.sidebar-scroll-area::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 10px; }
 
 /* Header Sidebar (Logo & Tagline) */
-.brand-row { display: flex; align-items: center; gap: 12px; padding: 10px 6px 4px 6px; }
+.brand-row { display: flex; align-items: center; gap: 12px; padding: 5px 6px 10px 6px; }
 .brand-text { font-size: 19px; font-weight: 600; color: #2E3644; }
 .brand-text b { color: var(--primary-magenta); font-weight: 600; }
-.tagline { font-size: 12px; color: #5B6472; margin-top: 3px; }
+.tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
 
 /* Conteneurs de la Sidebar */
-.card-box { background: #fff; border-radius: 16px; box-shadow: 0 8px 26px rgba(80,60,120,.1); padding: 18px; position: relative; display: flex; flex-direction: column; gap: 12px; }
+.card-box { background: #fff; border-radius: 16px; box-shadow: 0 8px 26px rgba(80,60,120,.06); padding: 18px; position: relative; display: flex; flex-direction: column; gap: 12px; }
 
 /* Inputs et Filtres */
 .input-field { border: 1px solid var(--border-color); border-radius: 100px; background: #fff; color: #1e293b; font-size: 12.5px; padding: 11px 14px; display: flex; align-items: center; gap: 8px; outline: none; width: 100%; transition: 0.2s;}
@@ -57,15 +59,15 @@ body { background: var(--bg-color); color: var(--text-main); height: 100vh; disp
 .filter-select:focus { border-color: var(--primary-magenta); }
 
 /* Catégories */
-.section-title { font-size: 10.5px; font-weight: 700; letter-spacing: .8px; color: #64748b; margin-bottom: 10px; text-transform: uppercase;}
-.category-buttons { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; scrollbar-width: none; padding-bottom: 5px; }
+.section-title { font-size: 11px; font-weight: 700; letter-spacing: .8px; color: #64748b; margin-bottom: 10px; text-transform: uppercase;}
+.category-buttons { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 5px; scrollbar-width: none; padding-bottom: 5px; }
 .category-buttons::-webkit-scrollbar { display: none; }
 .cat-card { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 100px; font-size: 11.5px; font-weight: 600; color: #64748b; white-space: nowrap; cursor: pointer; transition: 0.2s; background: white;}
 .cat-card:hover { border-color: var(--primary-magenta); }
 .cat-card.active { background: var(--accent-pink); border-color: var(--primary-magenta); color: var(--primary-magenta); }
 
 /* Liste des Lieux */
-.location-list { display: flex; flex-direction: column; gap: 9px; }
+.location-list { display: flex; flex-direction: column; gap: 9px; padding-bottom: 20px;}
 .loc-item { display: flex; gap: 11px; align-items: center; background: #faf9fc; border-radius: 12px; padding: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
 .loc-item:hover { border-color: var(--primary-magenta); background: white; }
 .loc-icon-box { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -74,7 +76,7 @@ body { background: var(--bg-color); color: var(--text-main); height: 100vh; disp
 .loc-name { font-size: 13px; font-weight: 600; color: #1e293b; }
 
 /* Zone Carte */
-.map-container { flex: 1; position: relative; background: #E7E9EC; overflow: hidden; z-index: 1;}
+.map-container { flex: 1; position: relative; background: #E7E9EC; overflow: hidden; z-index: 1; height: 100%;}
 #map { width: 100%; height: 100%; background: transparent; z-index: 1;}
 
 .stat-pill { position: absolute; top: 20px; left: 20px; background: #fff; border-radius: 100px; padding: 10px 20px; font-size: 12.5px; font-weight: 700; color: #2E3644; box-shadow: 0 6px 18px rgba(80,60,120,.1); display: flex; gap: 10px; align-items: center; z-index: 1000;}
@@ -123,232 +125,3 @@ body { background: var(--bg-color); color: var(--text-main); height: 100vh; disp
     .hamburger-btn { display: flex !important; }
 }
 .hamburger-btn { display: none; }
-</style>
-</head>
-<body>
-
-<div class="app-container">
-    
-    <!-- Sidebar Gauche -->
-    <aside class="sidebar" id="app-sidebar">
-        <!-- Effets visuels -->
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-
-        <div class="sidebar-content">
-            <!-- Header avec Logo -->
-            <div class="brand-row">
-                <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
-                    <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
-                    <circle cx="200" cy="150" r="26" fill="#D42759"/>
-                </svg>
-                <div>
-                    <div class="brand-text">Screen To <b>Street</b></div>
-                    <div class="tagline" data-i18n="subtitle">Following the footsteps of your favorite artists</div>
-                </div>
-            </div>
-
-            <!-- VUE 1 : RECHERCHE ET LISTE -->
-            <div id="sidebar-main" class="sidebar-scroll-area">
-                <!-- Bloc Recherche et Iti -->
-                <div class="card-box">
-                    <div style="position:relative;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:14px; top:12px;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="text" id="search-input" class="input-field" style="padding-left:36px;" placeholder="Search a location...">
-                    </div>
-                    <button id="open-itinerary-btn" class="cta-primary">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8 19h6a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4h-1"/></svg> 
-                        <span data-i18n="btnGenerateIti">Auto-Itinerary Generator</span>
-                    </button>
-                </div>
-
-                <!-- Bloc Filtres -->
-                <div class="card-box">
-                    <div class="filters-grid">
-                        <div>
-                            <div class="filter-item-label" data-i18n="filterGroup">GROUP</div>
-                            <select id="group-select" class="filter-select"></select>
-                        </div>
-                        <div>
-                            <div class="filter-item-label" data-i18n="filterMember">MEMBER</div>
-                            <select id="member-select" class="filter-select"></select>
-                        </div>
-                        <div>
-                            <div class="filter-item-label" data-i18n="filterArea">AREA</div>
-                            <select id="country-select" class="filter-select"></select>
-                        </div>
-                        <div>
-                            <div class="filter-item-label" data-i18n="filterYear">YEAR</div>
-                            <select id="year-select" class="filter-select">
-                                <option value="All">All Years</option>
-                                <option value="2026">2026</option><option value="2023">2023</option>
-                                <option value="2021">2021</option><option value="2020">2020</option>
-                                <option value="2019">2019</option><option value="2018">2018</option>
-                                <option value="2017">2017</option><option value="2013 - 2017">2013 - 2017</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bloc Résultats -->
-                <div class="card-box" style="flex:1;">
-                    <div class="section-title" data-i18n="filterCategories">CATEGORIES</div>
-                    <div id="category-buttons" class="category-buttons"></div>
-
-                    <div class="section-title" style="margin-top:5px;"><span data-i18n="locationsCount">LOCATIONS</span> (<span id="location-count-sidebar">0</span>)</div>
-                    <div class="location-list" id="location-list">
-                        <!-- Rempli par le JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- VUE 2 : DÉTAILS D'UN LIEU -->
-            <div id="sidebar-details" class="card-box hidden" style="flex:1; overflow-y:auto; overflow-x: hidden;">
-                <div class="sidebar-details-header">
-                    <button class="back-details-btn" onclick="closeDetailsPanel()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to list
-                    </button>
-                </div>
-                
-                <h2 id="details-title" style="font-size: 18px; font-weight: 700; color: var(--text-main);">Location Name</h2>
-                
-                <div style="display:flex; gap:15px; flex-wrap:wrap; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9;">
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="details-visited" class="custom-checkbox">
-                        <label for="details-visited">I visited this place</label>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="details-wishlist" class="custom-checkbox">
-                        <label for="details-wishlist">Add to Wishlist</label>
-                    </div>
-                </div>
-
-                <ul class="modal-metadata">
-                    <li><strong data-i18n="mdlGroup">Group:</strong> <span id="details-group"></span></li>
-                    <li><strong data-i18n="mdlMember">Members:</strong> <span id="details-member"></span></li>
-                    <li><strong data-i18n="mdlCountry">Country:</strong> <span id="details-country"></span></li>
-                    <li><strong data-i18n="mdlCity">City:</strong> <span id="details-city"></span></li>
-                    <li><strong data-i18n="mdlAddress">Address:</strong> <span id="details-full-address"></span></li>
-                    <li><strong data-i18n="mdlDate">Date:</strong> <span id="details-date"></span></li>
-                    <li id="details-episode-container"><strong data-i18n="mdlEpisode">Episode:</strong> <span id="details-episode"></span></li>
-                    <li id="details-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="details-episode-link" href="#" target="_blank" style="color:var(--primary-magenta); font-weight:600;">Official Link</a></li>
-                </ul>
-
-                <div id="details-gallery-section" class="media-section hidden">
-                    <h3 data-i18n="mdlPhotosTitle">Location Photos</h3>
-                    <div class="modal-gallery" id="details-gallery"></div>
-                </div>
-
-                <div class="media-section" style="margin-top:0;">
-                    <h3 data-i18n="mdlStoryTitle">The story of this place</h3>
-                    <div id="details-desc" style="line-height: 1.6; font-size: 12px; color: #5B6472;"></div> 
-                </div>
-
-                <div id="details-video-section" class="media-section hidden">
-                    <h3 data-i18n="mdlVideoTitle">Watch the Episode</h3>
-                    <div id="details-video-container" style="display:flex; flex-direction:column; gap:10px;"></div>
-                </div>
-
-                <div id="details-tip-section" class="media-section hidden" style="background:#faf9fc; padding:12px; border-radius:8px; border-left:3px solid var(--primary-magenta);">
-                    <h3 style="border:none; padding:0; margin-bottom:5px; color:#D42759;">Tip</h3>
-                    <p id="details-tip" style="font-size:11.5px; font-style:italic; color:#5B6472;"></p>
-                </div>
-
-                <div class="media-section" style="margin-bottom:20px;">
-                    <h3 data-i18n="mdlDirTitle">How to get there</h3>
-                    <p id="details-directions" style="font-size:12px; color:#5B6472; margin-bottom:10px;"></p>
-                    <a id="details-map-link" href="#" target="_blank" style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:#2E3644; border:1px solid #cbd5e1; padding:6px 12px; border-radius:6px; background:#fff; transition:0.2s;">Open in Google Maps</a>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Zone Carte à Droite -->
-    <main class="map-container">
-        <!-- Boutons superposés à la carte -->
-        <div class="top-nav">
-            <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-            <div class="dropdown-container">
-                <button id="lang-btn" class="nav-btn" title="Langue">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                </button>
-                <div id="lang-menu" class="dropdown-menu hidden">
-                    <div class="dropdown-option lang-option" data-lang="en">English</div>
-                    <div class="dropdown-option lang-option" data-lang="fr">Français</div>
-                </div>
-            </div>
-            <div class="dropdown-container">
-                <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock Passes">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                </button>
-            </div>
-            <div class="dropdown-container">
-                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover;"></button>
-                <div id="profile-menu" class="dropdown-menu hidden">
-                    <a href="account.html" class="dropdown-option">Your Account</a>
-                    <a href="visited.html" class="dropdown-option">My Visited Places</a>
-                    <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
-                    <a href="settings.html" class="dropdown-option">Settings</a>
-                    <div class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="stat-pill"><span class="n1" id="stat-locations">0</span> LOCATIONS <span class="sep">|</span> <span id="stat-countries">0</span> COUNTRIES</div>
-        
-        <div id="map"></div>
-    </main>
-</div>
-
-<!-- Modal Itinéraire -->
-<div id="itinerary-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 650px;">
-        <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
-        <h2 style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 5px;" data-i18n="itiTitle">Auto-Itinerary Generator</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay.</p>
-        
-        <div id="iti-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
-            <select id="iti-group" class="filter-select"></select>
-            <select id="iti-country" class="filter-select"></select>
-            <input type="number" id="iti-days" min="1" max="7" value="3" class="filter-select">
-            <button class="cta-primary" onclick="generateItinerary()" data-i18n="itiCreateBtn">Create My Guide</button>
-        </div>
-
-        <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <div id="iti-map-container" style="width: 100%; height: 200px; background: #e5e5e5; border-radius: 12px; margin-bottom: 15px;"></div>
-            <div id="iti-days-list"></div>
-            <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="margin-top: 15px; background: #2E3644;">Export Guide as PDF</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Panier -->
-<div id="cart-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 500px;">
-        <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 style="color: #1e293b; margin-bottom: 5px;">Unlock New Passes</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select the groups you want to unlock. (14.99€ per group)</p>
-        
-        <form id="cart-form">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
-                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
-                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
-            </div>
-            <button type="submit" id="cart-pay-btn" class="cta-primary" disabled>Select a group</button>
-        </form>
-    </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
