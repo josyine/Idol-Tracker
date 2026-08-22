@@ -32,7 +32,7 @@
     </div>
 </div>
 
-<!-- LE DESIGN VERSION 5 EN PLEIN ÉCRAN -->
+<!-- LE DESIGN PLEIN ÉCRAN -->
 <div class="hero">
 
     <!-- Blobs Flous d'Arrière Plan -->
@@ -40,7 +40,7 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
-    <!-- Route Animée (Pleine Largeur) -->
+    <!-- Route Animée -->
     <svg class="bg-route" viewBox="0 0 1180 600" preserveAspectRatio="xMidYMid slice">
       <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260"
             fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
@@ -94,7 +94,7 @@
 
 </div>
 
-<!-- NOUVELLE MODALE D'AUTHENTIFICATION (Design Final) -->
+<!-- MODALE D'AUTHENTIFICATION -->
 <div id="auth-modal" class="auth-modal hidden">
     <div class="auth-modal-content">
         <button class="close-auth-btn" id="close-auth">&times;</button>
@@ -122,9 +122,9 @@
 
                 <p class="terms">
                     <span data-i18n="authTerms">By continuing, you agree to Screen To Street's</span> 
-                    <a href="legal.html#cgv" target="_blank" class="highlight" style="color:#D42759;font-weight:600;" data-i18n="linkTerms">Terms of Use</a>. 
+                    <a href="legal.html#cgu" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkTerms">Terms of Use</a>. 
                     <span data-i18n="authPrivacy">Read our</span> 
-                    <a href="legal.html#confidentialite" target="_blank" class="highlight" style="color:#D42759;font-weight:600;" data-i18n="linkPrivacy">Privacy Policy</a>.
+                    <a href="legal.html#confidentialite" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkPrivacy">Privacy Policy</a>.
                 </p>
             </div>
 
@@ -132,41 +132,50 @@
             <div id="auth-step-2" class="auth-step hidden">
                 <button class="back-step-btn" id="btn-back-1">← <span data-i18n="authEmail">Continue with email</span></button>
                 <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
-                <div class="input-group">
-                    <label data-i18n="emailLabel">Email address</label>
-                    <input type="email" id="user-email" placeholder="jane.doe@example.com" required>
+                <div style="display:flex; flex-direction:column; margin-bottom: 15px;">
+                    <span class="field-label" data-i18n="emailLabel">Email address</span>
+                    <input type="email" id="user-email" class="field-input" placeholder="jane.doe@example.com" required>
                 </div>
-                <button class="primary-btn" id="btn-to-details" data-i18n="btnContinue">Continue</button>
+                <button class="pay-btn" id="btn-to-details" data-i18n="btnContinue">Continue</button>
             </div>
 
-            <!-- ETAPE 3 : PAIEMENT (LA VOICI !) -->
+            <!-- ETAPE 3 : PAIEMENT (AVEC STEPPER) -->
             <div id="auth-step-3" class="auth-step hidden">
-                <button class="back-step-btn" id="btn-back-2">← <span data-i18n="stepBackAccount">Account Details</span></button>
+                
+                <div class="stepper">
+                    <div class="step" style="color:#94a3b8;"><div class="step-dot" style="background:#e2e8f0;color:#64748b;">✓</div>Account</div>
+                    <div class="step-line" style="background:#D42759;"></div>
+                    <div class="step" style="color:#D42759;"><div class="step-dot" style="background:#D42759;color:#fff;">2</div>Passes</div>
+                    <div class="step-line" style="background:#e2e8f0;"></div>
+                    <div class="step" style="color:#cbd5e1;"><div class="step-dot" style="background:#e2e8f0;color:#94a3b8;">3</div>Payment</div>
+                </div>
+
                 <form id="checkout-form">
-                    <div class="input-row">
-                        <div class="input-group"><label data-i18n="fname">First Name</label><input type="text" id="fname" required></div>
-                        <div class="input-group"><label data-i18n="lname">Last Name</label><input type="text" id="lname" required></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+                        <div><span class="field-label" data-i18n="fname">First Name</span><input type="text" id="fname" class="field-input" required></div>
+                        <div><span class="field-label" data-i18n="lname">Last Name</span><input type="text" id="lname" class="field-input" required></div>
                     </div>
-                    <div class="input-group"><label data-i18n="password">Password</label><input type="password" id="user-password" required minlength="8" placeholder="••••••••"></div>
+                    <div style="margin-bottom:22px;"><span class="field-label" data-i18n="password">Password</span><input type="password" id="user-password" class="field-input" value="12345678" required></div>
+
+                    <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:4px;" data-i18n="step2">Choose Your Passes</div>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:16px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
                     
-                    <div class="form-divider"></div>
-                    <h3 data-i18n="step2" style="font-size: 15px; margin-bottom: 8px; color: var(--text-main);">2. Choose Your Passes</h3>
-                    <p data-i18n="passDesc" style="margin-bottom: 15px; font-size:12px; color:#64748b;">Select the groups you want to unlock. (14.99€ per group)</p>
-                    
-                    <div class="group-selection">
-                        <label class="checkbox-card"><input type="checkbox" name="groups" value="BTS" class="group-checkbox"><span class="card-content">BTS</span></label>
-                        <label class="checkbox-card"><input type="checkbox" name="groups" value="Blackpink" class="group-checkbox"><span class="card-content">Blackpink</span></label>
-                        <label class="checkbox-card"><input type="checkbox" name="groups" value="Twice" class="group-checkbox"><span class="card-content">Twice</span></label>
-                        <label class="checkbox-card"><input type="checkbox" name="groups" value="Seventeen" class="group-checkbox"><span class="card-content">Seventeen</span></label>
-                        <label class="checkbox-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox"><span class="card-content">Katseye</span></label>
-                        <label class="checkbox-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox"><span class="card-content">TXT</span></label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;">
+                        <label class="pass-card"><input type="checkbox" name="groups" value="BTS" class="group-checkbox">BTS</label>
+                        <label class="pass-card"><input type="checkbox" name="groups" value="Blackpink" class="group-checkbox">Blackpink</label>
+                        <label class="pass-card"><input type="checkbox" name="groups" value="Twice" class="group-checkbox">Twice</label>
+                        <label class="pass-card"><input type="checkbox" name="groups" value="Seventeen" class="group-checkbox">Seventeen</label>
+                        <label class="pass-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox">Katseye</label>
+                        <label class="pass-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox">TXT</label>
                     </div>
                     
-                    <div class="checkout-footer">
-                        <div class="total-price"><span data-i18n="totalDue">Total Due:</span><strong id="price-display">0.00 €</strong></div>
-                        <button type="submit" id="pay-btn" class="primary-btn" disabled data-i18n="payBtnEmpty">Select a group</button>
+                    <div class="total-row" style="margin-bottom:14px;">
+                        <span class="total-label" data-i18n="totalDue">Total Due:</span>
+                        <span class="total-price" id="price-display">0.00 €</span>
                     </div>
-                    <div id="payment-loader" class="hidden">
+                    <button type="submit" id="pay-btn" class="pay-btn" disabled data-i18n="payBtnEmpty">Select a group</button>
+                    
+                    <div id="payment-loader" class="hidden" style="margin-top: 15px;">
                         <div class="spinner"></div>
                         <p data-i18n="processing" style="text-align: center; color: var(--primary-magenta); margin-top: 10px; font-size:13px; font-weight:600;">Processing securely...</p>
                     </div>
@@ -181,12 +190,12 @@
             <div class="auth-blob auth-blob-2"></div>
             <div class="auth-blob auth-blob-3"></div>
             <div class="brand-content">
-                <svg width="60" height="60" viewBox="0 0 400 400" style="margin-bottom:18px;">
+                <svg width="56" height="56" viewBox="0 0 400 400" style="margin-bottom:16px;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#fff"/>
                     <polygon points="176,110 176,182 236,146" fill="#D42759"/>
                 </svg>
-                <div style="font-size:19px;font-weight:600;color:#fff;margin-bottom:14px;">Screen To <span style="color:#F06090;">Street</span></div>
-                <div data-i18n="authRightTitle" style="font-size:22px;font-weight:600;color:#fff;text-align:center;line-height:1.35;">Unlock the world<br>of your idols.</div>
+                <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:12px;">Screen To <span style="color:#F06090;">Street</span></div>
+                <div data-i18n="authRightTitle" style="font-size:20px;font-weight:600;color:#fff;text-align:center;line-height:1.35;">Unlock the world<br>of your idols.</div>
             </div>
         </div>
 
