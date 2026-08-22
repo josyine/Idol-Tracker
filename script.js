@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION DE LA CARTE
+// 1. INITIALISATION DE LA CARTE PRINCIPALE
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -21,7 +21,7 @@ window.toggleMobileMenu = function() {
 };
 
 // ==========================================
-// 2. DONNÉES (ICONES, COULEURS & LIEUX - LES 19 LIEUX RESTAURÉS)
+// 2. DONNÉES : LES 19 LIEUX INTÉGRAUX
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5h18"/><path d="M4 8.5 5.5 4h3L7 8.5"/><path d="M9.3 8.5 10.8 4h3l-1.5 4.5"/><path d="M14.7 8.5 16.2 4h3l-1.5 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.5"/></svg>`,
@@ -36,7 +36,6 @@ const iconsSVG = {
     "Landmarks": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="13" x="4" y="8" rx="2" ry="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
     "Default": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`
 };
-const mapPinSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
 const groupColors = { "BTS": "#8b5cf6", "Blackpink": "#ec4899", "Twice": "#f43f5e", "Seventeen": "#3b82f6", "Katseye": "#10b981", "TXT": "#f59e0b" };
 
@@ -46,7 +45,6 @@ const filterData = {
     "General": { categories: ["Cafe", "Concerts", "Fashion", "Landmarks", "Museums", "Restaurants", "Pop-up Store"] }
 };
 
-// LES 19 LIEUX INTÉGRAUX
 let celebLocations = [
     {
         id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020",
@@ -179,7 +177,7 @@ let celebLocations = [
         directions: { en: "Accessible via regional commuter rail followed by a local bus.", fr: "Accessible via les trains de banlieue régionaux suivis d'un bus local." }
     },
     {
-        id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "Default", year: "2026", episode: "\"Swim\" MV", episodeLink: "https://www.youtube.com/watch?v=b4iVv91Z6lY",
+        id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "MV Location", year: "2026", episode: "\"Swim\" MV", episodeLink: "https://www.youtube.com/watch?v=b4iVv91Z6lY",
         context: { en: "The historic naval museum serving as the grandiose backdrop for the 'Swim' music video.", fr: "Le musée naval historique servant de décor grandiose pour le clip de 'Swim'." },
         address: "Praça do Império, 1400-206 Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg", videoEmbeds: ["https://www.youtube.com/embed/b4iVv91Z6lY"], gallery: ["images/Marinha1.jpg"],
         fullDescription: { en: "Housed in the Jerónimos Monastery, the Navy Museum displays over 17,000 historical items.", fr: "Situé dans le monastère des Hiéronymites, le musée de la Marine expose plus de 17 000 objets historiques." },
@@ -263,7 +261,7 @@ function initializeFilters() {
     
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
-    if(unlockedGroups.length === 0) availableLocs = celebLocations; // Mode demo si rien n'est acheté
+    if(unlockedGroups.length === 0) availableLocs = celebLocations;
 
     const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
     if(groupSelect.options.length === 0) {
@@ -488,6 +486,9 @@ window.closeDetailsPanel = function() {
 // ==========================================
 // 7. ITINERARY & CART MODALS
 // ==========================================
+let itiLeafletMap = null;
+let itiLayerGroup = null;
+
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
