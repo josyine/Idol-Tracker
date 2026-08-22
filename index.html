@@ -38,6 +38,7 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
+    <!-- Route Animée -->
     <svg class="bg-route" viewBox="0 0 1180 600" preserveAspectRatio="xMidYMid slice">
       <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260" fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
       <circle class="dot dot-a" cx="380" cy="340" r="6" fill="#B9A8DA"/>
@@ -59,8 +60,9 @@
         <span>Screen To Street</span>
       </div>
       <div class="nav-right">
-        <a class="nav-link" data-i18n="navDest">Destinations</a>
-        <a class="nav-link" data-i18n="navArtists">Artists</a>
+        <!-- Liens mis à jour -->
+        <a class="nav-link" href="map.html" data-i18n="navDest">Destinations</a>
+        <a class="nav-link" href="artists.html" data-i18n="navArtists">Artists</a>
         <div class="nav-actions">
           <div class="icon-btn" id="lang-btn" title="Langue / Région">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -142,7 +144,7 @@
                 </p>
             </div>
 
-            <!-- ETAPE 1 : COMPTE (EMAIL & MOT DE PASSE) -->
+            <!-- ETAPE 1 : COMPTE (EMAIL & MOT DE PASSE OBLIGATOIRES) -->
             <div id="auth-step-1" class="auth-step hidden">
                 <h2 data-i18n="step1Title">Account</h2>
                 <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
@@ -157,7 +159,7 @@
                 <button class="pay-btn" id="btn-to-step2" data-i18n="btnContinue">Continue</button>
             </div>
 
-            <!-- ETAPE 2 : PROFIL (USERNAME, NOM, PRENOM, RAISON) -->
+            <!-- ETAPE 2 : PROFIL (USERNAME OBLIGATOIRE, LE RESTE OPTIONNEL) -->
             <div id="auth-step-2" class="auth-step hidden">
                 <h2 data-i18n="step2Title">Profile</h2>
                 <p data-i18n="step2Desc">Tell us a bit about yourself.</p>
@@ -202,7 +204,7 @@
                 <button class="pay-btn" id="btn-to-step4" disabled data-i18n="payBtnEmpty">Select a group</button>
             </div>
 
-            <!-- ETAPE 4 : PAIEMENT -->
+            <!-- ETAPE 4 : PAIEMENT (CHAMPS OBLIGATOIRES) -->
             <div id="auth-step-4" class="auth-step hidden">
                 <h2 data-i18n="step4Title">Payment</h2>
                 <p data-i18n="step4Desc">Complete your purchase to unlock the guides.</p>
