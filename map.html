@@ -6,43 +6,51 @@
     <title>Idol Tracker Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
-    <style>
-        .hidden { display: none !important; }
-    </style>
 </head>
 <body>
     
     <div class="top-nav">
-        <!-- LANGUE -->
-        <div class="dropdown-container">
-            <button id="lang-btn" class="nav-btn">🌐</button>
-            <div id="lang-menu" class="dropdown-menu hidden">
-                <div class="dropdown-option lang-option" data-lang="en">English</div>
-                <div class="dropdown-option lang-option" data-lang="fr">Français</div>
-            </div>
-        </div>
-        
-        <!-- CADDIE -->
-        <div class="dropdown-container">
-            <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">🛒</button>
-        </div>
+        <!-- MENU HAMBURGER (MOBILE UNIQUEMENT) -->
+        <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
 
-        <!-- PROFIL -->
-        <div class="dropdown-container">
-            <button id="profile-btn" class="nav-btn"></button>
-            <div id="profile-menu" class="dropdown-menu hidden">
-                <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Your Account</a>
-                <a href="visited.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">My Visited Places</a>
-                <a href="wishlist.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">My Wishlist</a>
-                <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Settings</a>
-                <div class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
+        <div class="nav-right-actions">
+            <!-- LANGUE -->
+            <div class="dropdown-container">
+                <button id="lang-btn" class="nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </button>
+                <div id="lang-menu" class="dropdown-menu hidden">
+                    <div class="dropdown-option lang-option" data-lang="en">English</div>
+                    <div class="dropdown-option lang-option" data-lang="fr">Français</div>
+                </div>
+            </div>
+            
+            <!-- CADDIE (ICONE SVG ÉLÉGANTE) -->
+            <div class="dropdown-container">
+                <button id="cart-btn" class="nav-btn" onclick="openCartModal()" title="Unlock more passes">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </button>
+            </div>
+
+            <!-- PROFIL -->
+            <div class="dropdown-container">
+                <button id="profile-btn" class="nav-btn"></button>
+                <div id="profile-menu" class="dropdown-menu hidden">
+                    <a href="account.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Your Account</a>
+                    <a href="visited.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">My Visited Places</a>
+                    <a href="wishlist.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">My Wishlist</a>
+                    <a href="settings.html" class="dropdown-option" style="display:block; text-decoration:none; color:inherit;">Settings</a>
+                    <div class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;">Logout</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="app-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="app-sidebar">
             <div class="sidebar-header" style="margin-bottom: 15px;">
                 <svg class="site-logo" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
                   <defs><style>.wordmark { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-weight: 600; font-size: 52px; letter-spacing: -0.3px; }</style></defs>
@@ -54,13 +62,13 @@
                 <p class="subtitle" data-i18n="subtitle" style="margin-top: -5px;">Following the footsteps of your favorite artists</p>
             </div>
 
-            <div class="search-container">
-                <input type="text" id="search-input" placeholder="Search a location, city, context...">
-            </div>
-            
-            <div class="sidebar-scroll-area">
+            <!-- VUE PRINCIPALE (RECHERCHE + FILTRES + LISTE) -->
+            <div id="sidebar-main" class="sidebar-scroll-area">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search a location, city, context...">
+                </div>
                 
-                <button id="open-itinerary-btn" class="action-btn" style="width: 100%; margin-top:0; margin-bottom: 30px; background: #1F2937;" data-i18n="btnGenerateIti">Auto-Itinerary Generator</button>
+                <button id="open-itinerary-btn" class="action-btn" style="width: 100%; margin-top:0; margin-bottom: 25px; background: #1F2937;" data-i18n="btnGenerateIti">Auto-Itinerary Generator</button>
 
                 <div class="filters-container">
                     <div class="filter-group">
@@ -99,7 +107,7 @@
                 <div class="location-list" id="location-list"></div>
                 
                 <div class="sidebar-footer">
-                    <p>Screen To Street is an independent fan-made guide. Not affiliated with agencies.</p>
+                    <p>Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links">
                         <a href="legal.html#notice">Legal Notice</a>
                         <a href="legal.html#cgv">Terms of Sale</a>
@@ -107,10 +115,68 @@
                     </div>
                 </div>
             </div>
+
+            <!-- VUE DETAILS (REMPLACE LA LISTE QUAND ON CLIQUE) -->
+            <div id="sidebar-details" class="sidebar-scroll-area hidden">
+                <button class="back-details-btn" onclick="closeDetailsPanel()">← Back to list</button>
+                
+                <h2 id="details-title" style="margin-bottom: 15px; font-size: 1.5rem; color: var(--primary-magenta);">Location Name</h2>
+                
+                <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px;">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="details-visited" class="custom-checkbox">
+                        <label for="details-visited">I visited this place</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="details-wishlist" class="custom-checkbox">
+                        <label for="details-wishlist">Add to Wishlist</label>
+                    </div>
+                </div>
+
+                <ul class="modal-metadata">
+                    <li><strong data-i18n="mdlGroup">Group:</strong> <span id="details-group"></span></li>
+                    <li><strong data-i18n="mdlMember">Members:</strong> <span id="details-member"></span></li>
+                    <li><strong data-i18n="mdlCountry">Country:</strong> <span id="details-country"></span></li>
+                    <li><strong data-i18n="mdlCity">City:</strong> <span id="details-city"></span></li>
+                    <li><strong data-i18n="mdlAddress">Address:</strong> <span id="details-full-address"></span></li>
+                    <li><strong data-i18n="mdlDate">Date:</strong> <span id="details-date"></span></li>
+                    <li id="details-episode-container"><strong data-i18n="mdlEpisode">Episode:</strong> <span id="details-episode"></span></li>
+                    <li id="details-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="details-episode-link" href="#" target="_blank" data-i18n="mdlLink">Official Link</a></li>
+                </ul>
+
+                <div class="modal-info" style="margin-top: 25px;">
+                    <h3 data-i18n="mdlStoryTitle">The story of this place</h3>
+                    <div id="details-desc" style="line-height: 1.6; font-size: 0.95rem; color: #475569;"></div> 
+                </div>
+
+                <div id="details-gallery-section" class="media-section hidden">
+                    <h3 data-i18n="mdlPhotosTitle">Location Photos</h3>
+                    <div class="modal-gallery" id="details-gallery"></div>
+                </div>
+
+                <div id="details-video-section" class="media-section hidden">
+                    <h3 data-i18n="mdlVideoTitle">Watch the Episode</h3>
+                    <div id="details-video-container" class="modal-videos"></div>
+                </div>
+
+                <div id="details-tip-section" class="media-section hidden" style="background-color: #f9f9f9; padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary-magenta);">
+                    <h3 style="border-bottom: none; padding-bottom: 0; margin-bottom: 8px;">💡 <span data-i18n="mdlTipTitle">The "Screen to Street" Tip:</span></h3>
+                    <p id="details-tip" style="font-size: 0.95rem; font-style: italic; color: #475569;"></p>
+                </div>
+
+                <div class="modal-info" style="margin-bottom: 30px;">
+                    <h3 data-i18n="mdlDirTitle">How to get there</h3>
+                    <p id="details-directions" style="font-size: 0.95rem; color: #475569;"></p>
+                    <a id="details-map-link" href="#" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 16px; margin-top:15px; font-size:0.9rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;" data-i18n="mdlGoogleMap">Open in Google Maps</a>
+                </div>
+            </div>
         </aside>
 
         <!-- Map Area -->
         <main class="map-container">
+            <!-- Couverture assombrie pour mobile quand menu ouvert -->
+            <div id="mobile-overlay" class="hidden" onclick="toggleMobileMenu()"></div>
+            
             <div class="map-stats">
                 <div class="stat-item"><span id="stat-locations">0</span> <span data-i18n="statLocs">Locations</span></div>
                 <div class="stat-divider"></div>
@@ -136,7 +202,6 @@
                     <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Katseye" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">Katseye</span></label>
                     <label style="position:relative; cursor:pointer;"><input type="checkbox" value="TXT" class="cart-checkbox" style="position:absolute; opacity:0;"><span style="display:block; padding:10px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-weight:bold; color:#64748b;">TXT</span></label>
                 </div>
-                
                 <div style="display:flex; flex-direction:column; border-top:1px solid #cbd5e1; padding-top:20px; gap:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-weight:bold; text-transform:uppercase; font-size:0.85rem; color:#64748b;">Total Due:</span>
@@ -145,61 +210,6 @@
                     <button type="submit" id="cart-pay-btn" class="action-btn" disabled style="width:100%; padding:14px; font-size:1rem;">Select a group</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- Modal Détails Lieu (Design épuré des Checkboxes) -->
-    <div id="details-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('details-modal')">&times;</span>
-            <h2 id="modal-title" style="margin-bottom: 15px;">Location Name</h2>
-            
-            <!-- CHECKBOXES ÉPURÉES -->
-            <div style="display:flex; gap:25px; flex-wrap:wrap; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px;">
-                <div id="modal-visited-container" style="display:inline-flex; align-items:center; gap:8px;">
-                    <input type="checkbox" id="modal-visited" style="width: 18px; height: 18px; cursor:pointer; accent-color: #10b981;">
-                    <label for="modal-visited" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); cursor:pointer;">I visited this place</label>
-                </div>
-                
-                <div id="modal-wishlist-container" style="display:inline-flex; align-items:center; gap:8px;">
-                    <input type="checkbox" id="modal-wishlist" style="width: 18px; height: 18px; cursor:pointer; accent-color: #f59e0b;">
-                    <label for="modal-wishlist" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); cursor:pointer;">Add to Wishlist</label>
-                </div>
-            </div>
-
-            <div id="modal-tags" class="modal-tags"></div>
-            <ul class="modal-metadata">
-                <li><strong data-i18n="mdlGroup">Group:</strong> <span id="modal-group"></span></li>
-                <li><strong data-i18n="mdlMember">Members:</strong> <span id="modal-member"></span></li>
-                <li><strong data-i18n="mdlCountry">Country:</strong> <span id="modal-country"></span></li>
-                <li><strong data-i18n="mdlCity">City:</strong> <span id="modal-city"></span></li>
-                <li><strong data-i18n="mdlAddress">Address:</strong> <span id="modal-full-address"></span></li>
-                <li><strong data-i18n="mdlDate">Date:</strong> <span id="modal-date"></span></li>
-                <li id="modal-episode-container"><strong data-i18n="mdlEpisode">Episode:</strong> <span id="modal-episode"></span></li>
-                <li id="modal-link-container"><strong data-i18n="mdlWatch">Watch:</strong> <a id="modal-episode-link" href="#" target="_blank" data-i18n="mdlLink">Official Link</a></li>
-            </ul>
-            <div class="modal-info" style="margin-top: 25px;">
-                <h3 data-i18n="mdlStoryTitle">The story of this place</h3>
-                <div id="modal-desc" style="line-height: 1.6;"></div> 
-            </div>
-            <div id="modal-gallery-section" class="media-section hidden">
-                <h3 data-i18n="mdlPhotosTitle">Location Photos</h3>
-                <div class="modal-gallery" id="modal-gallery"></div>
-            </div>
-            <div id="modal-video-section" class="media-section hidden">
-                <h3 data-i18n="mdlVideoTitle">Watch the Episode</h3>
-                <div id="modal-video-container" class="modal-videos"></div>
-            </div>
-            <div id="modal-tip-section" class="media-section hidden" style="background-color: #f9f9f9; padding: 15px; border-radius: 12px; border-left: 4px solid var(--primary-magenta);">
-                <h3 style="border-bottom: none; padding-bottom: 0; margin-bottom: 8px;">💡 <span data-i18n="mdlTipTitle">The "Screen to Street" Tip:</span></h3>
-                <p id="modal-tip" style="font-size: 0.95rem; font-style: italic;"></p>
-            </div>
-            <div class="modal-info">
-                <h3 data-i18n="mdlDirTitle">How to get there</h3>
-                <p id="modal-directions"></p>
-                <p id="modal-address" style="color: #6B7280; font-size: 0.9rem; margin-top: 5px; margin-bottom: 40px;"></p>
-                <a id="modal-map-link" href="#" target="_blank" class="action-btn" data-i18n="mdlGoogleMap">Open in Google Maps</a>
-            </div>
         </div>
     </div>
 
@@ -229,7 +239,6 @@
             <div id="iti-result" class="hidden" style="border-top: 2px solid var(--border-color); padding-top: 25px; margin-top: 25px;">
                 <div id="iti-map-container" style="width: 100%; height: 250px; background: #e5e5e5; border-radius: 12px; margin-bottom: 20px; overflow: hidden;"></div>
                 <div id="iti-days-list"></div>
-                <!-- BOUTON EXPORT PDF ÉLÉGANT -->
                 <button id="export-pdf-btn" class="action-btn" onclick="exportItineraryPDF()" style="width: 100%; margin-top: 20px; background: #34414C; color: white;">Export Guide as PDF</button>
             </div>
         </div>
