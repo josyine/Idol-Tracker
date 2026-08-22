@@ -1,12 +1,10 @@
-:root { --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; }
+:root { --bg-color: #0e0e14; --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
 a { text-decoration: none; }
-
-/* PLEIN ÉCRAN - PLUS DE FOND NOIR NI DE MARGES */
 body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw; display: flex; overflow: hidden; }
 .hidden { display: none !important; }
 
-/* Cadre de l'Application (100% de l'écran) */
+/* Cadre de l'Application */
 .app-container { width: 100%; height: 100%; display: flex; background: #fff; position: relative; }
 
 /* Top Nav sur la carte (Langue, Profil, Panier) */
@@ -14,10 +12,12 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .dropdown-container { position: relative; display: inline-block; }
 .nav-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 4px 14px rgba(80,60,120,.1); display: flex; align-items: center; justify-content: center; color: #2E3644; border: none; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px;}
 .nav-btn:hover { background: #f1f5f9; color: var(--primary-magenta); }
-.dropdown-menu { position: absolute; right: 0; top: 50px; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: auto; min-width: 160px; overflow: hidden; }
-.dropdown-option { padding: 10px 15px; cursor: pointer; font-size: 0.9rem; color: var(--text-main); transition: background 0.2s; border-bottom: 1px solid #f0f0f0; white-space: nowrap;}
-.dropdown-option:last-child { border-bottom: none; }
+
+/* AMÉLIORATION DU MENU DROPDOWN */
+.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+.dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); transition: 0.2s; border-radius: 8px; display: block; text-align: left; }
 .dropdown-option:hover { background: #f1f5f9; color: var(--primary-magenta); }
+.dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
 /* Sidebar (Menu de gauche) */
 .sidebar { width: 360px; flex-shrink: 0; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--sidebar-bg); position: relative; overflow: hidden; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 1000; border-right: 1px solid rgba(0,0,0,0.05);}
@@ -117,6 +117,13 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 /* Iti Generator */
 .iti-day-card { background: #faf9fc; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 12px; font-size: 12px;}
 .iti-day-title { font-weight: 700; color: #334e68; margin-bottom: 8px; font-size: 13px; }
+
+/* Cookie Banner */
+.cookie-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; width: 90%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; color: var(--text-main);}
+.cookie-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.cookie-content p { font-size: 13px; margin: 0; }
+.cookie-content a { color: var(--primary-magenta); font-weight: bold; }
+.cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 @media (max-width: 800px) {
     .app-container { flex-direction: column; width: 100%; height: 100vh; border-radius: 0; }
