@@ -21,7 +21,6 @@
         </svg>
         <h3 style="color: #34414C; margin-bottom: 5px;">Sign in with Google</h3>
         <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 20px;">Choose an account to continue</p>
-        
         <div class="google-account-mock" onclick="completeGoogleLogin()">
             <div class="google-avatar">JD</div>
             <div class="google-info">
@@ -32,18 +31,13 @@
     </div>
 </div>
 
-<!-- LE DESIGN PLEIN ÉCRAN -->
 <div class="hero">
-
-    <!-- Blobs Flous d'Arrière Plan -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
-    <!-- Route Animée -->
     <svg class="bg-route" viewBox="0 0 1180 600" preserveAspectRatio="xMidYMid slice">
-      <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260"
-            fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
+      <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260" fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
       <circle class="dot dot-a" cx="380" cy="340" r="6" fill="#B9A8DA"/>
       <circle class="dot dot-b" cx="820" cy="300" r="6" fill="#B9A8DA"/>
       <circle class="dot dot-c" cx="1040" cy="240" r="8" fill="#D42759"/>
@@ -53,7 +47,6 @@
       <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 
-    <!-- Navbar -->
     <div class="nav">
       <div class="brand">
         <svg class="pin" viewBox="0 0 400 400">
@@ -82,7 +75,6 @@
       </div>
     </div>
 
-    <!-- Contenu Principal -->
     <div class="copy">
       <h1 data-i18n="heroTitle">You have a destination.<br>We have the guide.</h1>
       <p data-i18n="heroSubtitle">Create custom routes instantly, with tools designed to follow your favorite artists.</p>
@@ -94,16 +86,34 @@
 
 </div>
 
-<!-- MODALE D'AUTHENTIFICATION -->
+<!-- MODALE D'AUTHENTIFICATION AVEC BARRE DE PROGRESSION -->
 <div id="auth-modal" class="auth-modal hidden">
     <div class="auth-modal-content">
         <button class="close-auth-btn" id="close-auth">&times;</button>
         
-        <!-- Colonne Gauche -->
         <div class="auth-left">
             
-            <!-- ETAPE 1 : CHOIX -->
-            <div id="auth-step-1" class="auth-step">
+            <!-- BARRE DE PROGRESSION (Visible étapes 1 à 4) -->
+            <div id="auth-stepper" class="stepper hidden">
+                <div class="step-container" id="step-btn-1">
+                    <div class="step-dot" id="step-dot-1">1</div><span class="step-label" id="step-label-1" data-i18n="step1Title">Account</span>
+                </div>
+                <div class="step-line" id="line-1"></div>
+                <div class="step-container" id="step-btn-2">
+                    <div class="step-dot" id="step-dot-2">2</div><span class="step-label" id="step-label-2" data-i18n="step2Title">Profile</span>
+                </div>
+                <div class="step-line" id="line-2"></div>
+                <div class="step-container" id="step-btn-3">
+                    <div class="step-dot" id="step-dot-3">3</div><span class="step-label" id="step-label-3" data-i18n="step3Title">Passes</span>
+                </div>
+                <div class="step-line" id="line-3"></div>
+                <div class="step-container" id="step-btn-4">
+                    <div class="step-dot" id="step-dot-4">4</div><span class="step-label" id="step-label-4" data-i18n="step4Title">Payment</span>
+                </div>
+            </div>
+
+            <!-- ETAPE 0 : CHOIX (SOCIAL OU EMAIL) -->
+            <div id="auth-step-0" class="auth-step">
                 <h2 data-i18n="authTitle">Log in or sign up</h2>
                 <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
 
@@ -128,52 +138,82 @@
                 </p>
             </div>
 
-            <!-- ETAPE 2 : EMAIL -->
-            <div id="auth-step-2" class="auth-step hidden">
-                <button class="back-step-btn" id="btn-back-1">← <span data-i18n="authEmail">Continue with email</span></button>
+            <!-- ETAPE 1 : COMPTE (EMAIL & MOT DE PASSE) -->
+            <div id="auth-step-1" class="auth-step hidden">
+                <h2 data-i18n="step1Title">Account</h2>
                 <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
-                <div style="display:flex; flex-direction:column; margin-bottom: 15px;">
-                    <span class="field-label" data-i18n="emailLabel">Email address</span>
+                <div class="input-group">
+                    <label data-i18n="emailLabel">Email address</label>
                     <input type="email" id="user-email" class="field-input" placeholder="jane.doe@example.com" required>
                 </div>
-                <button class="pay-btn" id="btn-to-details" data-i18n="btnContinue">Continue</button>
+                <div class="input-group">
+                    <label data-i18n="password">Password</label>
+                    <input type="password" id="user-password" class="field-input" minlength="8" placeholder="••••••••" required>
+                </div>
+                <button class="pay-btn" id="btn-to-step2" data-i18n="btnContinue">Continue</button>
             </div>
 
-            <!-- ETAPE 3 : PAIEMENT (AVEC STEPPER) -->
+            <!-- ETAPE 2 : PROFIL (NOM, PRENOM, RAISON) -->
+            <div id="auth-step-2" class="auth-step hidden">
+                <h2 data-i18n="step2Title">Profile</h2>
+                <p data-i18n="step2Desc">Tell us a bit about yourself.</p>
+                <div class="input-row">
+                    <div class="input-group"><label data-i18n="fname">First Name</label><input type="text" id="fname" class="field-input" required></div>
+                    <div class="input-group"><label data-i18n="lname">Last Name</label><input type="text" id="lname" class="field-input" required></div>
+                </div>
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <label data-i18n="reasonLabel">Why are you using Screen To Street?</label>
+                    <select id="user-reason" class="field-input">
+                        <option value="" data-i18n="reasonPlaceholder">Select an option (optional)</option>
+                        <option value="discover" data-i18n="reason1">To discover new places</option>
+                        <option value="travel" data-i18n="reason2">To plan a trip</option>
+                        <option value="addresses" data-i18n="reason3">To get good addresses</option>
+                        <option value="idols" data-i18n="reason4">To follow my idol's footsteps</option>
+                        <option value="other" data-i18n="reason5">Other</option>
+                    </select>
+                </div>
+                <button class="pay-btn" id="btn-to-step3" data-i18n="btnContinue">Continue</button>
+            </div>
+
+            <!-- ETAPE 3 : SÉLECTION DES PASS -->
             <div id="auth-step-3" class="auth-step hidden">
+                <h2 data-i18n="step3Title">Choose Your Passes</h2>
+                <p data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+                    <label class="pass-card"><input type="checkbox" name="groups" value="BTS" class="group-checkbox"><span class="card-content">BTS</span></label>
+                    <label class="pass-card"><input type="checkbox" name="groups" value="Blackpink" class="group-checkbox"><span class="card-content">Blackpink</span></label>
+                    <label class="pass-card"><input type="checkbox" name="groups" value="Twice" class="group-checkbox"><span class="card-content">Twice</span></label>
+                    <label class="pass-card"><input type="checkbox" name="groups" value="Seventeen" class="group-checkbox"><span class="card-content">Seventeen</span></label>
+                    <label class="pass-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox"><span class="card-content">Katseye</span></label>
+                    <label class="pass-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox"><span class="card-content">TXT</span></label>
+                </div>
+                <div class="total-row">
+                    <span class="total-label" data-i18n="subtotalLabel">Subtotal:</span>
+                    <span class="total-price" id="subtotal-display">0.00 €</span>
+                </div>
+                <button class="pay-btn" id="btn-to-step4" disabled data-i18n="payBtnEmpty">Select a group</button>
+            </div>
+
+            <!-- ETAPE 4 : PAIEMENT -->
+            <div id="auth-step-4" class="auth-step hidden">
+                <h2 data-i18n="step4Title">Payment</h2>
+                <p data-i18n="step4Desc">Complete your purchase to unlock the guides.</p>
                 
-                <div class="stepper">
-                    <div class="step" style="color:#94a3b8;"><div class="step-dot" style="background:#e2e8f0;color:#64748b;">✓</div>Account</div>
-                    <div class="step-line" style="background:#D42759;"></div>
-                    <div class="step" style="color:#D42759;"><div class="step-dot" style="background:#D42759;color:#fff;">2</div>Passes</div>
-                    <div class="step-line" style="background:#e2e8f0;"></div>
-                    <div class="step" style="color:#cbd5e1;"><div class="step-dot" style="background:#e2e8f0;color:#94a3b8;">3</div>Payment</div>
+                <div style="background:#f8fafc; border-radius:10px; padding:12px; font-size:12.5px; color:#334155; margin-bottom:15px; border:1px solid #e2e8f0;">
+                    <b data-i18n="summaryPasses">Selected Passes:</b> <span id="summary-passes" style="color:#64748b;">None</span><br>
+                    <b data-i18n="summaryTotal" style="display:inline-block; margin-top:5px;">Total Due:</b> <span id="summary-price" style="color:var(--primary-magenta); font-weight:bold; font-size:14px;">0.00 €</span>
                 </div>
 
                 <form id="checkout-form">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-                        <div><span class="field-label" data-i18n="fname">First Name</span><input type="text" id="fname" class="field-input" required></div>
-                        <div><span class="field-label" data-i18n="lname">Last Name</span><input type="text" id="lname" class="field-input" required></div>
+                    <div class="input-group">
+                        <label data-i18n="cardNum">Card Number</label>
+                        <input type="text" class="field-input" placeholder="XXXX XXXX XXXX XXXX" required>
                     </div>
-                    <div style="margin-bottom:22px;"><span class="field-label" data-i18n="password">Password</span><input type="password" id="user-password" class="field-input" value="12345678" required></div>
-
-                    <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:4px;" data-i18n="step2">Choose Your Passes</div>
-                    <p style="font-size:12px;color:#64748b;margin-bottom:16px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
-                    
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;">
-                        <label class="pass-card"><input type="checkbox" name="groups" value="BTS" class="group-checkbox">BTS</label>
-                        <label class="pass-card"><input type="checkbox" name="groups" value="Blackpink" class="group-checkbox">Blackpink</label>
-                        <label class="pass-card"><input type="checkbox" name="groups" value="Twice" class="group-checkbox">Twice</label>
-                        <label class="pass-card"><input type="checkbox" name="groups" value="Seventeen" class="group-checkbox">Seventeen</label>
-                        <label class="pass-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox">Katseye</label>
-                        <label class="pass-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox">TXT</label>
+                    <div class="input-row">
+                        <div class="input-group"><label data-i18n="expiry">Expiry Date</label><input type="text" class="field-input" placeholder="MM/YY" required></div>
+                        <div class="input-group"><label data-i18n="cvc">CVC</label><input type="text" class="field-input" placeholder="123" required></div>
                     </div>
-                    
-                    <div class="total-row" style="margin-bottom:14px;">
-                        <span class="total-label" data-i18n="totalDue">Total Due:</span>
-                        <span class="total-price" id="price-display">0.00 €</span>
-                    </div>
-                    <button type="submit" id="pay-btn" class="pay-btn" disabled data-i18n="payBtnEmpty">Select a group</button>
+                    <button type="submit" id="btn-submit-payment" class="pay-btn" data-i18n="paySecurely">Pay securely</button>
                     
                     <div id="payment-loader" class="hidden" style="margin-top: 15px;">
                         <div class="spinner"></div>
