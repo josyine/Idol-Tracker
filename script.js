@@ -11,11 +11,13 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     markerGroup = L.layerGroup().addTo(map);
 }
 
-// Mobile Menu Toggle
 window.toggleMobileMenu = function() {
     const sidebar = document.getElementById('app-sidebar');
     const overlay = document.getElementById('mobile-overlay');
-    if(sidebar) sidebar.classList.toggle('open');
+    if(sidebar) {
+        sidebar.classList.toggle('open');
+        if(!sidebar.classList.contains('open')) sidebar.classList.remove('expanded');
+    }
     if(overlay) overlay.classList.toggle('hidden');
 };
 
@@ -330,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(pMenu) pMenu.classList.add('hidden');
     });
 
+    // Cart Form event listener
     const cartForm = document.getElementById('cart-form');
     if (cartForm) {
         cartForm.addEventListener('submit', function(e) {
@@ -350,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// CART FUNCTIONS (Globally accessible)
 window.openCartModal = function() {
     const cartModal = document.getElementById('cart-modal');
     if(!cartModal) return;
@@ -528,20 +532,22 @@ function renderLocations() {
         const isWishlist = wishlistData.some(w => w.id === loc.id || w === loc.id);
         
         const baseColor = groupColors[loc.group] || '#334e68';
-        let iconColorStyle = `border-color: ${baseColor}; color: ${baseColor};`;
-        let extraClass = '';
-
-        if(isVisited) {
-            iconColorStyle = `border-color: #34d399; color: #34d399;`;
-            extraClass = 'visited-marker-div';
-        } else if (isWishlist) {
-            iconColorStyle = `border-color: #fbbf24; color: #fbbf24;`;
-            extraClass = 'wishlist-marker-div';
+        
+        // LA LOGIQUE DE COULEUR EXACTE DEMANDÉE ICI :
+        let inlineStyle = `border-color: ${baseColor}; --marker-color: ${baseColor};`;
+        if (isVisited) {
+            // Si visité, rempli avec la couleur du groupe, texte blanc
+            inlineStyle += ` background-color: ${baseColor}; color: white;`;
+        } else {
+            // Sinon, fond blanc et icone couleur du groupe
+            inlineStyle += ` background-color: white; color: ${baseColor};`;
         }
+        
+        // Wishlist ne change pas l'apparence
         
         const customIcon = L.divIcon({ 
             className: 'custom-category-marker', 
-            html: `<div class="${extraClass}" style="${iconColorStyle}">${catIconSvg}</div>`, 
+            html: `<div style="${inlineStyle}">${catIconSvg}</div>`, 
             iconSize: [32, 32], 
             iconAnchor: [16, 16], 
             popupAnchor: [0, -16] 
@@ -661,20 +667,28 @@ window.openDetailsPanel = function(id) {
         };
     }
 
+    // Basculer l'affichage (Masque liste, affiche détails)
     document.getElementById('sidebar-main').classList.add('hidden');
     document.getElementById('sidebar-details').classList.remove('hidden');
     
+    // Elargit la sidebar
     const sidebar = document.getElementById('app-sidebar');
     const overlay = document.getElementById('mobile-overlay');
-    if(sidebar) sidebar.classList.add('open');
+    if(sidebar) {
+        sidebar.classList.add('open');
+        sidebar.classList.add('expanded');
+    }
     if(overlay) overlay.classList.remove('hidden');
 };
 
 window.closeDetailsPanel = function() {
     const detailsPanel = document.getElementById('sidebar-details');
     const mainPanel = document.getElementById('sidebar-main');
+    const sidebar = document.getElementById('app-sidebar');
+    
     if(detailsPanel) detailsPanel.classList.add('hidden');
     if(mainPanel) mainPanel.classList.remove('hidden');
+    if(sidebar) sidebar.classList.remove('expanded'); 
 }
 
 
@@ -689,6 +703,7 @@ window.generateItinerary = function() {
     let validLocs = celebLocations.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert(t('noLocationsFound')); return; }
 
+    // Optimization basique route
     let unvisited = [...validLocs];
     let route = [unvisited.shift()]; 
     while(unvisited.length > 0) {
@@ -727,6 +742,7 @@ window.generateItinerary = function() {
         let dayHtml = `<div class="iti-day-card"><div class="iti-day-title">${t('day')} ${i + 1}</div>`;
         dayLocs.forEach((l, index) => { dayHtml += `<div class="iti-loc"><strong>${index+1}. ${l.name}</strong> <span style="color:#9CA3AF; font-size:0.8rem;">(${l.category})</span></div>`; });
         
+        // BOUTON GOOGLE MAPS SANS EMOJI ET ALIGNÉ À GAUCHE
         dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">Open in Google Maps</a></div></div>`;
         resultDiv.innerHTML += dayHtml;
     }
@@ -763,6 +779,7 @@ window.exportItineraryPDF = function() {
     html2pdf().set(opt).from(element).save().then(() => { exportBtn.style.display = 'block'; });
 };
 
+// CLOSING MODALS LOGIC SÉCURISÉE
 window.closeModal = function(id) { 
     if(document.getElementById(id)) document.getElementById(id).classList.add('hidden'); 
 };
