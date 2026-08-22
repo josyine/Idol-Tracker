@@ -18,9 +18,9 @@
         .progress-bar-fill { height: 100%; background-color: #10b981; border-radius: 10px; transition: width 0.5s ease; }
         
         .visited-list { list-style: none; padding: 0; }
-        .visited-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; }
-        .visited-item:last-child { border-bottom: none; }
-        .loc-name { font-weight: bold; color: #D94680; font-size: 1.1rem;}
+        .visited-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; transition: 0.2s; border-radius: 8px;}
+        .visited-item:hover { background: #f8fafc; }
+        .loc-name { font-weight: bold; color: #D94680; font-size: 1.1rem; text-decoration: underline;}
         .loc-group { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold;}
         .loc-date { font-size: 0.85rem; color: #94a3b8; }
     </style>
@@ -36,7 +36,6 @@
         <ul id="visited-list" class="visited-list"></ul>
     </div>
 
-    <!-- On charge Leaflet juste pour éviter les erreurs de script.js, puis le script -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script> 
     <script>
@@ -67,7 +66,7 @@
                                     <span>${percentage}% (${visitedCount}/${totalLocsInGroup})</span>
                                 </div>
                                 <div class="progress-bar-bg">
-                                    <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
+                                    <div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${groupColors[group] || '#10b981'};"></div>
                                 </div>
                             </div>
                         `;
@@ -78,7 +77,7 @@
                     const loc = celebLocations.find(l => l.id === v.id);
                     if(loc) {
                         listContainer.innerHTML += `
-                            <li class="visited-item">
+                            <li class="visited-item" style="cursor: pointer;" onclick="window.location.href='map.html?locId=${loc.id}'">
                                 <div>
                                     <div class="loc-name">${loc.name}</div>
                                     <div class="loc-group">${loc.group} • ${loc.city}</div>
