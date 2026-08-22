@@ -79,41 +79,48 @@ const dict = {
 };
 
 // ==========================================
-// TRADUCTIONS ET UI
+// 1. TRADUCTIONS ET UI
 // ==========================================
 function updateLangUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if(dict[currentLang][key]) {
-            el.innerHTML = dict[currentLang][key]; // innerHTML permet de garder les <br>
+            el.innerHTML = dict[currentLang][key]; 
         }
     });
-    updatePrice();
+    updatePrice(); // Met à jour la devise/le texte du bouton payer
 }
 
-const langBtn = document.getElementById('lang-btn');
-if (langBtn) {
-    langBtn.addEventListener('click', (e) => {
-        document.getElementById('lang-menu').classList.toggle('hidden');
-        e.stopPropagation();
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // Menu des langues
+    const langBtn = document.getElementById('lang-btn');
+    if (langBtn) {
+        langBtn.addEventListener('click', (e) => {
+            const lMenu = document.getElementById('lang-menu');
+            if(lMenu) lMenu.classList.toggle('hidden');
+            e.stopPropagation();
+        });
+    }
 
-document.addEventListener('click', () => { 
-    const langMenu = document.getElementById('lang-menu');
-    if (langMenu) langMenu.classList.add('hidden'); 
-});
-
-document.querySelectorAll('.lang-option').forEach(opt => {
-    opt.addEventListener('click', function() {
-        currentLang = this.getAttribute('data-lang');
-        localStorage.setItem('lang', currentLang);
-        updateLangUI();
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentLang = this.getAttribute('data-lang');
+            localStorage.setItem('lang', currentLang);
+            updateLangUI();
+        });
     });
+
+    document.addEventListener('click', () => { 
+        const langMenu = document.getElementById('lang-menu');
+        if (langMenu) langMenu.classList.add('hidden'); 
+    });
+
+    updateLangUI();
 });
 
 // ==========================================
-// GESTION DE LA MODALE D'AUTHENTIFICATION
+// 2. GESTION DE LA MODALE D'AUTHENTIFICATION
 // ==========================================
 const modal = document.getElementById('auth-modal');
 const step1 = document.getElementById('auth-step-1');
@@ -121,75 +128,108 @@ const step2 = document.getElementById('auth-step-2');
 const step3 = document.getElementById('auth-step-3');
 
 function showStep(step) {
-    step1.classList.add('hidden'); 
-    step2.classList.add('hidden'); 
-    step3.classList.add('hidden');
-    if(step === 1) step1.classList.remove('hidden');
-    if(step === 2) step2.classList.remove('hidden');
-    if(step === 3) step3.classList.remove('hidden');
+    if(step1) step1.classList.add('hidden'); 
+    if(step2) step2.classList.add('hidden'); 
+    if(step3) step3.classList.add('hidden');
+    
+    if(step === 1 && step1) step1.classList.remove('hidden');
+    if(step === 2 && step2) step2.classList.remove('hidden');
+    if(step === 3 && step3) {
+        step3.classList.remove('hidden');
+        // Optionnel : Scroll tout en haut du formulaire de paiement
+        document.querySelector('.auth-left').scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
+// Ouvrir la modale
 document.querySelectorAll('.open-auth-btn').forEach(btn => {
     btn.addEventListener('click', () => { 
-        modal.classList.remove('hidden'); 
+        if(modal) modal.classList.remove('hidden'); 
         showStep(1); 
     });
 });
 
-document.getElementById('close-auth').addEventListener('click', () => { 
-    modal.classList.add('hidden'); 
-});
+// Fermer la modale
+const closeAuth = document.getElementById('close-auth');
+if(closeAuth) {
+    closeAuth.addEventListener('click', () => { 
+        if(modal) modal.classList.add('hidden'); 
+    });
+}
 
-document.getElementById('btn-to-email').addEventListener('click', () => { showStep(2); });
-document.getElementById('btn-back-1').addEventListener('click', () => { showStep(1); });
+// Naviguer entre les étapes
+const btnToEmail = document.getElementById('btn-to-email');
+if(btnToEmail) {
+    btnToEmail.addEventListener('click', () => { showStep(2); });
+}
+
+const btnBack1 = document.getElementById('btn-back-1');
+if(btnBack1) {
+    btnBack1.addEventListener('click', () => { showStep(1); });
+}
+
+const btnBack2 = document.getElementById('btn-back-2');
+if(btnBack2) {
+    btnBack2.addEventListener('click', () => { showStep(2); });
+}
 
 // ==========================================
-// LOGIQUE DE CONNEXION INTELLIGENTE
+// 3. LOGIQUE DE CONNEXION INTELLIGENTE (ÉTAPE 2 -> 3)
 // ==========================================
-document.getElementById('btn-to-details').addEventListener('click', () => { 
-    const emailInput = document.getElementById('user-email');
-    const emailVal = emailInput.value.trim().toLowerCase();
-    
-    if(emailInput.checkValidity()) {
-        const savedEmail = localStorage.getItem('userEmail');
+const btnToDetails = document.getElementById('btn-to-details');
+if(btnToDetails) {
+    btnToDetails.addEventListener('click', () => { 
+        const emailInput = document.getElementById('user-email');
+        if(!emailInput) return;
         
-        // Si l'email correspond à celui déjà sauvegardé et qu'il a déjà des groupes débloqués
-        if (savedEmail && emailVal === savedEmail.toLowerCase() && localStorage.getItem('unlockedGroups')) {
-            // L'utilisateur existe déjà : Connexion directe !
-            document.getElementById('btn-to-details').textContent = "Logging in...";
-            setTimeout(() => {
-                window.location.href = 'map.html';
-            }, 800);
+        const emailVal = emailInput.value.trim().toLowerCase();
+        
+        if(emailInput.checkValidity()) {
+            const savedEmail = localStorage.getItem('userEmail');
+            
+            // L'utilisateur existe déjà
+            if (savedEmail && emailVal === savedEmail.toLowerCase() && localStorage.getItem('unlockedGroups')) {
+                btnToDetails.textContent = "Logging in...";
+                setTimeout(() => {
+                    window.location.href = 'map.html';
+                }, 800);
+            } else {
+                // Nouvel utilisateur : Passe à l'étape 3 (Paiement)
+                localStorage.removeItem('userProfilePic'); 
+                localStorage.setItem('userEmail', emailVal);
+                showStep(3);
+            }
         } else {
-            // Nouvel utilisateur : Passe à l'étape 3 (Paiement)
-            localStorage.removeItem('userProfilePic'); 
-            localStorage.setItem('userEmail', emailVal);
-            showStep(3);
+            emailInput.reportValidity();
         }
-    } else {
-        emailInput.reportValidity();
-    }
-});
-document.getElementById('btn-back-2').addEventListener('click', () => { showStep(2); });
-
+    });
+}
 
 // ==========================================
-// POPUP GOOGLE ET FACEBOOK (SIMULATION)
+// 4. POPUP GOOGLE ET FACEBOOK
 // ==========================================
 window.openGooglePopup = function() {
-    document.getElementById('google-auth-popup').classList.remove('hidden');
+    const popup = document.getElementById('google-auth-popup');
+    if(popup) popup.classList.remove('hidden');
 };
 
 window.completeGoogleLogin = function() {
-    document.getElementById('google-auth-popup').classList.add('hidden');
+    const popup = document.getElementById('google-auth-popup');
+    if(popup) popup.classList.add('hidden');
     
-    // Si c'est un compte existant via Google, on le connecte direct
     if(localStorage.getItem('userEmail') === 'jane.doe@gmail.com' && localStorage.getItem('unlockedGroups')) {
         window.location.href = 'map.html';
     } else {
-        // Sinon, création de compte
         localStorage.setItem('userEmail', 'jane.doe@gmail.com');
         localStorage.setItem('userName', 'Jane Doe');
+        
+        // On pré-remplit les champs de l'étape 3 si on vient de Google
+        const fnameInput = document.getElementById('fname');
+        const lnameInput = document.getElementById('lname');
+        if(fnameInput) fnameInput.value = "Jane";
+        if(lnameInput) lnameInput.value = "Doe";
+        
+        if(modal) modal.classList.remove('hidden');
         showStep(3);
     }
 };
@@ -202,16 +242,19 @@ window.simulateFacebookLogin = function() {
 
 
 // ==========================================
-// GESTION DU PANIER ET DU PAIEMENT
+// 5. GESTION DU PAIEMENT ET DES CHECKBOXES (ÉTAPE 3)
 // ==========================================
 const checkboxes = document.querySelectorAll('.group-checkbox');
 const priceDisplay = document.getElementById('price-display');
 const payBtn = document.getElementById('pay-btn');
 
 function updatePrice() {
+    if(!priceDisplay || !payBtn) return;
+    
     const selectedCount = document.querySelectorAll('.group-checkbox:checked').length;
     const totalPrice = selectedCount * PRICE_PER_GROUP;
     priceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
+    
     if (selectedCount > 0) {
         payBtn.disabled = false;
         payBtn.textContent = dict[currentLang].payBtnActive.replace('{price}', totalPrice.toFixed(2));
@@ -220,45 +263,56 @@ function updatePrice() {
         payBtn.textContent = dict[currentLang].payBtnEmpty;
     }
 }
-checkboxes.forEach(cb => cb.addEventListener('change', updatePrice));
 
-document.getElementById('checkout-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
-    if(checkedBoxes.length === 0) return;
-
-    // Enregistrement du nom
-    const fname = document.getElementById('fname').value;
-    const lname = document.getElementById('lname').value;
-    if(fname) localStorage.setItem('userName', `${fname} ${lname}`);
-
-    // Déblocage des groupes
-    let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    checkedBoxes.forEach(cb => {
-        if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value);
-    });
-    localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
-
-    // Animation et redirection
-    payBtn.style.display = 'none';
-    document.getElementById('payment-loader').classList.remove('hidden');
-    
-    setTimeout(() => { window.location.href = 'map.html'; }, 2000);
+checkboxes.forEach(cb => {
+    cb.addEventListener('change', updatePrice);
 });
 
+const checkoutForm = document.getElementById('checkout-form');
+if(checkoutForm) {
+    checkoutForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
+        if(checkedBoxes.length === 0) return;
+
+        // Enregistrement du nom
+        const fname = document.getElementById('fname').value;
+        const lname = document.getElementById('lname').value;
+        if(fname) localStorage.setItem('userName', `${fname} ${lname}`);
+
+        // Déblocage des groupes
+        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        checkedBoxes.forEach(cb => {
+            if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value);
+        });
+        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+
+        // Animation de paiement
+        payBtn.style.display = 'none';
+        const paymentLoader = document.getElementById('payment-loader');
+        if(paymentLoader) paymentLoader.classList.remove('hidden');
+        
+        setTimeout(() => { window.location.href = 'map.html'; }, 2000);
+    });
+}
+
 // ==========================================
-// BANNIÈRE DES COOKIES
+// 6. BANNIÈRE DES COOKIES
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted')) { 
-    document.getElementById('cookie-banner').classList.remove('hidden'); 
+    const cBanner = document.getElementById('cookie-banner');
+    if(cBanner) cBanner.classList.remove('hidden'); 
 }
 function closeCookies() { 
     localStorage.setItem('cookiesAccepted', 'true'); 
-    document.getElementById('cookie-banner').classList.add('hidden'); 
+    const cBanner = document.getElementById('cookie-banner');
+    if(cBanner) cBanner.classList.add('hidden'); 
 }
-document.getElementById('cookie-accept').addEventListener('click', closeCookies);
-document.getElementById('cookie-reject').addEventListener('click', closeCookies);
-document.getElementById('cookie-manage').addEventListener('click', () => { window.location.href = 'settings.html'; });
 
-// Initialisation UI au chargement
-updateLangUI();
+const cookieAccept = document.getElementById('cookie-accept');
+const cookieReject = document.getElementById('cookie-reject');
+const cookieManage = document.getElementById('cookie-manage');
+
+if(cookieAccept) cookieAccept.addEventListener('click', closeCookies);
+if(cookieReject) cookieReject.addEventListener('click', closeCookies);
+if(cookieManage) cookieManage.addEventListener('click', () => { window.location.href = 'legal.html#confidentialite'; });
