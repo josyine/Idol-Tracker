@@ -20,7 +20,7 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 
 /* Sidebar principale */
 .sidebar { width: 360px; flex-shrink: 0; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--sidebar-bg); position: relative; overflow: hidden; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 1000; border-right: 1px solid rgba(0,0,0,0.05);}
-.sidebar.expanded { width: 480px; padding: 0; } /* Padding 0 pour que le hero touche les bords */
+.sidebar.expanded { width: 480px; padding: 0; }
 
 .blob { position: absolute; border-radius: 50%; filter: blur(40px); pointer-events: none; z-index: 0; }
 .blob-1 { top: -60px; left: -60px; width: 220px; height: 220px; background: radial-gradient(circle,rgba(212,39,89,.15),transparent 70%); animation: bm1 15s ease-in-out infinite; }
@@ -68,7 +68,7 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .loc-name { font-size: 13px; font-weight: 600; color: #1e293b; }
 
 /* ==========================================================
-   STYLE DU NOUVEAU PANNEAU DE DÉTAIL (TYPE IN THE SOOP)
+   STYLE DU PANNEAU DE DÉTAIL (TYPE IN THE SOOP)
    ========================================================== */
 #sidebar-details { height: 100%; display: flex; flex-direction: column; overflow-y: auto; background: #fff; padding: 0; }
 #sidebar-details::-webkit-scrollbar { width: 6px; }
