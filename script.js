@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION DE LA CARTE (SÉCURISÉE)
+// 1. INITIALISATION DE LA CARTE
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -11,8 +11,16 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     markerGroup = L.layerGroup().addTo(map);
 }
 
+// Mobile Menu Toggle
+window.toggleMobileMenu = function() {
+    const sidebar = document.getElementById('app-sidebar');
+    const overlay = document.getElementById('mobile-overlay');
+    if(sidebar) sidebar.classList.toggle('open');
+    if(overlay) overlay.classList.toggle('hidden');
+};
+
 // ==========================================
-// 2. DONNÉES (ICONES & LIEUX)
+// 2. DONNÉES (ICONES, COULEURS & LIEUX)
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>`,
@@ -29,9 +37,19 @@ const iconsSVG = {
 };
 const mapPinSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
+const groupColors = {
+    "BTS": "#8b5cf6",       
+    "Blackpink": "#ec4899", 
+    "Twice": "#f43f5e",     
+    "Seventeen": "#3b82f6", 
+    "Katseye": "#10b981",   
+    "TXT": "#f59e0b"        
+};
+
 const filterData = {
     "BTS": { members: ["Namjoon", "Jin", "Suga", "JHope", "Jimin", "V", "Jungkook"], categories: ["Run BTS", "Bon Voyage", "Museums", "Restaurants", "Cafe", "MV Location", "Concerts", "Fashion", "Landmarks"] },
-    "Blackpink": { members: ["Jisoo", "Jennie", "Rosé", "Lisa"], categories: ["Cafe", "Restaurants", "MV Location", "Pop-up Store", "Concerts", "Fashion"] }
+    "Blackpink": { members: ["Jisoo", "Jennie", "Rosé", "Lisa"], categories: ["Cafe", "Restaurants", "MV Location", "Pop-up Store", "Concerts", "Fashion"] },
+    "General": { categories: ["Cafe", "Concerts", "Fashion", "Landmarks", "Museums", "Restaurants", "Pop-up Store"] }
 };
 
 let celebLocations = [
@@ -208,7 +226,7 @@ const translations = {
         itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay. We will generate an optimized route for you!",
         itiGroup: "Group", itiCountry: "Country", itiDays: "Number of Days", itiCreateBtn: "Create My Guide",
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allCats: "All Categories",
-        moreDetails: "More details", day: "Day", noLocationsFound: "Not enough locations found for this selection.", openRouteMap: "Open Route in Google Maps", searchPlaceholder: "Search a location, city, context...",
+        moreDetails: "More details", day: "Day", noLocationsFound: "Not enough locations found for this selection.", openRouteMap: "Open in Google Maps", searchPlaceholder: "Search a location, city, context...",
         cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
     },
     fr: {
@@ -223,7 +241,7 @@ const translations = {
         itiTitle: "Générateur d'Itinéraire", itiDesc: "Choisissez un groupe, un pays, et le nombre de jours. Nous vous créons un parcours optimisé !",
         itiGroup: "Groupe", itiCountry: "Pays", itiDays: "Nombre de Jours", itiCreateBtn: "Créer Mon Guide",
         allGroups: "Tous les Groupes", allMembers: "Tous les Membres", allAreas: "Toutes les Régions", allCats: "Toutes les Catégories",
-        moreDetails: "Plus de détails", day: "Jour", noLocationsFound: "Pas assez de lieux trouvés pour cette sélection.", openRouteMap: "Ouvrir l'itinéraire Google Maps", searchPlaceholder: "Rechercher un lieu, une ville...",
+        moreDetails: "Plus de détails", day: "Jour", noLocationsFound: "Pas assez de lieux trouvés pour cette sélection.", openRouteMap: "Ouvrir dans Google Maps", searchPlaceholder: "Rechercher un lieu, une ville...",
         cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
     }
 };
@@ -312,7 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(pMenu) pMenu.classList.add('hidden');
     });
 
-    // Cart Form event listener
     const cartForm = document.getElementById('cart-form');
     if (cartForm) {
         cartForm.addEventListener('submit', function(e) {
@@ -333,7 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// CART FUNCTIONS (Globally accessible)
 window.openCartModal = function() {
     const cartModal = document.getElementById('cart-modal');
     if(!cartModal) return;
@@ -393,7 +409,7 @@ document.querySelectorAll('.cart-checkbox').forEach(cb => {
 
 
 // ==========================================
-// 5. MAP LOGIC & FILTERING
+// 5. LOGIQUE FILTRES & CATEGORIES
 // ==========================================
 const unlockedGroupsStr = localStorage.getItem('unlockedGroups');
 if (unlockedGroupsStr) {
@@ -439,22 +455,25 @@ function initializeFilters() {
         if(countrySelect) countrySelect.innerHTML += `<option value="${country}">${country}</option>`;
     });
 
+    let catsToShow = [];
     if (selectedGroup !== "All" && filterData[selectedGroup]) {
         if(memberSelect) filterData[selectedGroup].members.forEach(member => { memberSelect.innerHTML += `<option value="${member}">${member}</option>`; });
-        if(categoryButtonsContainer) filterData[selectedGroup].categories.forEach(cat => { categoryButtonsContainer.innerHTML += `<button class="filter-btn" data-cat="${cat}">${cat}</button>`; });
+        catsToShow = filterData[selectedGroup].categories;
     } else {
-        const allCats = [...new Set(filteredByGroup.map(l => l.category))].sort();
-        if(categoryButtonsContainer) allCats.forEach(cat => { categoryButtonsContainer.innerHTML += `<button class="filter-btn" data-cat="${cat}">${cat}</button>`; });
+        catsToShow = filterData["General"].categories;
     }
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            activeCategory = this.getAttribute('data-cat');
-            renderLocations();
+    if(categoryButtonsContainer) {
+        catsToShow.forEach(cat => { categoryButtonsContainer.innerHTML += `<button class="filter-btn" data-cat="${cat}">${cat}</button>`; });
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                activeCategory = this.getAttribute('data-cat');
+                renderLocations();
+            });
         });
-    });
+    }
 }
 
 if(groupSelect) groupSelect.addEventListener('change', () => { initializeFilters(); renderLocations(); });
@@ -463,6 +482,9 @@ if(yearSelect) yearSelect.addEventListener('change', renderLocations);
 if(countrySelect) countrySelect.addEventListener('change', renderLocations);
 if(searchInput) searchInput.addEventListener('input', renderLocations);
 
+// ==========================================
+// 6. AFFICHAGE DES LIEUX (CARTE ET LISTE)
+// ==========================================
 function renderLocations() {
     if(!groupSelect || !map || !markerGroup) return; 
     markerGroup.clearLayers();
@@ -505,19 +527,21 @@ function renderLocations() {
         const isVisited = visitedData.some(v => v.id === loc.id || v === loc.id);
         const isWishlist = wishlistData.some(w => w.id === loc.id || w === loc.id);
         
-        let iconColorStyle = '';
+        const baseColor = groupColors[loc.group] || '#334e68';
+        let iconColorStyle = `border-color: ${baseColor}; color: ${baseColor};`;
         let extraClass = '';
+
         if(isVisited) {
-            iconColorStyle = `style="border-color: #10b981; color: #10b981;"`;
+            iconColorStyle = `border-color: #34d399; color: #34d399;`;
             extraClass = 'visited-marker-div';
         } else if (isWishlist) {
-            iconColorStyle = `style="border-color: #f59e0b; color: #f59e0b;"`;
+            iconColorStyle = `border-color: #fbbf24; color: #fbbf24;`;
             extraClass = 'wishlist-marker-div';
         }
         
         const customIcon = L.divIcon({ 
             className: 'custom-category-marker', 
-            html: `<div class="${extraClass}" ${iconColorStyle}>${catIconSvg}</div>`, 
+            html: `<div class="${extraClass}" style="${iconColorStyle}">${catIconSvg}</div>`, 
             iconSize: [32, 32], 
             iconAnchor: [16, 16], 
             popupAnchor: [0, -16] 
@@ -526,15 +550,15 @@ function renderLocations() {
         const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(markerGroup);
         mapMarkers.push(marker);
 
-        let metaHtml = `<strong>Year:</strong> ${loc.year}`;
+        let metaHtml = `<strong>Group:</strong> ${loc.group} <br><strong>Member:</strong> ${loc.member} <br><strong>Year:</strong> ${loc.year}`;
         if(loc.episode) { metaHtml += ` <br><strong>Ep:</strong> ${loc.episode}`; }
         const popupContent = `
-            <div class="popup-title" onclick="window.openModal(${loc.id}); event.stopPropagation();">${loc.name}</div>
+            <div class="popup-title" onclick="window.openDetailsPanel(${loc.id}); event.stopPropagation();">${loc.name}</div>
             <span class="popup-tag">${catIconSvg} ${loc.category}</span>
             <img src="${loc.img}" alt="${loc.name}" class="popup-img" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
             <div class="popup-context">"${getLocText(loc.context)}"</div>
             <div class="popup-meta">${metaHtml}</div>
-            <button type="button" onclick="window.openModal(${loc.id}); event.stopPropagation();" style="width:100%; padding:8px; background:var(--primary-magenta); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">${t('moreDetails')}</button>
+            <button type="button" onclick="window.openDetailsPanel(${loc.id}); event.stopPropagation();" style="width:100%; padding:8px; background:var(--primary-magenta); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">${t('moreDetails')}</button>
         `;
         marker.bindPopup(popupContent);
 
@@ -558,32 +582,35 @@ if(document.getElementById('search-input')) {
 }
 
 // ==========================================
-// 8. DETAILS MODAL (AVEC CHECKBOXES)
+// 7. PANNEAU DE DÉTAILS LATÉRAL (DETAILS)
 // ==========================================
-window.openModal = function(id) {
+window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
-    document.getElementById('modal-title').textContent = loc.name;
-    document.getElementById('modal-desc').innerHTML = getLocText(loc.fullDescription); 
-    document.getElementById('modal-directions').textContent = getLocText(loc.directions);
-    document.getElementById('modal-group').textContent = loc.group;
-    document.getElementById('modal-member').textContent = loc.member === "All" ? t('allMembers') : loc.member;
-    document.getElementById('modal-country').textContent = loc.country;
-    document.getElementById('modal-city').textContent = loc.city;
-    document.getElementById('modal-full-address').textContent = loc.address;
-    document.getElementById('modal-date').textContent = loc.year;
+    
+    const titleEl = document.getElementById('details-title');
+    if(!titleEl) return; 
 
-    if (loc.episode) { document.getElementById('modal-episode').textContent = loc.episode; document.getElementById('modal-episode-container').style.display = 'block'; } else { document.getElementById('modal-episode-container').style.display = 'none'; }
-    if (loc.episodeLink) { document.getElementById('modal-episode-link').href = loc.episodeLink; document.getElementById('modal-link-container').style.display = 'block'; } else { document.getElementById('modal-link-container').style.display = 'none'; }
-    document.getElementById('modal-address').textContent = `${loc.address}, ${loc.city}`;
-    document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+    titleEl.textContent = loc.name;
+    document.getElementById('details-desc').innerHTML = getLocText(loc.fullDescription); 
+    document.getElementById('details-directions').textContent = getLocText(loc.directions);
+    document.getElementById('details-group').textContent = loc.group;
+    document.getElementById('details-member').textContent = loc.member === "All" ? t('allMembers') : loc.member;
+    document.getElementById('details-country').textContent = loc.country;
+    document.getElementById('details-city').textContent = loc.city;
+    document.getElementById('details-full-address').textContent = loc.address;
+    document.getElementById('details-date').textContent = loc.year;
+
+    if (loc.episode) { document.getElementById('details-episode').textContent = loc.episode; document.getElementById('details-episode-container').style.display = 'block'; } else { document.getElementById('details-episode-container').style.display = 'none'; }
+    if (loc.episodeLink) { document.getElementById('details-episode-link').href = loc.episodeLink; document.getElementById('details-link-container').style.display = 'block'; } else { document.getElementById('details-link-container').style.display = 'none'; }
+    document.getElementById('details-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
     const tipText = getLocText(loc.tip);
-    const tipSection = document.getElementById('modal-tip-section');
-    if (tipText) { document.getElementById('modal-tip').textContent = tipText; if(tipSection) tipSection.classList.remove('hidden'); } else { if(tipSection) tipSection.classList.add('hidden'); }
+    const tipSection = document.getElementById('details-tip-section');
+    if (tipText) { document.getElementById('details-tip').textContent = tipText; if(tipSection) tipSection.classList.remove('hidden'); } else { if(tipSection) tipSection.classList.add('hidden'); }
 
-    const galleryContainer = document.getElementById('modal-gallery');
-    const gallerySection = document.getElementById('modal-gallery-section');
+    const galleryContainer = document.getElementById('details-gallery');
+    const gallerySection = document.getElementById('details-gallery-section');
     if (galleryContainer && gallerySection) {
         galleryContainer.innerHTML = ""; 
         if(loc.gallery && loc.gallery.length > 0) {
@@ -596,8 +623,8 @@ window.openModal = function(id) {
         } else { gallerySection.classList.add('hidden'); }
     }
 
-    const videoContainer = document.getElementById('modal-video-container');
-    const videoSection = document.getElementById('modal-video-section');
+    const videoContainer = document.getElementById('details-video-container');
+    const videoSection = document.getElementById('details-video-section');
     if (videoContainer && videoSection) {
         videoContainer.innerHTML = ""; 
         if (loc.videoEmbeds && loc.videoEmbeds.length > 0) {
@@ -606,101 +633,54 @@ window.openModal = function(id) {
         } else { videoSection.classList.add('hidden'); }
     }
     
-    const visitedCheckbox = document.getElementById('modal-visited');
+    const visitedCheckbox = document.getElementById('details-visited');
     if(visitedCheckbox) {
         let visitedLocs = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
         visitedCheckbox.checked = visitedLocs.some(v => v.id === loc.id || v === loc.id);
-        
         visitedCheckbox.onchange = function() {
             let vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
             if(this.checked) {
-                if(!vList.some(v => v.id === loc.id || v === loc.id)) {
-                    vList.push({id: loc.id, date: new Date().toLocaleDateString()});
-                }
-            } else {
-                vList = vList.filter(v => v.id !== loc.id && v !== loc.id);
-            }
+                if(!vList.some(v => v.id === loc.id || v === loc.id)) { vList.push({id: loc.id, date: new Date().toLocaleDateString()}); }
+            } else { vList = vList.filter(v => v.id !== loc.id && v !== loc.id); }
             localStorage.setItem('visitedLocs', JSON.stringify(vList));
             renderLocations(); 
         };
     }
 
-    const wishlistCheckbox = document.getElementById('modal-wishlist');
+    const wishlistCheckbox = document.getElementById('details-wishlist');
     if (wishlistCheckbox) {
         let wishlistLocs = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
         wishlistCheckbox.checked = wishlistLocs.some(w => w.id === loc.id || w === loc.id);
-        
         wishlistCheckbox.onchange = function() {
             let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
             if(this.checked) {
-                if(!wList.some(w => w.id === loc.id || w === loc.id)) {
-                    wList.push({id: loc.id, date: new Date().toLocaleDateString()});
-                }
-            } else {
-                wList = wList.filter(w => w.id !== loc.id && w !== loc.id);
-            }
+                if(!wList.some(w => w.id === loc.id || w === loc.id)) { wList.push({id: loc.id, date: new Date().toLocaleDateString()}); }
+            } else { wList = wList.filter(w => w.id !== loc.id && w !== loc.id); }
             localStorage.setItem('wishlistLocs', JSON.stringify(wList));
             renderLocations();
         };
     }
 
-    const detailsModal = document.getElementById('details-modal');
-    if(detailsModal) detailsModal.classList.remove('hidden');
+    document.getElementById('sidebar-main').classList.add('hidden');
+    document.getElementById('sidebar-details').classList.remove('hidden');
+    
+    const sidebar = document.getElementById('app-sidebar');
+    const overlay = document.getElementById('mobile-overlay');
+    if(sidebar) sidebar.classList.add('open');
+    if(overlay) overlay.classList.remove('hidden');
 };
 
-window.closeModal = function(id) { 
-    if(document.getElementById(id)) document.getElementById(id).classList.add('hidden'); 
-    if (id === 'details-modal') {
-        const vidContainer = document.getElementById('modal-video-container');
-        if(vidContainer) vidContainer.innerHTML = ""; 
-    }
-};
-
-window.onclick = function(event) { 
-    if (event.target === document.getElementById('details-modal')) window.closeModal('details-modal'); 
-    if (event.target === document.getElementById('itinerary-modal')) window.closeModal('itinerary-modal'); 
-    if (event.target === document.getElementById('cart-modal')) window.closeModal('cart-modal'); 
-};
-
-// ==========================================
-// 9. ITINERARY GENERATOR & EXPORT
-// ==========================================
-let itiLeafletMap = null;
-let itiLayerGroup = null;
-
-const btnOpenIti = document.getElementById('open-itinerary-btn');
-if(btnOpenIti) {
-    btnOpenIti.addEventListener('click', () => {
-        const itiGroup = document.getElementById('iti-group');
-        const itiCountry = document.getElementById('iti-country');
-        
-        const availableGroups = [...new Set(celebLocations.map(l => l.group))].sort();
-        itiGroup.innerHTML = ''; availableGroups.forEach(g => { itiGroup.innerHTML += `<option value="${g}">${g}</option>`; });
-        itiCountry.innerHTML = ''; [...new Set(celebLocations.map(l => l.country))].sort().forEach(c => { itiCountry.innerHTML += `<option value="${c}">${c}</option>`; });
-        
-        document.getElementById('iti-result').classList.add('hidden');
-        document.getElementById('iti-form').classList.remove('hidden');
-        document.getElementById('itinerary-modal').classList.remove('hidden');
-    });
+window.closeDetailsPanel = function() {
+    const detailsPanel = document.getElementById('sidebar-details');
+    const mainPanel = document.getElementById('sidebar-main');
+    if(detailsPanel) detailsPanel.classList.add('hidden');
+    if(mainPanel) mainPanel.classList.remove('hidden');
 }
 
-function optimizeRoute(locations) {
-    if(locations.length <= 1) return locations;
-    let unvisited = [...locations];
-    let route = [unvisited.shift()]; 
-    while(unvisited.length > 0) {
-        let lastLoc = route[route.length - 1];
-        let nearestIdx = 0;
-        let minDist = Infinity;
-        for(let i=0; i<unvisited.length; i++) {
-            let d = Math.hypot(lastLoc.lat - unvisited[i].lat, lastLoc.lng - unvisited[i].lng);
-            if(d < minDist) { minDist = d; nearestIdx = i; }
-        }
-        route.push(unvisited.splice(nearestIdx, 1)[0]);
-    }
-    return route;
-}
 
+// ==========================================
+// 8. ITINERARY GENERATOR & EXPORT
+// ==========================================
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
     const country = document.getElementById('iti-country').value;
@@ -709,7 +689,18 @@ window.generateItinerary = function() {
     let validLocs = celebLocations.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert(t('noLocationsFound')); return; }
 
-    validLocs = optimizeRoute(validLocs);
+    let unvisited = [...validLocs];
+    let route = [unvisited.shift()]; 
+    while(unvisited.length > 0) {
+        let lastLoc = route[route.length - 1];
+        let nearestIdx = 0; let minDist = Infinity;
+        for(let i=0; i<unvisited.length; i++) {
+            let d = Math.hypot(lastLoc.lat - unvisited[i].lat, lastLoc.lng - unvisited[i].lng);
+            if(d < minDist) { minDist = d; nearestIdx = i; }
+        }
+        route.push(unvisited.splice(nearestIdx, 1)[0]);
+    }
+    validLocs = route;
 
     const resultDiv = document.getElementById('iti-days-list');
     resultDiv.innerHTML = "";
@@ -736,11 +727,11 @@ window.generateItinerary = function() {
         let dayHtml = `<div class="iti-day-card"><div class="iti-day-title">${t('day')} ${i + 1}</div>`;
         dayLocs.forEach((l, index) => { dayHtml += `<div class="iti-loc"><strong>${index+1}. ${l.name}</strong> <span style="color:#9CA3AF; font-size:0.8rem;">(${l.category})</span></div>`; });
         
-        dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">🗺️ ${t('openRouteMap')}</a></div></div>`;
+        dayHtml += `<div style="text-align: left;"><a href="${mapLink}" target="_blank" class="subtle-btn" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:0.85rem; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; text-decoration:none; font-weight:600; background:white; transition:all 0.2s;">Open in Google Maps</a></div></div>`;
         resultDiv.innerHTML += dayHtml;
     }
 
-    document.getElementById('iti-form').classList.remove('hidden'); // Formulaire toujours visible
+    document.getElementById('iti-form').classList.remove('hidden'); 
     document.getElementById('iti-result').classList.remove('hidden');
 
     if(!itiLeafletMap) {
@@ -768,21 +759,21 @@ window.exportItineraryPDF = function() {
     const exportBtn = document.getElementById('export-pdf-btn');
     exportBtn.style.display = 'none';
 
-    const opt = {
-      margin:       10,
-      filename:     'ScreenToStreet_Guide.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+    const opt = { margin: 10, filename: 'ScreenToStreet_Guide.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+    html2pdf().set(opt).from(element).save().then(() => { exportBtn.style.display = 'block'; });
+};
 
-    html2pdf().set(opt).from(element).save().then(() => {
-        exportBtn.style.display = 'block';
-    });
+window.closeModal = function(id) { 
+    if(document.getElementById(id)) document.getElementById(id).classList.add('hidden'); 
+};
+
+window.onclick = function(event) { 
+    if (event.target === document.getElementById('itinerary-modal')) window.closeModal('itinerary-modal'); 
+    if (event.target === document.getElementById('cart-modal')) window.closeModal('cart-modal'); 
 };
 
 // ==========================================
-// 10. COOKIES LOGIC
+// 9. COOKIES LOGIC
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
@@ -795,5 +786,3 @@ const btnAccept = document.getElementById('cookie-accept');
 if(btnAccept) btnAccept.addEventListener('click', closeCookies);
 const btnReject = document.getElementById('cookie-reject');
 if(btnReject) btnReject.addEventListener('click', closeCookies);
-const btnManage = document.getElementById('cookie-manage');
-if(btnManage) btnManage.addEventListener('click', () => { window.location.href = 'settings.html'; });
