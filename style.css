@@ -14,10 +14,12 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .dropdown-option:last-child { border-bottom: none; }
 .dropdown-option:hover { background: #f1f5f9; color: var(--primary-magenta); }
 
-/* Sidebar & Structure (Ajout de la transition et classe 'expanded') */
+/* Sidebar & Structure */
 .app-container { display: flex; flex: 1; overflow: hidden; }
 .sidebar { width: 420px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.03); z-index: 1000; position: relative; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);}
-.sidebar.expanded { width: 550px; }
+
+/* LA FENÊTRE EST PLUS GRANDE ICI */
+.sidebar.expanded { width: 680px; }
 
 .site-logo { width: 100%; max-width: 230px; height: auto; display: block; margin-bottom: 10px; }
 
@@ -72,7 +74,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .stat-item span { color: var(--primary-magenta); font-weight: 800; font-size: 1rem; margin-right: 4px;}
 .stat-divider { width: 1px; height: 20px; background-color: var(--border-color); }
 
-/* CUSTOM MARKERS (Variables CSS pour gérer le survol et le clic) */
+/* CUSTOM MARKERS */
 .custom-category-marker div { 
     border-radius: 50%; width: 32px; height: 32px; 
     display: flex; align-items: center; justify-content: center; 
@@ -82,7 +84,6 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 }
 .custom-category-marker div svg { width: 16px; height: 16px; }
 
-/* Survol : se remplit totalement de la couleur du groupe ! */
 .custom-category-marker:hover div { 
     transform: scale(1.15) translateY(-2px); 
     background-color: var(--marker-color) !important; 
@@ -114,10 +115,12 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .modal-metadata li { margin-bottom: 8px; font-size: 0.95rem; }
 .modal-metadata strong { color: #334e68; display: inline-block; min-width: 90px; }
 #details-episode-link { color: var(--primary-magenta); text-decoration: none; font-weight: 600; }
-.modal-gallery { display: flex; gap: 15px; overflow-x: auto; margin: 20px 0; padding-bottom: 10px; }
-.modal-gallery img { height: 250px; min-width: 200px; border-radius: 12px; object-fit: cover; }
 
-.media-section { margin: 30px 0; }
+/* STYLE GOOGLE PHOTOS POUR LA GALERIE */
+.modal-gallery { display: flex; gap: 15px; overflow-x: auto; margin: 10px 0 20px 0; padding-bottom: 10px; scrollbar-width: thin; }
+.modal-gallery img { height: 200px; min-width: 260px; border-radius: 12px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+.media-section { margin: 25px 0; }
 .media-section h3 { color: #334e68; font-size: 1rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px;}
 .modal-videos { display: flex; flex-direction: column; gap: 15px; }
 .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; }
@@ -137,7 +140,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 /* MOBILE RESPONSIVENESS */
 .hamburger-btn { display: none; pointer-events: auto;}
 @media (max-width: 800px) {
-    .sidebar.expanded { width: 100%; } /* Sur mobile, l'expanded prend toute la place possible */
+    .sidebar.expanded { width: 100%; }
     .hamburger-btn { display: flex; }
     .top-nav { width: calc(100% - 20px); left: 10px; right: auto;}
     .sidebar { position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; width: 340px; max-width: 85vw; transition: 0.3s ease-in-out; border-right: none; box-shadow: 5px 0 25px rgba(0,0,0,0.2);}
