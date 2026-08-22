@@ -1,108 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Visited Places - Screen To Street</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #E7E9EC; color: #1e293b; padding: 40px; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 8px 26px rgba(80,60,120,.06); border: 1px solid #cbd5e1; }
-        h1 { color: #D42759; text-align: center; border-bottom: 2px solid #FCE7F0; padding-bottom: 15px; margin-bottom: 30px; font-weight: 700;}
-        a.back-btn { display: inline-block; margin-bottom: 20px; color: #D42759; text-decoration: none; font-weight: 600; font-size: 14px;}
-        a.back-btn:hover { text-decoration: underline; }
-        
-        /* STYLE DU SLICER / BARRE DE PROGRESSION */
-        .progress-section { margin-bottom: 40px; }
-        .group-progress { margin-bottom: 20px; }
-        .group-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; font-size: 13px; color: #334e68;}
-        .progress-bar-bg { width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; border-radius: 10px; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
-        
-        /* LISTE DES LIEUX (SANS SOULIGNEMENT) */
-        .visited-list { list-style: none; padding: 0; }
-        .visited-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; transition: 0.2s; border-radius: 8px;}
-        .visited-item:hover { background: #faf9fc; }
-        .loc-name { font-weight: 700; color: #D42759; font-size: 15px; text-decoration: none;} /* Pas de soulignement ici */
-        .loc-group { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; margin-top: 2px;}
-        .loc-date { font-size: 12px; color: #94a3b8; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen To Street — My Visited Places</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+  a{text-decoration:none;}
+  body{background:#0e0e14;padding:50px 0 100px 0; min-height: 100vh;}
+  .hidden { display: none !important; }
+
+  /* En-tête */
+  .frame{width:900px;max-width:96vw;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.4); background:linear-gradient(150deg,#FAF8FE 0%,#F1EBFA 50%,#E9DFF6 100%); padding:44px 46px 50px 46px;}
+  .back-link{color:#D42759;font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;gap:6px; cursor:pointer;}
+  .back-link:hover{text-decoration:underline;}
+  h1.pg-title{font-size:28px;font-weight:700;color:#D42759;text-align:center;}
+  .underline{width:46px;height:3px;background:#D42759;border-radius:3px;margin:14px auto 0 auto;}
+
+  /* Sections */
+  .section-card {background:#fff;border-radius:16px;box-shadow:0 8px 26px rgba(80,60,120,.1);padding:20px;margin-top:30px;}
+  .section-title {font-size:10.5px;font-weight:700;letter-spacing:.8px;color:#64748b;text-transform:uppercase;margin-bottom:14px;}
+
+  /* Barres de Progression */
+  .progress-item {margin-bottom:16px;}
+  .progress-item:last-child {margin-bottom: 0;}
+  .progress-header {display:flex;justify-content:space-between;margin-bottom:7px;}
+  .progress-header span {font-size:12.5px;font-weight:700;color:#2E3644;}
+  .progress-bg {height:8px;background:#eef0f4;border-radius:100px;overflow:hidden;}
+  .progress-fill {height:100%;border-radius:100px;transition:width 0.8s cubic-bezier(0.25, 1, 0.5, 1);}
+
+  /* Liste des Lieux */
+  .loc-item {display:flex;justify-content:space-between;align-items:center;background:#faf9fc;border-radius:12px;padding:12px 14px;margin-bottom:9px; cursor:pointer; border: 1px solid transparent; transition: 0.2s;}
+  .loc-item:hover {border-color: #D42759; background: white;}
+  .loc-left {display:flex;align-items:center;gap:11px;}
+  .loc-icon-box {width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center; flex-shrink: 0;}
+  .loc-name {font-size:13px;font-weight:700;color:#D42759;}
+  .loc-meta {font-size:10px;font-weight:700;color:#64748b; text-transform: uppercase;}
+  .loc-date {font-size:10.5px;color:#94a3b8;}
+
+  .empty-state { text-align: center; color: #64748b; font-size: 13.5px; padding: 20px; }
+
+  @media (max-width: 600px) {
+      .frame { padding: 30px 20px; }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <a href="map.html" class="back-btn">← Back to Map</a>
-        <h1>My Visited Places</h1>
-        
-        <!-- SECTION DES BARRES DE PROGRESSION -->
-        <div id="progress-container" class="progress-section"></div>
 
-        <h3 style="color: #334e68; margin-bottom: 15px; font-size: 16px; font-weight: 700;">Visited Locations</h3>
-        <ul id="visited-list" class="visited-list"></ul>
+<div class="frame">
+    <a href="map.html" class="back-link">← Back to Map</a>
+    <h1 class="pg-title" style="margin-top:20px;">My Visited Places</h1>
+    <div class="underline"></div>
+
+    <!-- Progression par groupe -->
+    <div class="section-card" id="progress-section">
+        <div class="section-title">Progress by group</div>
+        <div id="progress-container"></div>
     </div>
 
-    <!-- On charge le script principal pour accéder aux données des lieux et des couleurs -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="script.js"></script> 
+    <!-- Liste triée du plus récent au plus ancien -->
+    <div class="section-card" style="margin-top:16px;">
+        <div class="section-title">Visited Locations</div>
+        <div id="visited-list"></div>
+    </div>
+</div>
+
+<!-- On charge Leaflet (nécessaire par script.js bien qu'on ne l'affiche pas ici) et notre script de données -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script> 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Récupération des données locales
+    let visitedDataRaw = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    // Compatibilité : Si le format était juste un array d'IDs, on le convertit
+    let visitedData = visitedDataRaw.map(v => typeof v === 'number' ? {id: v, date: "Unknown Date"} : v);
     
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Récupère les lieux visités stockés (compatibilité avec l'ancien et nouveau format)
-            let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-            visitedData = visitedData.map(v => typeof v === 'number' ? {id: v, date: "Unknown Date"} : v);
+    // On inverse pour avoir du plus récent au plus ancien
+    visitedData = visitedData.reverse();
 
-            const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-            const progressContainer = document.getElementById('progress-container');
-            const listContainer = document.getElementById('visited-list');
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    
+    const progressContainer = document.getElementById('progress-container');
+    const listContainer = document.getElementById('visited-list');
 
-            if(visitedData.length === 0) {
-                listContainer.innerHTML = "<p style='color:#64748b; text-align:center; font-size: 14px;'>You haven't visited any places yet.</p>";
-            } else {
-                // 1. GÉNÉRATION DES BARRES DE PROGRESSION
-                unlockedGroups.forEach(group => {
-                    // Compte total de lieux de ce groupe dans nos données (celebLocations vient de script.js)
-                    const totalLocsInGroup = celebLocations.filter(loc => loc.group === group).length;
-                    
-                    // Compte de lieux visités appartenant à ce groupe
-                    const visitedCount = visitedData.filter(v => {
-                        const loc = celebLocations.find(l => l.id === v.id);
-                        return loc && loc.group === group;
-                    }).length;
+    // S'il n'y a aucun lieu visité
+    if(visitedData.length === 0) {
+        document.getElementById('progress-section').classList.add('hidden');
+        listContainer.innerHTML = "<div class='empty-state'>You haven't visited any places yet. Time to travel!</div>";
+        return;
+    }
 
-                    if(totalLocsInGroup > 0) {
-                        const percentage = Math.round((visitedCount / totalLocsInGroup) * 100);
-                        const gColor = groupColors[group] || '#10b981'; // Récupère la couleur du groupe depuis script.js
-                        
-                        progressContainer.innerHTML += `
-                            <div class="group-progress">
-                                <div class="group-header">
-                                    <span>${group}</span>
-                                    <span>${percentage}% (${visitedCount}/${totalLocsInGroup})</span>
-                                </div>
-                                <div class="progress-bar-bg">
-                                    <div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${gColor};"></div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
+    // 2. GÉNÉRATION DES BARRES DE PROGRESSION
+    let hasProgress = false;
+    unlockedGroups.forEach(group => {
+        const totalLocsInGroup = celebLocations.filter(loc => loc.group === group).length;
+        const visitedCount = visitedData.filter(v => {
+            const loc = celebLocations.find(l => l.id === v.id);
+            return loc && loc.group === group;
+        }).length;
 
-                // 2. GÉNÉRATION DE LA LISTE DES LIEUX VISITÉS (Liens sans soulignement)
-                visitedData.forEach(v => {
-                    const loc = celebLocations.find(l => l.id === v.id);
-                    if(loc) {
-                        listContainer.innerHTML += `
-                            <li class="visited-item" style="cursor: pointer;" onclick="window.location.href='map.html?locId=${loc.id}'">
-                                <div>
-                                    <div class="loc-name">${loc.name}</div>
-                                    <div class="loc-group">${loc.group} &middot; ${loc.city}</div>
-                                </div>
-                                <div class="loc-date">Visited: ${v.date}</div>
-                            </li>
-                        `;
-                    }
-                });
-            }
-        });
-    </script>
+        if(totalLocsInGroup > 0) {
+            hasProgress = true;
+            const percentage = Math.round((visitedCount / totalLocsInGroup) * 100);
+            const gColor = groupColors[group] || '#10b981'; 
+
+            progressContainer.innerHTML += `
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>${group}</span>
+                        <span>${percentage}% (${visitedCount}/${totalLocsInGroup})</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" style="width: ${percentage}%; background-color: ${gColor};"></div>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    if(!hasProgress) document.getElementById('progress-section').classList.add('hidden');
+
+    // 3. GÉNÉRATION DE LA LISTE DES LIEUX VISITÉS
+    visitedData.forEach(v => {
+        const loc = celebLocations.find(l => l.id === v.id);
+        if(loc) {
+            // Récupère l'icône SVG du lieu (défini dans script.js)
+            const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
+            const baseColor = groupColors[loc.group] || '#8b5cf6';
+            
+            // On manipule l'icône SVG pour qu'elle prenne la couleur du groupe
+            const coloredIcon = catIconSvg.replace('stroke="currentColor"', `stroke="${baseColor}"`);
+
+            listContainer.innerHTML += `
+                <div class="loc-item" onclick="window.location.href='map.html?locId=${loc.id}'">
+                    <div class="loc-left">
+                        <div class="loc-icon-box" style="background-color: ${baseColor}22;">
+                            ${coloredIcon}
+                        </div>
+                        <div>
+                            <div class="loc-name">${loc.name}</div>
+                            <div class="loc-meta">${loc.group} &middot; ${loc.city}</div>
+                        </div>
+                    </div>
+                    <div class="loc-date">${v.date}</div>
+                </div>
+            `;
+        }
+    });
+});
+</script>
 </body>
 </html>
