@@ -803,3 +803,19 @@ const btnAccept = document.getElementById('cookie-accept');
 if(btnAccept) btnAccept.addEventListener('click', closeCookies);
 const btnReject = document.getElementById('cookie-reject');
 if(btnReject) btnReject.addEventListener('click', closeCookies);
+
+// ==========================================
+// 11. REDIRECTION DEPUIS VISITED / WISHLIST
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const locId = urlParams.get('locId');
+    if (locId && document.getElementById('map')) {
+        setTimeout(() => {
+            window.openDetailsPanel(parseInt(locId));
+            // Optionnel: Centrer la carte sur ce lieu
+            const loc = celebLocations.find(l => l.id === parseInt(locId));
+            if(loc && map) map.flyTo([loc.lat, loc.lng], 16, { duration: 1.5 });
+        }, 800); // Délai pour laisser la carte se charger
+    }
+});
