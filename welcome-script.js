@@ -16,7 +16,7 @@ const dict = {
         emailLabel: "Email address", password: "Password", btnContinue: "Continue",
         
         step2Title: "Profile", step2Desc: "Tell us a bit about yourself.",
-        fname: "First Name", lname: "Last Name",
+        usernameLabel: "Username", fname: "First Name", lname: "Last Name",
         reasonLabel: "Why are you using Screen To Street?", reasonPlaceholder: "Select an option (optional)",
         reason1: "To discover new places", reason2: "To plan a trip", reason3: "To get good addresses", reason4: "To follow my idol's footsteps", reason5: "Other",
         
@@ -45,7 +45,7 @@ const dict = {
         emailLabel: "Adresse e-mail", password: "Mot de passe", btnContinue: "Continuer",
         
         step2Title: "Profil", step2Desc: "Parlez-nous un peu de vous.",
-        fname: "Prénom", lname: "Nom",
+        usernameLabel: "Nom d'utilisateur", fname: "Prénom", lname: "Nom",
         reasonLabel: "Pourquoi utilisez-vous Screen To Street ?", reasonPlaceholder: "Sélectionnez une option (facultatif)",
         reason1: "Pour découvrir de nouveaux lieux", reason2: "Pour préparer un voyage", reason3: "Pour avoir de bonnes adresses", reason4: "Pour suivre la trace de mon idole", reason5: "Autre",
         
@@ -73,7 +73,6 @@ function updateLangUI() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Menu des langues
     const langBtn = document.getElementById('lang-btn');
     if (langBtn) langBtn.addEventListener('click', (e) => {
         const lMenu = document.getElementById('lang-menu');
@@ -102,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const stepBtn = document.getElementById('step-btn-' + i);
         if(stepBtn) {
             stepBtn.addEventListener('click', () => {
-                if(i < currentActiveStep) { // On ne peut que reculer, pas avancer dans le vide
+                if(i < currentActiveStep) { // On ne peut que reculer
                     showStep(i);
                 }
             });
@@ -112,17 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const modal = document.getElementById('auth-modal');
 
-// Afficher une étape spécifique et mettre à jour la barre de progression
 function showStep(step) {
     currentActiveStep = step;
     
-    // Cacher toutes les étapes
     for(let i=0; i<=4; i++) {
         let s = document.getElementById('auth-step-' + i);
         if(s) s.classList.add('hidden');
     }
     
-    // Afficher l'étape demandée
     const targetStep = document.getElementById('auth-step-' + step);
     if(targetStep) targetStep.classList.remove('hidden');
 
@@ -132,24 +128,20 @@ function showStep(step) {
     } else {
         if(stepper) stepper.classList.remove('hidden');
         
-        // Mettre à jour l'apparence des points (1, 2, 3, 4) et des lignes
         for(let i=1; i<=4; i++) {
             let st = document.getElementById('step-dot-' + i);
             let lbl = document.getElementById('step-label-' + i);
             let line = document.getElementById('line-' + (i-1));
             
             if(i < step) {
-                // Étape terminée (coche)
                 if(st) { st.style.background = '#e2e8f0'; st.style.color = '#64748b'; st.innerHTML = '✓'; }
                 if(lbl) lbl.style.color = '#94a3b8';
                 if(line) line.style.background = '#D42759';
             } else if(i === step) {
-                // Étape active
                 if(st) { st.style.background = '#D42759'; st.style.color = '#fff'; st.innerHTML = i; }
                 if(lbl) lbl.style.color = '#D42759';
                 if(line) line.style.background = '#D42759';
             } else {
-                // Étape future
                 if(st) { st.style.background = '#e2e8f0'; st.style.color = '#94a3b8'; st.innerHTML = i; }
                 if(lbl) lbl.style.color = '#cbd5e1';
                 if(line) line.style.background = '#e2e8f0';
@@ -158,7 +150,6 @@ function showStep(step) {
     }
 }
 
-// Boutons d'ouverture/fermeture
 document.querySelectorAll('.open-auth-btn').forEach(btn => {
     btn.addEventListener('click', () => { 
         if(modal) modal.classList.remove('hidden'); 
@@ -169,7 +160,7 @@ document.querySelectorAll('.open-auth-btn').forEach(btn => {
 const closeAuth = document.getElementById('close-auth');
 if(closeAuth) closeAuth.addEventListener('click', () => { if(modal) modal.classList.add('hidden'); });
 
-// --- GESTION DE LA NAVIGATION --- //
+// --- NAVIGATION --- //
 
 // Step 0 -> Step 1 (Email)
 const btnToEmail = document.getElementById('btn-to-email');
@@ -180,12 +171,13 @@ const btnToStep2 = document.getElementById('btn-to-step2');
 if(btnToStep2) {
     btnToStep2.addEventListener('click', () => { 
         const emailInput = document.getElementById('user-email');
+        const passInput = document.getElementById('user-password');
         if(!emailInput.checkValidity()) { emailInput.reportValidity(); return; }
+        if(!passInput.checkValidity()) { passInput.reportValidity(); return; }
         
         const emailVal = emailInput.value.trim().toLowerCase();
         const savedEmail = localStorage.getItem('userEmail');
         
-        // Connexion intelligente si l'utilisateur existe déjà (saut à la carte)
         if (savedEmail && emailVal === savedEmail.toLowerCase() && localStorage.getItem('unlockedGroups')) {
             btnToStep2.textContent = "Logging in...";
             setTimeout(() => { window.location.href = 'map.html'; }, 800);
@@ -200,18 +192,19 @@ if(btnToStep2) {
 const btnToStep3 = document.getElementById('btn-to-step3');
 if(btnToStep3) {
     btnToStep3.addEventListener('click', () => {
-        const fname = document.getElementById('fname');
-        if(!fname.checkValidity()) { fname.reportValidity(); return; }
-        localStorage.setItem('userName', fname.value.trim());
+        const uname = document.getElementById('uname');
+        // SEUL le nom d'utilisateur est obligatoire
+        if(!uname.checkValidity()) { uname.reportValidity(); return; }
+        
+        localStorage.setItem('userName', uname.value.trim());
         showStep(3);
     });
 }
 
-// Step 3 -> Step 4 (Passes -> Payment Summary)
+// Step 3 -> Step 4 (Passes -> Payment)
 const btnToStep4 = document.getElementById('btn-to-step4');
 if(btnToStep4) {
     btnToStep4.addEventListener('click', () => {
-        // Préparer le résumé sur l'étape de paiement
         const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
         let selectedNames = [];
         checkedBoxes.forEach(cb => selectedNames.push(cb.value));
@@ -227,7 +220,7 @@ if(btnToStep4) {
     });
 }
 
-// Popups Google/Facebook (Passent direct au Profil)
+// Popups Google/Facebook
 window.openGooglePopup = function() {
     const popup = document.getElementById('google-auth-popup');
     if(popup) popup.classList.remove('hidden');
@@ -241,8 +234,7 @@ window.completeGoogleLogin = function() {
         window.location.href = 'map.html';
     } else {
         localStorage.setItem('userEmail', 'jane.doe@gmail.com');
-        document.getElementById('fname').value = "Jane";
-        document.getElementById('lname').value = "Doe";
+        document.getElementById('uname').value = "JaneDoe99"; // On pré-remplit pour Google
         showStep(2);
     }
 };
