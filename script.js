@@ -296,12 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // On vide les données d'identification
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userName');
             localStorage.removeItem('unlockedGroups');
-            // Redirection vers l'accueil index.html
-            window.location.href = 'index.html';
+            window.location.href = 'index.html'; // Redirection vers l'accueil
         });
     }
 });
@@ -433,7 +431,6 @@ window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
     
-    // Remplissage des données d'en-tête (Hero)
     const heroBg = document.getElementById('detail-hero-bg');
     if(heroBg) {
         const bgImg = loc.ytId ? `https://img.youtube.com/vi/${loc.ytId}/maxresdefault.jpg` : loc.img;
@@ -509,7 +506,6 @@ window.openDetailsPanel = function(id) {
             });
         }
         
-        // Ajout dynamique des Inspis à poster (#1 à #5)
         galleryContainer.innerHTML += `
             <div style="grid-column: 1 / span 2; margin-top: 15px;">
                 <span class="sub-label">Inspis à poster</span>
