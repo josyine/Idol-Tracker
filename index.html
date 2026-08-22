@@ -7,6 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="welcome-style.css"> 
+<style>
+    /* Force l'absence de soulignement sur tous les liens de la navbar comme sur les autres pages */
+    a { text-decoration: none !important; }
+</style>
 </head>
 <body>
 
@@ -50,18 +54,17 @@
       <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 
-    <!-- Navbar -->
+    <!-- Navbar 100% identique aux autres pages -->
     <div class="nav">
-      <div class="brand">
+      <a href="index.html" class="brand">
         <svg class="pin" viewBox="0 0 400 400">
           <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
           <circle cx="200" cy="150" r="26" fill="#D42759"/>
         </svg>
-        <span>Screen To Street</span>
-      </div>
+        <span>Screen To <b>Street</b></span>
+      </a>
       <div class="nav-right">
-        <!-- Liens mis à jour -->
-        <a class="nav-link" href="map.html" data-i18n="navDest">Destinations</a>
+        <a class="nav-link" href="destinations.html" data-i18n="navDest">Destinations</a>
         <a class="nav-link" href="artists.html" data-i18n="navArtists">Artists</a>
         <div class="nav-actions">
           <div class="icon-btn" id="lang-btn" title="Langue / Région">
