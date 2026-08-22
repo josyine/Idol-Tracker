@@ -3,7 +3,7 @@
 body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 .hidden { display: none !important; }
 
-/* Top Nav (Cart, Lang & Profile) */
+/* Top Nav */
 .top-nav { position: absolute; top: 20px; right: 20px; z-index: 2000; display: flex; justify-content: space-between; align-items: center; width: calc(100% - 40px); pointer-events: none;}
 .nav-right-actions { display: flex; gap: 10px; pointer-events: auto; margin-left: auto; }
 .dropdown-container { position: relative; display: inline-block; }
@@ -14,11 +14,11 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .dropdown-option:last-child { border-bottom: none; }
 .dropdown-option:hover { background: #f1f5f9; color: var(--primary-magenta); }
 
-/* Sidebar & Structure */
+/* Sidebar & Structure (Ajout de la transition et classe 'expanded') */
 .app-container { display: flex; flex: 1; overflow: hidden; }
-.sidebar { width: 420px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.03); z-index: 1000; position: relative;}
+.sidebar { width: 420px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.03); z-index: 1000; position: relative; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);}
+.sidebar.expanded { width: 550px; }
 
-/* LOGO PLUS GRAND */
 .site-logo { width: 100%; max-width: 230px; height: auto; display: block; margin-bottom: 10px; }
 
 .subtitle { font-size: 0.85rem; color: var(--muted-text); margin-bottom: 10px; }
@@ -41,7 +41,6 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .filter-select { padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: white; font-size: 0.85rem; outline: none; cursor: pointer; color: var(--text-main);}
 .filter-select:focus { border-color: var(--primary-magenta); }
 
-/* CATÉGORIES DESIGN ÉPURÉ ET DÉFILABLE */
 .category-filter-section { margin-bottom: 25px; }
 .category-buttons { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; scrollbar-width: none; }
 .category-buttons::-webkit-scrollbar { display: none; }
@@ -51,7 +50,6 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .action-btn { background: var(--primary-magenta); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; text-align: center; display: inline-block; text-decoration: none;}
 .action-btn:hover { background: #bd336b; }
 
-/* BOUTONS SUBTILS */
 .subtle-btn:hover { background: #f1f5f9 !important; }
 .back-details-btn { background: none; border: none; font-size: 0.9rem; color: var(--muted-text); font-weight: bold; cursor: pointer; text-align: left; padding: 0; margin-bottom: 15px; display: inline-block;}
 .back-details-btn:hover { color: var(--primary-magenta); text-decoration: underline; }
@@ -66,7 +64,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .card-title { font-weight: 800; font-size: 0.95rem; color: var(--text-main); }
 .card-address { font-size: 0.80rem; color: var(--muted-text); display: flex; align-items: center; gap: 4px; }
 
-/* Map & Markers Hover */
+/* Map & Stats */
 .map-container { flex: 1; position: relative; }
 #map { width: 100%; height: 100%; background-color: #f8fafc; z-index: 1;}
 .map-stats { position: absolute; top: 20px; left: 20px; z-index: 1000; background: rgba(255, 255, 255, 0.95); padding: 8px 16px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.06);}
@@ -74,12 +72,22 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .stat-item span { color: var(--primary-magenta); font-weight: 800; font-size: 1rem; margin-right: 4px;}
 .stat-divider { width: 1px; height: 20px; background-color: var(--border-color); }
 
-/* CUSTOM MARKERS : La couleur du groupe sera injectée dans le HTML, mais le background de base est blanc */
-.custom-category-marker div { background-color: white; border: 2px solid; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.15); transition: transform 0.2s ease, background-color 0.2s, color 0.2s;}
+/* CUSTOM MARKERS (Variables CSS pour gérer le survol et le clic) */
+.custom-category-marker div { 
+    border-radius: 50%; width: 32px; height: 32px; 
+    display: flex; align-items: center; justify-content: center; 
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15); 
+    transition: transform 0.2s ease, background-color 0.2s, color 0.2s;
+    border: 2px solid var(--marker-color);
+}
 .custom-category-marker div svg { width: 16px; height: 16px; }
 
-/* Hover par défaut : Le fond prend la couleur de la bordure (définie en ligne) et l'icone devient blanche */
-.custom-category-marker:hover div { transform: scale(1.15) translateY(-2px); color: white !important; }
+/* Survol : se remplit totalement de la couleur du groupe ! */
+.custom-category-marker:hover div { 
+    transform: scale(1.15) translateY(-2px); 
+    background-color: var(--marker-color) !important; 
+    color: white !important; 
+}
 
 /* Popups & Details */
 .leaflet-popup-content-wrapper { border-radius: 12px !important; border: 2px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important; padding: 0 !important; overflow: hidden;}
@@ -91,7 +99,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .popup-context { font-size: 0.85rem; color: #475569; margin-bottom: 10px; font-style: italic;}
 .popup-meta { font-size: 0.85rem; color: var(--text-main); margin-bottom: 12px; background: #f8fafc; padding: 8px; border-radius: 8px;}
 
-/* STYLE DES CHECKBOXES (ÉPURÉ) */
+/* STYLE DES CHECKBOXES */
 .checkbox-wrapper { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .custom-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #34414C; }
 .checkbox-wrapper label { font-weight: 600; font-size: 0.9rem; color: #34414C; cursor: pointer; }
@@ -129,11 +137,12 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 /* MOBILE RESPONSIVENESS */
 .hamburger-btn { display: none; pointer-events: auto;}
 @media (max-width: 800px) {
+    .sidebar.expanded { width: 100%; } /* Sur mobile, l'expanded prend toute la place possible */
     .hamburger-btn { display: flex; }
     .top-nav { width: calc(100% - 20px); left: 10px; right: auto;}
     .sidebar { position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; width: 340px; max-width: 85vw; transition: 0.3s ease-in-out; border-right: none; box-shadow: 5px 0 25px rgba(0,0,0,0.2);}
     .sidebar.open { left: 0; }
     #mobile-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 2999;}
     .app-container { flex-direction: column; }
-    .map-stats { display: none; /* Cache les stats sur mobile pour ne pas surcharger */ }
+    .map-stats { display: none; }
 }
