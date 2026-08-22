@@ -7,7 +7,9 @@ let markerGroup = null;
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+        attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 
+    }).addTo(map);
     markerGroup = L.layerGroup().addTo(map);
     setTimeout(() => { map.invalidateSize(); }, 200);
 
@@ -15,8 +17,9 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     map.on('zoomend', function() {
         const zoom = map.getZoom();
         let markerSize = 32; let iconSize = 16;
-        if(zoom < 5) { markerSize = 12; iconSize = 0; } // Discrets points éloignés
-        else if(zoom < 9) { markerSize = 20; iconSize = 10; } // Taille moyenne
+        
+        if (zoom < 5) { markerSize = 12; iconSize = 0; } // Discrets points éloignés
+        else if (zoom < 9) { markerSize = 20; iconSize = 10; } // Taille moyenne
         else { markerSize = 32; iconSize = 16; } // Taille pleine
         
         document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
@@ -26,14 +29,14 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
 
 window.toggleMobileMenu = function() {
     const sidebar = document.getElementById('app-sidebar');
-    if(sidebar) {
+    if (sidebar) {
         sidebar.classList.toggle('open');
-        if(!sidebar.classList.contains('open')) sidebar.classList.remove('expanded');
+        if (!sidebar.classList.contains('open')) sidebar.classList.remove('expanded');
     }
 };
 
 // ==========================================
-// 2. DONNÉES (LES 19 LIEUX)
+// 2. DONNÉES : LES 19 LIEUX INTÉGRAUX AVEC TEXTES
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5h18"/><path d="M4 8.5 5.5 4h3L7 8.5"/><path d="M9.3 8.5 10.8 4h3l-1.5 4.5"/><path d="M14.7 8.5 16.2 4h3l-1.5 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.5"/></svg>`,
@@ -245,6 +248,7 @@ function updateUI() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Boutons de navigation (Langue, Profil)
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -254,12 +258,20 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
         });
     });
+
     document.addEventListener('click', () => { 
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
     });
+
     document.querySelectorAll('.lang-option').forEach(opt => {
-        opt.addEventListener('click', function(e) { e.preventDefault(); currentLang = this.getAttribute('data-lang'); localStorage.setItem('lang', currentLang); updateUI(); });
+        opt.addEventListener('click', function(e) { 
+            e.preventDefault(); 
+            currentLang = this.getAttribute('data-lang'); 
+            localStorage.setItem('lang', currentLang); 
+            updateUI(); 
+        });
     });
+
     const profileBtn = document.getElementById('profile-btn');
     if (profileBtn) {
         const savedName = localStorage.getItem('userName') || 'U';
@@ -276,6 +288,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if(target) target.classList.add('active');
         });
     });
+
+    // ==========================================
+    // LOGOUT LOGIC (NETTOYAGE DU CACHE)
+    // ==========================================
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // On vide les données d'identification
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('unlockedGroups');
+            // Redirection vers l'accueil index.html
+            window.location.href = 'index.html';
+        });
+    }
 });
 
 // ==========================================
@@ -481,7 +509,7 @@ window.openDetailsPanel = function(id) {
             });
         }
         
-        // Ajout dynamique des Inspis
+        // Ajout dynamique des Inspis à poster (#1 à #5)
         galleryContainer.innerHTML += `
             <div style="grid-column: 1 / span 2; margin-top: 15px;">
                 <span class="sub-label">Inspis à poster</span>
@@ -673,6 +701,9 @@ window.exportItineraryPDF = function() {
     html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' } }).from(el).save().then(() => btn.style.display = 'block');
 };
 
+// ==========================================
+// 8. MODAL PANIER DEPUIS LA CARTE (ACHAT ADDITIONNEL)
+// ==========================================
 window.openCartModal = function() {
     const modal = document.getElementById('cart-modal');
     if(!modal) return;
@@ -727,7 +758,7 @@ window.onclick = function(e) {
 };
 
 // ==========================================
-// 8. COOKIES BANNER LOGIC
+// 9. BANNIÈRE COOKIES ET REDIRECTION VISITED
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
@@ -741,9 +772,6 @@ if(btnAccept) btnAccept.addEventListener('click', closeCookies);
 const btnReject = document.getElementById('cookie-reject');
 if(btnReject) btnReject.addEventListener('click', closeCookies);
 
-// ==========================================
-// 9. REDIRECTION DEPUIS VISITED / WISHLIST
-// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const locId = urlParams.get('locId');
