@@ -1,10 +1,12 @@
-:root { --bg-color: #0e0e14; --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; }
+:root { --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
 a { text-decoration: none; }
+
+/* PLEIN ÉCRAN - PAS DE FOND NOIR */
 body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw; display: flex; overflow: hidden; }
 .hidden { display: none !important; }
 
-/* Cadre de l'Application */
+/* Cadre de l'Application (100% de l'écran) */
 .app-container { width: 100%; height: 100%; display: flex; background: #fff; position: relative; }
 
 /* Top Nav sur la carte (Langue, Profil, Panier) */
@@ -13,7 +15,7 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .nav-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 4px 14px rgba(80,60,120,.1); display: flex; align-items: center; justify-content: center; color: #2E3644; border: none; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px;}
 .nav-btn:hover { background: #f1f5f9; color: var(--primary-magenta); }
 
-/* AMÉLIORATION DU MENU DROPDOWN */
+/* MENU DROPDOWN PROFIL */
 .dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
 .dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); transition: 0.2s; border-radius: 8px; display: block; text-align: left; }
 .dropdown-option:hover { background: #f1f5f9; color: var(--primary-magenta); }
@@ -35,13 +37,13 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .sidebar-scroll-area::-webkit-scrollbar { width: 5px; }
 .sidebar-scroll-area::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 10px; }
 
-/* Header Sidebar (Logo & Tagline) */
+/* Header Sidebar */
 .brand-row { display: flex; align-items: center; gap: 12px; padding: 5px 6px 10px 6px; }
 .brand-text { font-size: 19px; font-weight: 600; color: #2E3644; }
 .brand-text b { color: var(--primary-magenta); font-weight: 600; }
 .tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
 
-/* Conteneurs de la Sidebar */
+/* Conteneurs */
 .card-box { background: #fff; border-radius: 16px; box-shadow: 0 8px 26px rgba(80,60,120,.06); padding: 18px; position: relative; display: flex; flex-direction: column; gap: 12px; }
 
 /* Inputs et Filtres */
@@ -114,7 +116,16 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .leaflet-popup-content-wrapper { border-radius: 12px !important; }
 .leaflet-popup-content { margin: 12px !important; font-family: 'Poppins', sans-serif;}
 
-/* Iti Generator */
+/* CARTE ITINÉRAIRE FORCÉE EN HAUTEUR */
+#iti-map-container {
+    width: 100% !important;
+    height: 250px !important;
+    min-height: 250px !important;
+    background: #e5e5e5;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    position: relative;
+}
 .iti-day-card { background: #faf9fc; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 12px; font-size: 12px;}
 .iti-day-title { font-weight: 700; color: #334e68; margin-bottom: 8px; font-size: 13px; }
 
