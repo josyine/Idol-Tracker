@@ -15,21 +15,23 @@
     
     <!-- Sidebar Gauche -->
     <aside class="sidebar" id="app-sidebar">
+        <!-- Effets visuels -->
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
 
         <div class="sidebar-content" style="height: 100%;">
-            <!-- Header avec Logo -->
-            <div class="brand-row" style="padding-top: 10px; padding-left: 5px;">
+            
+            <!-- Header avec Logo Cliquable -->
+            <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
                 </svg>
                 <div>
-                    <div class="brand-text">Screen To <b>Street</b></div>
-                    <div class="tagline" data-i18n="subtitle">Following the footsteps of your favorite artists</div>
+                    <div class="brand-text" style="color: #2E3644;">Screen To <b>Street</b></div>
+                    <div class="tagline" data-i18n="subtitle" style="color: #5B6472;">Following the footsteps of your favorite artists</div>
                 </div>
-            </div>
+            </a>
 
             <!-- VUE 1 : RECHERCHE ET LISTE -->
             <div id="sidebar-main" class="sidebar-scroll-area" style="padding: 0 5px 5px 5px;">
@@ -79,6 +81,7 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
+                <!-- PIED DE PAGE AVEC LIENS LÉGAUX -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -90,7 +93,7 @@
                 </div>
             </div>
 
-            <!-- VUE 2 : NOUVEAU PANNEAU DE DÉTAILS TYPE IN THE SOOP -->
+            <!-- VUE 2 : PANNEAU DE DÉTAILS -->
             <div id="sidebar-details" class="hidden">
                 <div class="detail-hero" id="detail-hero-bg">
                     <a class="detail-back-link" onclick="closeDetailsPanel()">← Back to list</a>
