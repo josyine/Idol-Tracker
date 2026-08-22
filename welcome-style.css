@@ -1,259 +1,142 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Screen To Street</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="welcome-style.css"> 
-</head>
-<body>
+:root { --card-bg: #FFFFFF; --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif; }
+body { margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; color: var(--text-main); }
+.hidden { display: none !important; }
 
-<!-- Popup Simulation Google -->
-<div id="google-auth-popup" class="google-popup-overlay hidden">
-    <div class="google-popup-box">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40px" height="40px" style="margin-bottom: 10px;">
-            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-        </svg>
-        <h3 style="color: #34414C; margin-bottom: 5px;">Sign in with Google</h3>
-        <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 20px;">Choose an account to continue</p>
-        <div class="google-account-mock" onclick="completeGoogleLogin()">
-            <div class="google-avatar">JD</div>
-            <div class="google-info">
-                <strong>Jane Doe</strong>
-                <span>jane.doe@gmail.com</span>
-            </div>
-        </div>
-    </div>
-</div>
+.hero { min-height: 100vh; display: flex; flex-direction: column; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; position: relative; overflow: hidden; }
+@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-<div class="hero">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
+.bg-route{position:absolute; inset:0; width:100%; height:100%; opacity:.4; pointer-events: none;}
+.dot{transform-box:fill-box;transform-origin:center;}
+.dot-a{animation:floatA 3.2s ease-in-out infinite;}
+.dot-b{animation:floatB 3.6s ease-in-out infinite;animation-delay:.4s;}
+.dot-c{animation:floatC 2.8s ease-in-out infinite;animation-delay:.7s;}
+.dot-d{animation:floatD 4s ease-in-out infinite;animation-delay:.2s;}
+.dot-e{animation:floatA 3.4s ease-in-out infinite;animation-delay:1s;}
+.dot-f{animation:floatB 3s ease-in-out infinite;animation-delay:.5s;}
+.dot-g{animation:floatC 3.8s ease-in-out infinite;animation-delay:1.3s;}
+@keyframes floatA{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(16px,-20px);} }
+@keyframes floatB{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-18px,18px);} }
+@keyframes floatC{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(14px,16px) scale(1.35);} }
+@keyframes floatD{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-20px,-14px) scale(.75);} }
+.route-line{ stroke-dasharray:1 12; animation:flow 14s linear infinite; }
+@keyframes flow{ to{stroke-dashoffset:-260;} }
 
-    <svg class="bg-route" viewBox="0 0 1180 600" preserveAspectRatio="xMidYMid slice">
-      <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260" fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
-      <circle class="dot dot-a" cx="380" cy="340" r="6" fill="#B9A8DA"/>
-      <circle class="dot dot-b" cx="820" cy="300" r="6" fill="#B9A8DA"/>
-      <circle class="dot dot-c" cx="1040" cy="240" r="8" fill="#D42759"/>
-      <circle class="dot dot-d" cx="420" cy="150" r="5" fill="#C6B8E3"/>
-      <circle class="dot dot-e" cx="840" cy="140" r="6" fill="#B9A8DA"/>
-      <circle class="dot dot-f" cx="150" cy="240" r="5" fill="#D9CDEE"/>
-      <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
-    </svg>
+.blob{position:absolute;border-radius:50%;filter:blur(40px);pointer-events:none; z-index: 0;}
+.blob-1{ top:-10%; left:-5%; width:500px; height:500px; background:radial-gradient(circle,rgba(212,39,89,.15),transparent 70%); animation:blobMove1 15s ease-in-out infinite; }
+.blob-2{ bottom:-15%; right:-5%; width:600px; height:600px; background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%); animation:blobMove2 16s ease-in-out infinite; }
+.blob-3{ top:25%; left:45%; width:400px; height:400px; background:radial-gradient(circle,rgba(91,141,255,.12),transparent 70%); animation:blobMove3 13s ease-in-out infinite; }
+@keyframes blobMove1{0%,100%{transform:translate(0,0);}50%{transform:translate(50px,30px);}}
+@keyframes blobMove2{0%,100%{transform:translate(0,0);}50%{transform:translate(-50px,-40px);}}
+@keyframes blobMove3{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,-50px);}}
 
-    <div class="nav">
-      <div class="brand">
-        <svg class="pin" viewBox="0 0 400 400">
-          <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
-          <circle cx="200" cy="150" r="26" fill="#D42759"/>
-        </svg>
-        <span>Screen To Street</span>
-      </div>
-      <div class="nav-right">
-        <a class="nav-link" data-i18n="navDest">Destinations</a>
-        <a class="nav-link" data-i18n="navArtists">Artists</a>
-        <div class="nav-actions">
-          <div class="icon-btn" id="lang-btn" title="Langue / Région">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M3 12h18"/>
-              <path d="M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/>
-            </svg>
-          </div>
-          <div id="lang-menu" class="lang-menu hidden">
-              <div class="lang-option" data-lang="en">English</div>
-              <div class="lang-option" data-lang="fr">Français</div>
-          </div>
-          <button class="login-btn-v5 open-auth-btn" data-i18n="navLogin">Log in</button>
-        </div>
-      </div>
-    </div>
+.nav{ display:flex; align-items:center; justify-content:space-between; padding: 40px 6%; position:relative; z-index: 10; width: 100%;}
+.brand{display:flex;align-items:center;gap:11px;}
+.brand span{font-family:'Poppins',sans-serif;font-weight:600;font-size:22px;color:#2E3644;}
+.pin{width:36px;height:36px;flex-shrink:0;}
 
-    <div class="copy">
-      <h1 data-i18n="heroTitle">You have a destination.<br>We have the guide.</h1>
-      <p data-i18n="heroSubtitle">Create custom routes instantly, with tools designed to follow your favorite artists.</p>
-      <div class="cta-row">
-        <button class="cta-primary open-auth-btn"><span data-i18n="heroCta">Generate my guide</span> <span>→</span></button>
-        <div class="cta-secondary" data-i18n="heroDemo">See Demo</div>
-      </div>
-    </div>
+.nav-right{display:flex;align-items:center;gap:35px;}
+.nav-link{font-family:'Poppins',sans-serif;font-size:15px;font-weight:500;color:#4A5262;transition:color .2s; cursor: pointer;}
+.nav-link:hover {color: var(--primary-magenta);}
+.nav-actions{display:flex;align-items:center;gap:16px; position: relative;}
+.icon-btn{ width:42px;height:42px; border-radius:50%; background:#fff; display:flex;align-items:center;justify-content:center; color:#2E3644; box-shadow:0 4px 14px rgba(80,60,120,.08); cursor: pointer; transition: 0.2s; border: none; outline: none; }
+.icon-btn:hover { background: #FCE7F0; color: var(--primary-magenta); }
+.login-btn-v5{ background:transparent; border:2px solid #2E3644; outline: none; color:#2E3644; font-family:'Poppins',sans-serif; font-size:14px; font-weight:600; padding:10px 24px; border-radius:100px; cursor: pointer; transition: 0.2s; }
+.login-btn-v5:hover { background: #2E3644; color: white; }
 
-</div>
+.copy{ position:relative; z-index: 10; max-width:680px; margin: auto auto auto 8%; padding-bottom: 5%;}
+.copy h1{ font-weight:700; font-size:60px; line-height:1.15; color:#212832; letter-spacing:-1px; margin-bottom:24px; text-shadow: 0 2px 10px rgba(255,255,255,0.6); }
+.copy p{ font-weight:500; font-size:18px; line-height:1.6; color:#4A5262; margin-bottom:40px; max-width:520px; }
+.cta-row{display:flex;align-items:center;gap:24px;}
+.cta-primary{ display:inline-flex;align-items:center;gap:10px; background:var(--primary-magenta);color:#fff; font-size:16px;font-weight:600; padding:16px 32px;border-radius:100px; border:none; outline:none; box-shadow:0 12px 26px rgba(212,39,89,.3); cursor: pointer; transition: 0.3s; }
+.cta-primary:hover { transform: translateY(-3px); box-shadow:0 16px 32px rgba(212,39,89,.4); }
+.cta-secondary{ font-size:16px;font-weight:600;color:#2E3644; cursor: pointer; transition: color 0.2s;}
+.cta-secondary:hover { color: var(--primary-magenta); text-decoration: underline;}
 
-<!-- MODALE D'AUTHENTIFICATION AVEC BARRE DE PROGRESSION -->
-<div id="auth-modal" class="auth-modal hidden">
-    <div class="auth-modal-content">
-        <button class="close-auth-btn" id="close-auth">&times;</button>
-        
-        <div class="auth-left">
-            
-            <!-- BARRE DE PROGRESSION (Visible étapes 1 à 4) -->
-            <div id="auth-stepper" class="stepper hidden">
-                <div class="step-container" id="step-btn-1">
-                    <div class="step-dot" id="step-dot-1">1</div><span class="step-label" id="step-label-1" data-i18n="step1Title">Account</span>
-                </div>
-                <div class="step-line" id="line-1"></div>
-                <div class="step-container" id="step-btn-2">
-                    <div class="step-dot" id="step-dot-2">2</div><span class="step-label" id="step-label-2" data-i18n="step2Title">Profile</span>
-                </div>
-                <div class="step-line" id="line-2"></div>
-                <div class="step-container" id="step-btn-3">
-                    <div class="step-dot" id="step-dot-3">3</div><span class="step-label" id="step-label-3" data-i18n="step3Title">Passes</span>
-                </div>
-                <div class="step-line" id="line-3"></div>
-                <div class="step-container" id="step-btn-4">
-                    <div class="step-dot" id="step-dot-4">4</div><span class="step-label" id="step-label-4" data-i18n="step4Title">Payment</span>
-                </div>
-            </div>
+.lang-menu { position: absolute; right: 90px; top: 60px; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 120px; overflow: hidden; z-index: 3000;}
+.lang-option { padding: 10px 15px; cursor: pointer; font-size: 0.9rem; color: var(--text-main); transition: background 0.2s; }
+.lang-option:hover { background: var(--accent-pink); color: var(--primary-magenta); }
 
-            <!-- ETAPE 0 : CHOIX (SOCIAL OU EMAIL) -->
-            <div id="auth-step-0" class="auth-step">
-                <h2 data-i18n="authTitle">Log in or sign up</h2>
-                <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
+.google-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; justify-content: center; align-items: center; }
+.google-popup-box { background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 340px; }
+.google-account-mock { display: flex; align-items: center; gap: 15px; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: 0.2s; text-align: left; margin-top: 15px;}
+.google-account-mock:hover { background: #f8fafc; border-color: #cbd5e1; }
+.google-avatar { width: 40px; height: 40px; background: #1976D2; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;}
+.google-info { display: flex; flex-direction: column; overflow: hidden;}
+.google-info strong { font-size: 0.95rem; color: #1e293b; }
+.google-info span { font-size: 0.8rem; color: #64748b; }
 
-                <div class="social-btn" onclick="openGooglePopup()">
-                    <svg class="g-icon" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>
-                    <span data-i18n="authGoogle">Continue with Google</span>
-                </div>
-                <div class="social-btn" onclick="simulateFacebookLogin()">
-                    <svg class="f-icon" viewBox="0 0 48 48"><path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"/><path fill="#fff" d="M26.6 29H31.5L32.3 24H26.6V21.3C26.6 19.2 27.3 17.4 29.2 17.4H32.3V13C31.8 12.9 30.6 12.7 28.4 12.7C23.9 12.7 21.2 15.1 21.2 20.6V24H16.5V29H21.2V42.8C22.1 42.9 23 43 24 43C24.9 43 25.7 42.9 26.6 42.8V29Z"/></svg>
-                    <span data-i18n="authFacebook">Continue with Facebook</span>
-                </div>
-                <div class="social-btn" id="btn-to-email">
-                    <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7L22 6"/></svg>
-                    <span data-i18n="authEmail">Continue with email</span>
-                </div>
+.cookie-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; width: 90%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; color: var(--text-main);}
+.cookie-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.cookie-content p { font-size: 0.9rem; margin: 0; }
+.cookie-content a { color: var(--primary-magenta); font-weight: bold; }
+.cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.filter-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--primary-magenta); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+.action-btn { background: var(--primary-magenta); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
 
-                <p class="terms">
-                    <span data-i18n="authTerms">By continuing, you agree to Screen To Street's</span> 
-                    <a href="legal.html#cgu" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkTerms">Terms of Use</a>. 
-                    <span data-i18n="authPrivacy">Read our</span> 
-                    <a href="legal.html#confidentialite" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkPrivacy">Privacy Policy</a>.
-                </p>
-            </div>
+/* MODALE D'AUTHENTIFICATION */
+.auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.auth-modal-content { width: 920px; max-width: 94vw; height: 620px; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.4); display: flex; position: relative; background: #fff; }
+.close-auth-btn { position: absolute; top: 16px; right: 20px; font-size: 26px; cursor: pointer; color: rgba(255,255,255,.7); z-index: 5; line-height: 1; border: none; background: transparent; outline: none; }
+.close-auth-btn:hover { color: #fff; }
 
-            <!-- ETAPE 1 : COMPTE (EMAIL & MOT DE PASSE) -->
-            <div id="auth-step-1" class="auth-step hidden">
-                <h2 data-i18n="step1Title">Account</h2>
-                <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
-                <div class="input-group">
-                    <label data-i18n="emailLabel">Email address</label>
-                    <input type="email" id="user-email" class="field-input" placeholder="jane.doe@example.com" required>
-                </div>
-                <div class="input-group">
-                    <label data-i18n="password">Password</label>
-                    <input type="password" id="user-password" class="field-input" minlength="8" placeholder="••••••••" required>
-                </div>
-                <button class="pay-btn" id="btn-to-step2" data-i18n="btnContinue">Continue</button>
-            </div>
+.auth-left { flex: 1; background: #fff; padding: 40px 46px 40px 46px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
+.auth-left::-webkit-scrollbar { width: 6px; }
+.auth-left::-webkit-scrollbar-thumb { background-color: #e2e8f0; border-radius: 10px; }
 
-            <!-- ETAPE 2 : PROFIL (NOM, PRENOM, RAISON) -->
-            <div id="auth-step-2" class="auth-step hidden">
-                <h2 data-i18n="step2Title">Profile</h2>
-                <p data-i18n="step2Desc">Tell us a bit about yourself.</p>
-                <div class="input-row">
-                    <div class="input-group"><label data-i18n="fname">First Name</label><input type="text" id="fname" class="field-input" required></div>
-                    <div class="input-group"><label data-i18n="lname">Last Name</label><input type="text" id="lname" class="field-input" required></div>
-                </div>
-                <div class="input-group" style="margin-bottom: 20px;">
-                    <label data-i18n="reasonLabel">Why are you using Screen To Street?</label>
-                    <select id="user-reason" class="field-input">
-                        <option value="" data-i18n="reasonPlaceholder">Select an option (optional)</option>
-                        <option value="discover" data-i18n="reason1">To discover new places</option>
-                        <option value="travel" data-i18n="reason2">To plan a trip</option>
-                        <option value="addresses" data-i18n="reason3">To get good addresses</option>
-                        <option value="idols" data-i18n="reason4">To follow my idol's footsteps</option>
-                        <option value="other" data-i18n="reason5">Other</option>
-                    </select>
-                </div>
-                <button class="pay-btn" id="btn-to-step3" data-i18n="btnContinue">Continue</button>
-            </div>
+/* BARRE DE PROGRESSION (STEPPER) */
+.stepper { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 30px; width: 100%; }
+.step-container { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.step-container:hover { opacity: 0.8; }
+.step-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; }
+.step-label { white-space: nowrap; }
+.step-line { flex: 1; height: 2px; transition: background 0.3s; }
 
-            <!-- ETAPE 3 : SÉLECTION DES PASS -->
-            <div id="auth-step-3" class="auth-step hidden">
-                <h2 data-i18n="step3Title">Choose Your Passes</h2>
-                <p data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-                    <label class="pass-card"><input type="checkbox" name="groups" value="BTS" class="group-checkbox"><span class="card-content">BTS</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Blackpink" class="group-checkbox"><span class="card-content">Blackpink</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Twice" class="group-checkbox"><span class="card-content">Twice</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Seventeen" class="group-checkbox"><span class="card-content">Seventeen</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox"><span class="card-content">Katseye</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox"><span class="card-content">TXT</span></label>
-                </div>
-                <div class="total-row">
-                    <span class="total-label" data-i18n="subtotalLabel">Subtotal:</span>
-                    <span class="total-price" id="subtotal-display">0.00 €</span>
-                </div>
-                <button class="pay-btn" id="btn-to-step4" disabled data-i18n="payBtnEmpty">Select a group</button>
-            </div>
+.auth-step { width: 100%; animation: fadeIn 0.3s ease; }
+.auth-step h2 { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+.auth-step p { font-size: 12.5px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
 
-            <!-- ETAPE 4 : PAIEMENT -->
-            <div id="auth-step-4" class="auth-step hidden">
-                <h2 data-i18n="step4Title">Payment</h2>
-                <p data-i18n="step4Desc">Complete your purchase to unlock the guides.</p>
-                
-                <div style="background:#f8fafc; border-radius:10px; padding:12px; font-size:12.5px; color:#334155; margin-bottom:15px; border:1px solid #e2e8f0;">
-                    <b data-i18n="summaryPasses">Selected Passes:</b> <span id="summary-passes" style="color:#64748b;">None</span><br>
-                    <b data-i18n="summaryTotal" style="display:inline-block; margin-top:5px;">Total Due:</b> <span id="summary-price" style="color:var(--primary-magenta); font-weight:bold; font-size:14px;">0.00 €</span>
-                </div>
+.g-icon, .f-icon, .m-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.social-btn { display: flex; align-items: center; gap: 14px; width: 100%; padding: 13px 18px; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer; margin-bottom: 12px; background: #fff; border: 1.5px solid #e5e7eb; color: #1e293b; transition: 0.2s;}
+.social-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+.terms { font-size: 11.5px !important; line-height: 1.6; text-align: center; color: #94a3b8 !important; margin-top: 10px; }
 
-                <form id="checkout-form">
-                    <div class="input-group">
-                        <label data-i18n="cardNum">Card Number</label>
-                        <input type="text" class="field-input" placeholder="XXXX XXXX XXXX XXXX" required>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-group"><label data-i18n="expiry">Expiry Date</label><input type="text" class="field-input" placeholder="MM/YY" required></div>
-                        <div class="input-group"><label data-i18n="cvc">CVC</label><input type="text" class="field-input" placeholder="123" required></div>
-                    </div>
-                    <button type="submit" id="btn-submit-payment" class="pay-btn" data-i18n="paySecurely">Pay securely</button>
-                    
-                    <div id="payment-loader" class="hidden" style="margin-top: 15px;">
-                        <div class="spinner"></div>
-                        <p data-i18n="processing" style="text-align: center; color: var(--primary-magenta); margin-top: 10px; font-size:13px; font-weight:600;">Processing securely...</p>
-                    </div>
-                </form>
-            </div>
-            
-        </div>
+.input-row { display: flex; gap: 15px; margin-bottom: 12px;}
+.input-group { display: flex; flex-direction: column; width: 100%; margin-bottom: 12px;}
+.input-group label { font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+.field-input { width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #1e293b; font-family: 'Poppins', sans-serif; transition: 0.2s;}
+.field-input:focus { outline: none; border-color: #D42759; box-shadow: 0 0 0 3px #FCE7F0; }
 
-        <!-- Colonne Droite (Brand Panel Graphique) -->
-        <div class="brand-panel">
-            <div class="auth-blob auth-blob-1"></div>
-            <div class="auth-blob auth-blob-2"></div>
-            <div class="auth-blob auth-blob-3"></div>
-            <div class="brand-content">
-                <svg width="56" height="56" viewBox="0 0 400 400" style="margin-bottom:16px;">
-                    <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#fff"/>
-                    <polygon points="176,110 176,182 236,146" fill="#D42759"/>
-                </svg>
-                <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:12px;">Screen To <span style="color:#F06090;">Street</span></div>
-                <div data-i18n="authRightTitle" style="font-size:20px;font-weight:600;color:#fff;text-align:center;line-height:1.35;">Unlock the world<br>of your idols.</div>
-            </div>
-        </div>
+select.field-input { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 36px; cursor: pointer;}
 
-    </div>
-</div>
+.pass-card { position: relative; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px; text-align: center; font-size: 12.5px; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s ease;}
+.pass-card input { position: absolute; opacity: 0; cursor: pointer; }
+.pass-card:has(input:checked) { background: #FCE7F0; border-color: #D42759; color: #D42759; }
 
-<!-- BANNIÈRE COOKIES -->
-<div id="cookie-banner" class="cookie-banner hidden">
-    <div class="cookie-content">
-        <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#confidentialite" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
-        <div class="cookie-actions">
-            <button id="cookie-manage" class="filter-btn" data-i18n="cookieManage">Manage</button>
-            <button id="cookie-reject" class="filter-btn" data-i18n="cookieReject">Reject</button>
-            <button id="cookie-accept" class="action-btn" data-i18n="cookieAccept">Accept</button>
-        </div>
-    </div>
-</div>
+.total-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0;}
+.total-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+.total-price { font-size: 22px; font-weight: 800; color: #D42759; }
 
-<script src="welcome-script.js"></script>
-</body>
-</html>
+.pay-btn { width: 100%; padding: 14px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-align: center; color: #fff; background: #D42759; border: none; font-family: 'Poppins', sans-serif; box-shadow: 0 10px 22px rgba(212,39,89,.28); cursor: pointer; transition: 0.2s; margin-top: 5px;}
+.pay-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(212,39,89,.35); }
+.pay-btn:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
+
+.brand-panel { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; background: linear-gradient(155deg,#2E3644 0%,#3d3159 60%,#4a2f52 100%); }
+.auth-blob { position: absolute; border-radius: 50%; filter: blur(20px); pointer-events: none; }
+.auth-blob-1 { top: -60px; left: -40px; width: 220px; height: 220px; background: radial-gradient(circle,rgba(212,39,89,.4),transparent 70%); animation: authBlobMove1 11s ease-in-out infinite; }
+.auth-blob-2 { bottom: -60px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle,rgba(139,92,246,.4),transparent 70%); animation: authBlobMove2 13s ease-in-out infinite; }
+.auth-blob-3 { top: 35%; left: 55%; width: 150px; height: 150px; background: radial-gradient(circle,rgba(91,141,255,.32),transparent 70%); animation: authBlobMove3 9.5s ease-in-out infinite; }
+@keyframes authBlobMove1 { 0%{transform:translate(0,0) scale(1);} 50%{transform:translate(34px,26px) scale(1.15);} 100%{transform:translate(0,0) scale(1);} }
+@keyframes authBlobMove2 { 0%{transform:translate(0,0) scale(1);} 50%{transform:translate(-30px,-22px) scale(1.12);} 100%{transform:translate(0,0) scale(1);} }
+@keyframes authBlobMove3 { 0%{transform:translate(0,0) scale(1);} 50%{transform:translate(-20px,18px) scale(.85);} 100%{transform:translate(0,0) scale(1);} }
+.brand-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center;}
+
+.spinner { border: 4px solid var(--accent-pink); border-top: 4px solid var(--primary-magenta); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+@media (max-width: 900px) {
+    .auth-modal-content { flex-direction: column; height: 90vh; overflow-y: auto;}
+    .brand-panel { display: none; }
+    .stepper { display: none; } /* On masque la timeline sur mobile pour gagner de la place */
+}
