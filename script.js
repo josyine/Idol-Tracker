@@ -686,22 +686,6 @@ window.closeDetailsPanel = function() {
 // ==========================================
 // 8. ITINERARY GENERATOR & EXPORT
 // ==========================================
-const btnOpenIti = document.getElementById('open-itinerary-btn');
-if(btnOpenIti) {
-    btnOpenIti.addEventListener('click', () => {
-        const itiGroup = document.getElementById('iti-group');
-        const itiCountry = document.getElementById('iti-country');
-        
-        const availableGroups = [...new Set(celebLocations.map(l => l.group))].sort();
-        itiGroup.innerHTML = ''; availableGroups.forEach(g => { itiGroup.innerHTML += `<option value="${g}">${g}</option>`; });
-        itiCountry.innerHTML = ''; [...new Set(celebLocations.map(l => l.country))].sort().forEach(c => { itiCountry.innerHTML += `<option value="${c}">${c}</option>`; });
-        
-        document.getElementById('iti-result').classList.add('hidden');
-        document.getElementById('iti-form').classList.remove('hidden');
-        document.getElementById('itinerary-modal').classList.remove('hidden');
-    });
-}
-
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
     const country = document.getElementById('iti-country').value;
@@ -710,6 +694,7 @@ window.generateItinerary = function() {
     let validLocs = celebLocations.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert(t('noLocationsFound')); return; }
 
+    // Optimization basique de la route
     let unvisited = [...validLocs];
     let route = [unvisited.shift()]; 
     while(unvisited.length > 0) {
@@ -752,45 +737,37 @@ window.generateItinerary = function() {
         resultDiv.innerHTML += dayHtml;
     }
 
+    // On affiche le résultat et on garde le formulaire visible
     document.getElementById('iti-form').classList.remove('hidden'); 
     document.getElementById('iti-result').classList.remove('hidden');
 
-    if(!itiLeafletMap) {
-        itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(itiLeafletMap);
-        itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
-    } else {
-        itiLayerGroup.clearLayers();
+    // Défilement fluide vers la carte pour que l'utilisateur n'ait pas à le faire
+    const modalContent = document.querySelector('#itinerary-modal .modal-content');
+    if(modalContent) {
+        modalContent.scrollTo({ top: modalContent.scrollHeight, behavior: 'smooth' });
     }
 
-    coordsForMap.forEach((c, idx) => {
-        L.circleMarker(c, { color: '#D94680', radius: 6, fillOpacity: 1 }).addTo(itiLayerGroup)
-         .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
-    });
-    L.polyline(coordsForMap, { color: '#D94680', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
-
+    // On crée la carte avec un micro-délai pour éviter les bugs de chargement de Leaflet
     setTimeout(() => {
+        if(!itiLeafletMap) {
+            itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(itiLeafletMap);
+            itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
+        } else {
+            itiLayerGroup.clearLayers();
+        }
+
+        coordsForMap.forEach((c, idx) => {
+            L.circleMarker(c, { color: '#D94680', radius: 6, fillOpacity: 1 }).addTo(itiLayerGroup)
+             .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
+        });
+        L.polyline(coordsForMap, { color: '#D94680', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
+
         itiLeafletMap.invalidateSize();
-        itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20] });
-    }, 300);
-};
-
-window.exportItineraryPDF = function() {
-    const element = document.getElementById('iti-result');
-    const exportBtn = document.getElementById('export-pdf-btn');
-    exportBtn.style.display = 'none';
-
-    const opt = { margin: 10, filename: 'ScreenToStreet_Guide.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-    html2pdf().set(opt).from(element).save().then(() => { exportBtn.style.display = 'block'; });
-};
-
-window.closeModal = function(id) { 
-    if(document.getElementById(id)) document.getElementById(id).classList.add('hidden'); 
-};
-
-window.onclick = function(event) { 
-    if (event.target === document.getElementById('itinerary-modal')) window.closeModal('itinerary-modal'); 
-    if (event.target === document.getElementById('cart-modal')) window.closeModal('cart-modal'); 
+        if(coordsForMap.length > 0) {
+            itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
+        }
+    }, 150); // Le délai magique qui règle le bug !
 };
 
 // ==========================================
