@@ -17,8 +17,6 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 /* Sidebar & Structure */
 .app-container { display: flex; flex: 1; overflow: hidden; }
 .sidebar { width: 420px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.03); z-index: 1000; position: relative; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);}
-
-/* LA FENÊTRE EST PLUS GRANDE ICI */
 .sidebar.expanded { width: 680px; }
 
 .site-logo { width: 100%; max-width: 230px; height: auto; display: block; margin-bottom: 10px; }
@@ -28,7 +26,7 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 #search-input { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background-color: #f8fafc; font-size: 0.9rem; outline: none; }
 #search-input:focus { border-color: var(--primary-magenta); background: white;}
 
-.sidebar-scroll-area { flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; }
+.sidebar-scroll-area { flex: 1; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; position: relative; } /* Added relative for sticky child */
 .sidebar-scroll-area::-webkit-scrollbar { width: 6px; }
 .sidebar-scroll-area::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
 
@@ -37,13 +35,16 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .sidebar-footer-links a { color: var(--primary-magenta); text-decoration: none; opacity: 0.8; }
 .sidebar-footer-links a:hover { opacity: 1; text-decoration: underline; }
 
-.filters-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
+.filters-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
 .filter-group { display: flex; flex-direction: column; }
 .filter-group label, .category-filter-section label, .locations-header label { font-size: 0.75rem; font-weight: 700; color: #334e68; margin-bottom: 8px; text-transform: uppercase; }
 .filter-select { padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: white; font-size: 0.85rem; outline: none; cursor: pointer; color: var(--text-main);}
 .filter-select:focus { border-color: var(--primary-magenta); }
 
-.category-filter-section { margin-bottom: 25px; }
+/* MARGES IDENTIQUES */
+.category-filter-section { margin-top: 25px; margin-bottom: 25px; }
+.locations-header { margin-top: 25px; margin-bottom: 12px; }
+
 .category-buttons { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; scrollbar-width: none; }
 .category-buttons::-webkit-scrollbar { display: none; }
 .filter-btn { background: white; border: 1px solid var(--border-color); color: #334e68; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap; transition: 0.2s;}
@@ -53,10 +54,21 @@ body { background-color: var(--bg-color); color: var(--text-main); height: 100vh
 .action-btn:hover { background: #bd336b; }
 
 .subtle-btn:hover { background: #f1f5f9 !important; }
-.back-details-btn { background: none; border: none; font-size: 0.9rem; color: var(--muted-text); font-weight: bold; cursor: pointer; text-align: left; padding: 0; margin-bottom: 15px; display: inline-block;}
+
+/* BOUTON DE RETOUR FIXE EN HAUT DU PANNEAU */
+.sidebar-details-header {
+    position: sticky;
+    top: 0;
+    background: var(--sidebar-bg);
+    z-index: 10;
+    padding-top: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 15px;
+}
+.back-details-btn { background: none; border: none; font-size: 0.9rem; color: var(--muted-text); font-weight: bold; cursor: pointer; text-align: left; padding: 0; margin-bottom: 0; display: inline-block;}
 .back-details-btn:hover { color: var(--primary-magenta); text-decoration: underline; }
 
-.locations-header { margin-bottom: 12px; }
 .location-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
 .location-card { border: 1px solid var(--border-color); border-radius: 16px; padding: 12px; cursor: pointer; background: white; display: flex; gap: 16px; align-items: center; }
 .location-card:hover { border-color: var(--primary-magenta); }
