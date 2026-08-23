@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
+  /* Ajouts pour le module Souvenir (Visited) */
   .memory-dropdown { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display: none; animation: slideDown 0.3s ease; }
   .memory-dropdown.open { display: block; }
   .stars { display:flex; gap:4px; cursor: pointer; }
@@ -20,6 +21,14 @@
   .memory-date { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; background: #e2e8f0; padding: 4px 10px; border-radius: 100px; }
   .memory-notes { font-size: 13.5px; color: #334155; line-height: 1.6; font-style: italic; border-left: 3px solid #D42759; padding-left: 12px; }
 
+  /* Style des photos ajoutées */
+  .photo-upload-grid { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
+  .photo-upload-btn { width:56px; height:56px; border:1.5px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink: 0; background: #fff; transition: 0.2s;}
+  .photo-upload-btn:hover { border-color: #D42759; background: #FCE7F0; }
+  .uploaded-thumb { width:56px; height:56px; border-radius:10px; background-size: cover; background-position: center; border: 1px solid #e2e8f0; flex-shrink: 0; position: relative; }
+  .uploaded-thumb .del-photo { position: absolute; top:-4px; right:-4px; background:#D42759; color:#fff; font-size:9px; font-weight:bold; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+  /* Ajouts pour le module Wishlist / Trip */
   .trip-box { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display:none; animation: slideDown 0.3s ease; }
   .trip-box.open { display:block; }
   .trip-select { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; color:#334155; font-family:'Poppins',sans-serif; margin-bottom:10px; background:#fff; cursor:pointer; outline:none; }
@@ -45,6 +54,7 @@
 
 <div class="app-container">
     
+    <!-- Sidebar Gauche -->
     <aside class="sidebar" id="app-sidebar">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -110,7 +120,7 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
-                <!-- PIED DE PAGE TRADUIT -->
+                <!-- PIED DE PAGE -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;" data-i18n="footerText">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -176,7 +186,7 @@
                         </div>
                     </div>
 
-                    <!-- LE TIROIR SOUVENIR (VISITED) -->
+                    <!-- LE TIROIR SOUVENIR (VISITED) AVEC PHOTOS -->
                     <div id="memory-dropdown" class="memory-dropdown">
                         <span class="sub-label">Your rating</span>
                         <div class="stars" id="memory-stars">
@@ -194,7 +204,17 @@
                         <span class="sub-label">Your notes (optional)</span>
                         <textarea id="memory-notes" placeholder="What do you remember about this place?" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; font-family:'Poppins',sans-serif; height:60px; resize:none; margin-bottom:14px; outline:none;"></textarea>
                         
-                        <button id="save-memory-btn" style="width:100%; margin-top:16px; background:#D42759; color:#fff; border:none; border-radius:9px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;">Save memory</button>
+                        <span class="sub-label">Add photos</span>
+                        <div class="photo-upload-grid" id="memory-photos-container">
+                            <div class="photo-upload-btn" onclick="alert('Module upload photo.')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </div>
+                            <!-- Mock Photos -->
+                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=200');"><div class="del-photo">✕</div></div>
+                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200');"><div class="del-photo">✕</div></div>
+                        </div>
+
+                        <button id="save-memory-btn" style="width:100%; margin-top:10px; background:#D42759; color:#fff; border:none; border-radius:9px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;">Save memory</button>
                     </div>
                 </div>
 
@@ -247,6 +267,12 @@
                             <div class="stars" id="display-memory-stars" style="pointer-events: none;"></div>
                             <div class="memory-date" id="display-memory-date"></div>
                         </div>
+                        
+                        <div class="photo-upload-grid" style="margin-bottom: 15px;">
+                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=200'); border:none;"></div>
+                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200'); border:none;"></div>
+                        </div>
+
                         <div class="memory-notes" id="display-memory-notes"></div>
                         <button id="edit-memory-btn" style="background:transparent; border:1.5px solid #cbd5e1; color:#64748b; font-size:11px; font-weight:700; padding:6px 12px; border-radius:100px; margin-top:20px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit memory</button>
                     </div>
@@ -279,9 +305,6 @@
             <div class="dropdown-container">
                 <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
-                    <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
-                    <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
-                    <div class="dropdown-divider"></div>
                     <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
                     <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
                     <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
