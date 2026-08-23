@@ -7,25 +7,30 @@ let currentFilteredLocations = [];
 let currentLocationIdForMemory = null; 
 let currentGeneratedItinerary = [];
 
-if (document.getElementById('map') && typeof L !== 'undefined') {
-    map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
-        attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 
-    }).addTo(map);
-    markerGroup = L.layerGroup().addTo(map);
-    setTimeout(() => { map.invalidateSize(); }, 200);
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialise la carte Uniquement si on est sur la bonne vue
+    if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
+        map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 
+        }).addTo(map);
+        markerGroup = L.layerGroup().addTo(map);
+        setTimeout(() => { map.invalidateSize(); }, 200);
 
-    map.on('zoomend', function() {
-        const zoom = map.getZoom();
-        let markerSize = 32; let iconSize = 16;
-        if (zoom < 5) { markerSize = 12; iconSize = 0; }
-        else if (zoom < 9) { markerSize = 20; iconSize = 10; }
-        else { markerSize = 32; iconSize = 16; }
-        document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
-        document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
-    });
-}
+        map.on('zoomend', function() {
+            const zoom = map.getZoom();
+            let markerSize = 32; let iconSize = 16;
+            if (zoom < 5) { markerSize = 12; iconSize = 0; }
+            else if (zoom < 9) { markerSize = 20; iconSize = 10; }
+            else { markerSize = 32; iconSize = 16; }
+            document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
+            document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
+        });
+    }
+
+    updateUI();
+});
 
 window.toggleMobileMenu = function() {
     const sidebar = document.getElementById('app-sidebar');
@@ -269,10 +274,30 @@ function updateUI() {
         if(yearOpt) yearOpt.textContent = t('allYears');
     }
 
-    if(window.location.pathname.includes('map.html')) {
+    if(document.getElementById('group-select')) {
         initializeFilters();
         renderLocations();
         loadTripOptions();
+    }
+    
+    if(document.getElementById('trip-name-display')) {
+        const isFr = currentLang === 'fr';
+        const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
+        const eAuto = document.getElementById('i18n-auto-btn'); if(eAuto) eAuto.textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
+        const eAct = document.getElementById('i18n-active'); if(eAct) eAct.textContent = isFr ? "Voyage actif :" : "Active Trip :";
+        const eEdit = document.getElementById('i18n-editing'); if(eEdit) eEdit.textContent = isFr ? "Édition de ce voyage" : "Editing this trip";
+        const eDur = document.getElementById('i18n-trip-duration'); if(eDur) eDur.textContent = isFr ? "Durée & Dates" : "Trip Duration & Dates";
+        const eSpec = document.getElementById('i18n-opt-specific'); if(eSpec) eSpec.textContent = isFr ? "Dates Précises" : "Specific Dates";
+        const eGen = document.getElementById('i18n-opt-duration'); if(eGen) eGen.textContent = isFr ? "Durée Globale" : "General Duration";
+        const eAdd = document.getElementById('i18n-add-more'); if(eAdd) eAdd.textContent = isFr ? "Ajouter des lieux" : "Add more locations";
+        const eReco = document.getElementById('i18n-reco'); if(eReco) eReco.textContent = isFr ? "Recommandé pour ce voyage (Même pays)" : "Recommended for this trip (Same Country)";
+        const eIti = document.getElementById('i18n-your-iti'); if(eIti) eIti.textContent = isFr ? "Votre itinéraire" : "Your itinerary";
+        const eAddDay = document.getElementById('i18n-add-day'); if(eAddDay) eAddDay.textContent = isFr ? "Ajouter un jour" : "Add an empty day";
+        const eCancel = document.getElementById('i18n-cancel'); if(eCancel) eCancel.textContent = isFr ? "Annuler" : "Cancel";
+        const eSave = document.getElementById('i18n-save'); if(eSave) eSave.textContent = isFr ? "Sauvegarder" : "Save changes";
+        const eModAdd = document.getElementById('i18n-modal-add'); if(eModAdd) eModAdd.textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
+        
+        if(typeof renderTrip === 'function') renderTrip();
     }
 }
 
@@ -297,7 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
             currentLang = this.getAttribute('data-lang'); 
             localStorage.setItem('lang', currentLang); 
             updateUI(); 
-            if(window.location.pathname.includes('trips.html')) { updateI18N(); renderTrip(); }
         });
     });
 
@@ -332,22 +356,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnShowLocs) { btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); }); }
     const btnShowCountries = document.getElementById('btn-show-countries');
     if (btnShowCountries) { btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); }); }
-
-    if(window.location.pathname.includes('map.html')) { updateUI(); }
 });
 
 // ==========================================
-// 4. FILTRES DE LA CARTE
+// 4. FILTRES
 // ==========================================
-const groupSelect = document.getElementById('group-select');
-const memberSelect = document.getElementById('member-select');
-const yearSelect = document.getElementById('year-select');
-const countrySelect = document.getElementById('country-select');
-const searchInput = document.getElementById('search-input');
-const categoryButtonsContainer = document.getElementById('category-buttons');
-let activeCategory = "All"; 
-
 function initializeFilters() {
+    const groupSelect = document.getElementById('group-select');
+    const memberSelect = document.getElementById('member-select');
+    const countrySelect = document.getElementById('country-select');
+    const categoryButtonsContainer = document.getElementById('category-buttons');
     if(!groupSelect) return;
     
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
@@ -385,15 +403,25 @@ function initializeFilters() {
     });
 }
 
-if(groupSelect) {
-    [groupSelect, memberSelect, yearSelect, countrySelect].forEach(el => el.addEventListener('change', () => { if(el===groupSelect) initializeFilters(); renderLocations(); }));
-    searchInput.addEventListener('input', renderLocations);
+const gSelect = document.getElementById('group-select');
+if(gSelect) {
+    [gSelect, document.getElementById('member-select'), document.getElementById('year-select'), document.getElementById('country-select')].forEach(el => {
+        if(el) el.addEventListener('change', () => { if(el===gSelect) initializeFilters(); renderLocations(); });
+    });
+    const sInput = document.getElementById('search-input');
+    if(sInput) sInput.addEventListener('input', renderLocations);
 }
 
 // ==========================================
 // 5. AFFICHAGE DES LIEUX
 // ==========================================
 function renderLocations() {
+    const groupSelect = document.getElementById('group-select');
+    const memberSelect = document.getElementById('member-select');
+    const yearSelect = document.getElementById('year-select');
+    const countrySelect = document.getElementById('country-select');
+    const searchInput = document.getElementById('search-input');
+    
     if(!groupSelect || !map) return; 
     markerGroup.clearLayers();
     const locationListElement = document.getElementById('location-list');
@@ -458,7 +486,7 @@ function renderLocations() {
 }
 
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST DEPUIS MAP.HTML
+// 6. GESTION DES TRIPS / WISHLIST
 // ==========================================
 function loadTripOptions() {
     const select = document.getElementById('trip-select');
@@ -466,9 +494,8 @@ function loadTripOptions() {
     
     select.innerHTML = '';
     const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    const lang = localStorage.getItem('lang') || 'en';
-    const noTripTxt = lang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
-    const newTripTxt = lang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
+    const noTripTxt = currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
+    const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
     
     select.innerHTML = `<option value="none">${noTripTxt}</option>`;
     trips.forEach(t => {
@@ -976,7 +1003,7 @@ window.saveItineraryToTrips = function() {
     const country = document.getElementById('iti-country').value;
     const daysCount = parseInt(document.getElementById('iti-days').value);
     const newTripId = 'trip-' + Date.now();
-    const tripName = `${country} Trip (${daysCount} days)`;
+    const tripName = `${country} Trip (${daysCount} ${currentLang === 'fr' ? 'Jours' : 'Days'})`;
 
     let newTrip = {
         id: newTripId,
@@ -1130,7 +1157,7 @@ window.onclick = function(e) {
 };
 
 // ==========================================
-// 11. BANNIÈRE COOKIES ET REDIRECTION VISITED
+// 11. BANNIÈRE COOKIES ET REDIRECTION
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
