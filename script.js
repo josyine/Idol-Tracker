@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION DE L'APPLICATION
+// 1. INITIALISATION ROBUSTE DE L'APPLICATION
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -7,13 +7,6 @@ let currentFilteredLocations = [];
 let currentLocationIdForMemory = null; 
 let currentGeneratedItinerary = [];
 let currentLang = localStorage.getItem('lang') || 'en';
-
-// Variables globales pour trips.html
-let myTrips = [];
-let wishlistLocs = [];
-let currentTrip = null;
-let editing = false;
-let draggedEl = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Si la page contient une carte Leaflet (map.html), on l'initialise
@@ -37,7 +30,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lance la logique UI (Filtres, Trips, etc.)
+    window.toggleMobileMenu = function() {
+        const sidebar = document.getElementById('app-sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('open');
+            if (!sidebar.classList.contains('open')) sidebar.classList.remove('expanded');
+        }
+    };
+
+    ['lang-btn', 'profile-btn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if(btn) btn.addEventListener('click', (e) => {
+            const menuId = id.replace('-btn', '-menu');
+            document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
+            document.getElementById(menuId).classList.toggle('hidden');
+            e.stopPropagation();
+        });
+    });
+
+    document.addEventListener('click', () => { 
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
+    });
+
+    const profileBtn = document.getElementById('profile-btn');
+    if (profileBtn) {
+        const savedName = localStorage.getItem('userName') || 'U';
+        profileBtn.textContent = savedName.charAt(0).toUpperCase();
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById('tab-' + btn.dataset.tab);
+            if(target) target.classList.add('active');
+        });
+    });
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('unlockedGroups');
+            window.location.href = 'index.html';
+        });
+    }
+
+    const btnShowLocs = document.getElementById('btn-show-locations');
+    if (btnShowLocs) btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); });
+    const btnShowCountries = document.getElementById('btn-show-countries');
+    if (btnShowCountries) btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); });
+
     updateUI();
 });
 
@@ -71,19 +117,19 @@ let celebLocations = [
         id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020",
         episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0",
         address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", 
-        fullDescription: { en: `<p>Located in Apgujeong, Cafe Camptong served as the sprawling backdrop for Run BTS.</p>`, fr: `<p>Situé à Apgujeong, le Cafe Camptong a servi de décor pour Run BTS.</p>` },
-        tip: { en: "The building facade remains a landmark.", fr: "La façade reste un repère historique." },
+        fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` },
+        tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." },
         directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." }
     },
     {
         id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1",
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
-        fullDescription: { en: `<p>Ossu Seiromushi represents Jin's venture into culinary business.</p>`, fr: `<p>Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` },
-        tip: { en: "Arrive early to secure a spot.", fr: "Arrivez tôt pour être sur la liste." },
-        directions: { en: "Line 8 to Songpanaru Station.", fr: "Ligne 8 jusqu'à Songpanaru." }
+        fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` },
+        tip: { en: "Arrive early to secure a spot.", fr: "Arrivez tôt pour être sur la liste d'attente." },
+        directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." }
     },
     {
-        id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", ytId: "d--MDCCJ3jg",
+        id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", ytId: "d--MDCCJ3jg",
         address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg"
     },
     {
@@ -183,9 +229,14 @@ const translations = {
 };
 
 const catTranslations = {
-    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", "Restaurants": {en: "Restaurants", fr: "Restaurants"}, "Cafe": {en: "Cafe", fr: "Café"}, 
-    "Museums": {en: "Museums", fr: "Musées"}, "MV Location": "MV Location", "Concerts": "Concerts", "Fashion": {en: "Fashion", fr: "Mode"}, 
-    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, "Pop-up Store": "Pop-up Store"
+    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", 
+    "Restaurants": {en: "Restaurants", fr: "Restaurants"}, 
+    "Cafe": {en: "Cafe", fr: "Café"}, 
+    "Museums": {en: "Museums", fr: "Musées"}, 
+    "MV Location": "MV Location", "Concerts": "Concerts", 
+    "Fashion": {en: "Fashion", fr: "Mode"}, 
+    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, 
+    "Pop-up Store": "Pop-up Store"
 };
 
 function getCatName(cat) {
@@ -213,14 +264,13 @@ function updateUI() {
         if(yearOpt) yearOpt.textContent = t('allYears');
     }
 
-    // MAP.HTML logic
     if(document.getElementById('group-select')) {
         initializeFilters();
         renderLocations();
         loadTripOptions();
     }
     
-    // TRIPS.HTML logic
+    // Si on est sur trips.html
     if(document.getElementById('trip-name-display')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
@@ -302,11 +352,9 @@ function initializeFilters() {
         if(sInput) sInput.addEventListener('input', renderLocations);
     }
 
-    // Init ITI Generator Selectors (in trips.html or map.html)
-    initItineraryGenerator();
+    window.initItineraryGenerator();
 }
 
-// Fonction utilitaire pour le générateur d'itinéraire (appelé aussi bien dans Map que dans Trips)
 window.initItineraryGenerator = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
@@ -573,7 +621,6 @@ window.openDetailsPanel = function(id) {
         else { tipSection.classList.add('hidden'); }
     }
     
-    // Checkboxes Visited
     const vCheck = document.getElementById('details-visited');
     const memoryDropdown = document.getElementById('memory-dropdown');
     const tabBtnVisit = document.getElementById('tab-btn-visit');
@@ -618,7 +665,6 @@ window.openDetailsPanel = function(id) {
         };
     }
 
-    // Checkboxes Wishlist
     const wCheck = document.getElementById('details-wishlist');
     const tripBox = document.getElementById('trip-box');
     
@@ -669,9 +715,7 @@ window.setStars = function(val) {
     });
 }
 document.querySelectorAll('#memory-stars .star').forEach(star => {
-    star.addEventListener('click', function() {
-        window.setStars(parseInt(this.getAttribute('data-val')));
-    });
+    star.addEventListener('click', function() { window.setStars(parseInt(this.getAttribute('data-val'))); });
 });
 
 const saveMemoryBtn = document.getElementById('save-memory-btn');
@@ -761,13 +805,17 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR
+// 8. AUTO-ITINERARY GENERATOR (RÉPARÉ)
 // ==========================================
+let itiLeafletMap = null;
+let itiLayerGroup = null;
+
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
         document.getElementById('iti-result').classList.add('hidden');
         document.getElementById('itinerary-modal').classList.remove('hidden');
+        window.initItineraryGenerator();
     });
 }
 
@@ -799,34 +847,25 @@ window.generateItinerary = function() {
     
     resultDiv.innerHTML = "";
     
-    // Rétabli comme à l'origine (Math.ceil)
-    const locsPerDay = Math.ceil(validLocs.length / days);
+    // CORRECTION du générateur : On force un minimum de 1 lieu par jour pour s'assurer que ça s'affiche
+    const locsPerDay = Math.max(1, Math.ceil(validLocs.length / days));
     let coordsForMap = [];
     currentGeneratedItinerary = [];
     
-    const txt = {
-        en: { day: "Day", transit: "Transit to next location (~30 mins)", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
-        fr: { day: "Jour", transit: "Trajet vers le prochain lieu (~30 mins)", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
-    }[currentLang];
-
     for(let i = 0; i < days; i++) {
         const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
         if(dayLocs.length === 0) continue;
         
         currentGeneratedItinerary.push(dayLocs);
         
-        let mapLink = "";
         if(dayLocs.length === 1) {
-            mapLink = `https://www.google.com/maps/search/?api=1&query=${dayLocs[0].lat},${dayLocs[0].lng}`;
             coordsForMap.push([dayLocs[0].lat, dayLocs[0].lng]);
         } else {
-            let waypoints = dayLocs.map(l => `${l.lat},${l.lng}`).join('|');
-            mapLink = `https://www.google.com/maps/dir/?api=1&origin=${dayLocs[0].lat},${dayLocs[0].lng}&destination=${dayLocs[dayLocs.length-1].lat},${dayLocs[dayLocs.length-1].lng}&waypoints=${waypoints}&travelmode=driving`;
             dayLocs.forEach(l => coordsForMap.push([l.lat, l.lng]));
         }
         
         let html = `<div class="iti-day-card" style="padding: 18px 16px;">
-            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">${txt.day} ${i + 1}</div>`;
+            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Day ${i + 1}</div>`;
         
         let currentTime = new Date();
         currentTime.setHours(10, 0, 0);
@@ -843,30 +882,17 @@ window.generateItinerary = function() {
                     <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
                     <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${startTime} - ${endTime}</div>
                     <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
-                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)} &middot; ${txt.free}</div>
+                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)}</div>
             `;
-            
-            if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
-                html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
-                    <b style="color:#2E3644;">${txt.lunch} ${l.name}</b><br>
-                    <span style="color:#64748b;">Explore local eateries before your next stop.</span>
-                </div>`;
-                currentTime.setHours(currentTime.getHours() + 1);
-            }
             html += `</div>`;
 
             if (idx < dayLocs.length - 1) {
-                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
+                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">Transit</span></div>`;
                 currentTime.setMinutes(currentTime.getMinutes() + 30);
-            } else {
-                html += `<div style="padding-left:18px; margin-top:5px; margin-bottom:15px;"><span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">${txt.coffee}</span></div>`;
             }
         });
         
-        html += `<a href="${mapLink}" target="_blank" style="display:inline-flex; align-items:center; gap:6px; padding:10px 16px; margin-top:5px; font-size:12px; color:#2E3644; border:1px solid #cbd5e1; border-radius:100px; background:white; font-weight:600; text-decoration:none; transition:0.2s;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-            ${txt.mapBtn}
-        </a></div>`;
+        html += `</div>`;
         resultDiv.innerHTML += html;
     }
     
@@ -889,10 +915,15 @@ window.generateItinerary = function() {
                 L.circleMarker(c, { color: '#D42759', radius: 6, fillOpacity: 1 }).addTo(itiLayerGroup)
                  .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
             });
-            L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
+            
+            if(coordsForMap.length > 1) {
+                L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
+                itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
+            } else if (coordsForMap.length === 1) {
+                itiLeafletMap.setView(coordsForMap[0], 12);
+            }
 
             itiLeafletMap.invalidateSize();
-            if(coordsForMap.length > 0) itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
         }, 250);
     }
 }
@@ -930,11 +961,11 @@ window.saveItineraryToTrips = function() {
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
 
-    if(document.getElementById('trip-name-display')) {
+    if(window.location.pathname.includes('trips.html')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
-        window.initTrips();
-        const sel = document.getElementById('active-trip-select');
-        if(sel) { sel.value = newTripId; window.switchTrip(); }
+        window.loadTripsSidebar();
+        document.getElementById('active-trip-select').value = newTripId;
+        window.switchTrip();
     } else {
         window.location.href = 'trips.html';
     }
@@ -954,64 +985,179 @@ window.exportItineraryPDF = function() {
 };
 
 // ==========================================
-// 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
+// 9. MODAL PANIER DEPUIS LA CARTE
 // ==========================================
-window.initTrips = function() {
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    
-    if (trips.length === 0) {
-        document.getElementById('empty-state').innerHTML = currentLang === 'fr' 
-            ? "Vous n'avez pas encore de voyage.<br>Allez sur la carte et ajoutez des lieux !"
-            : "You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist'!";
-        document.getElementById('empty-state').classList.remove('hidden');
-        document.getElementById('trip-detail-content').style.display = 'none';
-        document.getElementById('sidebar-title').textContent = `MY TRIPS (0)`;
-        document.getElementById('trips-list-container').innerHTML = '';
-        return;
-    }
-    
-    document.getElementById('empty-state').classList.add('hidden');
-    document.getElementById('trip-detail-content').style.display = 'block';
-    
-    // Assigne le voyage actif si non défini
-    if (!currentTrip || !trips.find(t => t.id === currentTrip.id)) {
-        currentTrip = trips[trips.length - 1];
-    }
-    if (!currentTrip.days) currentTrip.days = [];
-
-    window.renderTripsSidebar();
-    window.renderTrip();
-    window.initItineraryGenerator();
+window.openCartModal = function() {
+    const modal = document.getElementById('cart-modal');
+    if(!modal) return;
+    modal.classList.remove('hidden');
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    document.querySelectorAll('.cart-checkbox').forEach(cb => {
+        cb.checked = false; 
+        const span = cb.nextElementSibling;
+        if(unlockedGroups.includes(cb.value)) { cb.disabled = true; span.style.background = "#f1f5f9"; span.style.color = "#94a3b8"; span.textContent = `${cb.value} (Purchased)`; }
+        else { cb.disabled = false; span.style.background = "white"; span.style.color = "#64748b"; span.textContent = cb.value; }
+    });
+    updateCartPrice();
 }
 
-window.renderTripsSidebar = function() {
-    const listContainer = document.getElementById('trips-list-container');
-    if(!listContainer) return;
+function updateCartPrice() {
+    const selected = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
+    const priceDisplay = document.getElementById('cart-price');
+    if(priceDisplay) priceDisplay.textContent = `${(selected * 14.99).toFixed(2)} €`;
+    const btn = document.getElementById('cart-pay-btn');
+    if(btn) {
+        if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; } 
+        else { btn.disabled = true; btn.textContent = `Select a group`; }
+    }
+}
+
+document.querySelectorAll('.cart-checkbox').forEach(cb => {
+    cb.addEventListener('change', function() {
+        this.nextElementSibling.style.borderColor = this.checked ? "#D42759" : "#cbd5e1";
+        this.nextElementSibling.style.color = this.checked ? "#D42759" : "#64748b";
+        this.nextElementSibling.style.background = this.checked ? "#FCE7F0" : "white";
+        updateCartPrice();
+    });
+});
+
+const cartForm = document.getElementById('cart-form');
+if(cartForm) {
+    cartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
+        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+        setTimeout(() => window.location.reload(), 1000);
+    });
+}
+
+// ==========================================
+// 10. GESTION DES MODALES "LIST" (Depuis KPI)
+// ==========================================
+window.openFilteredListModal = function(type) {
+    const modal = document.getElementById('list-modal');
+    const title = document.getElementById('list-modal-title');
+    const content = document.getElementById('list-modal-content');
+    if (!modal || !content) return;
+
+    content.innerHTML = '';
     
+    if (type === 'locations') {
+        title.textContent = currentLang === 'fr' ? "Lieux filtrés" : "Filtered Locations";
+        currentFilteredLocations.forEach(loc => {
+            content.innerHTML += `
+                <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='#D42759'" onmouseout="this.style.borderColor='#e2e8f0'" onclick="closeModal('list-modal'); window.openDetailsPanel(${loc.id}); map.flyTo([${loc.lat}, ${loc.lng}], 16);">
+                    <div style="font-weight: 700; color: #2E3644; font-size:14px; margin-bottom:2px;">${loc.name}</div>
+                    <div style="font-size: 11px; color: #64748b; text-transform:uppercase; font-weight:600;">${loc.city}, ${loc.country} &middot; <span style="color:#D42759;">${getCatName(loc.category)}</span></div>
+                </div>
+            `;
+        });
+    } else if (type === 'countries') {
+        title.textContent = currentLang === 'fr' ? "Pays filtrés" : "Filtered Countries";
+        const countries = [...new Set(currentFilteredLocations.map(l => l.country))].sort();
+        countries.forEach(c => {
+            const count = currentFilteredLocations.filter(l => l.country === c).length;
+            const textLoc = count > 1 ? (currentLang === 'fr' ? "lieux" : "locations") : (currentLang === 'fr' ? "lieu" : "location");
+            content.innerHTML += `
+                <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-weight: 700; color: #D42759; font-size:15px;">${c}</div>
+                    <div style="font-size: 12px; color: #64748b; font-weight:600;">${count} ${textLoc}</div>
+                </div>
+            `;
+        });
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+window.closeModal = function(id) { 
+    const el = document.getElementById(id);
+    if(el) el.classList.add('hidden'); 
+};
+window.onclick = function(e) { 
+    if (e.target.classList.contains('modal')) e.target.classList.add('hidden'); 
+};
+
+if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
+    document.getElementById('cookie-banner').classList.remove('hidden'); 
+}
+function closeCookies() { 
+    localStorage.setItem('cookiesAccepted', 'true'); 
+    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
+}
+const btnAccept = document.getElementById('cookie-accept');
+if(btnAccept) btnAccept.addEventListener('click', closeCookies);
+const btnReject = document.getElementById('cookie-reject');
+if(btnReject) btnReject.addEventListener('click', closeCookies);
+
+// ==========================================
+// 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
+// ==========================================
+window.loadTripsSidebar = function() {
+    const listContainer = document.getElementById('trips-list-container');
+    const title = document.getElementById('sidebar-title');
+    const select = document.getElementById('active-trip-select');
+    if(!listContainer) return;
+
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     
     listContainer.innerHTML = '';
-    document.getElementById('sidebar-title').textContent = `MY TRIPS (${trips.length})`;
+    if(select) select.innerHTML = '';
+    
+    title.textContent = `MY TRIPS (${trips.length})`;
+
+    if (trips.length === 0) {
+        document.getElementById('empty-state').innerHTML = currentLang==='fr'?"Vous n'avez pas encore créé de voyage.<br>Allez sur la carte et ajoutez des lieux à votre Wishlist !":"You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist' to create your first trip!";
+        document.getElementById('empty-state').classList.remove('hidden');
+        document.getElementById('trip-detail-content').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('trip-detail-content').style.display = 'block';
 
     trips.forEach(t => {
+        if(select) {
+            let opt = document.createElement('option');
+            opt.value = t.id; opt.textContent = t.name;
+            select.appendChild(opt);
+        }
+
         const locCount = wList.filter(w => w.tripId === t.id).length;
         let dateStr = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.startDate || '?'} to ${t.endDate || '?'}`;
         
         let pill = document.createElement('div');
         pill.className = `trip-pill ${currentTrip && currentTrip.id === t.id ? 'active' : ''}`;
-        pill.onclick = () => { 
-            currentTrip = t; 
-            if (!currentTrip.days) currentTrip.days = [];
-            window.renderTripsSidebar(); 
-            window.renderTrip(); 
-        };
+        pill.onclick = () => { if(select) select.value = t.id; window.switchTrip(); };
         pill.innerHTML = `
             <div class="trip-pill-name">${t.name}</div>
             <div class="trip-pill-meta">${dateStr} &middot; ${locCount} locations</div>
         `;
         listContainer.appendChild(pill);
     });
+
+    if(select && !select.value && trips.length > 0) {
+        select.value = trips[trips.length - 1].id;
+    }
+    
+    if (!currentTrip || !trips.find(t => t.id === currentTrip.id)) {
+         window.switchTrip();
+    } else {
+         window.renderTrip();
+    }
+}
+
+window.switchTrip = function() {
+    const select = document.getElementById('active-trip-select');
+    if(!select) return;
+    
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    currentTrip = trips.find(t => t.id === select.value);
+    if (!currentTrip.days) currentTrip.days = []; 
+    
+    window.loadTripsSidebar(); 
 }
 
 window.renderTrip = function() {
@@ -1041,7 +1187,7 @@ window.renderTrip = function() {
         const loc = celebLocations.find(l => l.id === id);
         if (loc) locList.appendChild(window.createLocRow(loc));
     });
-    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `LIEUX NON ASSIGNÉS (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
+    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `Lieux non assignés (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
 
     const box = document.getElementById('itinerary-box');
     const addBtn = box.querySelector('.add-day-btn');
@@ -1202,7 +1348,7 @@ window.removeFromTrip = function(btn, locId) {
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     btn.closest('.day-loc').remove();
     
-    window.saveTrip(false); // Sauvegarde silencieuse
+    window.saveTrip(false); 
 }
 
 window.quickAddLoc = function(locId) {
@@ -1210,11 +1356,11 @@ window.quickAddLoc = function(locId) {
     if(!wList.some(w => w.id === locId && w.tripId === currentTrip.id)) {
         wList.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-        window.saveTrip(false); // Rafraîchit l'UI en restant en mode edit
+        window.saveTrip(false); 
     }
 }
 
-window.saveTrip = function() {
+window.saveTrip = function(exitEdit = true) {
     currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
     
     const type = document.getElementById('trip-duration-type').value;
@@ -1239,9 +1385,11 @@ window.saveTrip = function() {
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
     
-    editing = false; 
-    window.renderTripsSidebar();
-    window.renderTrip(); 
+    const opt = document.getElementById('active-trip-select').querySelector(`option[value="${currentTrip.id}"]`);
+    if(opt) opt.textContent = currentTrip.name;
+    
+    if (exitEdit) { editing = false; window.renderTripsSidebar(); window.renderTrip(); } 
+    else { window.renderTripsSidebar(); window.renderTrip(); }
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
@@ -1289,51 +1437,7 @@ window.createNewTripEmpty = function() {
     document.getElementById('add-trip-modal').classList.add('hidden');
     nameInput.value = '';
     
-    window.initTrips(); 
-}
-
-// Panier et déconnexion
-window.openCartModal = function() {
-    const modal = document.getElementById('cart-modal');
-    if(!modal) return;
-    modal.classList.remove('hidden');
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    document.querySelectorAll('.cart-checkbox').forEach(cb => {
-        cb.checked = false; 
-        const span = cb.nextElementSibling;
-        if(unlockedGroups.includes(cb.value)) { cb.disabled = true; span.style.background = "#f1f5f9"; span.style.color = "#94a3b8"; span.textContent = `${cb.value} (Purchased)`; }
-        else { cb.disabled = false; span.style.background = "white"; span.style.color = "#64748b"; span.textContent = cb.value; }
-    });
-    updateCartPrice();
-}
-
-function updateCartPrice() {
-    const selected = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
-    const priceDisplay = document.getElementById('cart-price');
-    if(priceDisplay) priceDisplay.textContent = `${(selected * 14.99).toFixed(2)} €`;
-    const btn = document.getElementById('cart-pay-btn');
-    if(btn) {
-        if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; } 
-        else { btn.disabled = true; btn.textContent = `Select a group`; }
-    }
-}
-
-document.querySelectorAll('.cart-checkbox').forEach(cb => {
-    cb.addEventListener('change', function() {
-        this.nextElementSibling.style.borderColor = this.checked ? "#D42759" : "#cbd5e1";
-        this.nextElementSibling.style.color = this.checked ? "#D42759" : "#64748b";
-        this.nextElementSibling.style.background = this.checked ? "#FCE7F0" : "white";
-        updateCartPrice();
-    });
-});
-
-const cartForm = document.getElementById('cart-form');
-if(cartForm) {
-    cartForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
-        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
-        setTimeout(() => window.location.reload(), 1000);
-    });
+    window.loadTripsSidebar(); 
+    document.getElementById('active-trip-select').value = newTripId;
+    window.switchTrip(); 
 }
