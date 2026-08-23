@@ -5,7 +5,7 @@ let map = null;
 let markerGroup = null;
 let currentFilteredLocations = []; 
 let currentLocationIdForMemory = null; 
-let currentGeneratedItinerary = []; // Sauvegarde temporaire pour l'Auto-Itinerary
+let currentGeneratedItinerary = [];
 
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
@@ -209,7 +209,6 @@ let celebLocations = [
 // ==========================================
 // 3. LOGIQUE UI ET LANGUES
 // ==========================================
-let currentLang = localStorage.getItem('lang') || 'en';
 const translations = {
     en: { 
         btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
@@ -270,9 +269,11 @@ function updateUI() {
         if(yearOpt) yearOpt.textContent = t('allYears');
     }
 
-    initializeFilters();
-    renderLocations();
-    loadTripOptions();
+    if(window.location.pathname.includes('map.html')) {
+        initializeFilters();
+        renderLocations();
+        loadTripOptions();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -296,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentLang = this.getAttribute('data-lang'); 
             localStorage.setItem('lang', currentLang); 
             updateUI(); 
+            if(window.location.pathname.includes('trips.html')) { updateI18N(); renderTrip(); }
         });
     });
 
@@ -315,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // LOGOUT
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
@@ -327,15 +328,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LIST MODAL FOR KPI PILLS
     const btnShowLocs = document.getElementById('btn-show-locations');
     if (btnShowLocs) { btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); }); }
     const btnShowCountries = document.getElementById('btn-show-countries');
     if (btnShowCountries) { btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); }); }
+
+    if(window.location.pathname.includes('map.html')) { updateUI(); }
 });
 
 // ==========================================
-// 4. FILTRES
+// 4. FILTRES DE LA CARTE
 // ==========================================
 const groupSelect = document.getElementById('group-select');
 const memberSelect = document.getElementById('member-select');
@@ -455,10 +457,8 @@ function renderLocations() {
     if (mapMarkers.length > 0) map.fitBounds(new L.featureGroup(mapMarkers).getBounds(), { padding: [50, 50], maxZoom: 16 });
 }
 
-if(groupSelect) { initializeFilters(); renderLocations(); loadTripOptions(); }
-
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST
+// 6. GESTION DES TRIPS / WISHLIST DEPUIS MAP.HTML
 // ==========================================
 function loadTripOptions() {
     const select = document.getElementById('trip-select');
@@ -493,7 +493,7 @@ window.toggleWishlist = function() {
         wList = wList.filter(w => w.id !== currentLocationIdForMemory && w !== currentLocationIdForMemory);
     }
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    renderLocations();
+    if(map) renderLocations();
 };
 
 window.handleTripSelect = function() {
@@ -534,8 +534,7 @@ window.createTrip = function() {
 
     const newTripId = 'trip-' + Date.now();
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    // Initialise avec un tableau "days" vide
-    trips.push({ id: newTripId, name: label, startDate: start, endDate: end, days: [] });
+    trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
 
     loadTripOptions(); 
@@ -678,7 +677,7 @@ window.openDetailsPanel = function(id) {
                 document.getElementById('tab-info').classList.add('active');
             }
             localStorage.setItem('visitedLocs', JSON.stringify(list));
-            renderLocations(); 
+            if(map) renderLocations(); 
         };
     }
 
@@ -717,7 +716,9 @@ window.openDetailsPanel = function(id) {
 
 // GESTION DES ÉTOILES (TIROIR SOUVENIR)
 function setStars(val) {
-    document.getElementById('memory-rating-val').value = val;
+    const memoryRatingVal = document.getElementById('memory-rating-val');
+    if(!memoryRatingVal) return;
+    memoryRatingVal.value = val;
     document.querySelectorAll('#memory-stars .star').forEach((star, index) => {
         if(index < val) {
             star.setAttribute('fill', '#D42759');
@@ -768,7 +769,8 @@ function displayMemoryData(data) {
     let starsHtml = '';
     for(let i=0; i<5; i++) { starsHtml += (i < data.rating) ? starSvg : emptyStarSvg; }
     
-    document.getElementById('display-memory-stars').innerHTML = starsHtml;
+    const displayStars = document.getElementById('display-memory-stars');
+    if(displayStars) displayStars.innerHTML = starsHtml;
     
     let formattedDate = data.date;
     if(data.date) {
@@ -778,8 +780,11 @@ function displayMemoryData(data) {
         }
     }
     
-    document.getElementById('display-memory-date').textContent = formattedDate || 'Unknown date';
-    document.getElementById('display-memory-notes').textContent = data.notes ? `"${data.notes}"` : (currentLang === 'fr' ? "Aucune note pour cette visite." : "No notes for this visit.");
+    const displayDate = document.getElementById('display-memory-date');
+    if(displayDate) displayDate.textContent = formattedDate || 'Unknown date';
+    
+    const displayNotes = document.getElementById('display-memory-notes');
+    if(displayNotes) displayNotes.textContent = data.notes ? `"${data.notes}"` : (currentLang === 'fr' ? "Aucune note pour cette visite." : "No notes for this visit.");
 }
 
 const editMemoryBtn = document.getElementById('edit-memory-btn');
@@ -807,14 +812,17 @@ window.closeDetailsPanel = function() {
     
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelector('.tab-btn[data-tab="info"]').classList.add('active');
-    document.getElementById('tab-info').classList.add('active');
+    
+    const tabInfo = document.querySelector('.tab-btn[data-tab="info"]');
+    if(tabInfo) tabInfo.classList.add('active');
+    const panelInfo = document.getElementById('tab-info');
+    if(panelInfo) panelInfo.classList.add('active');
     
     setTimeout(() => { if(map) map.invalidateSize(); }, 450);
 }
 
 // ==========================================
-// 8. ITINERARY & CART MODALS
+// 8. AUTO-ITINERARY GENERATOR
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -863,25 +871,24 @@ window.generateItinerary = function() {
     validLocs = route;
 
     const resultDiv = document.getElementById('iti-days-list');
+    if(!resultDiv) return;
+    
     resultDiv.innerHTML = "";
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     
-    // Initialise le tableau global pour l'enregistrement (Save to Trips)
     currentGeneratedItinerary = [];
     
-    const lang = localStorage.getItem('lang') || 'en';
-    const itiText = {
+    const txt = {
         en: { day: "Day", transit: "Transit to next location (~30 mins)", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
         fr: { day: "Jour", transit: "Trajet vers le prochain lieu (~30 mins)", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
-    };
-    const t_iti = itiText[lang];
+    }[currentLang];
 
     for(let i = 0; i < days; i++) {
         const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
         if(dayLocs.length === 0) continue;
         
-        currentGeneratedItinerary.push(dayLocs); // Pour le save
+        currentGeneratedItinerary.push(dayLocs);
         
         let mapLink = "";
         if(dayLocs.length === 1) {
@@ -894,7 +901,7 @@ window.generateItinerary = function() {
         }
         
         let html = `<div class="iti-day-card" style="padding: 18px 16px;">
-            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">${t_iti.day} ${i + 1}</div>`;
+            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">${txt.day} ${i + 1}</div>`;
         
         let currentTime = new Date();
         currentTime.setHours(10, 0, 0);
@@ -911,42 +918,29 @@ window.generateItinerary = function() {
                     <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
                     <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${startTime} - ${endTime}</div>
                     <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
-                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)} &middot; ${t_iti.free}</div>
+                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)} &middot; ${txt.free}</div>
             `;
             
             if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
                 html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
-                    <b style="color:#2E3644;">${t_iti.lunch} ${l.name}</b><br>
+                    <b style="color:#2E3644;">${txt.lunch} ${l.name}</b><br>
                     <span style="color:#64748b;">Explore local eateries before your next stop.</span>
                 </div>`;
                 currentTime.setHours(currentTime.getHours() + 1);
             }
-
             html += `</div>`;
 
             if (idx < dayLocs.length - 1) {
-                html += `
-                    <div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;">
-                        <span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">
-                            ${t_iti.transit}
-                        </span>
-                    </div>
-                `;
+                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
                 currentTime.setMinutes(currentTime.getMinutes() + 30);
             } else {
-                html += `
-                    <div style="padding-left:18px; margin-top:5px; margin-bottom:15px;">
-                        <span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">
-                            ${t_iti.coffee}
-                        </span>
-                    </div>
-                `;
+                html += `<div style="padding-left:18px; margin-top:5px; margin-bottom:15px;"><span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">${txt.coffee}</span></div>`;
             }
         });
         
         html += `<a href="${mapLink}" target="_blank" style="display:inline-flex; align-items:center; gap:6px; padding:10px 16px; margin-top:5px; font-size:12px; color:#2E3644; border:1px solid #cbd5e1; border-radius:100px; background:white; font-weight:600; text-decoration:none; transition:0.2s;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-            ${t_iti.mapBtn}
+            ${txt.mapBtn}
         </a></div>`;
         resultDiv.innerHTML += html;
     }
@@ -956,46 +950,39 @@ window.generateItinerary = function() {
     const modalContent = document.querySelector('#itinerary-modal .modal-content');
     if(modalContent) modalContent.scrollTo({ top: modalContent.scrollHeight, behavior: 'smooth' });
 
-    setTimeout(() => {
-        if(!itiLeafletMap) {
-            itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(itiLeafletMap);
-            itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
-        } else {
-            itiLayerGroup.clearLayers();
-        }
+    if(document.getElementById('iti-map-container')) {
+        setTimeout(() => {
+            if(!itiLeafletMap) {
+                itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(itiLeafletMap);
+                itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
+            } else {
+                itiLayerGroup.clearLayers();
+            }
 
-        coordsForMap.forEach((c, idx) => {
-            L.circleMarker(c, { color: '#D42759', radius: 6, fillOpacity: 1 }).addTo(itiLayerGroup)
-             .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
-        });
-        L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
+            coordsForMap.forEach((c, idx) => {
+                L.circleMarker(c, { color: '#D42759', radius: 6, fillOpacity: 1 }).addTo(itiLayerGroup)
+                 .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
+            });
+            L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
 
-        itiLeafletMap.invalidateSize();
-        if(coordsForMap.length > 0) itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
-    }, 250);
+            itiLeafletMap.invalidateSize();
+            if(coordsForMap.length > 0) itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
+        }, 250);
+    }
 }
 
-window.exportItineraryPDF = function() {
-    const el = document.getElementById('iti-result');
-    const btn = document.getElementById('export-pdf-btn');
-    if(!el || !btn) return;
-    btn.style.display = 'none';
-    html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' } }).from(el).save().then(() => btn.style.display = 'block');
-};
-
-// Sauvegarde directe de l'itinéraire généré dans "My Trips"
 window.saveItineraryToTrips = function() {
     const country = document.getElementById('iti-country').value;
     const daysCount = parseInt(document.getElementById('iti-days').value);
     const newTripId = 'trip-' + Date.now();
-    const tripName = `Auto-Itinerary: ${country} (${daysCount} days)`;
+    const tripName = `${country} Trip (${daysCount} days)`;
 
     let newTrip = {
         id: newTripId,
         name: tripName,
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date(Date.now() + daysCount*86400000).toISOString().split('T')[0],
+        dateType: 'duration',
+        duration: daysCount + (currentLang === 'fr' ? ' Jours' : ' Days'),
         days: []
     };
 
@@ -1005,7 +992,6 @@ window.saveItineraryToTrips = function() {
         let dayIds = [];
         dayLocs.forEach(loc => {
             dayIds.push(loc.id);
-            // Ajout à la wishlist pour lier le lieu au voyage
             let existing = wList.find(w => w.id === loc.id && w.tripId === newTripId);
             if (!existing) {
                 wList.push({ id: loc.id, dateAdded: new Date().toLocaleDateString(), tripId: newTripId });
@@ -1019,7 +1005,32 @@ window.saveItineraryToTrips = function() {
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
 
-    window.location.href = 'trips.html';
+    if(window.location.pathname.includes('trips.html')) {
+        document.getElementById('itinerary-modal').classList.add('hidden');
+        const sel = document.getElementById('active-trip-select');
+        if(sel) {
+            let opt = document.createElement('option');
+            opt.value = newTripId; opt.textContent = tripName;
+            sel.appendChild(opt);
+            sel.value = newTripId;
+            switchTrip();
+        }
+    } else {
+        window.location.href = 'trips.html';
+    }
+};
+
+window.exportItineraryPDF = function() {
+    const el = document.getElementById('iti-result');
+    const btn = document.getElementById('export-pdf-btn');
+    const saveBtn = document.getElementById('save-trip-btn');
+    if(!el) return;
+    if(btn) btn.style.display = 'none'; 
+    if(saveBtn) saveBtn.style.display = 'none';
+    html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' } }).from(el).save().then(() => { 
+        if(btn) btn.style.display = 'block'; 
+        if(saveBtn) saveBtn.style.display = 'block'; 
+    });
 };
 
 // ==========================================
@@ -1119,7 +1130,7 @@ window.onclick = function(e) {
 };
 
 // ==========================================
-// 11. BANNIÈRE COOKIES ET REDIRECTION
+// 11. BANNIÈRE COOKIES ET REDIRECTION VISITED
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
