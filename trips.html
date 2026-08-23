@@ -6,75 +6,69 @@
 <title>Screen To Street — My Trips</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="welcome-style.css">
+<link rel="stylesheet" href="style.css">
 <style>
-  * {box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
-  a {text-decoration:none;}
-  body {background:#E7E9EC; min-height: 100vh;}
-  .hidden { display: none !important; }
-
-  /* HEADER IDENTIQUE A LA CARTE */
-  .nav { display: flex; align-items: center; justify-content: space-between; padding: 30px 6%; position: relative; z-index: 10; width: 100%; }
-
-  /* CONTENEUR PRINCIPAL */
-  .trips-container { padding: 20px 0 100px 0; }
-  .lab {text-align:center;color:#D42759;font-size:24px;font-weight:700;margin-bottom:6px;}
-  .lab-sub {text-align:center;color:#64748b;font-size:13px;margin-bottom:36px;}
+  /* Base Layout (Map simulation) */
+  body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #E7E9EC; }
+  .app-container { display: flex; height: 100vh; width: 100vw; position: relative; }
+  .sidebar { width: 380px; height: 100%; background: #fff; box-shadow: 2px 0 20px rgba(0,0,0,0.05); z-index: 100; position: relative; }
+  .map-container { flex: 1; position: relative; background: #e2e8f0; display: flex; align-items: center; justify-content: center; }
   
-  .frame {width:700px;max-width:96vw;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(80,60,120,.08);background:#fff;padding:32px 36px;}
+  /* Trippy Overlay Frame */
+  .trips-frame { width: 800px; max-width: 90%; max-height: 85vh; background: #fff; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; z-index: 50; }
+  .trips-header { background: linear-gradient(150deg,#FAF8FE 0%,#F1EBFA 50%,#E9DFF6 100%); padding: 30px 40px; border-bottom: 1px solid #e2e8f0; }
+  .trips-content { padding: 30px 40px; overflow-y: auto; background: #fff; flex: 1; }
+  .trips-content::-webkit-scrollbar { width: 6px; }
+  .trips-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
   /* SELECTEUR DE VOYAGE AU DESSUS DU TITRE */
-  .trip-selector-row { margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+  .trip-selector-row { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
   .trip-selector-row select { padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; cursor: pointer; font-size: 13px; color: #334155; font-weight: 600; }
   .trip-selector-row select:focus { border-color: #D42759; }
 
   .trip-head {display:flex;justify-content:space-between;align-items:flex-start;}
-  .trip-name {font-size:20px;font-weight:700;color:#212832;}
-  .trip-dates {font-size:12px;color:#94a3b8;margin-top:3px;}
+  .trip-name {font-size:24px;font-weight:700;color:#212832;}
+  .trip-dates {font-size:13px;color:#94a3b8;margin-top:4px;}
 
-  .gen-btn {
-    display:inline-flex;align-items:center;gap:7px;background:#D42759;color:#fff;font-size:12px;font-weight:700;
-    padding:9px 16px;border-radius:100px;box-shadow:0 8px 18px rgba(212,39,89,.22);white-space:nowrap;cursor:pointer;
-    border:none;font-family:'Poppins',sans-serif; transition: 0.2s;
-  }
+  .gen-btn { display:inline-flex;align-items:center;gap:7px;background:#D42759;color:#fff;font-size:12px;font-weight:700; padding:10px 18px;border-radius:100px;box-shadow:0 8px 18px rgba(212,39,89,.22);white-space:nowrap;cursor:pointer; border:none;font-family:'Poppins',sans-serif; transition: 0.2s; }
   .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(212,39,89,.35); }
   .gen-btn.ghost {background:transparent;color:#D42759;border:1.5px solid #D42759;box-shadow:none;}
   .gen-btn.ghost:hover { background:#FCE7F0; }
 
-  .section-label {font-size:10.5px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 12px 0;}
+  .section-label {font-size:11px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 12px 0;}
 
   /* LIEUX SAUVEGARDÉS */
   .loc-row {display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9; position: relative;}
   .loc-row:last-child {border-bottom:none;}
   .loc-thumb {width:44px;height:44px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0;}
-  .loc-name {font-size:13px;font-weight:700;color:#212832;}
+  .loc-name {font-size:13.5px;font-weight:700;color:#212832;}
   .loc-meta {font-size:11px;color:#94a3b8;}
-  .add-to-trip-btn { display: none; margin-left: auto; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px; padding: 4px 8px; font-size: 11px; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; }
+  .add-to-trip-btn { display: none; margin-left: auto; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; }
   .add-to-trip-btn:hover { background: #D42759; color: #fff; border-color: #D42759; }
 
   /* BANDEAU D'EDITION */
-  .edit-banner {display:none;background:#FCE7F0;border:1px dashed #D42759;border-radius:14px;padding:18px;margin-top:20px;}
+  .edit-banner {display:none;background:#FCE7F0;border:1px dashed #D42759;border-radius:14px;padding:20px;margin-top:20px;}
   .edit-banner.open {display:block;}
-  .edit-tag {font-size:11.5px;font-weight:700;color:#D42759;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
-  .date-inputs {display:flex;gap:8px;}
-  .date-inputs input {flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Poppins',sans-serif; background: #fff;}
-  .date-inputs input:focus {outline:none;border-color:#D42759;}
+  .edit-tag {font-size:12px;font-weight:700;color:#D42759;text-transform:uppercase;letter-spacing:.5px;margin-bottom:15px;}
+  .date-inputs {display:flex;gap:10px; align-items: center; flex-wrap: wrap;}
+  .date-inputs input, .date-inputs select {flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12.5px;font-family:'Poppins',sans-serif; background: #fff;}
+  .date-inputs input:focus, .date-inputs select:focus {outline:none;border-color:#D42759;}
 
-  .x-btn {cursor:pointer;padding:4px;flex-shrink:0; font-size: 14px; font-weight: bold; color: #94a3b8; transition: 0.2s;}
+  .x-btn {cursor:pointer;padding:4px;flex-shrink:0; font-size: 16px; font-weight: bold; color: #94a3b8; transition: 0.2s;}
   .x-btn:hover { color: #D42759; }
-  .add-locs-link {display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#D42759;margin-top:16px;cursor:pointer;background:none;border:none;font-family:'Poppins',sans-serif;padding:0;}
+  .add-locs-link {display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#D42759;margin-top:16px;cursor:pointer;background:none;border:none;font-family:'Poppins',sans-serif;padding:0;}
 
-  /* ITINÉRAIRE MODULABLE (DRAG & DROP) */
+  /* ITINÉRAIRE MODULABLE */
   .itinerary-box {background:#faf9fc;border:1px solid #e2e8f0; border-radius:16px;padding:20px;margin-top:10px;}
-  .day-card {background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:14px;transition:border-color .2s, background .2s; position: relative;}
+  .day-card {background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:14px;transition:border-color .2s, background .2s; position: relative;}
   .day-card:last-child {margin-bottom:0;}
   .day-card.drag-over {border-color:#D42759;background:#FCE7F0;}
   .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .day-title {font-size:12.5px;font-weight:700;color:#D42759;}
-  .day-items {min-height:20px;}
+  .day-title {font-size:13px;font-weight:700;color:#D42759;}
+  .day-items {min-height:25px;}
   
   .day-loc {
-    display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:#334155;padding:10px 12px;border-radius:8px;
+    display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;color:#334155;padding:12px 14px;border-radius:8px;
     background:#fff;border:1px solid #e2e8f0;margin-bottom:8px;cursor:grab; transition: box-shadow 0.2s;
   }
   .day-loc:last-child {margin-bottom:0;}
@@ -86,124 +80,197 @@
 
   .add-day-btn {
     display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px dashed #cbd5e1;border-radius:12px;
-    padding:12px;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;background:#fff;font-family:'Poppins',sans-serif;width:100%; transition: 0.2s;
+    padding:14px;font-size:12.5px;font-weight:700;color:#64748b;cursor:pointer;background:#fff;font-family:'Poppins',sans-serif;width:100%; transition: 0.2s;
   }
   .add-day-btn:hover { border-color: #D42759; color: #D42759; }
 
-  .save-row {display:flex;gap:10px;margin-top:20px;}
-  .save-row .gen-btn {flex:1;justify-content:center; padding: 12px;}
+  .save-row {display:flex;gap:10px;margin-top:24px;}
+  .save-row .gen-btn {flex:1;justify-content:center; padding: 14px;}
 
   /* MODAL ADD MORE LOCATIONS */
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-  .modal-box { background: #fff; width: 500px; max-width: 90%; border-radius: 16px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 80vh; display: flex; flex-direction: column;}
+  .modal-box { background: #fff; width: 550px; max-width: 90%; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 80vh; display: flex; flex-direction: column;}
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-  .modal-title { font-size: 18px; font-weight: 700; color: #212832; }
-  .modal-close { cursor: pointer; font-size: 20px; color: #64748b; }
-  .modal-search { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; font-family: 'Poppins', sans-serif; }
+  .modal-title { font-size: 20px; font-weight: 700; color: #212832; }
+  .modal-close { cursor: pointer; font-size: 24px; color: #64748b; }
+  .modal-search { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-family: 'Poppins', sans-serif; font-size: 13px; }
   .modal-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
 
-  .empty-state { text-align: center; color: #94a3b8; padding: 40px 0; font-size: 14px; }
+  .empty-state { text-align: center; color: #94a3b8; padding: 40px 0; font-size: 15px; }
+  
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<div class="nav">
-    <a href="map.html" class="brand">
-        <svg class="pin" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
-        <span>Screen To <b style="color: #D42759;">Street</b></span>
-    </a>
-    <div class="nav-right">
-        <a class="nav-link" href="map-destinations.html">Destinations</a>
-        <a class="nav-link" href="map-artists.html">Artists</a>
-        <div class="nav-actions">
-            <a href="map.html" class="login-btn-v5" style="background:#fff; color:#2E3644; border:1px solid #cbd5e1;">Back to Map</a>
+<div class="app-container">
+    <!-- Fausse Sidebar (visuellement identique à Map) -->
+    <aside class="sidebar">
+        <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer; margin-bottom: 20px;">
+            <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
+                <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+                <circle cx="200" cy="150" r="26" fill="#D42759"/>
+            </svg>
+            <div>
+                <div class="brand-text" style="color: #2E3644;">Screen To <b style="color: #D42759;">Street</b></div>
+                <div class="tagline" style="color: #5B6472;" id="i18n-sub">Following the footsteps of your favorite artists</div>
+            </div>
+        </a>
+        
+        <div style="padding: 0 15px;">
+            <div class="card-box" style="background:#faf9fc; border:1px solid #e2e8f0; border-radius:12px; padding:20px; text-align:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" style="margin-bottom:10px;"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:5px;">Need Inspiration?</div>
+                <p style="font-size:11.5px; color:#64748b; margin-bottom:15px;">Let our AI generate a perfect trip based on your selected group and days.</p>
+                <button class="cta-primary" style="width:100%;" onclick="document.getElementById('itinerary-modal').classList.remove('hidden');" id="i18n-auto-btn">Auto-Itinerary Generator</button>
+            </div>
         </div>
-    </div>
-</div>
+    </aside>
 
-<div class="trips-container">
-    <div class="lab" id="page-title">My Trips</div>
-    <div class="lab-sub" id="page-subtitle">Organize your wishlist into daily itineraries</div>
-
-    <div class="frame">
-        <div class="page" id="main-content">
-            
-            <div class="trip-selector-row">
-                <span style="font-size:12px; color:#64748b; font-weight:600;">Active Trip :</span>
-                <select id="active-trip-select" onchange="switchTrip()"></select>
-            </div>
-
-            <div class="trip-head">
-                <div style="flex:1;">
-                    <div class="trip-name" id="trip-name-display">Loading...</div>
-                    <div class="trip-dates" id="dates-display">...</div>
-                </div>
-                <button class="gen-btn" id="edit-toggle" onclick="toggleEdit()">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-                    Edit trip
+    <main class="map-container">
+        <!-- Top Nav (Identique à Map) -->
+        <div class="top-nav" style="position: absolute; top:0; left:0; width:100%; z-index:90;">
+            <div style="flex:1;"></div>
+            <div class="dropdown-container">
+                <button id="lang-btn" class="nav-btn" title="Langue" onclick="document.getElementById('lang-menu').classList.toggle('hidden')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </button>
-            </div>
-
-            <div class="edit-banner" id="edit-banner">
-                <div class="edit-tag">✏️ Editing this trip</div>
-                <div class="section-label" style="margin-top:0;">Trip dates</div>
-                <div class="date-inputs">
-                    <input type="date" id="date-start">
-                    <input type="date" id="date-end">
+                <div id="lang-menu" class="dropdown-menu hidden">
+                    <a href="#" class="dropdown-option" onclick="changeLang('en'); return false;">English</a>
+                    <a href="#" class="dropdown-option" onclick="changeLang('fr'); return false;">Français</a>
                 </div>
             </div>
-
-            <div class="section-label" id="saved-locs-label">Unassigned Locations (0)</div>
-            <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent;">
-                <!-- Les lieux non assignés de la wishlist apparaîtront ici -->
-            </div>
-            
-            <button class="add-locs-link edit-only" style="display:none;" onclick="openAddModal()">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                Add more locations
-            </button>
-
-            <!-- Recommandations -->
-            <div id="reco-section" style="display: none;">
-                <div class="section-label" style="color:#D42759;">Recommended for this trip</div>
-                <div id="reco-list"></div>
-            </div>
-
-            <div class="section-label">Your itinerary</div>
-            <div class="itinerary-box" id="itinerary-box">
-                <!-- Les jours apparaîtront ici -->
-                <button class="add-day-btn edit-only" style="display:none;" onclick="addDay()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                    Add an empty day
+            <div class="dropdown-container">
+                <button class="nav-btn" title="Back to Map" onclick="window.location.href='map.html'">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 </button>
             </div>
+            <div class="dropdown-container">
+                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; text-align:center; font-weight:bold; color:#fff;" onclick="document.getElementById('profile-menu').classList.toggle('hidden')">U</button>
+                <div id="profile-menu" class="dropdown-menu hidden">
+                    <a href="account.html" class="dropdown-option">Your Account</a>
+                    <a href="visited.html" class="dropdown-option">My Visited Places</a>
+                    <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
+                    <a href="trips.html" class="dropdown-option" style="color:#D42759; font-weight:bold;">My Trips</a>
+                    <a href="settings.html" class="dropdown-option">Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="index.html" class="dropdown-option" style="color:var(--primary-magenta); font-weight:bold;">Logout</a>
+                </div>
+            </div>
+        </div>
 
-            <div class="save-row edit-only" style="display:none;">
-                <button class="gen-btn ghost" onclick="cancelEdit()">Cancel</button>
-                <button class="gen-btn" onclick="saveTrip()">Save changes</button>
+        <!-- LE CADRE TRIPS -->
+        <div class="trips-frame">
+            <div class="trips-header">
+                <div class="trip-selector-row">
+                    <span style="font-size:12px; color:#64748b; font-weight:600;" id="i18n-active">Active Trip :</span>
+                    <select id="active-trip-select" onchange="switchTrip()"></select>
+                </div>
+                <div class="trip-head">
+                    <div style="flex:1;">
+                        <input type="text" id="edit-trip-name" class="trip-name edit-only" style="display:none; width:90%; border:1px solid #cbd5e1; border-radius:8px; padding:6px 12px; font-family:'Poppins';">
+                        <div class="trip-name" id="trip-name-display">Loading...</div>
+                        <div class="trip-dates" id="dates-display">...</div>
+                    </div>
+                    <button class="gen-btn" id="edit-toggle" onclick="toggleEdit()">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                        Edit trip
+                    </button>
+                </div>
             </div>
 
+            <div class="trips-content" id="main-content">
+                <div class="edit-banner" id="edit-banner">
+                    <div class="edit-tag">✏️ <span id="i18n-editing">Editing this trip</span></div>
+                    
+                    <div class="section-label" style="margin-top:0;" id="i18n-trip-duration">Trip Duration & Dates</div>
+                    <div class="date-inputs">
+                        <select id="trip-duration-type" onchange="toggleDateType()">
+                            <option value="specific" id="i18n-opt-specific">Specific Dates</option>
+                            <option value="duration" id="i18n-opt-duration">General Duration</option>
+                        </select>
+                        <input type="date" id="date-start" class="date-specific">
+                        <input type="date" id="date-end" class="date-specific">
+                        <select id="duration-length" class="date-duration" style="display:none;">
+                            <option value="1 Week">1 Week</option>
+                            <option value="2 Weeks">2 Weeks</option>
+                            <option value="Few Days">A Few Days</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-label" id="saved-locs-label">Unassigned Locations (0)</div>
+                <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent;">
+                    <!-- Lieux non assignés -->
+                </div>
+                
+                <button class="add-locs-link edit-only" style="display:none;" onclick="openAddModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                    <span id="i18n-add-more">Add more locations</span>
+                </button>
+
+                <!-- Recommandations Intelligentes -->
+                <div id="reco-section" style="display: none; margin-top: 20px;">
+                    <div class="section-label" style="color:#D42759;" id="i18n-reco">Recommended for this trip (Same Country)</div>
+                    <div id="reco-list"></div>
+                </div>
+
+                <div class="section-label" id="i18n-your-iti">Your itinerary</div>
+                <div class="itinerary-box" id="itinerary-box">
+                    <button class="add-day-btn edit-only" style="display:none;" onclick="addDay()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                        <span id="i18n-add-day">Add an empty day</span>
+                    </button>
+                </div>
+
+                <div class="save-row edit-only" style="display:none;">
+                    <button class="gen-btn ghost" onclick="cancelEdit()" id="i18n-cancel">Cancel</button>
+                    <button class="gen-btn" onclick="saveTrip()" id="i18n-save">Save changes</button>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 </div>
 
 <!-- Modal Add More Locations -->
 <div class="modal-overlay hidden" id="add-modal">
     <div class="modal-box">
         <div class="modal-header">
-            <div class="modal-title">Add to this Trip</div>
+            <div class="modal-title" id="i18n-modal-add">Add to this Trip</div>
             <div class="modal-close" onclick="closeAddModal()">&times;</div>
         </div>
         <input type="text" id="add-search" class="modal-search" placeholder="Search by name, city or category..." onkeyup="filterAddModal()">
-        <div class="modal-list" id="add-modal-list">
-            <!-- Liste injectée -->
+        <div class="modal-list" id="add-modal-list"></div>
+    </div>
+</div>
+
+<!-- Modal Itinéraire -->
+<div class="modal-overlay hidden" id="itinerary-modal">
+    <div class="modal-box" style="width:650px;">
+        <div class="modal-header">
+            <div class="modal-title" id="i18n-itiTitle">Auto-Itinerary Generator</div>
+            <div class="modal-close" onclick="document.getElementById('itinerary-modal').classList.add('hidden')">&times;</div>
+        </div>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" id="i18n-itiDesc">Select a group, a country, and how many days you stay.</p>
+        
+        <div id="iti-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
+            <select id="iti-group" class="trip-select" style="padding:12px;"></select>
+            <select id="iti-country" class="trip-select" style="padding:12px;"></select>
+            <input type="number" id="iti-days" min="1" max="7" value="3" class="trip-select" style="padding:12px;">
+            <button class="gen-btn" onclick="generateItinerary()" style="padding:14px; font-size:14px; justify-content:center;" id="i18n-itiCreateBtn">Create My Guide</button>
+        </div>
+
+        <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
+            <div id="iti-days-list" style="max-height:40vh; overflow-y:auto; margin-bottom:15px; padding-right:10px;"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="gen-btn" onclick="saveItineraryToTrips()" style="flex:1; justify-content:center;" id="i18n-itiSave">Save to My Trips</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-// --- DONNÉES GLOBALES IDENTIQUES À SCRIPT.JS ---
+// --- DONNÉES GLOBALES ---
 const celebLocations = [
     { id: 1, name: "Cafe Camptong", group: "BTS", country: "South Korea", city: "Seoul", category: "Run BTS", img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg" },
     { id: 2, name: "Ossu Seiromushi", group: "BTS", country: "South Korea", city: "Seoul", category: "Restaurants", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600" },
@@ -232,14 +299,42 @@ let currentTrip = null;
 let editing = false;
 let draggedEl = null;
 
-// --- INITIALISATION ---
+// --- TRADUCTION ---
+let currentLang = localStorage.getItem('lang') || 'en';
+function changeLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateI18N(); renderTrip(); }
+function updateI18N() {
+    const isFr = currentLang === 'fr';
+    document.getElementById('i18n-sub').textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
+    document.getElementById('i18n-auto-btn').textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
+    document.getElementById('i18n-active').textContent = isFr ? "Voyage actif :" : "Active Trip :";
+    document.getElementById('i18n-editing').textContent = isFr ? "Édition de ce voyage" : "Editing this trip";
+    document.getElementById('i18n-trip-duration').textContent = isFr ? "Durée & Dates" : "Trip Duration & Dates";
+    document.getElementById('i18n-opt-specific').textContent = isFr ? "Dates Précises" : "Specific Dates";
+    document.getElementById('i18n-opt-duration').textContent = isFr ? "Durée Globale" : "General Duration";
+    document.getElementById('i18n-add-more').textContent = isFr ? "Ajouter des lieux" : "Add more locations";
+    document.getElementById('i18n-reco').textContent = isFr ? "Recommandé pour ce voyage (Même pays)" : "Recommended for this trip (Same Country)";
+    document.getElementById('i18n-your-iti').textContent = isFr ? "Votre itinéraire" : "Your itinerary";
+    document.getElementById('i18n-add-day').textContent = isFr ? "Ajouter un jour" : "Add an empty day";
+    document.getElementById('i18n-cancel').textContent = isFr ? "Annuler" : "Cancel";
+    document.getElementById('i18n-save').textContent = isFr ? "Sauvegarder" : "Save changes";
+    document.getElementById('i18n-modal-add').textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
+    document.getElementById('i18n-itiTitle').textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
+    document.getElementById('i18n-itiDesc').textContent = isFr ? "Sélectionnez un groupe, un pays et la durée." : "Select a group, a country, and how many days you stay.";
+    document.getElementById('i18n-itiCreateBtn').textContent = isFr ? "Créer mon guide" : "Create My Guide";
+    document.getElementById('i18n-itiSave').textContent = isFr ? "Sauvegarder dans My Trips" : "Save to My Trips";
+    
+    const profileBtn = document.getElementById('profile-btn');
+    if (profileBtn) profileBtn.textContent = (localStorage.getItem('userName') || 'U').charAt(0).toUpperCase();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     myTrips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     wishlistLocs = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    updateI18N();
 
     const select = document.getElementById('active-trip-select');
     if (myTrips.length === 0) {
-        document.getElementById('main-content').innerHTML = `<div class="empty-state">You haven't created any trips yet. <br>Go to the map, click on a location and "Add to Wishlist" to create your first trip!</div>`;
+        document.getElementById('main-content').innerHTML = `<div class="empty-state">${currentLang==='fr'?"Vous n'avez pas encore créé de voyage.<br>Allez sur la carte et ajoutez des lieux à votre Wishlist !":"You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist' to create your first trip!"}</div>`;
         return;
     }
 
@@ -250,15 +345,24 @@ document.addEventListener('DOMContentLoaded', () => {
         select.appendChild(opt);
     });
 
-    // Sélectionne le dernier voyage créé
     select.value = myTrips[myTrips.length - 1].id;
     switchTrip();
+
+    // Init ITI Selectors
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
+    if(unlockedGroups.length === 0) availableLocs = celebLocations;
+    
+    const gSelect = document.getElementById('iti-group');
+    const cSelect = document.getElementById('iti-country');
+    [...new Set(availableLocs.map(l => l.group))].sort().forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
+    [...new Set(availableLocs.map(l => l.country))].sort().forEach(c => cSelect.innerHTML += `<option value="${c}">${c}</option>`);
 });
 
 function switchTrip() {
     const tripId = document.getElementById('active-trip-select').value;
     currentTrip = myTrips.find(t => t.id === tripId);
-    if (!currentTrip.days) currentTrip.days = []; // Initialise les jours si vide
+    if (!currentTrip.days) currentTrip.days = []; 
     renderTrip();
 }
 
@@ -266,24 +370,30 @@ function renderTrip() {
     if (!currentTrip) return;
 
     document.getElementById('trip-name-display').textContent = currentTrip.name;
-    document.getElementById('date-start').value = currentTrip.startDate || '';
-    document.getElementById('date-end').value = currentTrip.endDate || '';
+    document.getElementById('edit-trip-name').value = currentTrip.name;
     
-    // Déterminer les lieux du voyage
+    if(currentTrip.dateType === 'duration') {
+        document.getElementById('trip-duration-type').value = 'duration';
+        document.getElementById('duration-length').value = currentTrip.duration || '1 Week';
+    } else {
+        document.getElementById('trip-duration-type').value = 'specific';
+        document.getElementById('date-start').value = currentTrip.startDate || '';
+        document.getElementById('date-end').value = currentTrip.endDate || '';
+    }
+    toggleDateType();
+    
     let tripLocIdsFromWishlist = wishlistLocs.filter(w => w.tripId === currentTrip.id).map(w => w.id);
     let allAssignedIds = currentTrip.days.flat();
     let unassignedIds = tripLocIdsFromWishlist.filter(id => !allAssignedIds.includes(id));
 
-    // Affichage des non-assignés
     const locList = document.getElementById('loc-list');
     locList.innerHTML = '';
     unassignedIds.forEach(id => {
         const loc = celebLocations.find(l => l.id === id);
         if (loc) locList.appendChild(createLocRow(loc));
     });
-    document.getElementById('saved-locs-label').textContent = `Unassigned Locations (${unassignedIds.length})`;
+    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `Lieux non assignés (${unassignedIds.length})` : `Unassigned Locations (${unassignedIds.length})`;
 
-    // Affichage des jours
     const box = document.getElementById('itinerary-box');
     const addBtn = box.querySelector('.add-day-btn');
     box.innerHTML = ''; 
@@ -304,16 +414,16 @@ function renderTrip() {
 
         card.innerHTML = `
             <div class="day-header">
-                <div class="day-title">Day ${index + 1}</div>
+                <div class="day-title">${currentLang==='fr'?'Jour':'Day'} ${index + 1}</div>
                 <div class="x-btn edit-only" style="display:none;" onclick="removeDay(this)">✕</div>
             </div>
             <div class="day-items">${itemsHtml}</div>
         `;
         box.appendChild(card);
     });
-    box.appendChild(addBtn); // Remet le bouton à la fin
+    box.appendChild(addBtn); 
 
-    // RECOMMANDATIONS (Même pays)
+    // RECOMMANDATIONS INTÉLLIGENTES (Même pays)
     let tripCountries = [...new Set(tripLocIdsFromWishlist.map(id => {
         let loc = celebLocations.find(l => l.id === id);
         return loc ? loc.country : null;
@@ -326,7 +436,7 @@ function renderTrip() {
     if(tripCountries.length > 0) {
         celebLocations.forEach(loc => {
             if (tripCountries.includes(loc.country) && !tripLocIdsFromWishlist.includes(loc.id)) {
-                if (recoCount < 3) {
+                if (recoCount < 4) {
                     recoList.innerHTML += `
                         <div class="loc-row">
                             <div class="loc-thumb" style="background-image:url('${loc.img}');"></div>
@@ -339,15 +449,21 @@ function renderTrip() {
             }
         });
     }
-    
     document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
 
     // Maj du total
     const total = allAssignedIds.length + unassignedIds.length;
-    document.getElementById('dates-display').textContent = `${currentTrip.startDate || '?'} to ${currentTrip.endDate || '?'} · ${total} location(s)`;
+    let datesTxt = currentTrip.dateType === 'duration' ? (currentTrip.duration || 'Flexible') : `${currentTrip.startDate || '?'} to ${currentTrip.endDate || '?'}`;
+    document.getElementById('dates-display').textContent = `${datesTxt} · ${total} location(s)`;
 
-    // Applique l'état d'édition actuel
     applyEditState();
+}
+
+function toggleDateType() {
+    const type = document.getElementById('trip-duration-type').value;
+    const isDuration = type === 'duration';
+    document.querySelectorAll('.date-specific').forEach(el => el.style.display = isDuration ? 'none' : 'block');
+    document.getElementById('duration-length').style.display = isDuration ? 'block' : 'none';
 }
 
 function createLocRow(loc) {
@@ -364,7 +480,6 @@ function createLocRow(loc) {
     `;
     return div;
 }
-
 function createLocRowHtml(loc) {
     return `
         <div class="day-loc" data-id="${loc.id}" draggable="${editing ? 'true' : 'false'}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
@@ -376,60 +491,28 @@ function createLocRowHtml(loc) {
 }
 
 // --- EDITION & DRAG DROP ---
-function toggleEdit() {
-    editing = true;
-    applyEditState();
-}
-
-function cancelEdit() {
-    editing = false;
-    renderTrip(); // Re-render from saved state to undo unsaved drags
-}
+function toggleEdit() { editing = true; applyEditState(); }
+function cancelEdit() { editing = false; renderTrip(); }
 
 function applyEditState() {
     document.getElementById('edit-banner').classList.toggle('open', editing);
+    document.getElementById('trip-name-display').style.display = editing ? 'none' : 'block';
+    document.getElementById('edit-trip-name').style.display = editing ? 'block' : 'none';
+    
     document.querySelectorAll('.edit-only').forEach(el => el.style.display = editing ? 'flex' : 'none');
     document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', editing ? 'true' : 'false'));
     
     document.getElementById('edit-toggle').style.display = editing ? 'none' : 'inline-flex';
     document.getElementById('loc-list').style.borderColor = editing ? '#cbd5e1' : 'transparent';
-    
-    // Style the +Add buttons in Reco
     document.querySelectorAll('.add-to-trip-btn').forEach(el => el.style.display = editing ? 'block' : 'none');
 }
 
-function dragStart(e) {
-    if (!editing) { e.preventDefault(); return; }
-    draggedEl = e.currentTarget;
-    draggedEl.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-}
-function dragEnd(e) {
-    if (draggedEl) draggedEl.classList.remove('dragging');
-    document.querySelectorAll('.day-card, #loc-list').forEach(d => d.classList.remove('drag-over'));
-    draggedEl = null;
-}
-function allowDrop(e) {
-    if (!editing) return;
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
-}
-function dragLeave(e) {
-    e.currentTarget.classList.remove('drag-over');
-}
-function drop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-    if (draggedEl) {
-        if (e.currentTarget.id === 'loc-list') {
-            e.currentTarget.appendChild(draggedEl);
-        } else {
-            e.currentTarget.querySelector('.day-items').appendChild(draggedEl);
-        }
-    }
-}
+function dragStart(e) { if(!editing) { e.preventDefault(); return; } draggedEl = e.currentTarget; draggedEl.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+function dragEnd(e) { if(draggedEl) draggedEl.classList.remove('dragging'); document.querySelectorAll('.day-card, #loc-list').forEach(d => d.classList.remove('drag-over')); draggedEl = null; }
+function allowDrop(e) { if(!editing) return; e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function drop(e) { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if(draggedEl) { if (e.currentTarget.id === 'loc-list') { e.currentTarget.appendChild(draggedEl); } else { e.currentTarget.querySelector('.day-items').appendChild(draggedEl); } } }
 
-// --- ACTIONS SUR LE VOYAGE ---
 function addDay() {
     const box = document.getElementById('itinerary-box');
     const addBtn = box.querySelector('.add-day-btn');
@@ -443,7 +526,7 @@ function addDay() {
     card.setAttribute('ondragleave', 'dragLeave(event)');
     card.innerHTML = `
         <div class="day-header">
-            <div class="day-title">Day ${newDayNum}</div>
+            <div class="day-title">${currentLang==='fr'?'Jour':'Day'} ${newDayNum}</div>
             <div class="x-btn edit-only" style="display:flex;" onclick="removeDay(this)">✕</div>
         </div>
         <div class="day-items"></div>
@@ -452,82 +535,70 @@ function addDay() {
 }
 
 function removeDay(btn) {
+    if(!confirm(currentLang === 'fr' ? "Supprimer ce jour ? Ses lieux retourneront dans les non-assignés." : "Delete this day? Locations will return to unassigned.")) return;
     const card = btn.closest('.day-card');
     const items = card.querySelectorAll('.day-loc');
     const locList = document.getElementById('loc-list');
-    items.forEach(i => locList.appendChild(i)); // Remet les lieux dans Unassigned
+    items.forEach(i => locList.appendChild(i)); 
     card.remove();
     
-    // Renuméroter les jours
     document.querySelectorAll('.day-card').forEach((c, index) => {
         c.dataset.day = index + 1;
-        c.querySelector('.day-title').textContent = `Day ${index + 1}`;
+        c.querySelector('.day-title').textContent = `${currentLang==='fr'?'Jour':'Day'} ${index + 1}`;
     });
 }
 
 function removeFromTrip(btn, locId) {
-    if(!confirm("Remove this location from the trip?")) return;
-    // On retire de la wishlistLocs
+    if(!confirm(currentLang === 'fr' ? "Retirer ce lieu du voyage ?" : "Remove this location from the trip?")) return;
     wishlistLocs = wishlistLocs.filter(w => w.id !== locId || w.tripId !== currentTrip.id);
     localStorage.setItem('wishlistLocs', JSON.stringify(wishlistLocs));
     btn.closest('.day-loc').remove();
+    saveTrip(false);
 }
 
 function quickAddLoc(locId) {
     if(!wishlistLocs.some(w => w.id === locId && w.tripId === currentTrip.id)) {
         wishlistLocs.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
         localStorage.setItem('wishlistLocs', JSON.stringify(wishlistLocs));
-        
-        // Add directly to unassigned
-        const loc = celebLocations.find(l => l.id === locId);
-        if (loc) {
-            document.getElementById('loc-list').appendChild(createLocRow(loc));
-            // Force re-render to update recommendations and counts
-            saveTrip(false); // save silently and re-render
-        }
+        saveTrip(false); 
     }
 }
 
 function saveTrip(exitEdit = true) {
-    // Collecte les dates
-    currentTrip.startDate = document.getElementById('date-start').value;
-    currentTrip.endDate = document.getElementById('date-end').value;
+    currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
     
-    // Collecte les jours
+    const type = document.getElementById('trip-duration-type').value;
+    currentTrip.dateType = type;
+    if(type === 'duration') {
+        currentTrip.duration = document.getElementById('duration-length').value;
+    } else {
+        currentTrip.startDate = document.getElementById('date-start').value;
+        currentTrip.endDate = document.getElementById('date-end').value;
+    }
+    
     const newDays = [];
     document.querySelectorAll('.day-card').forEach(card => {
         const ids = [];
-        card.querySelectorAll('.day-loc').forEach(locEl => {
-            ids.push(parseInt(locEl.dataset.id));
-        });
+        card.querySelectorAll('.day-loc').forEach(locEl => { ids.push(parseInt(locEl.dataset.id)); });
         newDays.push(ids);
     });
-    
     currentTrip.days = newDays;
     
-    // Sauvegarde localStorage
     const tripIndex = myTrips.findIndex(t => t.id === currentTrip.id);
     if(tripIndex !== -1) myTrips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(myTrips));
     
-    if (exitEdit) {
-        editing = false;
-        renderTrip();
-    } else {
-        renderTrip(); // Reste en mode edit mais met à jour l'UI
-    }
+    // MAJ selecteur de nom
+    const opt = document.getElementById('active-trip-select').querySelector(`option[value="${currentTrip.id}"]`);
+    if(opt) opt.textContent = currentTrip.name;
+    
+    if (exitEdit) { editing = false; renderTrip(); } 
+    else { renderTrip(); }
 }
 
 // --- MODAL AJOUT MANUEL ---
-function openAddModal() {
-    document.getElementById('add-modal').classList.remove('hidden');
-    filterAddModal(); // Populates list
-}
-
-function closeAddModal() {
-    document.getElementById('add-modal').classList.add('hidden');
-    document.getElementById('add-search').value = "";
-}
+function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); filterAddModal(); }
+function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-search').value = ""; }
 
 function filterAddModal() {
     const query = document.getElementById('add-search').value.toLowerCase();
@@ -552,6 +623,141 @@ function filterAddModal() {
         }
     });
 }
+
+// --- AUTO-ITINERARY (GÉNÉRATEUR) ---
+let currentGeneratedItinerary = [];
+window.generateItinerary = function() {
+    const group = document.getElementById('iti-group').value;
+    const country = document.getElementById('iti-country').value;
+    const days = parseInt(document.getElementById('iti-days').value);
+    
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
+    if(unlockedGroups.length === 0) availableLocs = celebLocations;
+
+    let validLocs = availableLocs.filter(l => l.group === group && l.country === country);
+    if(validLocs.length === 0) { alert('No locations found.'); return; }
+
+    let route = [validLocs.shift()]; 
+    while(validLocs.length > 0) {
+        let lastLoc = route[route.length - 1], nearestIdx = 0, minDist = Infinity;
+        for(let i=0; i<validLocs.length; i++) {
+            let d = Math.hypot(lastLoc.lat - validLocs[i].lat, lastLoc.lng - validLocs[i].lng);
+            if(d < minDist) { minDist = d; nearestIdx = i; }
+        }
+        route.push(validLocs.splice(nearestIdx, 1)[0]);
+    }
+    validLocs = route;
+
+    const resultDiv = document.getElementById('iti-days-list');
+    resultDiv.innerHTML = "";
+    const locsPerDay = Math.ceil(validLocs.length / days);
+    
+    currentGeneratedItinerary = [];
+    
+    const txt = {
+        en: { day: "Day", transit: "Transit to next location (~30 mins)", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
+        fr: { day: "Jour", transit: "Trajet vers le prochain lieu (~30 mins)", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
+    }[currentLang];
+
+    for(let i = 0; i < days; i++) {
+        const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
+        if(dayLocs.length === 0) continue;
+        
+        currentGeneratedItinerary.push(dayLocs);
+        
+        let html = `<div class="iti-day-card" style="padding: 18px 16px;">
+            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">${txt.day} ${i + 1}</div>`;
+        
+        let currentTime = new Date();
+        currentTime.setHours(10, 0, 0);
+        const formatTime = (d) => d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        dayLocs.forEach((l, idx) => {
+            let startTime = formatTime(currentTime);
+            currentTime.setHours(currentTime.getHours() + 1);
+            currentTime.setMinutes(currentTime.getMinutes() + 30);
+            let endTime = formatTime(currentTime);
+
+            html += `
+                <div style="padding-left:18px; border-left: 2px solid #D42759; position:relative; margin-bottom:15px;">
+                    <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
+                    <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${startTime} - ${endTime}</div>
+                    <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
+                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${l.category} &middot; ${txt.free}</div>
+            `;
+            
+            if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
+                html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+                    <b style="color:#2E3644;">${txt.lunch} ${l.name}</b><br>
+                    <span style="color:#64748b;">Explore local eateries before your next stop.</span>
+                </div>`;
+                currentTime.setHours(currentTime.getHours() + 1);
+            }
+            html += `</div>`;
+
+            if (idx < dayLocs.length - 1) {
+                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
+                currentTime.setMinutes(currentTime.getMinutes() + 30);
+            } else {
+                html += `<div style="padding-left:18px; margin-top:5px; margin-bottom:15px;"><span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">${txt.coffee}</span></div>`;
+            }
+        });
+        
+        html += `</div>`;
+        resultDiv.innerHTML += html;
+    }
+    
+    document.getElementById('iti-result').classList.remove('hidden');
+}
+
+window.saveItineraryToTrips = function() {
+    const country = document.getElementById('iti-country').value;
+    const daysCount = parseInt(document.getElementById('iti-days').value);
+    const newTripId = 'trip-' + Date.now();
+    const tripName = `${country} Trip (${daysCount} days)`;
+
+    let newTrip = {
+        id: newTripId, name: tripName, dateType: 'duration', duration: daysCount + ' Days', days: []
+    };
+
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    currentGeneratedItinerary.forEach((dayLocs) => {
+        let dayIds = [];
+        dayLocs.forEach(loc => {
+            dayIds.push(loc.id);
+            let existing = wList.find(w => w.id === loc.id && w.tripId === newTripId);
+            if (!existing) wList.push({ id: loc.id, dateAdded: new Date().toLocaleDateString(), tripId: newTripId });
+        });
+        newTrip.days.push(dayIds);
+    });
+
+    myTrips.push(newTrip);
+    localStorage.setItem('myTrips', JSON.stringify(myTrips));
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+
+    // Si on est sur trips.html on recharge, sinon on redirige vers trips.html
+    if(window.location.pathname.includes('trips.html')) {
+        document.getElementById('itinerary-modal').classList.add('hidden');
+        const sel = document.getElementById('active-trip-select');
+        let opt = document.createElement('option');
+        opt.value = newTripId; opt.textContent = tripName;
+        sel.appendChild(opt);
+        sel.value = newTripId;
+        switchTrip();
+    } else {
+        window.location.href = 'trips.html';
+    }
+};
+
+window.exportItineraryPDF = function() {
+    const el = document.getElementById('iti-result');
+    const btn = document.getElementById('export-pdf-btn');
+    const saveBtn = document.getElementById('save-trip-btn');
+    if(!el) return;
+    btn.style.display = 'none'; saveBtn.style.display = 'none';
+    html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' } }).from(el).save().then(() => { btn.style.display = 'block'; saveBtn.style.display = 'block'; });
+};
 </script>
 
 </body>
