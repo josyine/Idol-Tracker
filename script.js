@@ -4,7 +4,7 @@
 let map = null;
 let markerGroup = null;
 let currentFilteredLocations = []; 
-let currentLocationIdForMemory = null; // Stocke l'ID du lieu en cours de consultation
+let currentLocationIdForMemory = null; 
 
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
@@ -233,19 +233,23 @@ const translations = {
         btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
         locationsCount: "LOCATIONS", statsCountries: "COUNTRIES", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", 
         cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
-        exploreDestOption: "🌍 Explore Destinations", exploreArtistsOption: "🎤 Explore Artists", accountOption: "Your Account",
+        exploreDestOption: "Explore Destinations", exploreArtistsOption: "Explore Artists", accountOption: "Your Account",
         visitedOption: "My Visited Places", wishlistOption: "My Wishlist", settingsOption: "Settings", logoutOption: "Logout",
         footerText: "Screen To Street is an independent fan-made guide.", footerMentions: "Legal Notice", footerAbout: "About Us", footerTOS: "Terms of Service", footerPrivacy: "Privacy Policy",
-        allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allYears: "All Years", allCategories: "All Categories"
+        allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allYears: "All Years", allCategories: "All Categories",
+        checkVisited: "I visited this place", checkWishlist: "Add to Wishlist", tripWhich: "Which trip is this for?",
+        tripName: "Trip name", tripWhen: "When are you planning to go?", tripFrom: "From", tripTo: "To", tripCreate: "Create trip", tripCancel: "Cancel"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
         locationsCount: "LIEUX", statsCountries: "PAYS", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", 
         cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
-        exploreDestOption: "🌍 Explorer les Destinations", exploreArtistsOption: "🎤 Explorer les Artistes", accountOption: "Mon Compte",
+        exploreDestOption: "Explorer les Destinations", exploreArtistsOption: "Explorer les Artistes", accountOption: "Mon Compte",
         visitedOption: "Mes Lieux Visités", wishlistOption: "Ma Wishlist", settingsOption: "Paramètres", logoutOption: "Déconnexion",
         footerText: "Screen To Street est un guide indépendant créé par des fans.", footerMentions: "Mentions légales", footerAbout: "Qui sommes-nous", footerTOS: "CGU", footerPrivacy: "Confidentialité",
-        allGroups: "Tous les groupes", allMembers: "Tous les membres", allAreas: "Toutes les régions", allYears: "Toutes les années", allCategories: "Toutes les catégories"
+        allGroups: "Tous les groupes", allMembers: "Tous les membres", allAreas: "Toutes les régions", allYears: "Toutes les années", allCategories: "Toutes les catégories",
+        checkVisited: "J'ai visité ce lieu", checkWishlist: "Ajouter à ma Wishlist", tripWhich: "Pour quel voyage ?",
+        tripName: "Nom du voyage", tripWhen: "Quand prévoyez-vous d'y aller ?", tripFrom: "De", tripTo: "À", tripCreate: "Créer", tripCancel: "Annuler"
     }
 };
 
@@ -284,6 +288,7 @@ function updateUI() {
 
     initializeFilters();
     renderLocations();
+    loadTripOptions(); // Recharge les options de la wishlist si la langue change
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -474,10 +479,114 @@ function renderLocations() {
     if (mapMarkers.length > 0) map.fitBounds(new L.featureGroup(mapMarkers).getBounds(), { padding: [50, 50], maxZoom: 16 });
 }
 
-if(groupSelect) { initializeFilters(); renderLocations(); }
+if(groupSelect) { initializeFilters(); renderLocations(); loadTripOptions(); }
 
 // ==========================================
-// 6. PANNEAU DE DÉTAILS ET SOUVENIR (MY VISIT)
+// GESTION DES TRIPS / WISHLIST
+// ==========================================
+function loadTripOptions() {
+    const select = document.getElementById('trip-select');
+    if(!select) return;
+    
+    const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const lang = localStorage.getItem('lang') || 'en';
+    const noTripTxt = lang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
+    const newTripTxt = lang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
+    
+    select.innerHTML = `<option value="none">${noTripTxt}</option>`;
+    trips.forEach(t => {
+        select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+    });
+    select.innerHTML += `<option value="new">${newTripTxt}</option>`;
+}
+
+window.toggleWishlist = function() {
+    const checked = document.getElementById('details-wishlist').checked;
+    const box = document.getElementById('trip-box');
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    
+    if (checked) {
+        box.classList.add('open');
+        if(!wList.some(w => w.id === currentLocationIdForMemory)) {
+            // Default "none" trip
+            wList.push({id: currentLocationIdForMemory, dateAdded: new Date().toLocaleDateString(), tripId: 'none'});
+        }
+    } else {
+        box.classList.remove('open');
+        cancelNewTrip();
+        wList = wList.filter(w => w.id !== currentLocationIdForMemory && w !== currentLocationIdForMemory);
+    }
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    renderLocations();
+};
+
+window.handleTripSelect = function() {
+    const value = document.getElementById('trip-select').value;
+    const field = document.getElementById('new-trip-field');
+    
+    if (value === 'new') {
+        field.classList.add('open');
+    } else {
+        field.classList.remove('open');
+        
+        // Mettre à jour le lieu avec le nouveau Trip ID
+        let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+        let idx = wList.findIndex(w => w.id === currentLocationIdForMemory);
+        if(idx !== -1) {
+            wList[idx].tripId = value;
+            localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+        }
+    }
+};
+
+window.validateNewTrip = function() {
+    const name = document.getElementById('new-trip-name').value.trim();
+    document.getElementById('create-trip-btn').disabled = !name;
+};
+
+window.createTrip = function() {
+    const name = document.getElementById('new-trip-name').value.trim();
+    if (!name) return;
+
+    const start = document.getElementById('new-trip-start').value;
+    const end = document.getElementById('new-trip-end').value;
+
+    let label = name;
+    if (start) {
+        const langCode = currentLang === 'fr' ? 'fr-FR' : 'en-US';
+        const fmt = (m) => { const [y,mo] = m.split('-'); return new Date(y, mo-1).toLocaleDateString(langCode,{month:'short', year:'numeric'}); };
+        label += ` (${fmt(start)}${end && end !== start ? ' – ' + fmt(end) : ''})`;
+    }
+
+    const newTripId = 'trip-' + Date.now();
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    trips.push({ id: newTripId, name: label, startDate: start, endDate: end });
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+
+    loadTripOptions(); // Recharge le menu déroulant
+    document.getElementById('trip-select').value = newTripId;
+    handleTripSelect(); // Met à jour le localStorage du lieu avec ce nouveau Trip ID
+    
+    cancelNewTrip();
+};
+
+window.cancelNewTrip = function() {
+    const field = document.getElementById('new-trip-field');
+    if(field) field.classList.remove('open');
+    if(document.getElementById('new-trip-name')) document.getElementById('new-trip-name').value = '';
+    if(document.getElementById('new-trip-start')) document.getElementById('new-trip-start').value = '';
+    if(document.getElementById('new-trip-end')) document.getElementById('new-trip-end').value = '';
+    if(document.getElementById('create-trip-btn')) document.getElementById('create-trip-btn').disabled = true;
+    
+    const select = document.getElementById('trip-select');
+    if (select && select.value === 'new') {
+        select.value = 'none';
+        handleTripSelect();
+    }
+};
+
+// ==========================================
+// 6. PANNEAU DE DÉTAILS
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -565,7 +674,6 @@ window.openDetailsPanel = function(id) {
         
         vCheck.checked = !!memoryData;
         
-        // Si déjà visité et qu'il y a un souvenir enregistré (rating), on affiche l'onglet My Visit
         if(vCheck.checked && memoryData && memoryData.rating) {
             tabBtnVisit.classList.remove('hidden');
             memoryDropdown.classList.remove('open');
@@ -581,18 +689,15 @@ window.openDetailsPanel = function(id) {
                 if(!list.some(v => v.id === loc.id)) {
                     list.push({id: loc.id, date: new Date().toISOString().split('T')[0]}); 
                 }
-                memoryDropdown.classList.add('open'); // Ouvre le tiroir
-                
-                // Set default date to today
+                memoryDropdown.classList.add('open'); 
                 document.getElementById('memory-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('memory-notes').value = '';
-                setStars(4); // Default rating
+                setStars(4); 
             } else { 
                 list = list.filter(v => v.id !== loc.id && v !== loc.id); 
-                memoryDropdown.classList.remove('open'); // Ferme le tiroir
+                memoryDropdown.classList.remove('open'); 
                 tabBtnVisit.classList.add('hidden');
                 
-                // Si on décoche, on repasse sur l'onglet Info
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 document.querySelector('.tab-btn[data-tab="info"]').classList.add('active');
@@ -603,17 +708,29 @@ window.openDetailsPanel = function(id) {
         };
     }
 
+    // GESTION WISHLIST
     const wCheck = document.getElementById('details-wishlist');
+    const tripBox = document.getElementById('trip-box');
+    
     if(wCheck) {
         let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-        wCheck.checked = wList.some(w => w.id === loc.id || w === loc.id);
-        wCheck.onchange = function() {
-            let list = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-            if(this.checked) { if(!list.some(w => w.id === loc.id)) list.push({id: loc.id, date: new Date().toLocaleDateString()}); }
-            else { list = list.filter(w => w.id !== loc.id && w !== loc.id); }
-            localStorage.setItem('wishlistLocs', JSON.stringify(list));
-            renderLocations();
-        };
+        let wishData = wList.find(w => w.id === loc.id || w === loc.id);
+        
+        wCheck.checked = !!wishData;
+        
+        if(wCheck.checked) {
+            tripBox.classList.add('open');
+            // Select the associated trip if it exists
+            const select = document.getElementById('trip-select');
+            if(wishData && wishData.tripId && select.querySelector(`option[value="${wishData.tripId}"]`)) {
+                select.value = wishData.tripId;
+            } else {
+                select.value = 'none';
+            }
+        } else {
+            tripBox.classList.remove('open');
+            cancelNewTrip();
+        }
     }
 
     document.getElementById('sidebar-main').classList.add('hidden');
@@ -644,7 +761,6 @@ document.querySelectorAll('#memory-stars .star').forEach(star => {
     });
 });
 
-// SAUVEGARDE DU SOUVENIR
 const saveMemoryBtn = document.getElementById('save-memory-btn');
 if(saveMemoryBtn) {
     saveMemoryBtn.addEventListener('click', () => {
@@ -656,7 +772,6 @@ if(saveMemoryBtn) {
         const idx = list.findIndex(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
         
         if(idx !== -1) {
-            // Transform in object if it was a plain ID (old logic compatibility)
             if(typeof list[idx] !== 'object') { list[idx] = { id: list[idx] }; }
             
             list[idx].rating = rating;
@@ -664,13 +779,10 @@ if(saveMemoryBtn) {
             list[idx].notes = notes;
             localStorage.setItem('visitedLocs', JSON.stringify(list));
             
-            // Fermer le dropdown, afficher le tab "My Visit" et basculer dessus
             document.getElementById('memory-dropdown').classList.remove('open');
             document.getElementById('tab-btn-visit').classList.remove('hidden');
             
             displayMemoryData(list[idx]);
-            
-            // Simule un clic sur l'onglet "My Visit"
             document.getElementById('tab-btn-visit').click();
         }
     });
@@ -685,7 +797,6 @@ function displayMemoryData(data) {
     
     document.getElementById('display-memory-stars').innerHTML = starsHtml;
     
-    // Formatage de la date (ex: 22 August 2026)
     let formattedDate = data.date;
     if(data.date) {
         const d = new Date(data.date);
@@ -708,8 +819,8 @@ if(editMemoryBtn) {
             document.getElementById('memory-notes').value = data.notes || '';
             setStars(data.rating || 4);
         }
-        document.querySelector('.tab-btn[data-tab="info"]').click(); // Retour à Info
-        document.getElementById('memory-dropdown').classList.add('open'); // Ouvre le tiroir
+        document.querySelector('.tab-btn[data-tab="info"]').click(); 
+        document.getElementById('memory-dropdown').classList.add('open'); 
     });
 }
 
@@ -721,7 +832,6 @@ window.closeDetailsPanel = function() {
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) sidebar.classList.remove('expanded'); 
     
-    // Reset tabs (Always start at Info)
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelector('.tab-btn[data-tab="info"]').classList.add('active');
