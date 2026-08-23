@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Ajouts spécifiques pour le module Souvenir */
+  /* Ajouts pour le module Souvenir (Visited) */
   .memory-dropdown { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display: none; animation: slideDown 0.3s ease; }
   .memory-dropdown.open { display: block; }
   .stars { display:flex; gap:4px; cursor: pointer; }
@@ -20,6 +20,27 @@
   .memory-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
   .memory-date { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; background: #e2e8f0; padding: 4px 10px; border-radius: 100px; }
   .memory-notes { font-size: 13.5px; color: #334155; line-height: 1.6; font-style: italic; border-left: 3px solid #D42759; padding-left: 12px; }
+
+  /* Ajouts pour le module Wishlist / Trip */
+  .trip-box { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display:none; animation: slideDown 0.3s ease; }
+  .trip-box.open { display:block; }
+  .trip-select { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; color:#334155; font-family:'Poppins',sans-serif; margin-bottom:10px; background:#fff; cursor:pointer; outline:none; }
+  .trip-select:focus { border-color:#D42759; box-shadow:0 0 0 3px #FCE7F0; }
+  
+  .new-trip-field { display:none; margin-top:12px; padding-top:14px; border-top:1px solid #e2e8f0; }
+  .new-trip-field.open { display:block; }
+  .new-trip-field input[type="text"] { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:9px 12px; font-size:12px; color:#334155; font-family:'Poppins',sans-serif; margin-bottom:12px; outline:none; }
+  .new-trip-field input:focus { border-color:#D42759; box-shadow:0 0 0 3px #FCE7F0; }
+  
+  .date-range { display:flex; gap:8px; margin-bottom:14px; }
+  .date-field { flex:1; display:flex; align-items:center; gap:6px; background:#fff; border:1px solid #cbd5e1; border-radius:8px; padding:9px 10px; }
+  .date-field:focus-within { border-color:#D42759; box-shadow:0 0 0 3px #FCE7F0; }
+  .date-field input { border:none; font-size:11.5px; color:#334155; font-family:'Poppins',sans-serif; outline:none; background:none; width:100%; }
+  
+  .new-trip-actions { display:flex; gap:8px; }
+  .btn-primary-sm { background:#D42759; color:#fff; border:none; border-radius:7px; padding:9px 16px; font-size:11.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; }
+  .btn-primary-sm:disabled { background:#e2e8f0; color:#94a3b8; cursor:not-allowed; }
+  .btn-ghost-sm { background:none; color:#64748b; border:none; font-size:11.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; padding:9px 6px; }
 </style>
 </head>
 <body>
@@ -33,7 +54,7 @@
 
         <div class="sidebar-content" style="height: 100%;">
             
-            <a href="index.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
+            <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -121,10 +142,46 @@
                 <div class="check-row" style="flex-direction:column; gap:0;">
                     <div style="display:flex; gap:16px; width:100%;">
                         <label class="check-item"><input type="checkbox" id="details-visited" class="custom-checkbox"> <span data-i18n="checkVisited">I visited this place</span></label>
-                        <label class="check-item"><input type="checkbox" id="details-wishlist" class="custom-checkbox"> <span data-i18n="checkWishlist">Add to Wishlist</span></label>
+                        <label class="check-item"><input type="checkbox" id="details-wishlist" class="custom-checkbox" onchange="toggleWishlist()"> <span data-i18n="checkWishlist">Add to Wishlist</span></label>
                     </div>
 
-                    <!-- LE TIROIR SOUVENIR -->
+                    <!-- LE TIROIR WISHLIST / TRIP -->
+                    <div class="trip-box" id="trip-box">
+                        <span class="sub-label" data-i18n="tripWhich">Which trip is this for?</span>
+                        <select id="trip-select" class="trip-select" onchange="handleTripSelect()">
+                            <!-- Options injectées par JS -->
+                        </select>
+
+                        <div class="new-trip-field" id="new-trip-field">
+                            <span class="sub-label" data-i18n="tripName">Trip name</span>
+                            <input type="text" id="new-trip-name" placeholder="e.g. Japan trip 2027" oninput="validateNewTrip()">
+
+                            <span class="sub-label" data-i18n="tripWhen">When are you planning to go?</span>
+                            <div class="date-range">
+                                <div style="flex:1;">
+                                    <span style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:4px;display:block;" data-i18n="tripFrom">From</span>
+                                    <div class="date-field">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                        <input type="month" id="new-trip-start">
+                                    </div>
+                                </div>
+                                <div style="flex:1;">
+                                    <span style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:4px;display:block;" data-i18n="tripTo">To</span>
+                                    <div class="date-field">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                        <input type="month" id="new-trip-end">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="new-trip-actions">
+                                <button class="btn-primary-sm" id="create-trip-btn" onclick="createTrip()" disabled data-i18n="tripCreate">Create trip</button>
+                                <button class="btn-ghost-sm" onclick="cancelNewTrip()" data-i18n="tripCancel">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LE TIROIR SOUVENIR (VISITED) -->
                     <div id="memory-dropdown" class="memory-dropdown">
                         <span class="sub-label">Your rating</span>
                         <div class="stars" id="memory-stars">
@@ -141,11 +198,6 @@
                         
                         <span class="sub-label">Your notes (optional)</span>
                         <textarea id="memory-notes" placeholder="What do you remember about this place?" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; font-family:'Poppins',sans-serif; height:60px; resize:none; margin-bottom:14px; outline:none;"></textarea>
-                        
-                        <span class="sub-label">Add photos</span>
-                        <div style="display:flex; gap:8px;">
-                            <div style="width:56px; height:56px; border:1.5px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-                        </div>
                         
                         <button id="save-memory-btn" style="width:100%; margin-top:16px; background:#D42759; color:#fff; border:none; border-radius:9px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;">Save memory</button>
                     </div>
@@ -259,30 +311,26 @@
     </main>
 </div>
 
-<!-- Modal Liste (Locations / Countries filtrées) -->
+<!-- Modales diverses ... -->
 <div id="list-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px; padding: 25px;">
         <span class="close-btn" onclick="closeModal('list-modal')">&times;</span>
         <h2 id="list-modal-title" style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 15px;">List</h2>
-        <div id="list-modal-content" style="display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 5px;">
-        </div>
+        <div id="list-modal-content" style="display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
     </div>
 </div>
 
-<!-- Modal Itinéraire -->
 <div id="itinerary-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 650px;">
         <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
         <h2 style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 5px;" data-i18n="itiTitle">Auto-Itinerary Generator</h2>
         <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay.</p>
-        
         <div id="iti-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
             <select id="iti-group" class="filter-select" style="padding:12px;"></select>
             <select id="iti-country" class="filter-select" style="padding:12px;"></select>
             <input type="number" id="iti-days" min="1" max="7" value="3" class="filter-select" style="padding:12px;">
             <button class="cta-primary" onclick="generateItinerary()" style="padding:14px; font-size:14px;" data-i18n="itiCreateBtn">Create My Guide</button>
         </div>
-
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
             <div id="iti-map-container"></div>
             <div id="iti-days-list"></div>
@@ -291,13 +339,11 @@
     </div>
 </div>
 
-<!-- Modal Panier -->
 <div id="cart-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px;">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
         <h2 style="color: #1e293b; margin-bottom: 5px;" data-i18n="cartTitle">Unlock New Passes</h2>
         <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
-        
         <form id="cart-form">
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
                 <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
