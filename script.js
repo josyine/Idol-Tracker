@@ -13,15 +13,13 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     markerGroup = L.layerGroup().addTo(map);
     setTimeout(() => { map.invalidateSize(); }, 200);
 
-    // ÉCOUTEUR DE ZOOM : Ajuste dynamiquement la taille des marqueurs selon le niveau de zoom
+    // ÉCOUTEUR DE ZOOM
     map.on('zoomend', function() {
         const zoom = map.getZoom();
         let markerSize = 32; let iconSize = 16;
-        
-        if (zoom < 5) { markerSize = 12; iconSize = 0; } // Discrets points éloignés
-        else if (zoom < 9) { markerSize = 20; iconSize = 10; } // Taille moyenne
-        else { markerSize = 32; iconSize = 16; } // Taille pleine
-        
+        if (zoom < 5) { markerSize = 12; iconSize = 0; }
+        else if (zoom < 9) { markerSize = 20; iconSize = 10; }
+        else { markerSize = 32; iconSize = 16; }
         document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
         document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
     });
@@ -36,7 +34,7 @@ window.toggleMobileMenu = function() {
 };
 
 // ==========================================
-// 2. DONNÉES : LES 19 LIEUX INTÉGRAUX AVEC TEXTES
+// 2. DONNÉES
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5h18"/><path d="M4 8.5 5.5 4h3L7 8.5"/><path d="M9.3 8.5 10.8 4h3l-1.5 4.5"/><path d="M14.7 8.5 16.2 4h3l-1.5 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.5"/></svg>`,
@@ -248,7 +246,6 @@ function updateUI() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Boutons de navigation (Langue, Profil)
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -278,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
         profileBtn.textContent = savedName.charAt(0).toUpperCase();
     }
 
-    // Gestion des onglets du panneau détail
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -289,9 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ==========================================
-    // LOGOUT LOGIC (NETTOYAGE DU CACHE)
-    // ==========================================
+    // LOGOUT
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
@@ -299,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userName');
             localStorage.removeItem('unlockedGroups');
-            window.location.href = 'index.html'; // Redirection vers l'accueil
+            window.location.href = 'index.html';
         });
     }
 });
@@ -358,7 +352,7 @@ if(groupSelect) {
 }
 
 // ==========================================
-// 5. AFFICHAGE DES LIEUX (LISTE + CARTE)
+// 5. AFFICHAGE DES LIEUX
 // ==========================================
 function renderLocations() {
     if(!groupSelect || !map) return; 
@@ -425,7 +419,7 @@ function renderLocations() {
 if(groupSelect) { initializeFilters(); renderLocations(); }
 
 // ==========================================
-// 6. PANNEAU DE DÉTAILS (STYLE IN THE SOOP)
+// 6. PANNEAU DE DÉTAILS
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -481,7 +475,6 @@ window.openDetailsPanel = function(id) {
     const mapLink = document.getElementById('details-map-link');
     if(mapLink) mapLink.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-    // Vidéo YouTube
     const videoContainer = document.getElementById('details-video-container');
     const videoSection = document.getElementById('details-video-section');
     if (videoContainer && videoSection) {
@@ -495,7 +488,6 @@ window.openDetailsPanel = function(id) {
         } else { videoSection.classList.add('hidden'); }
     }
 
-    // Galerie photos + Inspis
     const galleryContainer = document.getElementById('details-gallery');
     if (galleryContainer) {
         galleryContainer.innerHTML = ""; 
@@ -591,7 +583,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 7. ITINERARY & CART MODALS
+// 7. ITINERARY & CART MODALS (MISE À JOUR MAJEURE DU GÉNÉRATEUR)
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -628,6 +620,7 @@ window.generateItinerary = function() {
     let validLocs = availableLocs.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert('No locations found.'); return; }
 
+    // Algo TSP basique
     let route = [validLocs.shift()]; 
     while(validLocs.length > 0) {
         let lastLoc = route[route.length - 1], nearestIdx = 0, minDist = Infinity;
@@ -644,6 +637,13 @@ window.generateItinerary = function() {
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     
+    const lang = localStorage.getItem('lang') || 'en';
+    const itiText = {
+        en: { day: "Day", transit: "🚇 Transit to next location (~30 mins)", lunch: "🍽️ Lunch recommendation near", coffee: "☕ Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
+        fr: { day: "Jour", transit: "🚇 Trajet vers le prochain lieu (~30 mins)", lunch: "🍽️ Déjeuner recommandé près de", coffee: "☕ Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
+    };
+    const t = itiText[lang];
+
     for(let i = 0; i < days; i++) {
         const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
         if(dayLocs.length === 0) continue;
@@ -658,9 +658,64 @@ window.generateItinerary = function() {
             dayLocs.forEach(l => coordsForMap.push([l.lat, l.lng]));
         }
         
-        let html = `<div class="iti-day-card"><div class="iti-day-title">Day ${i + 1}</div>`;
-        dayLocs.forEach((l, idx) => html += `<div class="iti-loc" style="font-size:12px; margin-bottom:5px;"><strong>${idx+1}. ${l.name}</strong></div>`);
-        html += `<a href="${mapLink}" target="_blank" style="display:inline-block; padding:8px 12px; margin-top:10px; font-size:11.5px; color:#34414C; border:1px solid #cbd5e1; border-radius:6px; background:white;">Open in Google Maps</a></div>`;
+        let html = `<div class="iti-day-card" style="padding: 18px 16px;">
+            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">${t.day} ${i + 1}</div>`;
+        
+        let currentTime = new Date();
+        currentTime.setHours(10, 0, 0);
+        const formatTime = (d) => d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        dayLocs.forEach((l, idx) => {
+            let startTime = formatTime(currentTime);
+            currentTime.setHours(currentTime.getHours() + 1);
+            currentTime.setMinutes(currentTime.getMinutes() + 30);
+            let endTime = formatTime(currentTime);
+
+            // BLOC LIEU
+            html += `
+                <div style="padding-left:18px; border-left: 2px solid #D42759; position:relative; margin-bottom:15px;">
+                    <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
+                    <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${startTime} - ${endTime}</div>
+                    <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
+                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${l.category} &middot; ${t.free}</div>
+            `;
+            
+            // BLOC DÉJEUNER (vers midi)
+            if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
+                html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+                    <b style="color:#2E3644;">${t.lunch} ${l.name}</b><br>
+                    <span style="color:#64748b;">Explore local eateries before your next stop.</span>
+                </div>`;
+                currentTime.setHours(currentTime.getHours() + 1);
+            }
+
+            html += `</div>`;
+
+            // BLOC TRANSPORT ou FIN DE JOURNÉE
+            if (idx < dayLocs.length - 1) {
+                html += `
+                    <div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;">
+                        <span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">
+                            ${t.transit}
+                        </span>
+                    </div>
+                `;
+                currentTime.setMinutes(currentTime.getMinutes() + 30);
+            } else {
+                html += `
+                    <div style="padding-left:18px; margin-top:5px; margin-bottom:15px;">
+                        <span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">
+                            ${t.coffee}
+                        </span>
+                    </div>
+                `;
+            }
+        });
+        
+        html += `<a href="${mapLink}" target="_blank" style="display:inline-flex; align-items:center; gap:6px; padding:10px 16px; margin-top:5px; font-size:12px; color:#2E3644; border:1px solid #cbd5e1; border-radius:100px; background:white; font-weight:600; text-decoration:none; transition:0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+            ${t.mapBtn}
+        </a></div>`;
         resultDiv.innerHTML += html;
     }
     
