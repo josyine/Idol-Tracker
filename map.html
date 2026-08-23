@@ -22,13 +22,13 @@
         <div class="sidebar-content" style="height: 100%;">
             
             <!-- Header avec Logo Cliquable -->
-            <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
+            <a href="index.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
                 </svg>
                 <div>
-                    <div class="brand-text" style="color: #2E3644;">Screen To <b>Street</b></div>
+                    <div class="brand-text" style="color: #2E3644;">Screen To <b style="color: #D42759;">Street</b></div>
                     <div class="tagline" data-i18n="subtitle" style="color: #5B6472;">Following the footsteps of your favorite artists</div>
                 </div>
             </a>
@@ -81,7 +81,7 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
-                <!-- PIED DE PAGE AVEC LIENS LÉGAUX -->
+                <!-- PIED DE PAGE -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -187,6 +187,9 @@
             <div class="dropdown-container">
                 <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
+                    <a href="destinations.html" class="dropdown-option">🌍 Explore Destinations</a>
+                    <a href="artists.html" class="dropdown-option">🎤 Explore Artists</a>
+                    <div class="dropdown-divider"></div>
                     <a href="account.html" class="dropdown-option">Your Account</a>
                     <a href="visited.html" class="dropdown-option">My Visited Places</a>
                     <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
@@ -197,10 +200,30 @@
             </div>
         </div>
 
-        <div class="stat-pill"><span class="n1" id="stat-locations">0</span> LOCATIONS <span class="sep">|</span> <span id="stat-countries">0</span> COUNTRIES</div>
+        <!-- STAT PILL CLIQUABLE -->
+        <div class="stat-pill" style="padding: 6px 14px;">
+            <div id="btn-show-locations" style="display:flex; gap:6px; align-items:center; cursor:pointer; padding: 6px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                <span class="n1" id="stat-locations">0</span> <span data-i18n="locationsCount" style="font-size: 11px;">LOCATIONS</span>
+            </div>
+            <span class="sep">|</span> 
+            <div id="btn-show-countries" style="display:flex; gap:6px; align-items:center; cursor:pointer; padding: 6px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                <span class="n1" id="stat-countries" style="color:var(--primary-magenta);">0</span> <span data-i18n="statsCountries" style="font-size: 11px;">COUNTRIES</span>
+            </div>
+        </div>
         
         <div id="map"></div>
     </main>
+</div>
+
+<!-- Modal Liste (Locations / Countries filtrées) -->
+<div id="list-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px; padding: 25px;">
+        <span class="close-btn" onclick="closeModal('list-modal')">&times;</span>
+        <h2 id="list-modal-title" style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 15px;">List</h2>
+        <div id="list-modal-content" style="display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 5px;">
+            <!-- Contenu injecté dynamiquement -->
+        </div>
+    </div>
 </div>
 
 <!-- Modal Itinéraire -->
