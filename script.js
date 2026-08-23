@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION DE L'APPLICATION
+// 1. INITIALISATION ROBUSTE DE L'APPLICATION
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Gestion du menu mobile
     window.toggleMobileMenu = function() {
         const sidebar = document.getElementById('app-sidebar');
         if (sidebar) {
@@ -91,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnShowCountries = document.getElementById('btn-show-countries');
     if (btnShowCountries) btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); });
 
-    // Initialisation
     updateUI();
 });
 
@@ -134,7 +132,7 @@ let celebLocations = [
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
         fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` },
         tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." },
-        directions: { en: "Take Line 8 or 9 to Songpanaru Station.", fr: "Prenez la ligne 8 ou 9 jusqu'à Songpanaru." }
+        directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." }
     },
     {
         id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", ytId: "d--MDCCJ3jg",
@@ -272,28 +270,25 @@ function updateUI() {
         if(yearOpt) yearOpt.textContent = t('allYears');
     }
 
-    // MAP.HTML logic
     if(document.getElementById('group-select')) {
         initializeFilters();
         renderLocations();
-        window.loadMapTripOptions();
     }
     
-    // TRIPS.HTML logic
+    // Si on est sur trips.html
     if(document.getElementById('trip-name-display')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
         const eAuto = document.getElementById('i18n-auto-btn'); if(eAuto) eAuto.textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
         const eOpen = document.getElementById('i18n-open-iti'); if(eOpen) eOpen.textContent = isFr ? "Ouvrir le Générateur" : "Open Auto-Itinerary Generator";
         const eNeed = document.getElementById('i18n-need-magic'); if(eNeed) eNeed.textContent = isFr ? "Besoin de magie ?" : "Need some magic?";
-        const eAct = document.getElementById('i18n-active'); if(eAct) eAct.textContent = isFr ? "Voyage actif :" : "Active Trip :";
         const eEditBtn = document.getElementById('i18n-edit-btn'); if(eEditBtn) eEditBtn.textContent = isFr ? "Modifier" : "Edit trip";
         const eEditing = document.getElementById('i18n-editing'); if(eEditing) eEditing.textContent = isFr ? "✏️ Édition de ce voyage" : "✏️ Editing this trip";
         const eDur = document.getElementById('i18n-trip-duration'); if(eDur) eDur.textContent = isFr ? "Durée & Dates" : "Trip Duration & Dates";
         const eSpec = document.getElementById('i18n-opt-specific'); if(eSpec) eSpec.textContent = isFr ? "Dates Précises" : "Specific Dates";
         const eGen = document.getElementById('i18n-opt-duration'); if(eGen) eGen.textContent = isFr ? "Durée Globale" : "General Duration";
         const eAdd = document.getElementById('i18n-add-more'); if(eAdd) eAdd.textContent = isFr ? "+ Ajouter des lieux" : "+ Add more locations";
-        const eReco = document.getElementById('i18n-reco'); if(eReco) eReco.textContent = isFr ? "RECOMMANDÉ POUR CE VOYAGE (MÊME PAYS)" : "RECOMMENDED FOR THIS TRIP (SAME COUNTRY)";
+        const eReco = document.getElementById('i18n-reco'); if(eReco) eReco.textContent = isFr ? "RECOMMANDÉ POUR CE VOYAGE" : "RECOMMENDED FOR THIS TRIP";
         const eIti = document.getElementById('i18n-your-iti'); if(eIti) eIti.textContent = isFr ? "VOTRE ITINÉRAIRE" : "YOUR ITINERARY";
         const eAddDay = document.getElementById('i18n-add-day'); if(eAddDay) eAddDay.textContent = isFr ? "Ajouter un jour" : "Add an empty day";
         const eCancel = document.getElementById('i18n-cancel'); if(eCancel) eCancel.textContent = isFr ? "Annuler" : "Cancel";
@@ -301,17 +296,19 @@ function updateUI() {
         const eModAdd = document.getElementById('i18n-modal-add'); if(eModAdd) eModAdd.textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
         const eCreateTitle = document.getElementById('i18n-create-title'); if(eCreateTitle) eCreateTitle.textContent = isFr ? "Créer un nouveau voyage" : "Create a new trip";
         const eBtnCreate = document.getElementById('i18n-btn-create'); if(eBtnCreate) eBtnCreate.textContent = isFr ? "Créer" : "Create";
+        const eDelBtn = document.getElementById('i18n-delete-trip'); if(eDelBtn) eDelBtn.textContent = isFr ? "Supprimer" : "Delete";
         
         if(typeof window.initTrips === 'function') window.initTrips();
     }
 
-    // Init ITI Selectors
+    // Init ITI Selectors (Map et Trips)
     window.initItineraryGenerator();
 }
 
 // ==========================================
 // 4. FILTRES DE LA CARTE
 // ==========================================
+let activeCategory = "All"; 
 function initializeFilters() {
     const groupSelect = document.getElementById('group-select');
     const memberSelect = document.getElementById('member-select');
@@ -364,7 +361,6 @@ function initializeFilters() {
     }
 }
 
-// Fonction utilitaire pour le générateur d'itinéraire
 window.initItineraryGenerator = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
@@ -411,8 +407,10 @@ function renderLocations() {
 
     const cSidebar = document.getElementById('location-count-sidebar');
     if(cSidebar) cSidebar.textContent = filteredLocations.length;
+    
     const sLocations = document.getElementById('stat-locations');
     if(sLocations) sLocations.textContent = filteredLocations.length;
+    
     const sCountries = document.getElementById('stat-countries');
     if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
@@ -452,22 +450,8 @@ function renderLocations() {
 }
 
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST DANS MAP.HTML
+// 6. GESTION DES TRIPS / WISHLIST (TIROIR MAP.HTML)
 // ==========================================
-window.loadMapTripOptions = function() {
-    const select = document.getElementById('trip-select');
-    if(!select) return;
-    
-    select.innerHTML = '';
-    const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    const noTripTxt = currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
-    const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
-    
-    select.innerHTML = `<option value="none">${noTripTxt}</option>`;
-    trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
-    select.innerHTML += `<option value="new">${newTripTxt}</option>`;
-};
-
 window.toggleWishlist = function() {
     const checked = document.getElementById('details-wishlist').checked;
     const box = document.getElementById('trip-box');
@@ -527,10 +511,14 @@ window.createTrip = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
-    localStorage.setItem('activeTripId', newTripId);
 
-    window.loadMapTripOptions(); 
-    document.getElementById('trip-select').value = newTripId;
+    // Met à jour la liste pour afficher le nouveau
+    const select = document.getElementById('trip-select');
+    let opt = document.createElement('option');
+    opt.value = newTripId; opt.textContent = label;
+    select.insertBefore(opt, select.lastElementChild);
+    select.value = newTripId;
+    
     window.handleTripSelect(); 
     window.cancelNewTrip();
 };
@@ -628,6 +616,7 @@ window.openDetailsPanel = function(id) {
         else { tipSection.classList.add('hidden'); }
     }
     
+    // Checkboxes Visited
     const vCheck = document.getElementById('details-visited');
     const memoryDropdown = document.getElementById('memory-dropdown');
     const tabBtnVisit = document.getElementById('tab-btn-visit');
@@ -672,6 +661,7 @@ window.openDetailsPanel = function(id) {
         };
     }
 
+    // Checkboxes Wishlist
     const wCheck = document.getElementById('details-wishlist');
     const tripBox = document.getElementById('trip-box');
     
@@ -684,10 +674,20 @@ window.openDetailsPanel = function(id) {
         if(wCheck.checked) {
             tripBox.classList.add('open');
             const select = document.getElementById('trip-select');
-            if(wishData && wishData.tripId && select.querySelector(`option[value="${wishData.tripId}"]`)) {
-                select.value = wishData.tripId;
-            } else {
-                select.value = 'none';
+            
+            // Re-rempli les options pour être sûr d'être à jour
+            if(select) {
+                select.innerHTML = '';
+                const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+                select.innerHTML = `<option value="none">${currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet"}</option>`;
+                trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
+                select.innerHTML += `<option value="new">${currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip..."}</option>`;
+                
+                if(wishData && wishData.tripId && select.querySelector(`option[value="${wishData.tripId}"]`)) {
+                    select.value = wishData.tripId;
+                } else {
+                    select.value = 'none';
+                }
             }
         } else {
             tripBox.classList.remove('open');
@@ -721,7 +721,6 @@ window.setStars = function(val) {
         }
     });
 }
-
 document.querySelectorAll('#memory-stars .star').forEach(star => {
     star.addEventListener('click', function() { window.setStars(parseInt(this.getAttribute('data-val'))); });
 });
@@ -860,8 +859,8 @@ window.generateItinerary = function() {
     currentGeneratedItinerary = [];
     
     const txt = {
-        en: { day: "Day", transit: "Transit to next location (~30 mins)", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
-        fr: { day: "Jour", transit: "Trajet vers le prochain lieu (~30 mins)", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
+        en: { day: "Day", transit: "Transit to next location", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
+        fr: { day: "Jour", transit: "Trajet vers le prochain lieu", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
     }[currentLang];
 
     for(let i = 0; i < days; i++) {
@@ -900,15 +899,28 @@ window.generateItinerary = function() {
                     <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
                     <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)}</div>
             `;
+            
+            if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
+                html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+                    <b style="color:#2E3644;">${txt.lunch} ${l.name}</b><br>
+                    <span style="color:#64748b;">Explore local eateries before your next stop.</span>
+                </div>`;
+                currentTime.setHours(currentTime.getHours() + 1);
+            }
             html += `</div>`;
 
             if (idx < dayLocs.length - 1) {
                 html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
                 currentTime.setMinutes(currentTime.getMinutes() + 30);
+            } else {
+                html += `<div style="padding-left:18px; margin-top:5px; margin-bottom:15px;"><span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">${txt.coffee}</span></div>`;
             }
         });
         
-        html += `</div>`;
+        html += `<a href="${mapLink}" target="_blank" style="display:inline-flex; align-items:center; gap:6px; padding:10px 16px; margin-top:5px; font-size:12px; color:#2E3644; border:1px solid #cbd5e1; border-radius:100px; background:white; font-weight:600; text-decoration:none; transition:0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+            ${txt.mapBtn}
+        </a></div>`;
         resultDiv.innerHTML += html;
     }
     
@@ -932,7 +944,7 @@ window.generateItinerary = function() {
                  .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
             });
             
-            // Sécurité pour le zoom : un point = vue fixe, plusieurs points = vue englobante
+            // Correction pour éviter l'erreur de zoom sur 1 seul point
             if(coordsForMap.length > 1) {
                 L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
                 itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
@@ -945,7 +957,6 @@ window.generateItinerary = function() {
     }
 }
 
-// Bouton Sauvegarder dans My Trips
 window.saveItineraryToTrips = function() {
     const country = document.getElementById('iti-country').value;
     const daysCount = parseInt(document.getElementById('iti-days').value);
@@ -978,7 +989,7 @@ window.saveItineraryToTrips = function() {
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    localStorage.setItem('activeTripId', newTripId); // Force l'ouverture sur trips.html
+    localStorage.setItem('activeTripId', newTripId);
 
     if(document.getElementById('trip-name-display')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
@@ -1096,6 +1107,18 @@ window.onclick = function(e) {
     if (e.target.classList.contains('modal')) e.target.classList.add('hidden'); 
 };
 
+if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
+    document.getElementById('cookie-banner').classList.remove('hidden'); 
+}
+function closeCookies() { 
+    localStorage.setItem('cookiesAccepted', 'true'); 
+    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
+}
+const btnAccept = document.getElementById('cookie-accept');
+if(btnAccept) btnAccept.addEventListener('click', closeCookies);
+const btnReject = document.getElementById('cookie-reject');
+if(btnReject) btnReject.addEventListener('click', closeCookies);
+
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
@@ -1150,8 +1173,12 @@ window.renderTripsSidebar = function() {
             localStorage.setItem('activeTripId', t.id);
             window.initTrips();
         };
+        // Ajout de la croix de suppression
         pill.innerHTML = `
-            <div class="trip-pill-name">${t.name}</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="trip-pill-name">${t.name}</div>
+                <div class="del-trip-btn" onclick="deleteTrip('${t.id}', event)" title="Delete trip">✕</div>
+            </div>
             <div class="trip-pill-meta">${dateStr} &middot; ${locCount} locations</div>
         `;
         listContainer.appendChild(pill);
@@ -1185,7 +1212,7 @@ window.renderTrip = function() {
         const loc = celebLocations.find(l => l.id === id);
         if (loc) locList.appendChild(window.createLocRow(loc));
     });
-    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `LIEUX NON ASSIGNÉS (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
+    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `Lieux non assignés (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
 
     const box = document.getElementById('itinerary-box');
     const addBtn = box.querySelector('.add-day-btn');
@@ -1358,6 +1385,47 @@ window.quickAddLoc = function(locId) {
     }
 }
 
+// Fonction de suppression complète du voyage
+window.deleteCurrentTrip = function() {
+    if (!currentTrip) return;
+    const msg = currentLang === 'fr' ? "Êtes-vous sûr de vouloir supprimer ce voyage ?" : "Are you sure you want to delete this trip?";
+    if(!confirm(msg)) return;
+    
+    // Supprime le voyage de myTrips
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    trips = trips.filter(t => t.id !== currentTrip.id);
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+    
+    // Dissocie les lieux de ce voyage (les remet en 'none' ou les supprime)
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    wList = wList.filter(w => w.tripId !== currentTrip.id);
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    
+    localStorage.removeItem('activeTripId');
+    currentTrip = null;
+    window.initTrips();
+};
+
+window.deleteTrip = function(tripId, event) {
+    if(event) event.stopPropagation(); // Évite de sélectionner le voyage en cliquant sur la croix
+    const msg = currentLang === 'fr' ? "Êtes-vous sûr de vouloir supprimer ce voyage ?" : "Are you sure you want to delete this trip?";
+    if(!confirm(msg)) return;
+    
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    trips = trips.filter(t => t.id !== tripId);
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+    
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    wList = wList.filter(w => w.tripId !== tripId);
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    
+    if (currentTrip && currentTrip.id === tripId) {
+        currentTrip = null;
+        localStorage.removeItem('activeTripId');
+    }
+    window.initTrips();
+};
+
 window.saveTrip = function(exitEdit = true) {
     currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
     
@@ -1421,13 +1489,14 @@ window.createNewTripEmpty = function() {
     if (!name) return;
 
     const newTripId = 'trip-' + Date.now();
-    let newTrip = { id: newTripId, name: name, dateType: 'duration', duration: 'Flexible', days: [] };
+    let newTrip = { id: newTripId, name: name, dateType: 'duration', duration: '1 Week', days: [] };
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
-    localStorage.setItem('activeTripId', newTripId); // Force l'ouverture de ce voyage
 
+    localStorage.setItem('activeTripId', newTripId);
+    
     document.getElementById('add-trip-modal').classList.add('hidden');
     nameInput.value = '';
     
