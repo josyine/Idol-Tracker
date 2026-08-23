@@ -81,14 +81,14 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
-                <!-- PIED DE PAGE -->
+                <!-- PIED DE PAGE TRADUIT -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
-                    <p style="margin-bottom: 5px;">Screen To Street is an independent fan-made guide.</p>
+                    <p style="margin-bottom: 5px;" data-i18n="footerText">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-                        <a href="legal.html#mentions" style="color: var(--primary-magenta); text-decoration: none;">Mentions légales</a>
-                        <a href="legal.html#apropos" style="color: var(--primary-magenta); text-decoration: none;">Qui sommes-nous</a>
-                        <a href="legal.html#cgu" style="color: var(--primary-magenta); text-decoration: none;">CGU</a>
-                        <a href="legal.html#confidentialite" style="color: var(--primary-magenta); text-decoration: none;">Confidentialité</a>
+                        <a href="legal.html#mentions" data-i18n="footerMentions" style="color: var(--primary-magenta); text-decoration: none;">Legal Notice</a>
+                        <a href="legal.html#apropos" data-i18n="footerAbout" style="color: var(--primary-magenta); text-decoration: none;">About Us</a>
+                        <a href="legal.html#cgu" data-i18n="footerTOS" style="color: var(--primary-magenta); text-decoration: none;">Terms of Service</a>
+                        <a href="legal.html#confidentialite" data-i18n="footerPrivacy" style="color: var(--primary-magenta); text-decoration: none;">Privacy Policy</a>
                     </div>
                 </div>
             </div>
@@ -179,15 +179,15 @@
             <div class="dropdown-container">
                 <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
-                    <a href="destinations.html" class="dropdown-option">🌍 Explore Destinations</a>
-                    <a href="artists.html" class="dropdown-option">🎤 Explore Artists</a>
+                    <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
+                    <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
                     <div class="dropdown-divider"></div>
-                    <a href="account.html" class="dropdown-option">Your Account</a>
-                    <a href="visited.html" class="dropdown-option">My Visited Places</a>
-                    <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
-                    <a href="settings.html" class="dropdown-option">Settings</a>
+                    <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
+                    <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
+                    <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
+                    <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;">Logout</a>
+                    <a href="#" class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;" data-i18n="logoutOption">Logout</a>
                 </div>
             </div>
         </div>
@@ -244,8 +244,8 @@
 <div id="cart-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px;">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 style="color: #1e293b; margin-bottom: 5px;">Unlock New Passes</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select the groups you want to unlock. (14.99€ per group)</p>
+        <h2 style="color: #1e293b; margin-bottom: 5px;" data-i18n="cartTitle">Unlock New Passes</h2>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
         
         <form id="cart-form">
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
@@ -258,7 +258,7 @@
                 <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
                 <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
             </div>
-            <button type="submit" id="cart-pay-btn" class="cta-primary" disabled style="padding:14px;">Select a group</button>
+            <button type="submit" id="cart-pay-btn" class="cta-primary" disabled style="padding:14px;" data-i18n="payBtnEmpty">Select a group</button>
         </form>
     </div>
 </div>
