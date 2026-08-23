@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
+  /* Modules Souvenir & Wishlist */
   .memory-dropdown { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display: none; animation: slideDown 0.3s ease; }
   .memory-dropdown.open { display: block; }
   .stars { display:flex; gap:4px; cursor: pointer; }
@@ -51,6 +52,7 @@
 
 <div class="app-container">
     
+    <!-- Sidebar Gauche -->
     <aside class="sidebar" id="app-sidebar">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -181,7 +183,7 @@
                         </div>
                     </div>
 
-                    <!-- LE TIROIR SOUVENIR (VISITED) -->
+                    <!-- LE TIROIR SOUVENIR (VISITED) AVEC PHOTOS -->
                     <div id="memory-dropdown" class="memory-dropdown">
                         <span class="sub-label">Your rating</span>
                         <div class="stars" id="memory-stars">
@@ -297,12 +299,13 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <!-- Icone de Profil (Fond transparent, texte noir comme demandé) -->
+                <!-- Icone de Profil corrigé (Transparent, texte noir, bordure) -->
                 <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: 1px solid #cbd5e1;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
                     <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
                     <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
+                    <!-- My trips est normal (noir) -->
                     <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
                     <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
                     <div class="dropdown-divider"></div>
@@ -349,10 +352,9 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <div style="width: 100%; height: 200px; margin-bottom: 15px;">
-                <div id="iti-map-container" style="height: 100%; width: 100%; background: #e2e8f0; border-radius: 12px;"></div>
-            </div>
-            <div id="iti-days-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
+            <!-- La carte est restaurée ici sans dépassement ! -->
+            <div id="iti-map-container" style="height: 250px; border-radius: 12px; margin-bottom: 15px; background: #e2e8f0; z-index: 10;"></div>
+            <div id="iti-days-list" style="max-height: 35vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
             <div style="display:flex; gap:10px;">
                 <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="background: #2E3644; flex:1; justify-content:center;" data-i18n="itiExport">Export Guide as PDF</button>
                 <button id="save-trip-btn" class="cta-primary" onclick="saveItineraryToTrips()" style="flex:1; justify-content:center;" data-i18n="itiSave">Save to My Trips</button>
@@ -381,17 +383,6 @@
             </div>
             <button type="submit" id="cart-pay-btn" class="cta-primary" disabled style="padding:14px; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
         </form>
-    </div>
-</div>
-
-<div id="cookie-banner" class="cookie-banner hidden">
-    <div class="cookie-content">
-        <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#confidentialite" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
-        <div class="cookie-actions">
-            <button id="cookie-manage" class="cat-card" style="border:1px solid var(--primary-magenta); color:var(--primary-magenta);" data-i18n="cookieManage">Manage</button>
-            <button id="cookie-reject" class="cat-card" data-i18n="cookieReject">Reject</button>
-            <button id="cookie-accept" class="cta-primary" style="width:auto;" data-i18n="cookieAccept">Accept</button>
-        </div>
     </div>
 </div>
 
