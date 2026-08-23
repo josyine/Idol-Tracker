@@ -3,14 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Magie pour le fondu entre les pages (Chrome/Edge) -->
+<meta name="view-transition" content="same-origin">
 <title>Screen To Street</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="welcome-style.css"> 
 <style>
-    /* Force l'absence de soulignement sur tous les liens de la navbar comme sur les autres pages */
     a { text-decoration: none !important; }
+    
+    /* SYNCHRONISATION DU FOND ANIMÉ */
+    .hero { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
+    .blob-1 { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
+    .blob-2 { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
+    .blob-3 { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
+    .route-line { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
+    .dot-a { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
+    .dot-b { animation-delay: calc(0.4s - var(--sync-t, 0s)) !important; }
+    .dot-c { animation-delay: calc(0.7s - var(--sync-t, 0s)) !important; }
+    .dot-d { animation-delay: calc(0.2s - var(--sync-t, 0s)) !important; }
+    .dot-e { animation-delay: calc(1s - var(--sync-t, 0s)) !important; }
+    .dot-f { animation-delay: calc(0.5s - var(--sync-t, 0s)) !important; }
+    .dot-g { animation-delay: calc(1.3s - var(--sync-t, 0s)) !important; }
 </style>
+<script>
+    // Calcul de l'avancement exact de l'animation pour lier toutes les pages
+    if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
+    const elapsed = (Date.now() - parseInt(sessionStorage.getItem('bgSyncTime'))) / 1000;
+    document.documentElement.style.setProperty('--sync-t', elapsed + 's');
+</script>
 </head>
 <body>
 
@@ -37,12 +58,10 @@
 
 <!-- LE DESIGN PLEIN ÉCRAN -->
 <div class="hero">
-    <!-- Blobs Flous d'Arrière Plan -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
-    <!-- Route Animée -->
     <svg class="bg-route" viewBox="0 0 1180 600" preserveAspectRatio="xMidYMid slice">
       <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260" fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
       <circle class="dot dot-a" cx="380" cy="340" r="6" fill="#B9A8DA"/>
@@ -99,96 +118,51 @@
 <div id="auth-modal" class="auth-modal hidden">
     <div class="auth-modal-content">
         <button class="close-auth-btn" id="close-auth">&times;</button>
-        
         <div class="auth-left">
-            
-            <!-- BARRE DE PROGRESSION (Visible étapes 1 à 4) -->
             <div id="auth-stepper" class="stepper hidden">
-                <div class="step-container" id="step-btn-1">
-                    <div class="step-dot" id="step-dot-1">1</div><span class="step-label" id="step-label-1" data-i18n="step1Title">Account</span>
-                </div>
+                <div class="step-container" id="step-btn-1"><div class="step-dot" id="step-dot-1">1</div><span class="step-label" id="step-label-1" data-i18n="step1Title">Account</span></div>
                 <div class="step-line" id="line-1"></div>
-                <div class="step-container" id="step-btn-2">
-                    <div class="step-dot" id="step-dot-2">2</div><span class="step-label" id="step-label-2" data-i18n="step2Title">Profile</span>
-                </div>
+                <div class="step-container" id="step-btn-2"><div class="step-dot" id="step-dot-2">2</div><span class="step-label" id="step-label-2" data-i18n="step2Title">Profile</span></div>
                 <div class="step-line" id="line-2"></div>
-                <div class="step-container" id="step-btn-3">
-                    <div class="step-dot" id="step-dot-3">3</div><span class="step-label" id="step-label-3" data-i18n="step3Title">Passes</span>
-                </div>
+                <div class="step-container" id="step-btn-3"><div class="step-dot" id="step-dot-3">3</div><span class="step-label" id="step-label-3" data-i18n="step3Title">Passes</span></div>
                 <div class="step-line" id="line-3"></div>
-                <div class="step-container" id="step-btn-4">
-                    <div class="step-dot" id="step-dot-4">4</div><span class="step-label" id="step-label-4" data-i18n="step4Title">Payment</span>
-                </div>
+                <div class="step-container" id="step-btn-4"><div class="step-dot" id="step-dot-4">4</div><span class="step-label" id="step-label-4" data-i18n="step4Title">Payment</span></div>
             </div>
 
-            <!-- ETAPE 0 : CHOIX (SOCIAL OU EMAIL) -->
+            <!-- ETAPE 0 -->
             <div id="auth-step-0" class="auth-step">
                 <h2 data-i18n="authTitle">Log in or sign up</h2>
                 <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
-
-                <div class="social-btn" onclick="openGooglePopup()">
-                    <svg class="g-icon" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>
-                    <span data-i18n="authGoogle">Continue with Google</span>
-                </div>
-                <div class="social-btn" onclick="simulateFacebookLogin()">
-                    <svg class="f-icon" viewBox="0 0 48 48"><path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"/><path fill="#fff" d="M26.6 29H31.5L32.3 24H26.6V21.3C26.6 19.2 27.3 17.4 29.2 17.4H32.3V13C31.8 12.9 30.6 12.7 28.4 12.7C23.9 12.7 21.2 15.1 21.2 20.6V24H16.5V29H21.2V42.8C22.1 42.9 23 43 24 43C24.9 43 25.7 42.9 26.6 42.8V29Z"/></svg>
-                    <span data-i18n="authFacebook">Continue with Facebook</span>
-                </div>
-                <div class="social-btn" id="btn-to-email">
-                    <svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7L22 6"/></svg>
-                    <span data-i18n="authEmail">Continue with email</span>
-                </div>
-
-                <p class="terms">
-                    <span data-i18n="authTerms">By continuing, you agree to Screen To Street's</span> 
-                    <a href="legal.html#cgu" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkTerms">Terms of Use</a>. 
-                    <span data-i18n="authPrivacy">Read our</span> 
-                    <a href="legal.html#confidentialite" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkPrivacy">Privacy Policy</a>.
-                </p>
+                <div class="social-btn" onclick="openGooglePopup()"><svg class="g-icon" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg><span data-i18n="authGoogle">Continue with Google</span></div>
+                <div class="social-btn" onclick="simulateFacebookLogin()"><svg class="f-icon" viewBox="0 0 48 48"><path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"/><path fill="#fff" d="M26.6 29H31.5L32.3 24H26.6V21.3C26.6 19.2 27.3 17.4 29.2 17.4H32.3V13C31.8 12.9 30.6 12.7 28.4 12.7C23.9 12.7 21.2 15.1 21.2 20.6V24H16.5V29H21.2V42.8C22.1 42.9 23 43 24 43C24.9 43 25.7 42.9 26.6 42.8V29Z"/></svg><span data-i18n="authFacebook">Continue with Facebook</span></div>
+                <div class="social-btn" id="btn-to-email"><svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7L22 6"/></svg><span data-i18n="authEmail">Continue with email</span></div>
+                <p class="terms"><span data-i18n="authTerms">By continuing, you agree to Screen To Street's</span> <a href="legal.html#cgu" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkTerms">Terms of Use</a>. <span data-i18n="authPrivacy">Read our</span> <a href="legal.html#confidentialite" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkPrivacy">Privacy Policy</a>.</p>
             </div>
 
-            <!-- ETAPE 1 : COMPTE (EMAIL & MOT DE PASSE OBLIGATOIRES) -->
+            <!-- ETAPES 1-4 -->
             <div id="auth-step-1" class="auth-step hidden">
                 <h2 data-i18n="step1Title">Account</h2>
                 <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
-                <div class="input-group">
-                    <label><span data-i18n="emailLabel">Email address</span> <span style="color:#D42759;">*</span></label>
-                    <input type="email" id="user-email" class="field-input" placeholder="jane.doe@example.com" required>
-                </div>
-                <div class="input-group">
-                    <label><span data-i18n="password">Password</span> <span style="color:#D42759;">*</span></label>
-                    <input type="password" id="user-password" class="field-input" minlength="8" placeholder="••••••••" required>
-                </div>
+                <div class="input-group"><label><span data-i18n="emailLabel">Email address</span> <span style="color:#D42759;">*</span></label><input type="email" id="user-email" class="field-input" placeholder="jane.doe@example.com" required></div>
+                <div class="input-group"><label><span data-i18n="password">Password</span> <span style="color:#D42759;">*</span></label><input type="password" id="user-password" class="field-input" minlength="8" placeholder="••••••••" required></div>
                 <button class="pay-btn" id="btn-to-step2" data-i18n="btnContinue">Continue</button>
             </div>
 
-            <!-- ETAPE 2 : PROFIL (USERNAME OBLIGATOIRE, LE RESTE OPTIONNEL) -->
             <div id="auth-step-2" class="auth-step hidden">
                 <h2 data-i18n="step2Title">Profile</h2>
                 <p data-i18n="step2Desc">Tell us a bit about yourself.</p>
-                <div class="input-group">
-                    <label><span data-i18n="usernameLabel">Username</span> <span style="color:#D42759;">*</span></label>
-                    <input type="text" id="uname" class="field-input" placeholder="e.g. JaneDoe99" required>
-                </div>
+                <div class="input-group"><label><span data-i18n="usernameLabel">Username</span> <span style="color:#D42759;">*</span></label><input type="text" id="uname" class="field-input" placeholder="e.g. JaneDoe99" required></div>
                 <div class="input-row">
                     <div class="input-group"><label data-i18n="fname">First Name</label><input type="text" id="fname" class="field-input" placeholder="(Optional)"></div>
                     <div class="input-group"><label data-i18n="lname">Last Name</label><input type="text" id="lname" class="field-input" placeholder="(Optional)"></div>
                 </div>
                 <div class="input-group" style="margin-bottom: 20px;">
                     <label data-i18n="reasonLabel">Why are you using Screen To Street?</label>
-                    <select id="user-reason" class="field-input">
-                        <option value="" data-i18n="reasonPlaceholder">Select an option (optional)</option>
-                        <option value="discover" data-i18n="reason1">To discover new places</option>
-                        <option value="travel" data-i18n="reason2">To plan a trip</option>
-                        <option value="addresses" data-i18n="reason3">To get good addresses</option>
-                        <option value="idols" data-i18n="reason4">To follow my idol's footsteps</option>
-                        <option value="other" data-i18n="reason5">Other</option>
-                    </select>
+                    <select id="user-reason" class="field-input"><option value="" data-i18n="reasonPlaceholder">Select an option (optional)</option><option value="discover" data-i18n="reason1">To discover new places</option><option value="travel" data-i18n="reason2">To plan a trip</option><option value="addresses" data-i18n="reason3">To get good addresses</option><option value="idols" data-i18n="reason4">To follow my idol's footsteps</option><option value="other" data-i18n="reason5">Other</option></select>
                 </div>
                 <button class="pay-btn" id="btn-to-step3" data-i18n="btnContinue">Continue</button>
             </div>
 
-            <!-- ETAPE 3 : SÉLECTION DES PASS -->
             <div id="auth-step-3" class="auth-step hidden">
                 <h2 data-i18n="step3Title">Choose Your Passes</h2>
                 <p data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
@@ -200,38 +174,25 @@
                     <label class="pass-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox"><span class="card-content">Katseye</span></label>
                     <label class="pass-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox"><span class="card-content">TXT</span></label>
                 </div>
-                <div class="total-row">
-                    <span class="total-label" data-i18n="subtotalLabel">Subtotal:</span>
-                    <span class="total-price" id="subtotal-display">0.00 €</span>
-                </div>
+                <div class="total-row"><span class="total-label" data-i18n="subtotalLabel">Subtotal:</span><span class="total-price" id="subtotal-display">0.00 €</span></div>
                 <button class="pay-btn" id="btn-to-step4" disabled data-i18n="payBtnEmpty">Select a group</button>
             </div>
 
-            <!-- ETAPE 4 : PAIEMENT (CHAMPS OBLIGATOIRES) -->
             <div id="auth-step-4" class="auth-step hidden">
                 <h2 data-i18n="step4Title">Payment</h2>
                 <p data-i18n="step4Desc">Complete your purchase to unlock the guides.</p>
-                
                 <div style="background:#f8fafc; border-radius:10px; padding:12px; font-size:12.5px; color:#334155; margin-bottom:15px; border:1px solid #e2e8f0;">
                     <b data-i18n="summaryPasses">Selected Passes:</b> <span id="summary-passes" style="color:#64748b;">None</span><br>
                     <b data-i18n="summaryTotal" style="display:inline-block; margin-top:5px;">Total Due:</b> <span id="summary-price" style="color:var(--primary-magenta); font-weight:bold; font-size:14px;">0.00 €</span>
                 </div>
-
                 <form id="checkout-form">
-                    <div class="input-group">
-                        <label><span data-i18n="cardNum">Card Number</span> <span style="color:#D42759;">*</span></label>
-                        <input type="text" class="field-input" placeholder="XXXX XXXX XXXX XXXX" required>
-                    </div>
+                    <div class="input-group"><label><span data-i18n="cardNum">Card Number</span> <span style="color:#D42759;">*</span></label><input type="text" class="field-input" placeholder="XXXX XXXX XXXX XXXX" required></div>
                     <div class="input-row">
                         <div class="input-group"><label><span data-i18n="expiry">Expiry Date</span> <span style="color:#D42759;">*</span></label><input type="text" class="field-input" placeholder="MM/YY" required></div>
                         <div class="input-group"><label><span data-i18n="cvc">CVC</span> <span style="color:#D42759;">*</span></label><input type="text" class="field-input" placeholder="123" required></div>
                     </div>
                     <button type="submit" id="btn-submit-payment" class="pay-btn" data-i18n="paySecurely">Pay securely</button>
-                    
-                    <div id="payment-loader" class="hidden" style="margin-top: 15px;">
-                        <div class="spinner"></div>
-                        <p data-i18n="processing" style="text-align: center; color: var(--primary-magenta); margin-top: 10px; font-size:13px; font-weight:600;">Processing securely...</p>
-                    </div>
+                    <div id="payment-loader" class="hidden" style="margin-top: 15px;"><div class="spinner"></div><p data-i18n="processing" style="text-align: center; color: var(--primary-magenta); margin-top: 10px; font-size:13px; font-weight:600;">Processing securely...</p></div>
                 </form>
             </div>
             
@@ -243,10 +204,7 @@
             <div class="auth-blob auth-blob-2"></div>
             <div class="auth-blob auth-blob-3"></div>
             <div class="brand-content">
-                <svg width="56" height="56" viewBox="0 0 400 400" style="margin-bottom:16px;">
-                    <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#fff"/>
-                    <polygon points="176,110 176,182 236,146" fill="#D42759"/>
-                </svg>
+                <svg width="56" height="56" viewBox="0 0 400 400" style="margin-bottom:16px;"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#fff"/><polygon points="176,110 176,182 236,146" fill="#D42759"/></svg>
                 <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:12px;">Screen To <span style="color:#F06090;">Street</span></div>
                 <div data-i18n="authRightTitle" style="font-size:20px;font-weight:600;color:#fff;text-align:center;line-height:1.35;">Unlock the world<br>of your idols.</div>
             </div>
@@ -255,7 +213,6 @@
     </div>
 </div>
 
-<!-- BANNIÈRE COOKIES -->
 <div id="cookie-banner" class="cookie-banner hidden">
     <div class="cookie-content">
         <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#confidentialite" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
