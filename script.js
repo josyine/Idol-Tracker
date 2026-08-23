@@ -3,6 +3,7 @@
 // ==========================================
 let map = null;
 let markerGroup = null;
+let currentFilteredLocations = []; // Variable globale pour stocker les lieux filtrés
 
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
@@ -230,8 +231,8 @@ let celebLocations = [
 // ==========================================
 let currentLang = localStorage.getItem('lang') || 'en';
 const translations = {
-    en: { btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", locationsCount: "LOCATIONS", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept" },
-    fr: { btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", locationsCount: "LIEUX", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter" }
+    en: { btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", locationsCount: "LOCATIONS", statsCountries: "COUNTRIES", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept" },
+    fr: { btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", locationsCount: "LIEUX", statsCountries: "PAYS", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter" }
 };
 function t(key) { return translations[currentLang] ? (translations[currentLang][key] || key) : key; }
 function getLocText(field) { return field ? (field[currentLang] || field.en || "") : ""; }
@@ -294,6 +295,20 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('userName');
             localStorage.removeItem('unlockedGroups');
             window.location.href = 'index.html';
+        });
+    }
+
+    // LIST MODAL FOR KPI PILLS
+    const btnShowLocs = document.getElementById('btn-show-locations');
+    if (btnShowLocs) {
+        btnShowLocs.addEventListener('click', () => {
+            openFilteredListModal('locations');
+        });
+    }
+    const btnShowCountries = document.getElementById('btn-show-countries');
+    if (btnShowCountries) {
+        btnShowCountries.addEventListener('click', () => {
+            openFilteredListModal('countries');
         });
     }
 });
@@ -371,6 +386,8 @@ function renderLocations() {
                (activeCategory === "All" || loc.category === activeCategory) && (fYear === "All" || loc.year === fYear) &&
                (fCountry === "All" || loc.country === fCountry) && (loc.name.toLowerCase().includes(searchTerm) || (loc.city && loc.city.toLowerCase().includes(searchTerm)));
     });
+
+    currentFilteredLocations = filteredLocations; // Save for modal
 
     const cSidebar = document.getElementById('location-count-sidebar');
     if(cSidebar) cSidebar.textContent = filteredLocations.length;
@@ -583,7 +600,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 7. ITINERARY & CART MODALS (MISE À JOUR MAJEURE DU GÉNÉRATEUR)
+// 7. ITINERARY & CART MODALS
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -620,7 +637,6 @@ window.generateItinerary = function() {
     let validLocs = availableLocs.filter(l => l.group === group && l.country === country);
     if(validLocs.length === 0) { alert('No locations found.'); return; }
 
-    // Algo TSP basique
     let route = [validLocs.shift()]; 
     while(validLocs.length > 0) {
         let lastLoc = route[route.length - 1], nearestIdx = 0, minDist = Infinity;
@@ -800,6 +816,46 @@ if(cartForm) {
     });
 }
 
+// ==========================================
+// 9. GESTION DES MODALES "LIST" (Depuis KPI)
+// ==========================================
+window.openFilteredListModal = function(type) {
+    const modal = document.getElementById('list-modal');
+    const title = document.getElementById('list-modal-title');
+    const content = document.getElementById('list-modal-content');
+    if (!modal || !content) return;
+
+    content.innerHTML = '';
+    const lang = localStorage.getItem('lang') || 'en';
+    
+    if (type === 'locations') {
+        title.textContent = lang === 'fr' ? "Lieux filtrés" : "Filtered Locations";
+        currentFilteredLocations.forEach(loc => {
+            content.innerHTML += `
+                <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='#D42759'" onmouseout="this.style.borderColor='#e2e8f0'" onclick="closeModal('list-modal'); window.openDetailsPanel(${loc.id}); map.flyTo([${loc.lat}, ${loc.lng}], 16);">
+                    <div style="font-weight: 700; color: #2E3644; font-size:14px; margin-bottom:2px;">${loc.name}</div>
+                    <div style="font-size: 11px; color: #64748b; text-transform:uppercase; font-weight:600;">${loc.city}, ${loc.country} &middot; <span style="color:#D42759;">${loc.category}</span></div>
+                </div>
+            `;
+        });
+    } else if (type === 'countries') {
+        title.textContent = lang === 'fr' ? "Pays filtrés" : "Filtered Countries";
+        const countries = [...new Set(currentFilteredLocations.map(l => l.country))].sort();
+        countries.forEach(c => {
+            const count = currentFilteredLocations.filter(l => l.country === c).length;
+            const textLoc = count > 1 ? (lang === 'fr' ? "lieux" : "locations") : (lang === 'fr' ? "lieu" : "location");
+            content.innerHTML += `
+                <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-weight: 700; color: #D42759; font-size:15px;">${c}</div>
+                    <div style="font-size: 12px; color: #64748b; font-weight:600;">${count} ${textLoc}</div>
+                </div>
+            `;
+        });
+    }
+    
+    modal.classList.remove('hidden');
+}
+
 window.closeModal = function(id) { 
     const el = document.getElementById(id);
     if(el) el.classList.add('hidden'); 
@@ -809,7 +865,7 @@ window.onclick = function(e) {
 };
 
 // ==========================================
-// 9. BANNIÈRE COOKIES ET REDIRECTION VISITED
+// 10. BANNIÈRE COOKIES ET REDIRECTION VISITED
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
