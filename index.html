@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Magie pour le fondu entre les pages (Chrome/Edge) -->
 <meta name="view-transition" content="same-origin">
 <title>Screen To Street</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +26,6 @@
     .dot-g { animation-delay: calc(1.3s - var(--sync-t, 0s)) !important; }
 </style>
 <script>
-    // Calcul de l'avancement exact de l'animation pour lier toutes les pages
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
     const elapsed = (Date.now() - parseInt(sessionStorage.getItem('bgSyncTime'))) / 1000;
     document.documentElement.style.setProperty('--sync-t', elapsed + 's');
@@ -56,7 +54,6 @@
     </div>
 </div>
 
-<!-- LE DESIGN PLEIN ÉCRAN -->
 <div class="hero">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -73,14 +70,14 @@
       <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 
-    <!-- Navbar 100% identique aux autres pages -->
+    <!-- Navbar : Logo mis à jour -->
     <div class="nav">
       <a href="index.html" class="brand">
         <svg class="pin" viewBox="0 0 400 400">
           <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
           <circle cx="200" cy="150" r="26" fill="#D42759"/>
         </svg>
-        <span>Screen To <b>Street</b></span>
+        <span>Screen To <b style="color: #D42759;">Street</b></span>
       </a>
       <div class="nav-right">
         <a class="nav-link" href="destinations.html" data-i18n="navDest">Destinations</a>
@@ -198,7 +195,7 @@
             
         </div>
 
-        <!-- Colonne Droite (Brand Panel Graphique) -->
+        <!-- Colonne Droite -->
         <div class="brand-panel">
             <div class="auth-blob auth-blob-1"></div>
             <div class="auth-blob auth-blob-2"></div>
