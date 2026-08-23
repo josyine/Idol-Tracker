@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION ROBUSTE DE L'APPLICATION
+// 1. INITIALISATION DE L'APPLICATION
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -14,6 +14,7 @@ let draggedEl = null;
 let tripIdToDelete = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Si la page contient une carte Leaflet (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -42,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Boutons communs
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -233,9 +235,14 @@ const translations = {
 };
 
 const catTranslations = {
-    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", "Restaurants": {en: "Restaurants", fr: "Restaurants"}, "Cafe": {en: "Cafe", fr: "Café"}, 
-    "Museums": {en: "Museums", fr: "Musées"}, "MV Location": "MV Location", "Concerts": "Concerts", "Fashion": {en: "Fashion", fr: "Mode"}, 
-    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, "Pop-up Store": "Pop-up Store"
+    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", 
+    "Restaurants": {en: "Restaurants", fr: "Restaurants"}, 
+    "Cafe": {en: "Cafe", fr: "Café"}, 
+    "Museums": {en: "Museums", fr: "Musées"}, 
+    "MV Location": "MV Location", "Concerts": "Concerts", 
+    "Fashion": {en: "Fashion", fr: "Mode"}, 
+    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, 
+    "Pop-up Store": "Pop-up Store"
 };
 
 function getCatName(cat) {
@@ -263,13 +270,14 @@ function updateUI() {
         if(yearOpt) yearOpt.textContent = t('allYears');
     }
 
+    // MAP.HTML logic
     if(document.getElementById('group-select')) {
         initializeFilters();
         renderLocations();
     }
     
-    // Si on est sur trips.html
-    if(document.getElementById('trip-name-display')) {
+    // TRIPS.HTML logic
+    if(document.getElementById('edit-trip-name')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
         const eAuto = document.getElementById('i18n-auto-btn'); if(eAuto) eAuto.textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
@@ -280,7 +288,7 @@ function updateUI() {
         const eSpec = document.getElementById('i18n-opt-specific'); if(eSpec) eSpec.textContent = isFr ? "Dates Précises" : "Specific Dates";
         const eGen = document.getElementById('i18n-opt-duration'); if(eGen) eGen.textContent = isFr ? "Durée Globale" : "General Duration";
         const eAdd = document.getElementById('i18n-add-more'); if(eAdd) eAdd.textContent = isFr ? "+ Ajouter des lieux" : "+ Add more locations";
-        const eReco = document.getElementById('i18n-reco'); if(eReco) eReco.textContent = isFr ? "RECOMMANDÉ POUR CE VOYAGE (MÊME PAYS)" : "RECOMMENDED FOR THIS TRIP (SAME COUNTRY)";
+        const eReco = document.getElementById('i18n-reco'); if(eReco) eReco.textContent = isFr ? "RECOMMANDÉ POUR CE VOYAGE" : "RECOMMENDED FOR THIS TRIP";
         const eIti = document.getElementById('i18n-your-iti'); if(eIti) eIti.textContent = isFr ? "VOTRE ITINÉRAIRE" : "YOUR ITINERARY";
         const eAddDay = document.getElementById('i18n-add-day'); if(eAddDay) eAddDay.textContent = isFr ? "Ajouter un jour" : "Add an empty day";
         const eCancel = document.getElementById('i18n-cancel'); if(eCancel) eCancel.textContent = isFr ? "Annuler" : "Cancel";
@@ -297,7 +305,6 @@ function updateUI() {
         if(typeof window.initTrips === 'function') window.initTrips();
     }
 
-    // Init ITI Selectors (Map et Trips)
     window.initItineraryGenerator();
 }
 
@@ -448,22 +455,6 @@ function renderLocations() {
 // ==========================================
 // 6. GESTION DES TRIPS / WISHLIST DANS LA CARTE
 // ==========================================
-function loadTripOptions() {
-    const select = document.getElementById('trip-select');
-    if(!select) return;
-    
-    select.innerHTML = '';
-    const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    const noTripTxt = currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
-    const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
-    
-    select.innerHTML = `<option value="none">${noTripTxt}</option>`;
-    trips.forEach(t => {
-        select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
-    });
-    select.innerHTML += `<option value="new">${newTripTxt}</option>`;
-}
-
 window.toggleWishlist = function() {
     const checked = document.getElementById('details-wishlist').checked;
     const box = document.getElementById('trip-box');
@@ -524,8 +515,15 @@ window.createTrip = function() {
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
 
-    loadTripOptions(); 
-    document.getElementById('trip-select').value = newTripId;
+    // Met à jour la liste sans doublons
+    const select = document.getElementById('trip-select');
+    if(select) {
+        let opt = document.createElement('option');
+        opt.value = newTripId; opt.textContent = label;
+        select.insertBefore(opt, select.lastElementChild);
+        select.value = newTripId;
+    }
+    
     window.handleTripSelect(); 
     window.cancelNewTrip();
 };
@@ -682,7 +680,6 @@ window.openDetailsPanel = function(id) {
             tripBox.classList.add('open');
             const select = document.getElementById('trip-select');
             
-            // Re-rempli les options pour être sûr d'être à jour
             if(select) {
                 select.innerHTML = '';
                 const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
@@ -819,7 +816,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR (RESTAURÉ COMME A L'ORIGINE)
+// 8. AUTO-ITINERARY GENERATOR (RÉPARÉ ET PROPRE)
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -860,7 +857,7 @@ window.generateItinerary = function() {
     
     resultDiv.innerHTML = "";
     
-    // Le calcul original qui répartissait équitablement
+    // Répartition équitable des jours
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     currentGeneratedItinerary = [];
@@ -987,6 +984,7 @@ window.saveItineraryToTrips = function() {
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     localStorage.setItem('activeTripId', newTripId);
 
+    // Redirige
     if(document.getElementById('trip-name-display')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
         window.initTrips();
@@ -1185,7 +1183,7 @@ window.renderTripsSidebar = function() {
     });
 }
 
-// DRAG & DROP DES VOYAGES
+// DRAG & DROP DES VOYAGES DANS LA SIDEBAR
 window.dragTripStart = function(e, id) { e.dataTransfer.setData('text/plain', id); e.currentTarget.style.opacity = '0.4'; }
 window.dragTripOver = function(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over-trip'); }
 window.dragTripLeave = function(e) { e.currentTarget.classList.remove('drag-over-trip'); }
@@ -1210,10 +1208,9 @@ window.dropTrip = function(e, targetId) {
 window.renderTrip = function() {
     if (!currentTrip) return;
 
-    // Edition permanente : On met à jour les champs directement
+    // Edition permanente
     document.getElementById('edit-trip-name').value = currentTrip.name;
     document.getElementById('edit-trip-name').style.display = 'block';
-    document.getElementById('trip-name-display').style.display = 'none';
     
     if(currentTrip.dateType === 'duration') {
         document.getElementById('trip-duration-type').value = 'duration';
@@ -1260,7 +1257,7 @@ window.renderTrip = function() {
         card.innerHTML = `
             <div class="day-header">
                 <div class="day-title">${currentLang==='fr'?'Jour':'Day'} ${index + 1}</div>
-                <div class="x-btn edit-only" style="display:block;" onclick="removeDay(this)">✕</div>
+                <div class="x-btn" style="display:block;" onclick="removeDay(this)">✕</div>
             </div>
             <div class="day-items">${itemsHtml}</div>
         `;
@@ -1285,7 +1282,7 @@ window.renderTrip = function() {
                         <div class="loc-row">
                             <div class="loc-thumb" style="background-image:url('${loc.img}');"></div>
                             <div style="flex:1;"><div class="loc-name">${loc.name}</div><div class="loc-meta">${loc.city}, ${loc.country} &middot; ${getCatName(loc.category)}</div></div>
-                            <button class="add-to-trip-btn edit-only" style="display:block;" onclick="quickAddLoc(${loc.id})">+ Add</button>
+                            <button class="add-to-trip-btn" style="display:block;" onclick="quickAddLoc(${loc.id})">+ Add</button>
                         </div>
                     `;
                     recoCount++;
@@ -1295,8 +1292,7 @@ window.renderTrip = function() {
     }
     document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
 
-    // Les éléments d'édition sont toujours visibles
-    document.querySelectorAll('.edit-only').forEach(el => el.style.display = 'flex');
+    // Rendre les éléments déplaçables
     document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', 'true'));
 }
 
@@ -1315,9 +1311,9 @@ window.createLocRow = function(loc) {
     div.setAttribute('ondragstart', 'dragStart(event)');
     div.setAttribute('ondragend', 'dragEnd(event)');
     div.innerHTML = `
-        <span class="drag-handle edit-only" style="display:inline;">⠿</span>
+        <span class="drag-handle">⠿</span>
         ${loc.name}
-        <span class="x-btn edit-only" style="display:inline;" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+        <span class="x-btn" onclick="removeFromTrip(this, ${loc.id})">✕</span>
     `;
     return div;
 }
@@ -1325,9 +1321,9 @@ window.createLocRow = function(loc) {
 window.createLocRowHtml = function(loc) {
     return `
         <div class="day-loc" data-id="${loc.id}" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-            <span class="drag-handle edit-only" style="display:inline;">⠿</span>
+            <span class="drag-handle">⠿</span>
             ${loc.name}
-            <span class="x-btn edit-only" style="display:inline;" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+            <span class="x-btn" onclick="removeFromTrip(this, ${loc.id})">✕</span>
         </div>
     `;
 }
@@ -1359,7 +1355,7 @@ window.addDay = function() {
     card.innerHTML = `
         <div class="day-header">
             <div class="day-title">${currentLang==='fr'?'Jour':'Day'} ${newDayNum}</div>
-            <div class="x-btn edit-only" style="display:flex;" onclick="removeDay(this)">✕</div>
+            <div class="x-btn" style="display:flex;" onclick="removeDay(this)">✕</div>
         </div>
         <div class="day-items"></div>
     `;
@@ -1476,9 +1472,9 @@ window.createNewTripEmpty = function() {
     window.initTrips(); 
 }
 
-// LOGIQUE DE SUPPRESSION (MODAL CUSTOM)
+// LOGIQUE DE SUPPRESSION
 window.openDeleteModal = function(id = null, event = null) {
-    if(event) event.stopPropagation(); // Évite de sélectionner le voyage en cliquant sur la croix
+    if(event) event.stopPropagation();
     tripIdToDelete = id || currentTrip.id;
     document.getElementById('delete-trip-modal').classList.remove('hidden');
 }
