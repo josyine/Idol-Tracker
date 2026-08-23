@@ -26,6 +26,7 @@
     .dot-g { animation-delay: calc(1.3s - var(--sync-t, 0s)) !important; }
 </style>
 <script>
+    // Synchronisation de l'arrière-plan
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
     const elapsed = (Date.now() - parseInt(sessionStorage.getItem('bgSyncTime'))) / 1000;
     document.documentElement.style.setProperty('--sync-t', elapsed + 's');
@@ -54,6 +55,7 @@
     </div>
 </div>
 
+<!-- LE DESIGN PLEIN ÉCRAN -->
 <div class="hero">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -107,6 +109,17 @@
         <button class="cta-primary open-auth-btn"><span data-i18n="heroCta">Generate my guide</span> <span>→</span></button>
         <div class="cta-secondary" data-i18n="heroDemo">See Demo</div>
       </div>
+    </div>
+
+    <!-- NOUVEAU FOOTER DE LA PAGE D'ACCUEIL -->
+    <div class="index-footer" style="position: relative; z-index: 10; margin-top: auto; padding: 30px 6%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; font-size: 12px; color: #64748b;">
+        <div data-i18n="footerText">Screen To Street is an independent fan-made guide.</div>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+            <a href="legal.html#mentions" data-i18n="footerMentions" style="color: #64748b; transition: 0.2s;" onmouseover="this.style.color='#D42759'" onmouseout="this.style.color='#64748b'">Legal Notice</a>
+            <a href="legal.html#apropos" data-i18n="footerAbout" style="color: #64748b; transition: 0.2s;" onmouseover="this.style.color='#D42759'" onmouseout="this.style.color='#64748b'">About Us</a>
+            <a href="legal.html#cgu" data-i18n="footerTOS" style="color: #64748b; transition: 0.2s;" onmouseover="this.style.color='#D42759'" onmouseout="this.style.color='#64748b'">Terms & CGV</a>
+            <a href="legal.html#confidentialite" data-i18n="footerPrivacy" style="color: #64748b; transition: 0.2s;" onmouseover="this.style.color='#D42759'" onmouseout="this.style.color='#64748b'">Privacy Policy</a>
+        </div>
     </div>
 
 </div>
@@ -195,7 +208,7 @@
             
         </div>
 
-        <!-- Colonne Droite -->
+        <!-- Colonne Droite (Brand Panel Graphique) -->
         <div class="brand-panel">
             <div class="auth-blob auth-blob-1"></div>
             <div class="auth-blob auth-blob-2"></div>
@@ -210,6 +223,7 @@
     </div>
 </div>
 
+<!-- BANNIÈRE COOKIES -->
 <div id="cookie-banner" class="cookie-banner hidden">
     <div class="cookie-content">
         <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#confidentialite" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
