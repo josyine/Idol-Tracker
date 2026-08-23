@@ -387,7 +387,7 @@ function renderLocations() {
                (fCountry === "All" || loc.country === fCountry) && (loc.name.toLowerCase().includes(searchTerm) || (loc.city && loc.city.toLowerCase().includes(searchTerm)));
     });
 
-    currentFilteredLocations = filteredLocations; // Save for modal
+    currentFilteredLocations = filteredLocations;
 
     const cSidebar = document.getElementById('location-count-sidebar');
     if(cSidebar) cSidebar.textContent = filteredLocations.length;
@@ -436,7 +436,7 @@ function renderLocations() {
 if(groupSelect) { initializeFilters(); renderLocations(); }
 
 // ==========================================
-// 6. PANNEAU DE DÉTAILS
+// 6. PANNEAU DE DÉTAILS (INSPIS SUPPRIMÉ)
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -503,46 +503,6 @@ window.openDetailsPanel = function(id) {
             videoContainer.innerHTML = `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${loc.ytId}" frameborder="0" allowfullscreen></iframe></div>`;
             videoSection.classList.remove('hidden');
         } else { videoSection.classList.add('hidden'); }
-    }
-
-    const galleryContainer = document.getElementById('details-gallery');
-    if (galleryContainer) {
-        galleryContainer.innerHTML = ""; 
-        if(loc.gallery && loc.gallery.length > 0) {
-            loc.gallery.forEach((p, idx) => {
-                const wideClass = idx === 0 ? "wide" : "";
-                galleryContainer.innerHTML += `<img class="${wideClass}" src="${p}" onerror="this.src='https://via.placeholder.com/300x250?text=No+Image'">`;
-            });
-        }
-        
-        galleryContainer.innerHTML += `
-            <div style="grid-column: 1 / span 2; margin-top: 15px;">
-                <span class="sub-label">Inspis à poster</span>
-                <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;">
-                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
-                        <img src="${loc.img}" style="width:100%;height:100%;object-fit:cover;display:block;">
-                        <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#1</div>
-                    </a>
-                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
-                        <img src="https://picsum.photos/seed/${loc.id}2/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
-                        <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#2</div>
-                    </a>
-                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
-                        <img src="https://picsum.photos/seed/${loc.id}3/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
-                        <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#3</div>
-                    </a>
-                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
-                        <img src="https://picsum.photos/seed/${loc.id}4/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
-                        <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#4</div>
-                    </a>
-                    <a href="#" target="_blank" style="min-width:110px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;height:130px; border: 1px solid #cbd5e1;">
-                        <img src="https://picsum.photos/seed/${loc.id}5/260/300" style="width:100%;height:100%;object-fit:cover;display:block;">
-                        <div style="position:absolute;top:6px;left:6px;background:rgba(20,16,30,.6);backdrop-filter:blur(4px);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;">#5</div>
-                    </a>
-                </div>
-                <p style="font-size:10.5px;color:#94a3b8;">Faites glisser pour voir toutes les inspirations.</p>
-            </div>
-        `;
     }
 
     const tipText = getLocText(loc.tip);
@@ -687,7 +647,6 @@ window.generateItinerary = function() {
             currentTime.setMinutes(currentTime.getMinutes() + 30);
             let endTime = formatTime(currentTime);
 
-            // BLOC LIEU
             html += `
                 <div style="padding-left:18px; border-left: 2px solid #D42759; position:relative; margin-bottom:15px;">
                     <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
@@ -696,7 +655,6 @@ window.generateItinerary = function() {
                     <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${l.category} &middot; ${t.free}</div>
             `;
             
-            // BLOC DÉJEUNER (vers midi)
             if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
                 html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
                     <b style="color:#2E3644;">${t.lunch} ${l.name}</b><br>
@@ -707,7 +665,6 @@ window.generateItinerary = function() {
 
             html += `</div>`;
 
-            // BLOC TRANSPORT ou FIN DE JOURNÉE
             if (idx < dayLocs.length - 1) {
                 html += `
                     <div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;">
@@ -769,7 +726,7 @@ window.exportItineraryPDF = function() {
 };
 
 // ==========================================
-// 8. MODAL PANIER DEPUIS LA CARTE (ACHAT ADDITIONNEL)
+// 8. MODAL PANIER DEPUIS LA CARTE
 // ==========================================
 window.openCartModal = function() {
     const modal = document.getElementById('cart-modal');
