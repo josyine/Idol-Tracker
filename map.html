@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Ajouts pour le module Souvenir (Visited) */
   .memory-dropdown { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display: none; animation: slideDown 0.3s ease; }
   .memory-dropdown.open { display: block; }
   .stars { display:flex; gap:4px; cursor: pointer; }
@@ -21,7 +20,6 @@
   .memory-date { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; background: #e2e8f0; padding: 4px 10px; border-radius: 100px; }
   .memory-notes { font-size: 13.5px; color: #334155; line-height: 1.6; font-style: italic; border-left: 3px solid #D42759; padding-left: 12px; }
 
-  /* Ajouts pour le module Wishlist / Trip */
   .trip-box { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display:none; animation: slideDown 0.3s ease; }
   .trip-box.open { display:block; }
   .trip-select { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; color:#334155; font-family:'Poppins',sans-serif; margin-bottom:10px; background:#fff; cursor:pointer; outline:none; }
@@ -47,7 +45,6 @@
 
 <div class="app-container">
     
-    <!-- Sidebar Gauche -->
     <aside class="sidebar" id="app-sidebar">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -160,14 +157,14 @@
                                     <span style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:4px;display:block;" data-i18n="tripFrom">From</span>
                                     <div class="date-field">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                                        <input type="month" id="new-trip-start">
+                                        <input type="date" id="new-trip-start">
                                     </div>
                                 </div>
                                 <div style="flex:1;">
                                     <span style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:4px;display:block;" data-i18n="tripTo">To</span>
                                     <div class="date-field">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                                        <input type="month" id="new-trip-end">
+                                        <input type="date" id="new-trip-end">
                                     </div>
                                 </div>
                             </div>
@@ -336,7 +333,10 @@
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
             <div id="iti-map-container"></div>
             <div id="iti-days-list"></div>
-            <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="margin-top: 15px; background: #2E3644;" data-i18n="itiExport">Export Guide as PDF</button>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="background: #2E3644; flex:1;" data-i18n="itiExport">Export Guide as PDF</button>
+                <button id="save-trip-btn" class="cta-primary" onclick="saveItineraryToTrips()" style="flex:1;" data-i18n="itiSave">Save to My Trips</button>
+            </div>
         </div>
     </div>
 </div>
