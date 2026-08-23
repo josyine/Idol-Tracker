@@ -5,6 +5,7 @@ let map = null;
 let markerGroup = null;
 let currentFilteredLocations = []; 
 let currentLocationIdForMemory = null; 
+let currentGeneratedItinerary = []; // Sauvegarde temporaire pour l'Auto-Itinerary
 
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
@@ -35,7 +36,7 @@ window.toggleMobileMenu = function() {
 };
 
 // ==========================================
-// 2. DONNÉES DE L'APPLICATION
+// 2. DONNÉES
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5h18"/><path d="M4 8.5 5.5 4h3L7 8.5"/><path d="M9.3 8.5 10.8 4h3l-1.5 4.5"/><path d="M14.7 8.5 16.2 4h3l-1.5 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.5"/></svg>`,
@@ -219,7 +220,8 @@ const translations = {
         footerText: "Screen To Street is an independent fan-made guide.", footerMentions: "Legal Notice", footerAbout: "About Us", footerTOS: "Terms of Service", footerPrivacy: "Privacy Policy",
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allYears: "All Years", allCategories: "All Categories",
         checkVisited: "I visited this place", checkWishlist: "Add to Wishlist", tripWhich: "Which trip is this for?",
-        tripName: "Trip name", tripWhen: "When are you planning to go?", tripFrom: "From", tripTo: "To", tripCreate: "Create trip", tripCancel: "Cancel"
+        tripName: "Trip name", tripWhen: "When are you planning to go?", tripFrom: "From", tripTo: "To", tripCreate: "Create trip", tripCancel: "Cancel",
+        itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -230,7 +232,8 @@ const translations = {
         footerText: "Screen To Street est un guide indépendant créé par des fans.", footerMentions: "Mentions légales", footerAbout: "Qui sommes-nous", footerTOS: "CGU", footerPrivacy: "Confidentialité",
         allGroups: "Tous les groupes", allMembers: "Tous les membres", allAreas: "Toutes les régions", allYears: "Toutes les années", allCategories: "Toutes les catégories",
         checkVisited: "J'ai visité ce lieu", checkWishlist: "Ajouter à ma Wishlist", tripWhich: "Pour quel voyage ?",
-        tripName: "Nom du voyage", tripWhen: "Quand prévoyez-vous d'y aller ?", tripFrom: "De", tripTo: "À", tripCreate: "Créer", tripCancel: "Annuler"
+        tripName: "Nom du voyage", tripWhen: "Quand prévoyez-vous d'y aller ?", tripFrom: "De", tripTo: "À", tripCreate: "Créer", tripCancel: "Annuler",
+        itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips"
     }
 };
 
@@ -461,6 +464,7 @@ function loadTripOptions() {
     const select = document.getElementById('trip-select');
     if(!select) return;
     
+    select.innerHTML = '';
     const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     const lang = localStorage.getItem('lang') || 'en';
     const noTripTxt = lang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
@@ -530,7 +534,8 @@ window.createTrip = function() {
 
     const newTripId = 'trip-' + Date.now();
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    trips.push({ id: newTripId, name: label, startDate: start, endDate: end });
+    // Initialise avec un tableau "days" vide
+    trips.push({ id: newTripId, name: label, startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
 
     loadTripOptions(); 
@@ -555,7 +560,7 @@ window.cancelNewTrip = function() {
 };
 
 // ==========================================
-// 7. PANNEAU DE DÉTAILS
+// 7. PANNEAU DE DÉTAILS ET VISITED
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
@@ -632,7 +637,7 @@ window.openDetailsPanel = function(id) {
         else { tipSection.classList.add('hidden'); }
     }
     
-    // GESTION DES CHECKBOXES ET DU SOUVENIR
+    // Checkboxes Visited
     const vCheck = document.getElementById('details-visited');
     const memoryDropdown = document.getElementById('memory-dropdown');
     const tabBtnVisit = document.getElementById('tab-btn-visit');
@@ -677,7 +682,7 @@ window.openDetailsPanel = function(id) {
         };
     }
 
-    // GESTION WISHLIST
+    // Checkboxes Wishlist
     const wCheck = document.getElementById('details-wishlist');
     const tripBox = document.getElementById('trip-box');
     
@@ -862,16 +867,21 @@ window.generateItinerary = function() {
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     
+    // Initialise le tableau global pour l'enregistrement (Save to Trips)
+    currentGeneratedItinerary = [];
+    
     const lang = localStorage.getItem('lang') || 'en';
     const itiText = {
-        en: { day: "Day", transit: "🚇 Transit to next location (~30 mins)", lunch: "🍽️ Lunch recommendation near", coffee: "☕ Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
-        fr: { day: "Jour", transit: "🚇 Trajet vers le prochain lieu (~30 mins)", lunch: "🍽️ Déjeuner recommandé près de", coffee: "☕ Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
+        en: { day: "Day", transit: "Transit to next location (~30 mins)", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
+        fr: { day: "Jour", transit: "Trajet vers le prochain lieu (~30 mins)", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
     };
     const t_iti = itiText[lang];
 
     for(let i = 0; i < days; i++) {
         const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
         if(dayLocs.length === 0) continue;
+        
+        currentGeneratedItinerary.push(dayLocs); // Pour le save
         
         let mapLink = "";
         if(dayLocs.length === 1) {
@@ -974,6 +984,44 @@ window.exportItineraryPDF = function() {
     html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' } }).from(el).save().then(() => btn.style.display = 'block');
 };
 
+// Sauvegarde directe de l'itinéraire généré dans "My Trips"
+window.saveItineraryToTrips = function() {
+    const country = document.getElementById('iti-country').value;
+    const daysCount = parseInt(document.getElementById('iti-days').value);
+    const newTripId = 'trip-' + Date.now();
+    const tripName = `Auto-Itinerary: ${country} (${daysCount} days)`;
+
+    let newTrip = {
+        id: newTripId,
+        name: tripName,
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date(Date.now() + daysCount*86400000).toISOString().split('T')[0],
+        days: []
+    };
+
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+
+    currentGeneratedItinerary.forEach((dayLocs) => {
+        let dayIds = [];
+        dayLocs.forEach(loc => {
+            dayIds.push(loc.id);
+            // Ajout à la wishlist pour lier le lieu au voyage
+            let existing = wList.find(w => w.id === loc.id && w.tripId === newTripId);
+            if (!existing) {
+                wList.push({ id: loc.id, dateAdded: new Date().toLocaleDateString(), tripId: newTripId });
+            }
+        });
+        newTrip.days.push(dayIds);
+    });
+
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    trips.push(newTrip);
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+
+    window.location.href = 'trips.html';
+};
+
 // ==========================================
 // 9. MODAL PANIER DEPUIS LA CARTE
 // ==========================================
@@ -1071,7 +1119,7 @@ window.onclick = function(e) {
 };
 
 // ==========================================
-// 11. BANNIÈRE COOKIES ET REDIRECTION VISITED
+// 11. BANNIÈRE COOKIES ET REDIRECTION
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
