@@ -48,7 +48,7 @@
   .legal-sub { text-align: center; color: #8A8496; font-size: 12.5px; margin-bottom: 14px; }
   .underline { width: 46px; height: 3px; background: #D42759; border-radius: 3px; margin: 0 auto 40px auto; }
 
-  /* SECTIONS */
+  /* SECTIONS (Reprise de tes styles exacts) */
   .section { padding-top: 32px; border-top: 1px solid #e2e8f0; margin-bottom: 8px; scroll-margin-top: 24px; }
   .sec-title { font-size: 18px; font-weight: 700; color: #D42759; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
   .sec-body { font-size: 13.5px; line-height: 1.75; color: #334155; margin-bottom: 14px; }
@@ -58,6 +58,7 @@
   .placeholder { background: #FCE7F0; color: #D42759; padding: 1px 6px; border-radius: 5px; font-weight: 600; font-size: 12.5px; }
   .note { background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; font-size: 12.5px; color: #64748b; line-height: 1.6; margin-top: 10px; }
 </style>
+
 <script>
     // Synchronisation du fond
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
@@ -67,13 +68,18 @@
     // FONCTION RETOUR INTELLIGENTE
     function smartBack(event) {
         event.preventDefault();
-        // Si on a un historique ET qu'on vient bien de notre propre site
+        // Vérifie si on a un historique et qu'on vient bien du même site (Screen to Street)
         if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
-            window.history.back();
+            window.history.back(); // Retourne d'où on vient (map, index, destinations...)
         } else {
-            // Sécurité : si on ouvre le lien direct, on renvoie à l'accueil
-            window.location.href = 'index.html';
+            window.location.href = 'index.html'; // Sécurité : redirige vers l'accueil si lien ouvert directement
         }
+    }
+
+    // Fonction pour animer les onglets
+    function setActiveTab(el) {
+        document.querySelectorAll('.subnav-tabs a').forEach(a => a.classList.remove('active'));
+        el.classList.add('active');
     }
 </script>
 </head>
@@ -95,7 +101,7 @@
       <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 
-    <!-- Navbar -->
+    <!-- Navbar unifiée -->
     <div class="nav">
       <a href="index.html" class="brand">
         <svg class="pin" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
@@ -114,17 +120,17 @@
     <div class="legal-container">
       
       <!-- BOUTON RETOUR INTELLIGENT -->
-      <a href="#" onclick="smartBack(event)" class="back-btn">← Back / Retour</a>
+      <a href="#" onclick="smartBack(event)" class="back-btn">← Retour</a>
       
       <div class="legal-card">
         
         <!-- Sous-navigation : onglets soulignés -->
         <div class="subnav">
             <div class="subnav-tabs">
-            <a href="#mentions" class="active" onclick="setActiveTab(this)">Mentions légales</a>
-            <a href="#apropos" onclick="setActiveTab(this)">Qui sommes-nous ?</a>
-            <a href="#cgu" onclick="setActiveTab(this)">CGU</a>
-            <a href="#confidentialite" onclick="setActiveTab(this)">Politique de confidentialité</a>
+                <a href="#mentions" class="active" onclick="setActiveTab(this)">Mentions légales</a>
+                <a href="#apropos" onclick="setActiveTab(this)">Qui sommes-nous ?</a>
+                <a href="#cgu" onclick="setActiveTab(this)">CGU</a>
+                <a href="#confidentialite" onclick="setActiveTab(this)">Politique de confidentialité</a>
             </div>
             <button class="subnav-cookies" onclick="alert('Pour gérer vos cookies, retournez à l\'accueil ou ouvrez les paramètres.')">Cookies ⚙</button>
         </div>
@@ -136,8 +142,8 @@
         <!-- ================= QUI SOMMES-NOUS ================= -->
         <div class="section" id="apropos">
             <div class="sec-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
-            Qui sommes-nous ?
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+                Qui sommes-nous ?
             </div>
             <p class="sec-body">Screen To Street est un guide indépendant créé pour aider les fans à retrouver, dans le monde réel, les lieux visités, photographiés ou filmés par leurs artistes préférés : plateaux de tournage d'émissions, restaurants, musées, salles de concert ou décors de clips.</p>
             <p class="sec-body">Le site répertorie des lieux publics et des informations déjà partagées publiquement (émissions, réseaux sociaux, presse), organisées sous forme de cartes interactives par artiste, catégorie et ville, avec un générateur d'itinéraire pour préparer un voyage sur les traces de son groupe préféré.</p>
@@ -148,8 +154,8 @@
         <!-- ================= CGU ================= -->
         <div class="section" id="cgu">
             <div class="sec-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-            Conditions Générales d'Utilisation (CGU)
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                Conditions Générales d'Utilisation (CGU)
             </div>
 
             <div class="sub-h">Article 1 — Préambule</div>
@@ -174,17 +180,17 @@
         <!-- ================= POLITIQUE DE CONFIDENTIALITE ================= -->
         <div class="section" id="confidentialite">
             <div class="sec-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.5 3.4 10 8 11 4.6-1 8-5.5 8-11V5z"/></svg>
-            Politique de confidentialité
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.5 3.4 10 8 11 4.6-1 8-5.5 8-11V5z"/></svg>
+                Politique de confidentialité
             </div>
             <p class="sec-body">Screen To Street, en qualité de responsable de traitement, s'engage à protéger vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.</p>
 
             <div class="sub-h">Données collectées</div>
             <ul class="plain">
-            <li>Nom et adresse email, lors de la création d'un compte ;</li>
-            <li>Groupes/artistes débloqués et historique d'achats ;</li>
-            <li>Lieux marqués « visités » ou ajoutés en liste de souhaits ;</li>
-            <li>Données de navigation (langue, préférences d'affichage).</li>
+                <li>Nom et adresse email, lors de la création d'un compte ;</li>
+                <li>Groupes/artistes débloqués et historique d'achats ;</li>
+                <li>Lieux marqués « visités » ou ajoutés en liste de souhaits ;</li>
+                <li>Données de navigation (langue, préférences d'affichage).</li>
             </ul>
             <p class="sec-body">Les paiements sont traités par un prestataire tiers sécurisé (ex. Stripe, PayPal) : Screen To Street ne stocke jamais vos coordonnées bancaires.</p>
 
@@ -207,22 +213,22 @@
         <!-- ================= MENTIONS LEGALES ================= -->
         <div class="section" id="mentions">
             <div class="sec-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
-            Mentions légales
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+                Mentions légales
             </div>
 
             <div class="sub-h">Éditeur du site</div>
             <p class="sec-body">
-            Nom / raison sociale : <span class="placeholder">[à compléter]</span><br>
-            Adresse : <span class="placeholder">[à compléter]</span><br>
-            Contact : contact@screentostreet.com<br>
-            Directeur de la publication : <span class="placeholder">[à compléter]</span>
+                Nom / raison sociale : <span class="placeholder">[à compléter]</span><br>
+                Adresse : <span class="placeholder">[à compléter]</span><br>
+                Contact : contact@screentostreet.com<br>
+                Directeur de la publication : <span class="placeholder">[à compléter]</span>
             </p>
 
             <div class="sub-h">Hébergeur</div>
             <p class="sec-body">
-            Raison sociale : <span class="placeholder">[à compléter]</span><br>
-            Adresse : <span class="placeholder">[à compléter]</span>
+                Raison sociale : <span class="placeholder">[à compléter]</span><br>
+                Adresse : <span class="placeholder">[à compléter]</span>
             </p>
 
             <div class="sub-h">Propriété intellectuelle</div>
@@ -236,12 +242,5 @@
     </div>
 </div>
 
-<script>
-    // Petit script pour que les onglets de la sous-navigation s'allument quand on clique dessus
-    function setActiveTab(el) {
-        document.querySelectorAll('.subnav-tabs a').forEach(a => a.classList.remove('active'));
-        el.classList.add('active');
-    }
-</script>
 </body>
 </html>
