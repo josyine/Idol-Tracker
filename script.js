@@ -4,6 +4,7 @@
 let map = null;
 let markerGroup = null;
 let currentFilteredLocations = []; 
+let currentLocationIdForMemory = null; // Stocke l'ID du lieu en cours de consultation
 
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
@@ -14,7 +15,6 @@ if (document.getElementById('map') && typeof L !== 'undefined') {
     markerGroup = L.layerGroup().addTo(map);
     setTimeout(() => { map.invalidateSize(); }, 200);
 
-    // ÉCOUTEUR DE ZOOM
     map.on('zoomend', function() {
         const zoom = map.getZoom();
         let markerSize = 32; let iconSize = 16;
@@ -233,7 +233,7 @@ const translations = {
         btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
         locationsCount: "LOCATIONS", statsCountries: "COUNTRIES", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", 
         cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
-        exploreDestOption: "Explore Destinations", exploreArtistsOption: "Explore Artists", accountOption: "Your Account",
+        exploreDestOption: "🌍 Explore Destinations", exploreArtistsOption: "🎤 Explore Artists", accountOption: "Your Account",
         visitedOption: "My Visited Places", wishlistOption: "My Wishlist", settingsOption: "Settings", logoutOption: "Logout",
         footerText: "Screen To Street is an independent fan-made guide.", footerMentions: "Legal Notice", footerAbout: "About Us", footerTOS: "Terms of Service", footerPrivacy: "Privacy Policy",
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allYears: "All Years", allCategories: "All Categories"
@@ -242,7 +242,7 @@ const translations = {
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
         locationsCount: "LIEUX", statsCountries: "PAYS", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", 
         cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
-        exploreDestOption: "Explorer les Destinations", exploreArtistsOption: "Explorer les Artistes", accountOption: "Mon Compte",
+        exploreDestOption: "🌍 Explorer les Destinations", exploreArtistsOption: "🎤 Explorer les Artistes", accountOption: "Mon Compte",
         visitedOption: "Mes Lieux Visités", wishlistOption: "Ma Wishlist", settingsOption: "Paramètres", logoutOption: "Déconnexion",
         footerText: "Screen To Street est un guide indépendant créé par des fans.", footerMentions: "Mentions légales", footerAbout: "Qui sommes-nous", footerTOS: "CGU", footerPrivacy: "Confidentialité",
         allGroups: "Tous les groupes", allMembers: "Tous les membres", allAreas: "Toutes les régions", allYears: "Toutes les années", allCategories: "Toutes les catégories"
@@ -276,7 +276,6 @@ function updateUI() {
         if(translations[currentLang] && translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
     });
     
-    // MAJ spécifique pour l'option "All Years" qui est en dur dans le HTML
     const yearSelect = document.getElementById('year-select');
     if(yearSelect) {
         const yearOpt = yearSelect.querySelector('option[value="All"]');
@@ -478,11 +477,12 @@ function renderLocations() {
 if(groupSelect) { initializeFilters(); renderLocations(); }
 
 // ==========================================
-// 6. PANNEAU DE DÉTAILS
+// 6. PANNEAU DE DÉTAILS ET SOUVENIR (MY VISIT)
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
+    currentLocationIdForMemory = loc.id;
     
     const heroBg = document.getElementById('detail-hero-bg');
     if(heroBg) {
@@ -554,15 +554,50 @@ window.openDetailsPanel = function(id) {
         else { tipSection.classList.add('hidden'); }
     }
     
-    // Checkboxes
+    // GESTION DES CHECKBOXES ET DU SOUVENIR
     const vCheck = document.getElementById('details-visited');
+    const memoryDropdown = document.getElementById('memory-dropdown');
+    const tabBtnVisit = document.getElementById('tab-btn-visit');
+    
     if(vCheck) {
         let vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-        vCheck.checked = vList.some(v => v.id === loc.id || v === loc.id);
+        let memoryData = vList.find(v => v.id === loc.id || v === loc.id);
+        
+        vCheck.checked = !!memoryData;
+        
+        // Si déjà visité et qu'il y a un souvenir enregistré (rating), on affiche l'onglet My Visit
+        if(vCheck.checked && memoryData && memoryData.rating) {
+            tabBtnVisit.classList.remove('hidden');
+            memoryDropdown.classList.remove('open');
+            displayMemoryData(memoryData);
+        } else {
+            tabBtnVisit.classList.add('hidden');
+            memoryDropdown.classList.remove('open');
+        }
+
         vCheck.onchange = function() {
             let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-            if(this.checked) { if(!list.some(v => v.id === loc.id)) list.push({id: loc.id, date: new Date().toLocaleDateString()}); }
-            else { list = list.filter(v => v.id !== loc.id && v !== loc.id); }
+            if(this.checked) { 
+                if(!list.some(v => v.id === loc.id)) {
+                    list.push({id: loc.id, date: new Date().toISOString().split('T')[0]}); 
+                }
+                memoryDropdown.classList.add('open'); // Ouvre le tiroir
+                
+                // Set default date to today
+                document.getElementById('memory-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('memory-notes').value = '';
+                setStars(4); // Default rating
+            } else { 
+                list = list.filter(v => v.id !== loc.id && v !== loc.id); 
+                memoryDropdown.classList.remove('open'); // Ferme le tiroir
+                tabBtnVisit.classList.add('hidden');
+                
+                // Si on décoche, on repasse sur l'onglet Info
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.querySelector('.tab-btn[data-tab="info"]').classList.add('active');
+                document.getElementById('tab-info').classList.add('active');
+            }
             localStorage.setItem('visitedLocs', JSON.stringify(list));
             renderLocations(); 
         };
@@ -590,6 +625,94 @@ window.openDetailsPanel = function(id) {
     setTimeout(() => { if(map) map.invalidateSize(); }, 450);
 };
 
+// GESTION DES ÉTOILES (TIROIR SOUVENIR)
+function setStars(val) {
+    document.getElementById('memory-rating-val').value = val;
+    document.querySelectorAll('#memory-stars .star').forEach((star, index) => {
+        if(index < val) {
+            star.setAttribute('fill', '#D42759');
+            star.setAttribute('stroke', '#D42759');
+        } else {
+            star.setAttribute('fill', '#e2e8f0');
+            star.setAttribute('stroke', '#e2e8f0');
+        }
+    });
+}
+document.querySelectorAll('#memory-stars .star').forEach(star => {
+    star.addEventListener('click', function() {
+        setStars(parseInt(this.getAttribute('data-val')));
+    });
+});
+
+// SAUVEGARDE DU SOUVENIR
+const saveMemoryBtn = document.getElementById('save-memory-btn');
+if(saveMemoryBtn) {
+    saveMemoryBtn.addEventListener('click', () => {
+        const rating = document.getElementById('memory-rating-val').value;
+        const date = document.getElementById('memory-date').value;
+        const notes = document.getElementById('memory-notes').value;
+        
+        let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        const idx = list.findIndex(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
+        
+        if(idx !== -1) {
+            // Transform in object if it was a plain ID (old logic compatibility)
+            if(typeof list[idx] !== 'object') { list[idx] = { id: list[idx] }; }
+            
+            list[idx].rating = rating;
+            list[idx].date = date;
+            list[idx].notes = notes;
+            localStorage.setItem('visitedLocs', JSON.stringify(list));
+            
+            // Fermer le dropdown, afficher le tab "My Visit" et basculer dessus
+            document.getElementById('memory-dropdown').classList.remove('open');
+            document.getElementById('tab-btn-visit').classList.remove('hidden');
+            
+            displayMemoryData(list[idx]);
+            
+            // Simule un clic sur l'onglet "My Visit"
+            document.getElementById('tab-btn-visit').click();
+        }
+    });
+}
+
+function displayMemoryData(data) {
+    const starSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const emptyStarSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="#e2e8f0" stroke="#e2e8f0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    
+    let starsHtml = '';
+    for(let i=0; i<5; i++) { starsHtml += (i < data.rating) ? starSvg : emptyStarSvg; }
+    
+    document.getElementById('display-memory-stars').innerHTML = starsHtml;
+    
+    // Formatage de la date (ex: 22 August 2026)
+    let formattedDate = data.date;
+    if(data.date) {
+        const d = new Date(data.date);
+        if(!isNaN(d.getTime())) {
+            formattedDate = d.toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+    }
+    
+    document.getElementById('display-memory-date').textContent = formattedDate || 'Unknown date';
+    document.getElementById('display-memory-notes').textContent = data.notes ? `"${data.notes}"` : (currentLang === 'fr' ? "Aucune note pour cette visite." : "No notes for this visit.");
+}
+
+const editMemoryBtn = document.getElementById('edit-memory-btn');
+if(editMemoryBtn) {
+    editMemoryBtn.addEventListener('click', () => {
+        let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        let data = list.find(v => v.id === currentLocationIdForMemory);
+        if(data) {
+            document.getElementById('memory-date').value = data.date || '';
+            document.getElementById('memory-notes').value = data.notes || '';
+            setStars(data.rating || 4);
+        }
+        document.querySelector('.tab-btn[data-tab="info"]').click(); // Retour à Info
+        document.getElementById('memory-dropdown').classList.add('open'); // Ouvre le tiroir
+    });
+}
+
 window.closeDetailsPanel = function() {
     const dDetails = document.getElementById('sidebar-details');
     if(dDetails) dDetails.classList.add('hidden');
@@ -597,6 +720,12 @@ window.closeDetailsPanel = function() {
     if(dMain) dMain.classList.remove('hidden');
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) sidebar.classList.remove('expanded'); 
+    
+    // Reset tabs (Always start at Info)
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="info"]').classList.add('active');
+    document.getElementById('tab-info').classList.add('active');
     
     setTimeout(() => { if(map) map.invalidateSize(); }, 450);
 }
