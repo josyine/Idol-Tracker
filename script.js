@@ -3,7 +3,7 @@
 // ==========================================
 let map = null;
 let markerGroup = null;
-let currentFilteredLocations = []; // Variable globale pour stocker les lieux filtrés
+let currentFilteredLocations = []; 
 
 if (document.getElementById('map') && typeof L !== 'undefined') {
     map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
@@ -231,8 +231,22 @@ let celebLocations = [
 // ==========================================
 let currentLang = localStorage.getItem('lang') || 'en';
 const translations = {
-    en: { btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", locationsCount: "LOCATIONS", statsCountries: "COUNTRIES", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept" },
-    fr: { btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", locationsCount: "LIEUX", statsCountries: "PAYS", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter" }
+    en: { 
+        btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
+        locationsCount: "LOCATIONS", statsCountries: "COUNTRIES", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", 
+        cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
+        exploreDestOption: "🌍 Explore Destinations", exploreArtistsOption: "🎤 Explore Artists", accountOption: "Your Account",
+        visitedOption: "My Visited Places", wishlistOption: "My Wishlist", settingsOption: "Settings", logoutOption: "Logout",
+        footerText: "Screen To Street is an independent fan-made guide.", footerMentions: "Legal Notice", footerAbout: "About Us", footerTOS: "Terms of Service", footerPrivacy: "Privacy Policy"
+    },
+    fr: { 
+        btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
+        locationsCount: "LIEUX", statsCountries: "PAYS", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", 
+        cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
+        exploreDestOption: "🌍 Explorer les Destinations", exploreArtistsOption: "🎤 Explorer les Artistes", accountOption: "Mon Compte",
+        visitedOption: "Mes Lieux Visités", wishlistOption: "Ma Wishlist", settingsOption: "Paramètres", logoutOption: "Déconnexion",
+        footerText: "Screen To Street est un guide indépendant créé par des fans.", footerMentions: "Mentions légales", footerAbout: "Qui sommes-nous", footerTOS: "CGU", footerPrivacy: "Confidentialité"
+    }
 };
 function t(key) { return translations[currentLang] ? (translations[currentLang][key] || key) : key; }
 function getLocText(field) { return field ? (field[currentLang] || field.en || "") : ""; }
@@ -436,7 +450,7 @@ function renderLocations() {
 if(groupSelect) { initializeFilters(); renderLocations(); }
 
 // ==========================================
-// 6. PANNEAU DE DÉTAILS (INSPIS SUPPRIMÉ)
+// 6. PANNEAU DE DÉTAILS
 // ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
