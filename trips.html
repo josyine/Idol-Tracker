@@ -6,40 +6,42 @@
 <title>Screen To Street — My Trips</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Base Layout */
-  body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #f8fafc; display: flex; flex-direction: column; }
+  /* Base Layout imitant map.html */
+  body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #f8fafc; }
   .hidden { display: none !important; }
 
-  /* NAVBAR DU HAUT (Même position que sur la carte) */
-  .top-navbar { display: flex; align-items: center; justify-content: space-between; padding: 15px 30px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); z-index: 100; border-bottom: 1px solid #e2e8f0; }
-  .brand-row { text-decoration: none; display: flex; align-items: center; cursor: pointer; gap: 10px; }
-  .brand-text { font-size: 18px; font-weight: 700; color: #2E3644; }
-
-  /* STRUCTURE SPLIT (Comme sur le screenshot) */
-  .trips-layout { display: flex; flex: 1; overflow: hidden; }
+  /* MÊME STRUCTURE QUE MAP.HTML POUR ALIGNEMENT PARFAIT */
+  .app-container { display: flex; height: 100vh; width: 100vw; position: relative; }
   
   /* COLONNE DE GAUCHE : LISTE DES VOYAGES */
-  .trips-sidebar { width: 320px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 30px 20px; overflow-y: auto; }
-  .sidebar-title { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; }
+  .sidebar { width: 380px; height: 100%; background: #fff; box-shadow: 2px 0 20px rgba(0,0,0,0.05); z-index: 100; position: relative; display: flex; flex-direction: column; }
+  .trips-sidebar-content { padding: 25px 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
   
-  .trip-pill { border: 1.5px solid transparent; border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; cursor: pointer; transition: 0.2s; background: #f8fafc; }
+  .sidebar-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  .trip-pill { border: 1.5px solid transparent; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; background: #f8fafc; position: relative;}
   .trip-pill.active { background: #FCE7F0; border-color: #D42759; }
   .trip-pill:hover:not(.active) { background: #f1f5f9; }
-  .trip-pill-name { font-size: 16px; font-weight: 700; color: #212832; margin-bottom: 4px; }
+  .trip-pill-name { font-size: 16px; font-weight: 700; color: #212832; margin-bottom: 4px; padding-right: 20px; }
   .trip-pill.active .trip-pill-name { color: #D42759; }
   .trip-pill-meta { font-size: 12px; color: #94a3b8; }
+  
+  /* Croix de suppression d'un voyage dans le menu gauche */
+  .del-trip-btn { position: absolute; top: 12px; right: 14px; font-size: 16px; font-weight: bold; color: #94a3b8; cursor: pointer; transition: 0.2s; padding: 2px 6px; border-radius: 6px; }
+  .del-trip-btn:hover { background: #fff; color: #ef4444; }
 
-  .new-trip-pill { border: 1.5px dashed #cbd5e1; border-radius: 16px; padding: 18px 20px; text-align: center; cursor: pointer; font-size: 13.5px; font-weight: 700; color: #D42759; transition: 0.2s; background: #fff; margin-top: 10px; }
+  .new-trip-pill { border: 1.5px dashed #cbd5e1; border-radius: 16px; padding: 18px 20px; text-align: center; cursor: pointer; font-size: 13.5px; font-weight: 700; color: #D42759; transition: 0.2s; background: #fff; margin-top: auto; }
   .new-trip-pill:hover { border-color: #D42759; background: #FCE7F0; }
 
   /* ZONE CENTRALE : DÉTAILS DU VOYAGE */
-  .trips-main { flex: 1; background: #f8fafc; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-  .trip-detail-wrapper { width: 100%; max-width: 900px; display: none; }
+  .map-container { flex: 1; position: relative; background: #f8fafc; display: flex; flex-direction: column; overflow-y: auto; align-items: center; }
   
-  .trip-hero { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0;}
-  .trip-head-info { display: flex; flex-direction: column; gap: 8px; }
+  .trips-main { width: 100%; max-width: 900px; padding: 40px 40px 100px 40px; }
+  
+  .trip-hero { background: linear-gradient(135deg, #f4f0fb 0%, #faeef3 100%); border-radius: 20px; padding: 40px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.6); }
+  .trip-head-info { display: flex; flex-direction: column; gap: 8px; flex: 1; }
   .trip-name { font-size: 32px; font-weight: 700; color: #212832; }
   .trip-dates { font-size: 14px; color: #64748b; font-weight: 500; }
 
@@ -112,118 +114,138 @@
 </head>
 <body>
 
-<!-- Navbar Principale -->
-<div class="top-navbar">
-    <a href="map.html" class="brand-row">
-        <svg width="32" height="32" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
-        <span class="brand-text">Screen To <b style="color: #D42759;">Street</b></span>
-    </a>
-    <div style="display:flex; gap:15px; align-items:center;">
-        <button id="lang-btn" class="nav-btn" style="background:#f1f5f9; border:none; padding:8px; border-radius:50%; cursor:pointer;" onclick="document.getElementById('lang-menu').classList.toggle('hidden')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-        </button>
-        <div id="lang-menu" class="dropdown-menu hidden" style="position:absolute; right:110px; top:60px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-            <a href="#" class="dropdown-option" style="display:block; padding:8px 16px; color:#334155;" onclick="changeLang('en'); document.getElementById('lang-menu').classList.add('hidden'); return false;">English</a>
-            <a href="#" class="dropdown-option" style="display:block; padding:8px 16px; color:#334155;" onclick="changeLang('fr'); document.getElementById('lang-menu').classList.add('hidden'); return false;">Français</a>
-        </div>
-        <button class="nav-btn" style="background:#f1f5f9; border:none; padding:8px; border-radius:50%; cursor:pointer;" onclick="window.location.href='map.html'" title="Back to Map">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-        </button>
-        <!-- Icone de Profil -->
-        <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: none; padding:8px 14px; border-radius:50%; cursor:pointer; background-color: transparent; color: #212832; font-weight: bold; border: 1px solid #cbd5e1;">U</button>
-    </div>
-</div>
+<div class="app-container">
 
-<div class="trips-layout">
-    <!-- COLONNE DE GAUCHE : LISTE DES VOYAGES -->
-    <div class="trips-sidebar">
-        <div class="sidebar-title" id="sidebar-title">MY TRIPS (0)</div>
-        <div id="trips-list-container">
-            <!-- La liste des voyages s'affiche ici dynamiquement -->
-        </div>
-        <div class="new-trip-pill" onclick="document.getElementById('add-trip-modal').classList.remove('hidden')">
-            + New trip
-        </div>
-    </div>
-
-    <!-- ZONE CENTRALE : DÉTAILS DU VOYAGE -->
-    <div class="trips-main">
-        <div class="empty-state" id="empty-state">
-            Loading your trips...
-        </div>
-
-        <div id="trip-detail-content" class="trip-detail-wrapper">
-            
-            <div class="trip-hero">
-                <div class="trip-head-info">
-                    <input type="text" id="edit-trip-name" class="trip-name edit-only" style="display:none; width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px 14px; font-family:'Poppins'; outline:none;">
-                    <div class="trip-name" id="trip-name-display">Trip Name</div>
-                    <div class="trip-dates" id="dates-display">Dates · 0 locations</div>
-                </div>
-                <button class="gen-btn" id="edit-toggle" onclick="toggleEdit()">
-                    <span id="i18n-edit-btn">Edit trip</span>
-                </button>
+    <!-- COLONNE DE GAUCHE (Identique structurellement à Map) -->
+    <aside class="sidebar">
+        <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; margin-bottom: 10px;">
+            <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
+                <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+                <circle cx="200" cy="150" r="26" fill="#D42759"/>
+            </svg>
+            <div>
+                <div class="brand-text" style="color: #2E3644;">Screen To <b style="color: #D42759;">Street</b></div>
+                <div class="tagline" style="color: #5B6472;" id="i18n-sub">Following the footsteps of your favorite artists</div>
             </div>
+        </a>
 
-            <!-- BANDEAU D'EDITION (Dates & Calendrier) -->
-            <div class="edit-banner" id="edit-banner">
-                <div class="edit-tag" id="i18n-editing">✏️ Editing this trip</div>
-                <div class="section-label" style="margin-top:0;" id="i18n-trip-duration">Trip Duration & Dates</div>
-                <div class="date-inputs">
-                    <select id="trip-duration-type" onchange="toggleDateType()">
-                        <option value="specific" id="i18n-opt-specific">Specific Dates (Calendar)</option>
-                        <option value="duration" id="i18n-opt-duration">General Duration</option>
-                    </select>
-                    <!-- CALENDRIERS -->
-                    <input type="date" id="date-start" class="date-specific">
-                    <input type="date" id="date-end" class="date-specific">
-                    <!-- DURÉE GÉNÉRALE -->
-                    <select id="duration-length" class="date-duration" style="display:none;">
-                        <option value="1 Week">1 Week</option>
-                        <option value="2 Weeks">2 Weeks</option>
-                        <option value="A Few Days">A Few Days</option>
-                        <option value="Someday">Someday</option>
-                    </select>
+        <div class="trips-sidebar-content">
+            <div class="sidebar-title" id="sidebar-title">MY TRIPS (0)</div>
+            <div id="trips-list-container">
+                <!-- La liste des voyages s'affiche ici dynamiquement -->
+            </div>
+            <div class="new-trip-pill" onclick="document.getElementById('add-trip-modal').classList.remove('hidden')">
+                + New trip
+            </div>
+        </div>
+    </aside>
+
+    <!-- ZONE CENTRALE (Détails du voyage au lieu de la carte) -->
+    <main class="map-container">
+        
+        <!-- Top Nav strictement identique à la carte -->
+        <div class="top-nav" style="width: 100%; position: sticky; top:0; z-index:90;">
+            <div style="flex:1;"></div>
+            <div class="dropdown-container">
+                <button id="lang-btn" class="nav-btn" title="Langue" onclick="document.getElementById('lang-menu').classList.toggle('hidden')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </button>
+                <div id="lang-menu" class="dropdown-menu hidden">
+                    <a href="#" class="dropdown-option" onclick="changeLang('en'); return false;">English</a>
+                    <a href="#" class="dropdown-option" onclick="changeLang('fr'); return false;">Français</a>
                 </div>
             </div>
-
-            <div class="section-label" id="i18n-your-iti">YOUR ITINERARY</div>
-            <div class="itinerary-box" id="itinerary-box">
-                <!-- Les jours apparaîtront ici -->
-                <button class="add-day-btn edit-only" style="display:none;" onclick="addDay()">
-                    <span id="i18n-add-day">+ Add an empty day</span>
+            <div class="dropdown-container">
+                <button class="nav-btn" title="Back to Map" onclick="window.location.href='map.html'">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 </button>
             </div>
-
-            <div class="section-label" id="saved-locs-label" style="margin-top: 40px;">UNASSIGNED LOCATIONS (0)</div>
-            <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent; background: #fff; border-radius: 12px;">
-                <!-- Lieux non assignés -->
+            <div class="dropdown-container">
+                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: 1px solid #cbd5e1;" onclick="document.getElementById('profile-menu').classList.toggle('hidden')">U</button>
+                <div id="profile-menu" class="dropdown-menu hidden">
+                    <a href="account.html" class="dropdown-option">Your Account</a>
+                    <a href="visited.html" class="dropdown-option">My Visited Places</a>
+                    <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
+                    <a href="trips.html" class="dropdown-option">My Trips</a>
+                    <a href="settings.html" class="dropdown-option">Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="index.html" class="dropdown-option" style="color:var(--primary-magenta); font-weight:bold;">Logout</a>
+                </div>
             </div>
-            
-            <!-- BOUTON POUR AJOUTER PLUS DE LIEUX (SANS QUITTER LA PAGE) -->
-            <button class="gen-btn ghost edit-only" style="display:none; margin-top:15px;" onclick="openAddModal()">
-                <span id="i18n-add-more">+ Add more locations</span>
-            </button>
-
-            <!-- Recommandations Intelligentes -->
-            <div id="reco-section" style="display: none; margin-top: 30px;">
-                <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP (SAME COUNTRY)</div>
-                <div id="reco-list"></div>
-            </div>
-
-            <div class="save-row edit-only" style="display:none;">
-                <button class="gen-btn ghost" onclick="cancelEdit()" id="i18n-cancel">Cancel</button>
-                <button class="gen-btn" onclick="saveTrip()" id="i18n-save">Save changes</button>
-            </div>
-
-            <!-- Bouton pour le Générateur d'itinéraire -->
-            <div style="text-align:center; margin-top: 60px;">
-                <p style="font-size:12px; color:#64748b; margin-bottom:10px;" id="i18n-need-magic">Need some magic?</p>
-                <button class="gen-btn ghost" onclick="document.getElementById('itinerary-modal').classList.remove('hidden')" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
-            </div>
-
         </div>
-    </div>
+
+        <div class="trips-main">
+            <div class="empty-state" id="empty-state">
+                Loading your trips...
+            </div>
+
+            <div id="trip-detail-content" style="display:none; width: 100%;">
+                
+                <div class="trip-hero">
+                    <div class="trip-head-info">
+                        <input type="text" id="edit-trip-name" class="trip-name edit-only" style="display:none; width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px 14px; font-family:'Poppins'; outline:none;">
+                        <div class="trip-name" id="trip-name-display">Trip Name</div>
+                        <div class="trip-dates" id="dates-display">Dates · 0 locations</div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="gen-btn ghost" style="border-color:#ef4444; color:#ef4444;" onclick="deleteCurrentTrip()" id="i18n-delete-trip">Delete</button>
+                        <button class="gen-btn" id="edit-toggle" onclick="toggleEdit()">
+                            <span id="i18n-edit-btn">Edit trip</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BANDEAU D'EDITION -->
+                <div class="edit-banner" id="edit-banner">
+                    <div class="edit-tag" id="i18n-editing">✏️ Editing this trip</div>
+                    <div class="section-label" style="margin-top:0;" id="i18n-trip-duration">Trip Duration & Dates</div>
+                    <div class="date-inputs">
+                        <select id="trip-duration-type" onchange="toggleDateType()">
+                            <option value="specific" id="i18n-opt-specific">Specific Dates</option>
+                            <option value="duration" id="i18n-opt-duration">General Duration</option>
+                        </select>
+                        <input type="date" id="date-start" class="date-specific">
+                        <input type="date" id="date-end" class="date-specific">
+                        <select id="duration-length" class="date-duration" style="display:none;">
+                            <option value="1 Week">1 Week</option>
+                            <option value="2 Weeks">2 Weeks</option>
+                            <option value="A Few Days">A Few Days</option>
+                            <option value="Someday">Someday</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-label" id="i18n-your-iti">YOUR ITINERARY</div>
+                <div class="itinerary-box" id="itinerary-box">
+                    <button class="add-day-btn edit-only" style="display:none;" onclick="addDay()">
+                        <span id="i18n-add-day">+ Add an empty day</span>
+                    </button>
+                </div>
+
+                <div class="section-label" id="saved-locs-label" style="margin-top: 40px;">UNASSIGNED LOCATIONS (0)</div>
+                <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent; background: #fff; border-radius: 12px;"></div>
+                
+                <button class="gen-btn ghost edit-only" style="display:none; margin-top:15px;" onclick="openAddModal()">
+                    <span id="i18n-add-more">+ Add more locations</span>
+                </button>
+
+                <div id="reco-section" style="display: none; margin-top: 30px;">
+                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP</div>
+                    <div id="reco-list"></div>
+                </div>
+
+                <div class="save-row edit-only" style="display:none;">
+                    <button class="gen-btn ghost" onclick="cancelEdit()" id="i18n-cancel">Cancel</button>
+                    <button class="gen-btn" onclick="saveTrip()" id="i18n-save">Save changes</button>
+                </div>
+
+                <div style="text-align:center; margin-top: 60px;">
+                    <p style="font-size:12px; color:#64748b; margin-bottom:10px;" id="i18n-need-magic">Need some magic?</p>
+                    <button class="gen-btn ghost" onclick="document.getElementById('itinerary-modal').classList.remove('hidden')" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <!-- Modal Add More Locations -->
@@ -234,9 +256,7 @@
             <div class="modal-close" onclick="closeAddModal()">&times;</div>
         </div>
         <input type="text" id="add-search" class="modal-search" placeholder="Search by name, city or category..." onkeyup="filterAddModal()">
-        <div class="modal-list" id="add-modal-list">
-            <!-- Liste de recherche injectée par JS -->
-        </div>
+        <div class="modal-list" id="add-modal-list"></div>
     </div>
 </div>
 
@@ -252,7 +272,7 @@
     </div>
 </div>
 
-<!-- Modal Auto-Itinerary -->
+<!-- Modal Auto-Itinerary (Réparé !) -->
 <div class="modal-overlay hidden" id="itinerary-modal">
     <div class="modal-box" style="width:650px;">
         <div class="modal-header">
