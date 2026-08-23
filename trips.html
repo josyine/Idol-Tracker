@@ -23,7 +23,12 @@
   
   .frame {width:700px;max-width:96vw;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(80,60,120,.08);background:#fff;padding:32px 36px;}
 
-  .trip-head {display:flex;justify-content:space-between;align-items:center;}
+  /* SELECTEUR DE VOYAGE AU DESSUS DU TITRE */
+  .trip-selector-row { margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+  .trip-selector-row select { padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; cursor: pointer; font-size: 13px; color: #334155; font-weight: 600; }
+  .trip-selector-row select:focus { border-color: #D42759; }
+
+  .trip-head {display:flex;justify-content:space-between;align-items:flex-start;}
   .trip-name {font-size:20px;font-weight:700;color:#212832;}
   .trip-dates {font-size:12px;color:#94a3b8;margin-top:3px;}
 
@@ -39,18 +44,20 @@
   .section-label {font-size:10.5px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 12px 0;}
 
   /* LIEUX SAUVEGARDÉS */
-  .loc-row {display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;}
+  .loc-row {display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9; position: relative;}
   .loc-row:last-child {border-bottom:none;}
   .loc-thumb {width:44px;height:44px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0;}
   .loc-name {font-size:13px;font-weight:700;color:#212832;}
   .loc-meta {font-size:11px;color:#94a3b8;}
+  .add-to-trip-btn { display: none; margin-left: auto; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px; padding: 4px 8px; font-size: 11px; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; }
+  .add-to-trip-btn:hover { background: #D42759; color: #fff; border-color: #D42759; }
 
   /* BANDEAU D'EDITION */
   .edit-banner {display:none;background:#FCE7F0;border:1px dashed #D42759;border-radius:14px;padding:18px;margin-top:20px;}
   .edit-banner.open {display:block;}
   .edit-tag {font-size:11.5px;font-weight:700;color:#D42759;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
   .date-inputs {display:flex;gap:8px;}
-  .date-inputs input {flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Poppins',sans-serif;}
+  .date-inputs input {flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Poppins',sans-serif; background: #fff;}
   .date-inputs input:focus {outline:none;border-color:#D42759;}
 
   .x-btn {cursor:pointer;padding:4px;flex-shrink:0; font-size: 14px; font-weight: bold; color: #94a3b8; transition: 0.2s;}
@@ -59,10 +66,11 @@
 
   /* ITINÉRAIRE MODULABLE (DRAG & DROP) */
   .itinerary-box {background:#faf9fc;border:1px solid #e2e8f0; border-radius:16px;padding:20px;margin-top:10px;}
-  .day-card {background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:14px;transition:border-color .2s, background .2s;}
+  .day-card {background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:14px;transition:border-color .2s, background .2s; position: relative;}
   .day-card:last-child {margin-bottom:0;}
   .day-card.drag-over {border-color:#D42759;background:#FCE7F0;}
-  .day-title {font-size:12.5px;font-weight:700;color:#D42759;margin-bottom:12px;}
+  .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .day-title {font-size:12.5px;font-weight:700;color:#D42759;}
   .day-items {min-height:20px;}
   
   .day-loc {
@@ -84,11 +92,22 @@
 
   .save-row {display:flex;gap:10px;margin-top:20px;}
   .save-row .gen-btn {flex:1;justify-content:center; padding: 12px;}
+
+  /* MODAL ADD MORE LOCATIONS */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+  .modal-box { background: #fff; width: 500px; max-width: 90%; border-radius: 16px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 80vh; display: flex; flex-direction: column;}
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+  .modal-title { font-size: 18px; font-weight: 700; color: #212832; }
+  .modal-close { cursor: pointer; font-size: 20px; color: #64748b; }
+  .modal-search { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; font-family: 'Poppins', sans-serif; }
+  .modal-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+
+  .empty-state { text-align: center; color: #94a3b8; padding: 40px 0; font-size: 14px; }
 </style>
 </head>
 <body>
 
-<!-- Header (Identique à la carte) -->
+<!-- Header -->
 <div class="nav">
     <a href="map.html" class="brand">
         <svg class="pin" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
@@ -104,15 +123,21 @@
 </div>
 
 <div class="trips-container">
-    <div class="lab" id="page-title">Screen To Street — My Trips</div>
-    <div class="lab-sub" data-i18n="tripSub">Clique sur "Edit trip" pour ouvrir le bandeau, puis fais glisser les lieux d'un jour à l'autre.</div>
+    <div class="lab" id="page-title">My Trips</div>
+    <div class="lab-sub" id="page-subtitle">Organize your wishlist into daily itineraries</div>
 
     <div class="frame">
-        <div class="page">
+        <div class="page" id="main-content">
+            
+            <div class="trip-selector-row">
+                <span style="font-size:12px; color:#64748b; font-weight:600;">Active Trip :</span>
+                <select id="active-trip-select" onchange="switchTrip()"></select>
+            </div>
+
             <div class="trip-head">
-                <div>
-                    <div class="trip-name" id="trip-name-display">Korea trip</div>
-                    <div class="trip-dates" id="dates-display">March – April 2027 · 3 locations</div>
+                <div style="flex:1;">
+                    <div class="trip-name" id="trip-name-display">Loading...</div>
+                    <div class="trip-dates" id="dates-display">...</div>
                 </div>
                 <button class="gen-btn" id="edit-toggle" onclick="toggleEdit()">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
@@ -124,60 +149,30 @@
                 <div class="edit-tag">✏️ Editing this trip</div>
                 <div class="section-label" style="margin-top:0;">Trip dates</div>
                 <div class="date-inputs">
-                    <input type="text" id="date-start" value="March 2027">
-                    <input type="text" id="date-end" value="April 2027">
+                    <input type="date" id="date-start">
+                    <input type="date" id="date-end">
                 </div>
             </div>
 
-            <div class="section-label" id="saved-locs-label">Saved locations (3)</div>
-            <div id="loc-list">
-                <!-- Lieux générés ici -->
-                <div class="loc-row">
-                    <div class="loc-thumb" style="background-image:url('https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg');"></div>
-                    <div style="flex:1;"><div class="loc-name">In the SOOP Estate</div><div class="loc-meta">Chuncheon, South Korea</div></div>
-                    <div class="x-btn edit-only" style="display:none;">✕</div>
-                </div>
-                <div class="loc-row">
-                    <div class="loc-thumb" style="background-image:url('https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg');"></div>
-                    <div style="flex:1;"><div class="loc-name">Cafe Camptong</div><div class="loc-meta">Seoul, South Korea</div></div>
-                    <div class="x-btn edit-only" style="display:none;">✕</div>
-                </div>
-                <div class="loc-row">
-                    <div class="loc-thumb" style="background-image:url('https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg');"></div>
-                    <div style="flex:1;"><div class="loc-name">Lotte World Adventure</div><div class="loc-meta">Seoul, South Korea</div></div>
-                    <div class="x-btn edit-only" style="display:none;">✕</div>
-                </div>
+            <div class="section-label" id="saved-locs-label">Unassigned Locations (0)</div>
+            <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent;">
+                <!-- Les lieux non assignés de la wishlist apparaîtront ici -->
             </div>
             
-            <button class="add-locs-link edit-only" style="display:none;" onclick="window.location.href='map.html'">
+            <button class="add-locs-link edit-only" style="display:none;" onclick="openAddModal()">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                Find more locations on Map
+                Add more locations
             </button>
+
+            <!-- Recommandations -->
+            <div id="reco-section" style="display: none;">
+                <div class="section-label" style="color:#D42759;">Recommended for this trip</div>
+                <div id="reco-list"></div>
+            </div>
 
             <div class="section-label">Your itinerary</div>
             <div class="itinerary-box" id="itinerary-box">
-                <div class="day-card" data-day="1" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
-                    <div class="day-title">Day 1 — Chuncheon</div>
-                    <div class="day-items" id="day-1-items">
-                        <div class="day-loc" draggable="false" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-                            <span class="drag-handle">⠿</span>In the SOOP Estate
-                            <span class="x-btn edit-only" style="display:none;" onclick="this.parentElement.remove()">✕</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="day-card" data-day="2" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
-                    <div class="day-title">Day 2 — Seoul</div>
-                    <div class="day-items" id="day-2-items">
-                        <div class="day-loc" draggable="false" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-                            <span class="drag-handle">⠿</span>Cafe Camptong
-                            <span class="x-btn edit-only" style="display:none;" onclick="this.parentElement.remove()">✕</span>
-                        </div>
-                        <div class="day-loc" draggable="false" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-                            <span class="drag-handle">⠿</span>Lotte World Adventure
-                            <span class="x-btn edit-only" style="display:none;" onclick="this.parentElement.remove()">✕</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- Les jours apparaîtront ici -->
                 <button class="add-day-btn edit-only" style="display:none;" onclick="addDay()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
                     Add an empty day
@@ -185,46 +180,233 @@
             </div>
 
             <div class="save-row edit-only" style="display:none;">
-                <button class="gen-btn ghost" onclick="toggleEdit()">Cancel</button>
-                <button class="gen-btn" onclick="toggleEdit()">Save changes</button>
+                <button class="gen-btn ghost" onclick="cancelEdit()">Cancel</button>
+                <button class="gen-btn" onclick="saveTrip()">Save changes</button>
             </div>
 
         </div>
     </div>
 </div>
 
-<script>
-let editing = false;
-let dayCount = 2;
+<!-- Modal Add More Locations -->
+<div class="modal-overlay hidden" id="add-modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">Add to this Trip</div>
+            <div class="modal-close" onclick="closeAddModal()">&times;</div>
+        </div>
+        <input type="text" id="add-search" class="modal-search" placeholder="Search by name, city or category..." onkeyup="filterAddModal()">
+        <div class="modal-list" id="add-modal-list">
+            <!-- Liste injectée -->
+        </div>
+    </div>
+</div>
 
+<script>
+// --- DONNÉES GLOBALES IDENTIQUES À SCRIPT.JS ---
+const celebLocations = [
+    { id: 1, name: "Cafe Camptong", group: "BTS", country: "South Korea", city: "Seoul", category: "Run BTS", img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg" },
+    { id: 2, name: "Ossu Seiromushi", group: "BTS", country: "South Korea", city: "Seoul", category: "Restaurants", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600" },
+    { id: 3, name: "Lotte World Adventure", group: "BTS", country: "South Korea", city: "Seoul", category: "Run BTS", img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg" },
+    { id: 4, name: "Ahwon Museum & Hotel", group: "BTS", country: "South Korea", city: "Wanju", category: "Museums", img: "https://img.youtube.com/vi/h1jUtpEzxxA/hqdefault.jpg" },
+    { id: 5, name: "Cafe Kitsuné Seoul", group: "Blackpink", country: "South Korea", city: "Seoul", category: "Cafe", img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600" },
+    { id: 6, name: "Pozzetto", group: "BTS", country: "France", city: "Paris", category: "Cafe", img: "https://images.unsplash.com/photo-1557142046-c704a3adf365?w=600" },
+    { id: 7, name: "Musée Nissim de Camondo", group: "BTS", country: "France", city: "Paris", category: "Fashion", img: "https://img.youtube.com/vi/1TdxCtgX53w/hqdefault.jpg" },
+    { id: 8, name: "Montmartre Stairs", group: "BTS", country: "France", city: "Paris", category: "Landmarks", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600" },
+    { id: 9, name: "Wall of Love", group: "BTS", country: "France", city: "Paris", category: "Landmarks", img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600" },
+    { id: 10, name: "Palais de Tokyo", group: "BTS", country: "France", city: "Paris", category: "Museums", img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600" },
+    { id: 11, name: "Cheonggu Building", group: "BTS", country: "South Korea", city: "Seoul", category: "Landmarks", img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg" },
+    { id: 12, name: "The First BTS Dorm", group: "BTS", country: "South Korea", city: "Seoul", category: "Landmarks", img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg" },
+    { id: 13, name: "Hyangho Beach Bus Stop", group: "BTS", country: "South Korea", city: "Gangneung", category: "Landmarks", img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg" },
+    { id: 14, name: "Iryeong Station", group: "BTS", country: "South Korea", city: "Yangju", category: "MV Location", img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg" },
+    { id: 15, name: "Quinta da Francelha de Cima", group: "BTS", country: "Portugal", city: "Prior Velho", category: "MV Location", img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg" },
+    { id: 16, name: "Sunhyewon", group: "BTS", country: "South Korea", city: "Seoul Area", category: "MV Location", img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg" },
+    { id: 17, name: "Museu de Marinha", group: "BTS", country: "Portugal", city: "Lisbon", category: "MV Location", img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg" },
+    { id: 18, name: "In the SOOP Estate", group: "BTS", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg" },
+    { id: 19, name: "Happy Meadow Ranch", group: "BTS", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg" }
+];
+
+let myTrips = [];
+let wishlistLocs = [];
+let currentTrip = null;
+let editing = false;
+let draggedEl = null;
+
+// --- INITIALISATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    myTrips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    wishlistLocs = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+
+    const select = document.getElementById('active-trip-select');
+    if (myTrips.length === 0) {
+        document.getElementById('main-content').innerHTML = `<div class="empty-state">You haven't created any trips yet. <br>Go to the map, click on a location and "Add to Wishlist" to create your first trip!</div>`;
+        return;
+    }
+
+    myTrips.forEach(t => {
+        let opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.name;
+        select.appendChild(opt);
+    });
+
+    // Sélectionne le dernier voyage créé
+    select.value = myTrips[myTrips.length - 1].id;
+    switchTrip();
+});
+
+function switchTrip() {
+    const tripId = document.getElementById('active-trip-select').value;
+    currentTrip = myTrips.find(t => t.id === tripId);
+    if (!currentTrip.days) currentTrip.days = []; // Initialise les jours si vide
+    renderTrip();
+}
+
+function renderTrip() {
+    if (!currentTrip) return;
+
+    document.getElementById('trip-name-display').textContent = currentTrip.name;
+    document.getElementById('date-start').value = currentTrip.startDate || '';
+    document.getElementById('date-end').value = currentTrip.endDate || '';
+    
+    // Déterminer les lieux du voyage
+    let tripLocIdsFromWishlist = wishlistLocs.filter(w => w.tripId === currentTrip.id).map(w => w.id);
+    let allAssignedIds = currentTrip.days.flat();
+    let unassignedIds = tripLocIdsFromWishlist.filter(id => !allAssignedIds.includes(id));
+
+    // Affichage des non-assignés
+    const locList = document.getElementById('loc-list');
+    locList.innerHTML = '';
+    unassignedIds.forEach(id => {
+        const loc = celebLocations.find(l => l.id === id);
+        if (loc) locList.appendChild(createLocRow(loc));
+    });
+    document.getElementById('saved-locs-label').textContent = `Unassigned Locations (${unassignedIds.length})`;
+
+    // Affichage des jours
+    const box = document.getElementById('itinerary-box');
+    const addBtn = box.querySelector('.add-day-btn');
+    box.innerHTML = ''; 
+    
+    currentTrip.days.forEach((dayIds, index) => {
+        const card = document.createElement('div');
+        card.className = 'day-card';
+        card.dataset.day = index + 1;
+        card.setAttribute('ondragover', 'allowDrop(event)');
+        card.setAttribute('ondrop', 'drop(event)');
+        card.setAttribute('ondragleave', 'dragLeave(event)');
+        
+        let itemsHtml = '';
+        dayIds.forEach(id => {
+            const loc = celebLocations.find(l => l.id === id);
+            if (loc) itemsHtml += createLocRowHtml(loc);
+        });
+
+        card.innerHTML = `
+            <div class="day-header">
+                <div class="day-title">Day ${index + 1}</div>
+                <div class="x-btn edit-only" style="display:none;" onclick="removeDay(this)">✕</div>
+            </div>
+            <div class="day-items">${itemsHtml}</div>
+        `;
+        box.appendChild(card);
+    });
+    box.appendChild(addBtn); // Remet le bouton à la fin
+
+    // RECOMMANDATIONS (Même pays)
+    let tripCountries = [...new Set(tripLocIdsFromWishlist.map(id => {
+        let loc = celebLocations.find(l => l.id === id);
+        return loc ? loc.country : null;
+    }).filter(Boolean))];
+
+    const recoList = document.getElementById('reco-list');
+    recoList.innerHTML = '';
+    let recoCount = 0;
+    
+    if(tripCountries.length > 0) {
+        celebLocations.forEach(loc => {
+            if (tripCountries.includes(loc.country) && !tripLocIdsFromWishlist.includes(loc.id)) {
+                if (recoCount < 3) {
+                    recoList.innerHTML += `
+                        <div class="loc-row">
+                            <div class="loc-thumb" style="background-image:url('${loc.img}');"></div>
+                            <div style="flex:1;"><div class="loc-name">${loc.name}</div><div class="loc-meta">${loc.city}, ${loc.country} &middot; ${loc.category}</div></div>
+                            <button class="add-to-trip-btn edit-only" style="display:none;" onclick="quickAddLoc(${loc.id})">+ Add</button>
+                        </div>
+                    `;
+                    recoCount++;
+                }
+            }
+        });
+    }
+    
+    document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
+
+    // Maj du total
+    const total = allAssignedIds.length + unassignedIds.length;
+    document.getElementById('dates-display').textContent = `${currentTrip.startDate || '?'} to ${currentTrip.endDate || '?'} · ${total} location(s)`;
+
+    // Applique l'état d'édition actuel
+    applyEditState();
+}
+
+function createLocRow(loc) {
+    const div = document.createElement('div');
+    div.className = 'day-loc';
+    div.dataset.id = loc.id;
+    div.setAttribute('draggable', editing ? 'true' : 'false');
+    div.setAttribute('ondragstart', 'dragStart(event)');
+    div.setAttribute('ondragend', 'dragEnd(event)');
+    div.innerHTML = `
+        <span class="drag-handle edit-only" style="display:${editing ? 'inline' : 'none'};">⠿</span>
+        ${loc.name}
+        <span class="x-btn edit-only" style="display:${editing ? 'inline' : 'none'};" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+    `;
+    return div;
+}
+
+function createLocRowHtml(loc) {
+    return `
+        <div class="day-loc" data-id="${loc.id}" draggable="${editing ? 'true' : 'false'}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+            <span class="drag-handle edit-only" style="display:${editing ? 'inline' : 'none'};">⠿</span>
+            ${loc.name}
+            <span class="x-btn edit-only" style="display:${editing ? 'inline' : 'none'};" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+        </div>
+    `;
+}
+
+// --- EDITION & DRAG DROP ---
 function toggleEdit() {
-    editing = !editing;
+    editing = true;
+    applyEditState();
+}
+
+function cancelEdit() {
+    editing = false;
+    renderTrip(); // Re-render from saved state to undo unsaved drags
+}
+
+function applyEditState() {
     document.getElementById('edit-banner').classList.toggle('open', editing);
     document.querySelectorAll('.edit-only').forEach(el => el.style.display = editing ? 'flex' : 'none');
     document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', editing ? 'true' : 'false'));
     
-    document.getElementById('edit-toggle').innerHTML = editing
-        ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Editing…`
-        : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit trip`;
-
-    if (!editing) {
-        // Enregistre visuellement
-        const total = document.querySelectorAll('.day-loc').length;
-        document.getElementById('dates-display').textContent = `${document.getElementById('date-start').value} – ${document.getElementById('date-end').value} · ${total} locations`;
-    }
+    document.getElementById('edit-toggle').style.display = editing ? 'none' : 'inline-flex';
+    document.getElementById('loc-list').style.borderColor = editing ? '#cbd5e1' : 'transparent';
+    
+    // Style the +Add buttons in Reco
+    document.querySelectorAll('.add-to-trip-btn').forEach(el => el.style.display = editing ? 'block' : 'none');
 }
-
-let draggedEl = null;
 
 function dragStart(e) {
     if (!editing) { e.preventDefault(); return; }
-    draggedEl = e.target.closest('.day-loc');
+    draggedEl = e.currentTarget;
     draggedEl.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
 }
 function dragEnd(e) {
     if (draggedEl) draggedEl.classList.remove('dragging');
-    document.querySelectorAll('.day-card').forEach(d => d.classList.remove('drag-over'));
+    document.querySelectorAll('.day-card, #loc-list').forEach(d => d.classList.remove('drag-over'));
     draggedEl = null;
 }
 function allowDrop(e) {
@@ -237,42 +419,139 @@ function dragLeave(e) {
 }
 function drop(e) {
     e.preventDefault();
-    const dayCard = e.currentTarget;
-    dayCard.classList.remove('drag-over');
+    e.currentTarget.classList.remove('drag-over');
     if (draggedEl) {
-        dayCard.querySelector('.day-items').appendChild(draggedEl);
+        if (e.currentTarget.id === 'loc-list') {
+            e.currentTarget.appendChild(draggedEl);
+        } else {
+            e.currentTarget.querySelector('.day-items').appendChild(draggedEl);
+        }
     }
 }
 
+// --- ACTIONS SUR LE VOYAGE ---
 function addDay() {
-    dayCount++;
     const box = document.getElementById('itinerary-box');
-    const addBtn = document.querySelector('.add-day-btn');
+    const addBtn = box.querySelector('.add-day-btn');
+    const newDayNum = document.querySelectorAll('.day-card').length + 1;
+    
     const card = document.createElement('div');
     card.className = 'day-card';
-    card.dataset.day = dayCount;
+    card.dataset.day = newDayNum;
     card.setAttribute('ondragover', 'allowDrop(event)');
     card.setAttribute('ondrop', 'drop(event)');
     card.setAttribute('ondragleave', 'dragLeave(event)');
-    card.innerHTML = `<div class="day-title">Day ${dayCount}</div><div class="day-items" id="day-${dayCount}-items"></div>`;
+    card.innerHTML = `
+        <div class="day-header">
+            <div class="day-title">Day ${newDayNum}</div>
+            <div class="x-btn edit-only" style="display:flex;" onclick="removeDay(this)">✕</div>
+        </div>
+        <div class="day-items"></div>
+    `;
     box.insertBefore(card, addBtn);
 }
 
-// LOGIQUE POUR CHARGER LE VRAI VOYAGE DEPUIS LOCALSTORAGE
-document.addEventListener('DOMContentLoaded', () => {
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    if(trips.length > 0) {
-        // Prend le dernier voyage créé comme exemple dynamique
-        let latestTrip = trips[trips.length - 1];
-        document.getElementById('trip-name-display').textContent = latestTrip.name;
-        document.getElementById('page-title').textContent = "Screen To Street — " + latestTrip.name;
-    }
+function removeDay(btn) {
+    const card = btn.closest('.day-card');
+    const items = card.querySelectorAll('.day-loc');
+    const locList = document.getElementById('loc-list');
+    items.forEach(i => locList.appendChild(i)); // Remet les lieux dans Unassigned
+    card.remove();
     
-    // Traduction simple
-    if(localStorage.getItem('lang') === 'fr') {
-        document.querySelector('.lab-sub').textContent = "Cliquez sur 'Edit trip' pour ouvrir le mode édition, puis faites glisser les lieux.";
+    // Renuméroter les jours
+    document.querySelectorAll('.day-card').forEach((c, index) => {
+        c.dataset.day = index + 1;
+        c.querySelector('.day-title').textContent = `Day ${index + 1}`;
+    });
+}
+
+function removeFromTrip(btn, locId) {
+    if(!confirm("Remove this location from the trip?")) return;
+    // On retire de la wishlistLocs
+    wishlistLocs = wishlistLocs.filter(w => w.id !== locId || w.tripId !== currentTrip.id);
+    localStorage.setItem('wishlistLocs', JSON.stringify(wishlistLocs));
+    btn.closest('.day-loc').remove();
+}
+
+function quickAddLoc(locId) {
+    if(!wishlistLocs.some(w => w.id === locId && w.tripId === currentTrip.id)) {
+        wishlistLocs.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
+        localStorage.setItem('wishlistLocs', JSON.stringify(wishlistLocs));
+        
+        // Add directly to unassigned
+        const loc = celebLocations.find(l => l.id === locId);
+        if (loc) {
+            document.getElementById('loc-list').appendChild(createLocRow(loc));
+            // Force re-render to update recommendations and counts
+            saveTrip(false); // save silently and re-render
+        }
     }
-});
+}
+
+function saveTrip(exitEdit = true) {
+    // Collecte les dates
+    currentTrip.startDate = document.getElementById('date-start').value;
+    currentTrip.endDate = document.getElementById('date-end').value;
+    
+    // Collecte les jours
+    const newDays = [];
+    document.querySelectorAll('.day-card').forEach(card => {
+        const ids = [];
+        card.querySelectorAll('.day-loc').forEach(locEl => {
+            ids.push(parseInt(locEl.dataset.id));
+        });
+        newDays.push(ids);
+    });
+    
+    currentTrip.days = newDays;
+    
+    // Sauvegarde localStorage
+    const tripIndex = myTrips.findIndex(t => t.id === currentTrip.id);
+    if(tripIndex !== -1) myTrips[tripIndex] = currentTrip;
+    localStorage.setItem('myTrips', JSON.stringify(myTrips));
+    
+    if (exitEdit) {
+        editing = false;
+        renderTrip();
+    } else {
+        renderTrip(); // Reste en mode edit mais met à jour l'UI
+    }
+}
+
+// --- MODAL AJOUT MANUEL ---
+function openAddModal() {
+    document.getElementById('add-modal').classList.remove('hidden');
+    filterAddModal(); // Populates list
+}
+
+function closeAddModal() {
+    document.getElementById('add-modal').classList.add('hidden');
+    document.getElementById('add-search').value = "";
+}
+
+function filterAddModal() {
+    const query = document.getElementById('add-search').value.toLowerCase();
+    const list = document.getElementById('add-modal-list');
+    list.innerHTML = '';
+    
+    let tripLocIds = wishlistLocs.filter(w => w.tripId === currentTrip.id).map(w => w.id);
+    
+    celebLocations.forEach(loc => {
+        if (!tripLocIds.includes(loc.id)) {
+            if(loc.name.toLowerCase().includes(query) || loc.city.toLowerCase().includes(query) || loc.category.toLowerCase().includes(query)) {
+                list.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #e2e8f0;">
+                        <div>
+                            <div style="font-weight:700; font-size:13px; color:#212832;">${loc.name}</div>
+                            <div style="font-size:11px; color:#64748b;">${loc.city}, ${loc.country} &middot; ${loc.category}</div>
+                        </div>
+                        <button onclick="quickAddLoc(${loc.id}); this.textContent='Added'; this.disabled=true; this.style.background='#e2e8f0';" style="background:#D42759; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:11px; cursor:pointer;">+ Add</button>
+                    </div>
+                `;
+            }
+        }
+    });
+}
 </script>
 
 </body>
