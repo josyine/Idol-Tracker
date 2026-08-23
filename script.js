@@ -12,6 +12,7 @@ let currentLang = localStorage.getItem('lang') || 'en';
 let currentTrip = null;
 let editing = false;
 let draggedEl = null;
+let tripIdToDelete = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Si la page contient une carte Leaflet (map.html), on l'initialise
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
     });
 
+    // Profil avec initiale noire sur fond transparent
     const profileBtn = document.getElementById('profile-btn');
     if (profileBtn) {
         const savedName = localStorage.getItem('userName') || 'U';
@@ -296,12 +298,14 @@ function updateUI() {
         const eModAdd = document.getElementById('i18n-modal-add'); if(eModAdd) eModAdd.textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
         const eCreateTitle = document.getElementById('i18n-create-title'); if(eCreateTitle) eCreateTitle.textContent = isFr ? "Créer un nouveau voyage" : "Create a new trip";
         const eBtnCreate = document.getElementById('i18n-btn-create'); if(eBtnCreate) eBtnCreate.textContent = isFr ? "Créer" : "Create";
-        const eDelBtn = document.getElementById('i18n-delete-trip'); if(eDelBtn) eDelBtn.textContent = isFr ? "Supprimer" : "Delete";
+        const eDelTitle = document.getElementById('i18n-del-title'); if(eDelTitle) eDelTitle.textContent = isFr ? "Supprimer ce voyage ?" : "Delete this trip?";
+        const eDelDesc = document.getElementById('i18n-del-desc'); if(eDelDesc) eDelDesc.textContent = isFr ? "Êtes-vous sûr de vouloir supprimer ce voyage ? Cette action est irréversible." : "Are you sure you want to delete this trip? This cannot be undone.";
+        const eDelCancel = document.getElementById('i18n-del-cancel'); if(eDelCancel) eDelCancel.textContent = isFr ? "Annuler" : "Cancel";
+        const eDelConfirm = document.getElementById('i18n-del-confirm'); if(eDelConfirm) eDelConfirm.textContent = isFr ? "Supprimer" : "Delete";
         
         if(typeof window.initTrips === 'function') window.initTrips();
     }
 
-    // Init ITI Selectors (Map et Trips)
     window.initItineraryGenerator();
 }
 
@@ -450,7 +454,7 @@ function renderLocations() {
 }
 
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST (TIROIR MAP.HTML)
+// 6. GESTION DES TRIPS / WISHLIST DANS LA CARTE
 // ==========================================
 window.toggleWishlist = function() {
     const checked = document.getElementById('details-wishlist').checked;
@@ -512,12 +516,14 @@ window.createTrip = function() {
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
 
-    // Met à jour la liste pour afficher le nouveau
+    // Met à jour la liste sans doublons
     const select = document.getElementById('trip-select');
-    let opt = document.createElement('option');
-    opt.value = newTripId; opt.textContent = label;
-    select.insertBefore(opt, select.lastElementChild);
-    select.value = newTripId;
+    if(select) {
+        let opt = document.createElement('option');
+        opt.value = newTripId; opt.textContent = label;
+        select.insertBefore(opt, select.lastElementChild);
+        select.value = newTripId;
+    }
     
     window.handleTripSelect(); 
     window.cancelNewTrip();
@@ -616,7 +622,6 @@ window.openDetailsPanel = function(id) {
         else { tipSection.classList.add('hidden'); }
     }
     
-    // Checkboxes Visited
     const vCheck = document.getElementById('details-visited');
     const memoryDropdown = document.getElementById('memory-dropdown');
     const tabBtnVisit = document.getElementById('tab-btn-visit');
@@ -661,7 +666,6 @@ window.openDetailsPanel = function(id) {
         };
     }
 
-    // Checkboxes Wishlist
     const wCheck = document.getElementById('details-wishlist');
     const tripBox = document.getElementById('trip-box');
     
@@ -675,7 +679,6 @@ window.openDetailsPanel = function(id) {
             tripBox.classList.add('open');
             const select = document.getElementById('trip-select');
             
-            // Re-rempli les options pour être sûr d'être à jour
             if(select) {
                 select.innerHTML = '';
                 const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
@@ -812,7 +815,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR
+// 8. AUTO-ITINERARY GENERATOR (RÉPARÉ)
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -853,7 +856,7 @@ window.generateItinerary = function() {
     
     resultDiv.innerHTML = "";
     
-    // Le calcul original qui répartissait équitablement
+    // Le calcul qui fonctionne parfaitement (Math.ceil) sans emoji
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     currentGeneratedItinerary = [];
@@ -899,21 +902,11 @@ window.generateItinerary = function() {
                     <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
                     <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)}</div>
             `;
-            
-            if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
-                html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
-                    <b style="color:#2E3644;">${txt.lunch} ${l.name}</b><br>
-                    <span style="color:#64748b;">Explore local eateries before your next stop.</span>
-                </div>`;
-                currentTime.setHours(currentTime.getHours() + 1);
-            }
             html += `</div>`;
 
             if (idx < dayLocs.length - 1) {
                 html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
                 currentTime.setMinutes(currentTime.getMinutes() + 30);
-            } else {
-                html += `<div style="padding-left:18px; margin-top:5px; margin-bottom:15px;"><span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">${txt.coffee}</span></div>`;
             }
         });
         
@@ -944,19 +937,15 @@ window.generateItinerary = function() {
                  .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
             });
             
-            // Correction pour éviter l'erreur de zoom sur 1 seul point
-            if(coordsForMap.length > 1) {
-                L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
-                itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
-            } else if (coordsForMap.length === 1) {
-                itiLeafletMap.setView(coordsForMap[0], 12);
-            }
+            L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
+            if(coordsForMap.length > 0) itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
 
             itiLeafletMap.invalidateSize();
         }, 250);
     }
 }
 
+// Redirection parfaite après la sauvegarde depuis la map
 window.saveItineraryToTrips = function() {
     const country = document.getElementById('iti-country').value;
     const daysCount = parseInt(document.getElementById('iti-days').value);
@@ -989,9 +978,10 @@ window.saveItineraryToTrips = function() {
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    localStorage.setItem('activeTripId', newTripId);
+    localStorage.setItem('activeTripId', newTripId); // L'ouvre directement
 
-    if(document.getElementById('trip-name-display')) {
+    // Redirige vers trips.html s'il n'est pas déjà dessus
+    if(window.location.pathname.includes('trips.html')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
         window.initTrips();
     } else {
@@ -1107,18 +1097,6 @@ window.onclick = function(e) {
     if (e.target.classList.contains('modal')) e.target.classList.add('hidden'); 
 };
 
-if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
-    document.getElementById('cookie-banner').classList.remove('hidden'); 
-}
-function closeCookies() { 
-    localStorage.setItem('cookiesAccepted', 'true'); 
-    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
-}
-const btnAccept = document.getElementById('cookie-accept');
-if(btnAccept) btnAccept.addEventListener('click', closeCookies);
-const btnReject = document.getElementById('cookie-reject');
-if(btnReject) btnReject.addEventListener('click', closeCookies);
-
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
@@ -1146,7 +1124,6 @@ window.initTrips = function() {
     if (!currentTrip) {
         currentTrip = trips[trips.length - 1];
     }
-    
     if (!currentTrip.days) currentTrip.days = [];
 
     window.renderTripsSidebar();
@@ -1169,20 +1146,48 @@ window.renderTripsSidebar = function() {
         
         let pill = document.createElement('div');
         pill.className = `trip-pill ${currentTrip && currentTrip.id === t.id ? 'active' : ''}`;
+        pill.setAttribute('draggable', 'true');
+        pill.ondragstart = (e) => window.dragTripStart(e, t.id);
+        pill.ondragover = (e) => window.dragTripOver(e);
+        pill.ondragleave = (e) => window.dragTripLeave(e);
+        pill.ondrop = (e) => window.dropTrip(e, t.id);
         pill.onclick = () => { 
             localStorage.setItem('activeTripId', t.id);
             window.initTrips();
         };
-        // Ajout de la croix de suppression
+
+        // Bouton supprimer le voyage
         pill.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div class="trip-pill-name">${t.name}</div>
-                <div class="del-trip-btn" onclick="deleteTrip('${t.id}', event)" title="Delete trip">✕</div>
+                <div class="del-trip-btn" onclick="openDeleteModal('${t.id}', event)" title="Delete trip">✕</div>
             </div>
             <div class="trip-pill-meta">${dateStr} &middot; ${locCount} locations</div>
         `;
         listContainer.appendChild(pill);
     });
+}
+
+// LOGIQUE DRAG & DROP POUR REORGANISER LES VOYAGES
+window.dragTripStart = function(e, id) { e.dataTransfer.setData('text/plain', id); e.currentTarget.style.opacity = '0.4'; }
+window.dragTripOver = function(e) { e.preventDefault(); e.currentTarget.style.borderTop = "2px solid #D42759"; }
+window.dragTripLeave = function(e) { e.currentTarget.style.borderTop = "1.5px solid transparent"; }
+window.dropTrip = function(e, targetId) {
+    e.preventDefault();
+    e.currentTarget.style.borderTop = "1.5px solid transparent";
+    const draggedId = e.dataTransfer.getData('text/plain');
+    if(draggedId && draggedId !== targetId) {
+        let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+        const fromIdx = trips.findIndex(t => t.id === draggedId);
+        const toIdx = trips.findIndex(t => t.id === targetId);
+        if(fromIdx > -1 && toIdx > -1) {
+            const [moved] = trips.splice(fromIdx, 1);
+            trips.splice(toIdx, 0, moved);
+            localStorage.setItem('myTrips', JSON.stringify(trips));
+            window.loadTripsSidebar();
+        }
+    }
+    document.querySelectorAll('.trip-pill').forEach(p => p.style.opacity = '1');
 }
 
 window.renderTrip = function() {
@@ -1372,7 +1377,6 @@ window.removeFromTrip = function(btn, locId) {
     wList = wList.filter(w => w.id !== locId || w.tripId !== currentTrip.id);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     btn.closest('.day-loc').remove();
-    
     window.saveTrip(false); 
 }
 
@@ -1384,47 +1388,6 @@ window.quickAddLoc = function(locId) {
         window.saveTrip(false); 
     }
 }
-
-// Fonction de suppression complète du voyage
-window.deleteCurrentTrip = function() {
-    if (!currentTrip) return;
-    const msg = currentLang === 'fr' ? "Êtes-vous sûr de vouloir supprimer ce voyage ?" : "Are you sure you want to delete this trip?";
-    if(!confirm(msg)) return;
-    
-    // Supprime le voyage de myTrips
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    trips = trips.filter(t => t.id !== currentTrip.id);
-    localStorage.setItem('myTrips', JSON.stringify(trips));
-    
-    // Dissocie les lieux de ce voyage (les remet en 'none' ou les supprime)
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-    wList = wList.filter(w => w.tripId !== currentTrip.id);
-    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    
-    localStorage.removeItem('activeTripId');
-    currentTrip = null;
-    window.initTrips();
-};
-
-window.deleteTrip = function(tripId, event) {
-    if(event) event.stopPropagation(); // Évite de sélectionner le voyage en cliquant sur la croix
-    const msg = currentLang === 'fr' ? "Êtes-vous sûr de vouloir supprimer ce voyage ?" : "Are you sure you want to delete this trip?";
-    if(!confirm(msg)) return;
-    
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    trips = trips.filter(t => t.id !== tripId);
-    localStorage.setItem('myTrips', JSON.stringify(trips));
-    
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-    wList = wList.filter(w => w.tripId !== tripId);
-    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    
-    if (currentTrip && currentTrip.id === tripId) {
-        currentTrip = null;
-        localStorage.removeItem('activeTripId');
-    }
-    window.initTrips();
-};
 
 window.saveTrip = function(exitEdit = true) {
     currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
@@ -1501,4 +1464,34 @@ window.createNewTripEmpty = function() {
     nameInput.value = '';
     
     window.initTrips(); 
+}
+
+// LOGIQUE DE SUPPRESSION (MODAL CUSTOM)
+let tripIdToDelete = null;
+
+window.openDeleteModal = function(id = null, event = null) {
+    if(event) event.stopPropagation(); // Évite de sélectionner le voyage
+    tripIdToDelete = id || currentTrip.id;
+    document.getElementById('delete-trip-modal').classList.remove('hidden');
+}
+
+window.confirmDeleteTrip = function() {
+    if (!tripIdToDelete) return;
+
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    trips = trips.filter(t => t.id !== tripIdToDelete);
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+    
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    wList = wList.filter(w => w.tripId !== tripIdToDelete);
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    
+    if (currentTrip && currentTrip.id === tripIdToDelete) {
+        currentTrip = null;
+        localStorage.removeItem('activeTripId');
+    }
+    
+    tripIdToDelete = null;
+    document.getElementById('delete-trip-modal').classList.add('hidden');
+    window.initTrips();
 }
