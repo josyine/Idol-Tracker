@@ -9,7 +9,7 @@ let currentGeneratedItinerary = [];
 let currentLang = localStorage.getItem('lang') || 'en';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Si on est sur une page avec la carte (map.html), on l'initialise
+    // Initialise la carte Uniquement si l'élément "map" est présent 
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Initialisation des boutons communs (Langue, Profil)
+    // Boutons communs
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -54,22 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
     });
 
-    document.querySelectorAll('.lang-option').forEach(opt => {
-        opt.addEventListener('click', function(e) { 
-            e.preventDefault(); 
-            currentLang = this.getAttribute('data-lang'); 
-            localStorage.setItem('lang', currentLang); 
-            updateUI(); 
-        });
-    });
-
     const profileBtn = document.getElementById('profile-btn');
     if (profileBtn) {
         const savedName = localStorage.getItem('userName') || 'U';
         profileBtn.textContent = savedName.charAt(0).toUpperCase();
     }
 
-    // Gestion des onglets de détails
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -80,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Déconnexion
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
@@ -92,13 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Boutons de KPI
     const btnShowLocs = document.getElementById('btn-show-locations');
     if (btnShowLocs) btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); });
     const btnShowCountries = document.getElementById('btn-show-countries');
     if (btnShowCountries) btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); });
 
-    // Initialisation dynamique selon la page
+    // Initialisation
     updateUI();
 });
 
@@ -318,9 +306,14 @@ function getCatName(cat) {
     if (catTranslations[cat] && typeof catTranslations[cat] === 'object') { return catTranslations[cat][currentLang]; }
     return catTranslations[cat] || cat;
 }
-
 function t(key) { return translations[currentLang] ? (translations[currentLang][key] || key) : key; }
 function getLocText(field) { return field ? (field[currentLang] || field.en || "") : ""; }
+
+window.changeLang = function(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    updateUI();
+};
 
 function updateUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -340,6 +333,7 @@ function updateUI() {
         loadTripOptions();
     }
     
+    // Si on est sur trips.html
     if(document.getElementById('trip-name-display')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
@@ -357,7 +351,7 @@ function updateUI() {
         const eSave = document.getElementById('i18n-save'); if(eSave) eSave.textContent = isFr ? "Sauvegarder" : "Save changes";
         const eModAdd = document.getElementById('i18n-modal-add'); if(eModAdd) eModAdd.textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
         
-        if(typeof renderTrip === 'function') renderTrip();
+        if(typeof loadTripsSidebar === 'function') loadTripsSidebar();
     }
 }
 
@@ -386,6 +380,8 @@ function initializeFilters() {
     const selectedGroup = groupSelect.value;
     memberSelect.innerHTML = `<option value="All">${t('allMembers')}</option>`;
     countrySelect.innerHTML = `<option value="All">${t('allAreas')}</option>`;
+    
+    // Nettoie les catégories avant de les ajouter pour éviter les doublons
     categoryButtonsContainer.innerHTML = `<div class="cat-card active" data-cat="All">${t('allCategories')}</div>`;
     activeCategory = "All";
     
@@ -406,7 +402,6 @@ function initializeFilters() {
         });
     });
 
-    // Fixations des event listeners à l'initialisation
     if(!groupSelect._hasListener) {
         groupSelect._hasListener = true;
         [groupSelect, memberSelect, document.getElementById('year-select'), countrySelect].forEach(el => {
@@ -449,10 +444,8 @@ function renderLocations() {
 
     const cSidebar = document.getElementById('location-count-sidebar');
     if(cSidebar) cSidebar.textContent = filteredLocations.length;
-    
     const sLocations = document.getElementById('stat-locations');
     if(sLocations) sLocations.textContent = filteredLocations.length;
-    
     const sCountries = document.getElementById('stat-countries');
     if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
@@ -492,7 +485,7 @@ function renderLocations() {
 }
 
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST DANS LA CARTE
+// 6. GESTION DES TRIPS / WISHLIST DEPUIS MAP.HTML
 // ==========================================
 function loadTripOptions() {
     const select = document.getElementById('trip-select');
@@ -500,9 +493,8 @@ function loadTripOptions() {
     
     select.innerHTML = '';
     const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    const lang = localStorage.getItem('lang') || 'en';
-    const noTripTxt = lang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
-    const newTripTxt = lang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
+    const noTripTxt = currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
+    const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
     
     select.innerHTML = `<option value="none">${noTripTxt}</option>`;
     trips.forEach(t => {
@@ -523,7 +515,7 @@ window.toggleWishlist = function() {
         }
     } else {
         box.classList.remove('open');
-        cancelNewTrip();
+        window.cancelNewTrip();
         wList = wList.filter(w => w.id !== currentLocationIdForMemory && w !== currentLocationIdForMemory);
     }
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
@@ -573,8 +565,8 @@ window.createTrip = function() {
 
     loadTripOptions(); 
     document.getElementById('trip-select').value = newTripId;
-    handleTripSelect(); 
-    cancelNewTrip();
+    window.handleTripSelect(); 
+    window.cancelNewTrip();
 };
 
 window.cancelNewTrip = function() {
@@ -588,7 +580,7 @@ window.cancelNewTrip = function() {
     const select = document.getElementById('trip-select');
     if (select && select.value === 'new') {
         select.value = 'none';
-        handleTripSelect();
+        window.handleTripSelect();
     }
 };
 
@@ -684,7 +676,7 @@ window.openDetailsPanel = function(id) {
         if(vCheck.checked && memoryData && memoryData.rating) {
             tabBtnVisit.classList.remove('hidden');
             memoryDropdown.classList.remove('open');
-            displayMemoryData(memoryData);
+            window.displayMemoryData(memoryData);
         } else {
             tabBtnVisit.classList.add('hidden');
             memoryDropdown.classList.remove('open');
@@ -699,7 +691,7 @@ window.openDetailsPanel = function(id) {
                 memoryDropdown.classList.add('open'); 
                 document.getElementById('memory-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('memory-notes').value = '';
-                setStars(4); 
+                window.setStars(4); 
             } else { 
                 list = list.filter(v => v.id !== loc.id && v !== loc.id); 
                 memoryDropdown.classList.remove('open'); 
@@ -735,7 +727,7 @@ window.openDetailsPanel = function(id) {
             }
         } else {
             tripBox.classList.remove('open');
-            cancelNewTrip();
+            window.cancelNewTrip();
         }
     }
 
@@ -752,7 +744,7 @@ window.openDetailsPanel = function(id) {
 };
 
 // GESTION DES ÉTOILES (TIROIR SOUVENIR)
-function setStars(val) {
+window.setStars = function(val) {
     const memoryRatingVal = document.getElementById('memory-rating-val');
     if(!memoryRatingVal) return;
     memoryRatingVal.value = val;
@@ -768,7 +760,7 @@ function setStars(val) {
 }
 document.querySelectorAll('#memory-stars .star').forEach(star => {
     star.addEventListener('click', function() {
-        setStars(parseInt(this.getAttribute('data-val')));
+        window.setStars(parseInt(this.getAttribute('data-val')));
     });
 });
 
@@ -793,13 +785,13 @@ if(saveMemoryBtn) {
             document.getElementById('memory-dropdown').classList.remove('open');
             document.getElementById('tab-btn-visit').classList.remove('hidden');
             
-            displayMemoryData(list[idx]);
+            window.displayMemoryData(list[idx]);
             document.getElementById('tab-btn-visit').click();
         }
     });
 }
 
-function displayMemoryData(data) {
+window.displayMemoryData = function(data) {
     const starSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     const emptyStarSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="#e2e8f0" stroke="#e2e8f0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     
@@ -832,7 +824,7 @@ if(editMemoryBtn) {
         if(data) {
             document.getElementById('memory-date').value = data.date || '';
             document.getElementById('memory-notes').value = data.notes || '';
-            setStars(data.rating || 4);
+            window.setStars(data.rating || 4);
         }
         document.querySelector('.tab-btn[data-tab="info"]').click(); 
         document.getElementById('memory-dropdown').classList.add('open'); 
@@ -910,7 +902,6 @@ window.generateItinerary = function() {
     resultDiv.innerHTML = "";
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
-    
     currentGeneratedItinerary = [];
     
     const txt = {
@@ -1041,14 +1032,9 @@ window.saveItineraryToTrips = function() {
 
     if(window.location.pathname.includes('trips.html')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
-        const sel = document.getElementById('active-trip-select');
-        if(sel) {
-            let opt = document.createElement('option');
-            opt.value = newTripId; opt.textContent = tripName;
-            sel.appendChild(opt);
-            sel.value = newTripId;
-            switchTrip();
-        }
+        window.loadTripsSidebar();
+        document.getElementById('active-trip-select').value = newTripId;
+        window.switchTrip();
     } else {
         window.location.href = 'trips.html';
     }
@@ -1177,14 +1163,331 @@ if(btnAccept) btnAccept.addEventListener('click', closeCookies);
 const btnReject = document.getElementById('cookie-reject');
 if(btnReject) btnReject.addEventListener('click', closeCookies);
 
-document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const locId = urlParams.get('locId');
-    if (locId && document.getElementById('map')) {
-        setTimeout(() => {
-            window.openDetailsPanel(parseInt(locId));
-            const loc = celebLocations.find(l => l.id === parseInt(locId));
-            if(loc && map) map.flyTo([loc.lat, loc.lng], 16, { duration: 1.5 });
-        }, 800); 
+// ==========================================
+// 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
+// ==========================================
+window.loadTripsSidebar = function() {
+    const listContainer = document.getElementById('trips-list-container');
+    const title = document.getElementById('sidebar-title');
+    const select = document.getElementById('active-trip-select');
+    if(!listContainer) return;
+
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    
+    listContainer.innerHTML = '';
+    select.innerHTML = '';
+    
+    title.textContent = `MY TRIPS (${trips.length})`;
+
+    if (trips.length === 0) {
+        document.getElementById('main-content').innerHTML = `<div class="empty-state">${currentLang==='fr'?"Vous n'avez pas encore créé de voyage.<br>Allez sur la carte et ajoutez des lieux à votre Wishlist !":"You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist' to create your first trip!"}</div>`;
+        return;
     }
-});
+
+    trips.forEach(t => {
+        // Dropdown
+        let opt = document.createElement('option');
+        opt.value = t.id; opt.textContent = t.name;
+        select.appendChild(opt);
+
+        // Sidebar Pill
+        const locCount = wList.filter(w => w.tripId === t.id).length;
+        let dateStr = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.startDate || '?'} to ${t.endDate || '?'}`;
+        
+        let pill = document.createElement('div');
+        pill.className = `trip-pill ${currentTrip && currentTrip.id === t.id ? 'active' : ''}`;
+        pill.onclick = () => { select.value = t.id; window.switchTrip(); };
+        pill.innerHTML = `
+            <div class="trip-pill-name">${t.name}</div>
+            <div class="trip-pill-meta">${dateStr} &middot; ${locCount} locations</div>
+        `;
+        listContainer.appendChild(pill);
+    });
+}
+
+window.switchTrip = function() {
+    const select = document.getElementById('active-trip-select');
+    if(!select) return;
+    
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    currentTrip = trips.find(t => t.id === select.value);
+    if (!currentTrip.days) currentTrip.days = []; 
+    
+    window.loadTripsSidebar(); 
+    window.renderTrip();
+}
+
+window.renderTrip = function() {
+    if (!currentTrip) return;
+
+    document.getElementById('trip-name-display').textContent = currentTrip.name;
+    document.getElementById('edit-trip-name').value = currentTrip.name;
+    
+    if(currentTrip.dateType === 'duration') {
+        document.getElementById('trip-duration-type').value = 'duration';
+        document.getElementById('duration-length').value = currentTrip.duration || '1 Week';
+    } else {
+        document.getElementById('trip-duration-type').value = 'specific';
+        document.getElementById('date-start').value = currentTrip.startDate || '';
+        document.getElementById('date-end').value = currentTrip.endDate || '';
+    }
+    window.toggleDateType();
+    
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let tripLocIdsFromWishlist = wList.filter(w => w.tripId === currentTrip.id).map(w => w.id);
+    let allAssignedIds = currentTrip.days.flat();
+    let unassignedIds = tripLocIdsFromWishlist.filter(id => !allAssignedIds.includes(id));
+
+    const locList = document.getElementById('loc-list');
+    locList.innerHTML = '';
+    unassignedIds.forEach(id => {
+        const loc = celebLocations.find(l => l.id === id);
+        if (loc) locList.appendChild(window.createLocRow(loc));
+    });
+    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `Lieux non assignés (${unassignedIds.length})` : `Unassigned Locations (${unassignedIds.length})`;
+
+    const box = document.getElementById('itinerary-box');
+    const addBtn = box.querySelector('.add-day-btn');
+    box.innerHTML = ''; 
+    
+    currentTrip.days.forEach((dayIds, index) => {
+        const card = document.createElement('div');
+        card.className = 'day-card';
+        card.dataset.day = index + 1;
+        card.setAttribute('ondragover', 'allowDrop(event)');
+        card.setAttribute('ondrop', 'drop(event)');
+        card.setAttribute('ondragleave', 'dragLeave(event)');
+        
+        let itemsHtml = '';
+        dayIds.forEach(id => {
+            const loc = celebLocations.find(l => l.id === id);
+            if (loc) itemsHtml += window.createLocRowHtml(loc);
+        });
+
+        card.innerHTML = `
+            <div class="day-header">
+                <div class="day-title">${currentLang==='fr'?'Jour':'Day'} ${index + 1}</div>
+                <div class="x-btn edit-only" style="display:none;" onclick="removeDay(this)">✕</div>
+            </div>
+            <div class="day-items">${itemsHtml}</div>
+        `;
+        box.appendChild(card);
+    });
+    box.appendChild(addBtn); 
+
+    let tripCountries = [...new Set(tripLocIdsFromWishlist.map(id => {
+        let loc = celebLocations.find(l => l.id === id);
+        return loc ? loc.country : null;
+    }).filter(Boolean))];
+
+    const recoList = document.getElementById('reco-list');
+    recoList.innerHTML = '';
+    let recoCount = 0;
+    
+    if(tripCountries.length > 0) {
+        celebLocations.forEach(loc => {
+            if (tripCountries.includes(loc.country) && !tripLocIdsFromWishlist.includes(loc.id)) {
+                if (recoCount < 4) {
+                    recoList.innerHTML += `
+                        <div class="loc-row">
+                            <div class="loc-thumb" style="background-image:url('${loc.img}');"></div>
+                            <div style="flex:1;"><div class="loc-name">${loc.name}</div><div class="loc-meta">${loc.city}, ${loc.country} &middot; ${getCatName(loc.category)}</div></div>
+                            <button class="add-to-trip-btn edit-only" style="display:none;" onclick="quickAddLoc(${loc.id})">+ Add</button>
+                        </div>
+                    `;
+                    recoCount++;
+                }
+            }
+        });
+    }
+    document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
+
+    const total = allAssignedIds.length + unassignedIds.length;
+    let datesTxt = currentTrip.dateType === 'duration' ? (currentTrip.duration || 'Flexible') : `${currentTrip.startDate || '?'} to ${currentTrip.endDate || '?'}`;
+    document.getElementById('dates-display').textContent = `${datesTxt} · ${total} location(s)`;
+
+    window.applyEditState();
+}
+
+window.toggleDateType = function() {
+    const type = document.getElementById('trip-duration-type').value;
+    const isDuration = type === 'duration';
+    document.querySelectorAll('.date-specific').forEach(el => el.style.display = isDuration ? 'none' : 'block');
+    document.getElementById('duration-length').style.display = isDuration ? 'block' : 'none';
+}
+
+window.createLocRow = function(loc) {
+    const div = document.createElement('div');
+    div.className = 'day-loc';
+    div.dataset.id = loc.id;
+    div.setAttribute('draggable', editing ? 'true' : 'false');
+    div.setAttribute('ondragstart', 'dragStart(event)');
+    div.setAttribute('ondragend', 'dragEnd(event)');
+    div.innerHTML = `
+        <span class="drag-handle edit-only" style="display:${editing ? 'inline' : 'none'};">⠿</span>
+        ${loc.name}
+        <span class="x-btn edit-only" style="display:${editing ? 'inline' : 'none'};" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+    `;
+    return div;
+}
+
+window.createLocRowHtml = function(loc) {
+    return `
+        <div class="day-loc" data-id="${loc.id}" draggable="${editing ? 'true' : 'false'}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+            <span class="drag-handle edit-only" style="display:${editing ? 'inline' : 'none'};">⠿</span>
+            ${loc.name}
+            <span class="x-btn edit-only" style="display:${editing ? 'inline' : 'none'};" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+        </div>
+    `;
+}
+
+window.toggleEdit = function() { editing = true; window.applyEditState(); }
+window.cancelEdit = function() { editing = false; window.renderTrip(); }
+
+window.applyEditState = function() {
+    document.getElementById('edit-banner').classList.toggle('open', editing);
+    document.getElementById('trip-name-display').style.display = editing ? 'none' : 'block';
+    document.getElementById('edit-trip-name').style.display = editing ? 'block' : 'none';
+    
+    document.querySelectorAll('.edit-only').forEach(el => el.style.display = editing ? 'flex' : 'none');
+    document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', editing ? 'true' : 'false'));
+    
+    document.getElementById('edit-toggle').style.display = editing ? 'none' : 'inline-flex';
+    document.getElementById('loc-list').style.borderColor = editing ? '#cbd5e1' : 'transparent';
+    document.querySelectorAll('.add-to-trip-btn').forEach(el => el.style.display = editing ? 'block' : 'none');
+}
+
+window.dragStart = function(e) { if(!editing) { e.preventDefault(); return; } draggedEl = e.currentTarget; draggedEl.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+window.dragEnd = function(e) { if(draggedEl) draggedEl.classList.remove('dragging'); document.querySelectorAll('.day-card, #loc-list').forEach(d => d.classList.remove('drag-over')); draggedEl = null; }
+window.allowDrop = function(e) { if(!editing) return; e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+window.dragLeave = function(e) { e.currentTarget.classList.remove('drag-over'); }
+window.drop = function(e) { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if(draggedEl) { if (e.currentTarget.id === 'loc-list') { e.currentTarget.appendChild(draggedEl); } else { e.currentTarget.querySelector('.day-items').appendChild(draggedEl); } } }
+
+window.addDay = function() {
+    const box = document.getElementById('itinerary-box');
+    const addBtn = box.querySelector('.add-day-btn');
+    const newDayNum = document.querySelectorAll('.day-card').length + 1;
+    
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.dataset.day = newDayNum;
+    card.setAttribute('ondragover', 'allowDrop(event)');
+    card.setAttribute('ondrop', 'drop(event)');
+    card.setAttribute('ondragleave', 'dragLeave(event)');
+    card.innerHTML = `
+        <div class="day-header">
+            <div class="day-title">${currentLang==='fr'?'Jour':'Day'} ${newDayNum}</div>
+            <div class="x-btn edit-only" style="display:flex;" onclick="removeDay(this)">✕</div>
+        </div>
+        <div class="day-items"></div>
+    `;
+    box.insertBefore(card, addBtn);
+}
+
+window.removeDay = function(btn) {
+    if(!confirm(currentLang === 'fr' ? "Supprimer ce jour ? Ses lieux retourneront dans les non-assignés." : "Delete this day? Locations will return to unassigned.")) return;
+    const card = btn.closest('.day-card');
+    const items = card.querySelectorAll('.day-loc');
+    const locList = document.getElementById('loc-list');
+    items.forEach(i => locList.appendChild(i)); 
+    card.remove();
+    
+    document.querySelectorAll('.day-card').forEach((c, index) => {
+        c.dataset.day = index + 1;
+        c.querySelector('.day-title').textContent = `${currentLang==='fr'?'Jour':'Day'} ${index + 1}`;
+    });
+}
+
+window.removeFromTrip = function(btn, locId) {
+    if(!confirm(currentLang === 'fr' ? "Retirer ce lieu du voyage ?" : "Remove this location from the trip?")) return;
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    wList = wList.filter(w => w.id !== locId || w.tripId !== currentTrip.id);
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    btn.closest('.day-loc').remove();
+    window.saveTrip(false);
+}
+
+window.quickAddLoc = function(locId) {
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    if(!wList.some(w => w.id === locId && w.tripId === currentTrip.id)) {
+        wList.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
+        localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+        window.saveTrip(false); 
+    }
+}
+
+window.saveTrip = function(exitEdit = true) {
+    currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
+    
+    const type = document.getElementById('trip-duration-type').value;
+    currentTrip.dateType = type;
+    if(type === 'duration') {
+        currentTrip.duration = document.getElementById('duration-length').value;
+    } else {
+        currentTrip.startDate = document.getElementById('date-start').value;
+        currentTrip.endDate = document.getElementById('date-end').value;
+    }
+    
+    const newDays = [];
+    document.querySelectorAll('.day-card').forEach(card => {
+        const ids = [];
+        card.querySelectorAll('.day-loc').forEach(locEl => { ids.push(parseInt(locEl.dataset.id)); });
+        newDays.push(ids);
+    });
+    currentTrip.days = newDays;
+    
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
+    if(tripIndex !== -1) trips[tripIndex] = currentTrip;
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+    
+    if (exitEdit) { editing = false; window.renderTrip(); } 
+    else { window.renderTrip(); }
+}
+
+window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
+window.closeAddModal = function() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-search').value = ""; }
+
+window.filterAddModal = function() {
+    const query = document.getElementById('add-search').value.toLowerCase();
+    const list = document.getElementById('add-modal-list');
+    list.innerHTML = '';
+    
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let tripLocIds = wList.filter(w => w.tripId === currentTrip.id).map(w => w.id);
+    
+    celebLocations.forEach(loc => {
+        if (!tripLocIds.includes(loc.id)) {
+            if(loc.name.toLowerCase().includes(query) || loc.city.toLowerCase().includes(query) || loc.category.toLowerCase().includes(query)) {
+                list.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #e2e8f0;">
+                        <div>
+                            <div style="font-weight:700; font-size:13px; color:#212832;">${loc.name}</div>
+                            <div style="font-size:11px; color:#64748b;">${loc.city}, ${loc.country} &middot; ${loc.category}</div>
+                        </div>
+                        <button onclick="quickAddLoc(${loc.id}); this.textContent='Added'; this.disabled=true; this.style.background='#e2e8f0';" style="background:#D42759; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:11px; cursor:pointer;">+ Add</button>
+                    </div>
+                `;
+            }
+        }
+    });
+}
+
+window.createNewTripEmpty = function() {
+    const nameInput = document.getElementById('create-trip-name');
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    const newTripId = 'trip-' + Date.now();
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    trips.push({ id: newTripId, name: name, dateType: 'duration', duration: 'Flexible', days: [] });
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+
+    document.getElementById('add-trip-modal').classList.add('hidden');
+    nameInput.value = '';
+    
+    window.loadTripsSidebar(); 
+    document.getElementById('active-trip-select').value = newTripId;
+    window.switchTrip(); 
+}
