@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen To Street — My Trips</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="welcome-style.css">
+<style>
+  * {box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+  a {text-decoration:none;}
+  body {background:#E7E9EC; min-height: 100vh;}
+  .hidden { display: none !important; }
+
+  /* HEADER IDENTIQUE A LA CARTE */
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 30px 6%; position: relative; z-index: 10; width: 100%; }
+
+  /* CONTENEUR PRINCIPAL */
+  .trips-container { padding: 20px 0 100px 0; }
+  .lab {text-align:center;color:#D42759;font-size:24px;font-weight:700;margin-bottom:6px;}
+  .lab-sub {text-align:center;color:#64748b;font-size:13px;margin-bottom:36px;}
+  
+  .frame {width:700px;max-width:96vw;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(80,60,120,.08);background:#fff;padding:32px 36px;}
+
+  .trip-head {display:flex;justify-content:space-between;align-items:center;}
+  .trip-name {font-size:20px;font-weight:700;color:#212832;}
+  .trip-dates {font-size:12px;color:#94a3b8;margin-top:3px;}
+
+  .gen-btn {
+    display:inline-flex;align-items:center;gap:7px;background:#D42759;color:#fff;font-size:12px;font-weight:700;
+    padding:9px 16px;border-radius:100px;box-shadow:0 8px 18px rgba(212,39,89,.22);white-space:nowrap;cursor:pointer;
+    border:none;font-family:'Poppins',sans-serif; transition: 0.2s;
+  }
+  .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(212,39,89,.35); }
+  .gen-btn.ghost {background:transparent;color:#D42759;border:1.5px solid #D42759;box-shadow:none;}
+  .gen-btn.ghost:hover { background:#FCE7F0; }
+
+  .section-label {font-size:10.5px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 12px 0;}
+
+  /* LIEUX SAUVEGARDÉS */
+  .loc-row {display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;}
+  .loc-row:last-child {border-bottom:none;}
+  .loc-thumb {width:44px;height:44px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0;}
+  .loc-name {font-size:13px;font-weight:700;color:#212832;}
+  .loc-meta {font-size:11px;color:#94a3b8;}
+
+  /* BANDEAU D'EDITION */
+  .edit-banner {display:none;background:#FCE7F0;border:1px dashed #D42759;border-radius:14px;padding:18px;margin-top:20px;}
+  .edit-banner.open {display:block;}
+  .edit-tag {font-size:11.5px;font-weight:700;color:#D42759;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+  .date-inputs {display:flex;gap:8px;}
+  .date-inputs input {flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Poppins',sans-serif;}
+  .date-inputs input:focus {outline:none;border-color:#D42759;}
+
+  .x-btn {cursor:pointer;padding:4px;flex-shrink:0; font-size: 14px; font-weight: bold; color: #94a3b8; transition: 0.2s;}
+  .x-btn:hover { color: #D42759; }
+  .add-locs-link {display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#D42759;margin-top:16px;cursor:pointer;background:none;border:none;font-family:'Poppins',sans-serif;padding:0;}
+
+  /* ITINÉRAIRE MODULABLE (DRAG & DROP) */
+  .itinerary-box {background:#faf9fc;border:1px solid #e2e8f0; border-radius:16px;padding:20px;margin-top:10px;}
+  .day-card {background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:14px;transition:border-color .2s, background .2s;}
+  .day-card:last-child {margin-bottom:0;}
+  .day-card.drag-over {border-color:#D42759;background:#FCE7F0;}
+  .day-title {font-size:12.5px;font-weight:700;color:#D42759;margin-bottom:12px;}
+  .day-items {min-height:20px;}
+  
+  .day-loc {
+    display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:#334155;padding:10px 12px;border-radius:8px;
+    background:#fff;border:1px solid #e2e8f0;margin-bottom:8px;cursor:grab; transition: box-shadow 0.2s;
+  }
+  .day-loc:last-child {margin-bottom:0;}
+  .day-loc:active {cursor:grabbing;}
+  .day-loc.dragging {opacity:.4; background: #f8fafc;}
+  .day-loc:not([draggable="true"]) {cursor:default;}
+  .drag-handle {color:#cbd5e1;flex-shrink:0;}
+  .day-loc .x-btn {margin-left:auto;}
+
+  .add-day-btn {
+    display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px dashed #cbd5e1;border-radius:12px;
+    padding:12px;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;background:#fff;font-family:'Poppins',sans-serif;width:100%; transition: 0.2s;
+  }
+  .add-day-btn:hover { border-color: #D42759; color: #D42759; }
+
+  .save-row {display:flex;gap:10px;margin-top:20px;}
+  .save-row .gen-btn {flex:1;justify-content:center; padding: 12px;}
+</style>
+</head>
+<body>
+
+<!-- Header (Identique à la carte) -->
+<div class="nav">
+    <a href="map.html" class="brand">
+        <svg class="pin" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
+        <span>Screen To <b style="color: #D42759;">Street</b></span>
+    </a>
+    <div class="nav-right">
+        <a class="nav-link" href="map-destinations.html">Destinations</a>
+        <a class="nav-link" href="map-artists.html">Artists</a>
+        <div class="nav-actions">
+            <a href="map.html" class="login-btn-v5" style="background:#fff; color:#2E3644; border:1px solid #cbd5e1;">Back to Map</a>
+        </div>
+    </div>
+</div>
+
+<div class="trips-container">
+    <div class="lab" id="page-title">Screen To Street — My Trips</div>
+    <div class="lab-sub" data-i18n="tripSub">Clique sur "Edit trip" pour ouvrir le bandeau, puis fais glisser les lieux d'un jour à l'autre.</div>
+
+    <div class="frame">
+        <div class="page">
+            <div class="trip-head">
+                <div>
+                    <div class="trip-name" id="trip-name-display">Korea trip</div>
+                    <div class="trip-dates" id="dates-display">March – April 2027 · 3 locations</div>
+                </div>
+                <button class="gen-btn" id="edit-toggle" onclick="toggleEdit()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    Edit trip
+                </button>
+            </div>
+
+            <div class="edit-banner" id="edit-banner">
+                <div class="edit-tag">✏️ Editing this trip</div>
+                <div class="section-label" style="margin-top:0;">Trip dates</div>
+                <div class="date-inputs">
+                    <input type="text" id="date-start" value="March 2027">
+                    <input type="text" id="date-end" value="April 2027">
+                </div>
+            </div>
+
+            <div class="section-label" id="saved-locs-label">Saved locations (3)</div>
+            <div id="loc-list">
+                <!-- Lieux générés ici -->
+                <div class="loc-row">
+                    <div class="loc-thumb" style="background-image:url('https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg');"></div>
+                    <div style="flex:1;"><div class="loc-name">In the SOOP Estate</div><div class="loc-meta">Chuncheon, South Korea</div></div>
+                    <div class="x-btn edit-only" style="display:none;">✕</div>
+                </div>
+                <div class="loc-row">
+                    <div class="loc-thumb" style="background-image:url('https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg');"></div>
+                    <div style="flex:1;"><div class="loc-name">Cafe Camptong</div><div class="loc-meta">Seoul, South Korea</div></div>
+                    <div class="x-btn edit-only" style="display:none;">✕</div>
+                </div>
+                <div class="loc-row">
+                    <div class="loc-thumb" style="background-image:url('https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg');"></div>
+                    <div style="flex:1;"><div class="loc-name">Lotte World Adventure</div><div class="loc-meta">Seoul, South Korea</div></div>
+                    <div class="x-btn edit-only" style="display:none;">✕</div>
+                </div>
+            </div>
+            
+            <button class="add-locs-link edit-only" style="display:none;" onclick="window.location.href='map.html'">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                Find more locations on Map
+            </button>
+
+            <div class="section-label">Your itinerary</div>
+            <div class="itinerary-box" id="itinerary-box">
+                <div class="day-card" data-day="1" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
+                    <div class="day-title">Day 1 — Chuncheon</div>
+                    <div class="day-items" id="day-1-items">
+                        <div class="day-loc" draggable="false" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+                            <span class="drag-handle">⠿</span>In the SOOP Estate
+                            <span class="x-btn edit-only" style="display:none;" onclick="this.parentElement.remove()">✕</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="day-card" data-day="2" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
+                    <div class="day-title">Day 2 — Seoul</div>
+                    <div class="day-items" id="day-2-items">
+                        <div class="day-loc" draggable="false" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+                            <span class="drag-handle">⠿</span>Cafe Camptong
+                            <span class="x-btn edit-only" style="display:none;" onclick="this.parentElement.remove()">✕</span>
+                        </div>
+                        <div class="day-loc" draggable="false" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+                            <span class="drag-handle">⠿</span>Lotte World Adventure
+                            <span class="x-btn edit-only" style="display:none;" onclick="this.parentElement.remove()">✕</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-day-btn edit-only" style="display:none;" onclick="addDay()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                    Add an empty day
+                </button>
+            </div>
+
+            <div class="save-row edit-only" style="display:none;">
+                <button class="gen-btn ghost" onclick="toggleEdit()">Cancel</button>
+                <button class="gen-btn" onclick="toggleEdit()">Save changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+let editing = false;
+let dayCount = 2;
+
+function toggleEdit() {
+    editing = !editing;
+    document.getElementById('edit-banner').classList.toggle('open', editing);
+    document.querySelectorAll('.edit-only').forEach(el => el.style.display = editing ? 'flex' : 'none');
+    document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', editing ? 'true' : 'false'));
+    
+    document.getElementById('edit-toggle').innerHTML = editing
+        ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Editing…`
+        : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit trip`;
+
+    if (!editing) {
+        // Enregistre visuellement
+        const total = document.querySelectorAll('.day-loc').length;
+        document.getElementById('dates-display').textContent = `${document.getElementById('date-start').value} – ${document.getElementById('date-end').value} · ${total} locations`;
+    }
+}
+
+let draggedEl = null;
+
+function dragStart(e) {
+    if (!editing) { e.preventDefault(); return; }
+    draggedEl = e.target.closest('.day-loc');
+    draggedEl.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+}
+function dragEnd(e) {
+    if (draggedEl) draggedEl.classList.remove('dragging');
+    document.querySelectorAll('.day-card').forEach(d => d.classList.remove('drag-over'));
+    draggedEl = null;
+}
+function allowDrop(e) {
+    if (!editing) return;
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+}
+function dragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+function drop(e) {
+    e.preventDefault();
+    const dayCard = e.currentTarget;
+    dayCard.classList.remove('drag-over');
+    if (draggedEl) {
+        dayCard.querySelector('.day-items').appendChild(draggedEl);
+    }
+}
+
+function addDay() {
+    dayCount++;
+    const box = document.getElementById('itinerary-box');
+    const addBtn = document.querySelector('.add-day-btn');
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.dataset.day = dayCount;
+    card.setAttribute('ondragover', 'allowDrop(event)');
+    card.setAttribute('ondrop', 'drop(event)');
+    card.setAttribute('ondragleave', 'dragLeave(event)');
+    card.innerHTML = `<div class="day-title">Day ${dayCount}</div><div class="day-items" id="day-${dayCount}-items"></div>`;
+    box.insertBefore(card, addBtn);
+}
+
+// LOGIQUE POUR CHARGER LE VRAI VOYAGE DEPUIS LOCALSTORAGE
+document.addEventListener('DOMContentLoaded', () => {
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    if(trips.length > 0) {
+        // Prend le dernier voyage créé comme exemple dynamique
+        let latestTrip = trips[trips.length - 1];
+        document.getElementById('trip-name-display').textContent = latestTrip.name;
+        document.getElementById('page-title').textContent = "Screen To Street — " + latestTrip.name;
+    }
+    
+    // Traduction simple
+    if(localStorage.getItem('lang') === 'fr') {
+        document.querySelector('.lab-sub').textContent = "Cliquez sur 'Edit trip' pour ouvrir le mode édition, puis faites glisser les lieux.";
+    }
+});
+</script>
+
+</body>
+</html>
