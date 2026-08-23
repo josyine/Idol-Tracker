@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION ROBUSTE DE L'APPLICATION
+// 1. INITIALISATION DE L'APPLICATION
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -8,8 +8,15 @@ let currentLocationIdForMemory = null;
 let currentGeneratedItinerary = [];
 let currentLang = localStorage.getItem('lang') || 'en';
 
+// Variables globales pour trips.html
+let myTrips = [];
+let wishlistLocs = [];
+let currentTrip = null;
+let editing = false;
+let draggedEl = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialise la carte Uniquement si l'élément "map" est présent 
+    // Si la page contient une carte Leaflet (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -30,63 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Gestion du menu mobile
-    window.toggleMobileMenu = function() {
-        const sidebar = document.getElementById('app-sidebar');
-        if (sidebar) {
-            sidebar.classList.toggle('open');
-            if (!sidebar.classList.contains('open')) sidebar.classList.remove('expanded');
-        }
-    };
-
-    // Boutons communs
-    ['lang-btn', 'profile-btn'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) btn.addEventListener('click', (e) => {
-            const menuId = id.replace('-btn', '-menu');
-            document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
-            document.getElementById(menuId).classList.toggle('hidden');
-            e.stopPropagation();
-        });
-    });
-
-    document.addEventListener('click', () => { 
-        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
-    });
-
-    const profileBtn = document.getElementById('profile-btn');
-    if (profileBtn) {
-        const savedName = localStorage.getItem('userName') || 'U';
-        profileBtn.textContent = savedName.charAt(0).toUpperCase();
-    }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            const target = document.getElementById('tab-' + btn.dataset.tab);
-            if(target) target.classList.add('active');
-        });
-    });
-
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('unlockedGroups');
-            window.location.href = 'index.html';
-        });
-    }
-
-    const btnShowLocs = document.getElementById('btn-show-locations');
-    if (btnShowLocs) btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); });
-    const btnShowCountries = document.getElementById('btn-show-countries');
-    if (btnShowCountries) btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); });
-
-    // Initialisation
+    // Lance la logique UI (Filtres, Trips, etc.)
     updateUI();
 });
 
@@ -120,144 +71,84 @@ let celebLocations = [
         id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020",
         episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0",
         address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", 
-        fullDescription: { 
-            en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p><h4>When a cafe becomes an obstacle course</h4><p>The multi-story building offered industrial aesthetics, open lounges, and maze-like corners which the production team weaponized into hideouts for hundreds of hidden sticky notes.</p><div class="quote">"If we find the golden note here, we're taking all the credit!" — RM</div><h4>Legacy</h4><p>Although the venue has closed, ARMYs still make pilgrimages to the building facade to retrace the members' running paths across Apgujeong.</p>`, 
-            fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p><h4>Quand un café devient un parcours d'obstacles</h4><p>Ce bâtiment à plusieurs niveaux offrait des espaces industriels et des recoins labyrinthiques parfaits pour cacher des centaines de post-it.</p><div class="quote">"Si on trouve le post-it doré ici, on prend tout le mérite !" — RM</div><h4>Héritage</h4><p>Bien que le lieu ait fermé, les ARMY continuent de visiter la façade pour revivre les courses effrénées des membres.</p>` 
-        },
-        tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." },
-        directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station (Exit 5).", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo (Sortie 5)." }
+        fullDescription: { en: `<p>Located in Apgujeong, Cafe Camptong served as the sprawling backdrop for Run BTS.</p>`, fr: `<p>Situé à Apgujeong, le Cafe Camptong a servi de décor pour Run BTS.</p>` },
+        tip: { en: "The building facade remains a landmark.", fr: "La façade reste un repère historique." },
+        directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." }
     },
     {
         id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1",
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
-        fullDescription: { 
-            en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business alongside his brother.</p><h4>Traditional Steamed Delights</h4><p>Specializing in seiromushi—traditional Japanese wood-steamed dishes—the restaurant pairs high-end cuts of meat and fresh vegetables with an intimate interior design.</p>`, 
-            fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration aux côtés de son frère.</p><h4>Cuisine vapeur traditionnelle</h4><p>Spécialisé dans le seiromushi, le restaurant propose des viandes et légumes frais dans un cadre intime.</p>` 
-        },
-        tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." },
-        directions: { en: "Take Line 8 or Line 9 to Songpanaru Station (Exit 1).", fr: "Prenez la ligne 8 ou 9 jusqu'à Songpanaru (Sortie 1)." }
+        fullDescription: { en: `<p>Ossu Seiromushi represents Jin's venture into culinary business.</p>`, fr: `<p>Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` },
+        tip: { en: "Arrive early to secure a spot.", fr: "Arrivez tôt pour être sur la liste." },
+        directions: { en: "Line 8 to Songpanaru Station.", fr: "Ligne 8 jusqu'à Songpanaru." }
     },
     {
-        id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", episodeLink: "https://www.youtube.com/watch?v=d--MDCCJ3jg", ytId: "d--MDCCJ3jg",
-        address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
-        fullDescription: { en: `<p>Lotte World is the world's largest indoor amusement park, providing an epic playground for Run BTS Episode 51.</p><h4>Privatized Thrills</h4><p>The group rented out the park after hours, screaming their way through the Gyro Drop and the iconic pirate ship.</p>`, fr: `<p>Lotte World est le plus grand parc d'attractions couvert au monde, servant de terrain de jeu épique pour l'épisode 51 de Run BTS.</p><h4>Sensations privatisées</h4><p>Le groupe a privatisé le parc pour affronter les manèges mythiques.</p>` },
-        tip: { en: "Wear animal headbands just like they did!", fr: "Portez des serre-têtes d'animaux comme eux !" },
-        directions: { en: "Take Line 2 or 8 to Jamsil Station.", fr: "Ligne 2 ou 8 jusqu'à Jamsil." }
+        id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", ytId: "d--MDCCJ3jg",
+        address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg"
     },
     {
-        id: 4, name: "Ahwon Museum & Hotel", group: "BTS", member: "All", country: "South Korea", city: "Wanju", category: "Museums", year: "2019", episode: "Summer Package", episodeLink: "https://www.youtube.com/watch?v=h1jUtpEzxxA", ytId: "h1jUtpEzxxA",
-        address: "516-7 Songgwangsuman-ro", lat: 35.8455, lng: 127.1895, img: "https://img.youtube.com/vi/h1jUtpEzxxA/hqdefault.jpg",
-        fullDescription: { en: `<p>A stunning blend of modern concrete art galleries and 250-year-old traditional Korean hanok architecture.</p>`, fr: `<p>Un mélange saisissant de galeries d'art modernes en béton et de maisons traditionnelles coréennes de 250 ans.</p>` },
-        tip: { en: "Operates as a cafe and gallery during the day.", fr: "Ouvert en journée comme galerie et café." },
-        directions: { en: "Taxi from Jeonju Station.", fr: "Taxi depuis la gare de Jeonju." }
+        id: 4, name: "Ahwon Museum & Hotel", group: "BTS", member: "All", country: "South Korea", city: "Wanju", category: "Museums", year: "2019", ytId: "h1jUtpEzxxA",
+        address: "516-7 Songgwangsuman-ro", lat: 35.8455, lng: 127.1895, img: "https://img.youtube.com/vi/h1jUtpEzxxA/hqdefault.jpg"
     },
     {
         id: 5, name: "Cafe Kitsuné Seoul", group: "Blackpink", member: "Jennie", country: "South Korea", city: "Seoul", category: "Cafe", year: "2021", ytId: "Kitsune1",
-        address: "23 Dosan-daero 13-gil", lat: 37.5197, lng: 127.0229, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600",
-        fullDescription: { en: `<p>A chic French-Japanese aesthetic cafe located in the heart of Garosu-gil.</p>`, fr: `<p>Un café chic à l'esthétique franco-japonaise situé au cœur de Garosu-gil.</p>` },
-        tip: { en: "Great spot for fashion lovers.", fr: "Super endroit pour les amateurs de mode." },
-        directions: { en: "Line 3 to Sinsa Station (Exit 8).", fr: "Ligne 3 jusqu'à Sinsa (Sortie 8)." }
+        address: "23 Dosan-daero 13-gil", lat: 37.5197, lng: 127.0229, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600"
     },
     {
         id: 6, name: "Pozzetto", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Cafe", year: "2019", ytId: "Pozzetto1",
-        address: "39 Rue du Roi de Sicile, Paris", lat: 48.8569, lng: 2.3572, img: "https://images.unsplash.com/photo-1557142046-c704a3adf365?w=600",
-        fullDescription: { en: `<p>High-end Italian artisan gelato in the Marais district.</p>`, fr: `<p>Glacier artisanal italien haut de gamme dans le Marais.</p>` },
-        tip: { en: "Try the pistachio flavor!", fr: "Goûtez la pistache !" },
-        directions: { en: "Metro Hôtel de Ville.", fr: "Métro Hôtel de Ville." }
+        address: "39 Rue du Roi de Sicile, Paris", lat: 48.8569, lng: 2.3572, img: "https://images.unsplash.com/photo-1557142046-c704a3adf365?w=600"
     },
     {
-        id: 7, name: "Musée Nissim de Camondo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Fashion", year: "2026", episode: "Dior Show", episodeLink: "https://www.youtube.com/watch?v=1TdxCtgX53w", ytId: "1TdxCtgX53w",
-        address: "63 Rue de Monceau, Paris", lat: 48.8795, lng: 2.3117, img: "https://img.youtube.com/vi/1TdxCtgX53w/hqdefault.jpg",
-        fullDescription: { en: `<p>A spectacular private mansion chosen by Dior for its Fashion Week presentation.</p>`, fr: `<p>Hôtel particulier spectaculaire choisi par Dior pour sa Fashion Week.</p>` },
-        tip: { en: "Open to the public as a museum.", fr: "Ouvert au public comme musée." },
-        directions: { en: "Metro Monceau.", fr: "Métro Monceau." }
+        id: 7, name: "Musée Nissim de Camondo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Fashion", year: "2026", ytId: "1TdxCtgX53w",
+        address: "63 Rue de Monceau, Paris", lat: 48.8795, lng: 2.3117, img: "https://img.youtube.com/vi/1TdxCtgX53w/hqdefault.jpg"
     },
     {
         id: 8, name: "Montmartre Stairs", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "Montmartre1",
-        address: "Rue Foyatier, Paris", lat: 48.8856, lng: 2.3432, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
-        fullDescription: { en: `<p>Steep, picturesque stairs in the historic Montmartre district.</p>`, fr: `<p>Escaliers pittoresques dans le quartier historique de Montmartre.</p>` },
-        tip: { en: "Visit early morning.", fr: "Visitez tôt le matin." },
-        directions: { en: "Metro Anvers.", fr: "Métro Anvers." }
+        address: "Rue Foyatier, Paris", lat: 48.8856, lng: 2.3432, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600"
     },
     {
         id: 9, name: "Wall of Love", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "WallOfLove1",
-        address: "Square Jehan Rictus, Paris", lat: 48.8848, lng: 2.3386, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
-        fullDescription: { en: `<p>Features 'I love you' in 250 languages.</p>`, fr: `<p>Affiche 'Je t'aime' en 250 langues.</p>` },
-        tip: { en: "Located in Abbesses.", fr: "Situé à Abbesses." },
-        directions: { en: "Metro Abbesses.", fr: "Métro Abbesses." }
+        address: "Square Jehan Rictus, Paris", lat: 48.8848, lng: 2.3386, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600"
     },
     {
         id: 10, name: "Palais de Tokyo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Museums", year: "2023", ytId: "PalaisTokyo1",
-        address: "13 Av. du Président Wilson, Paris", lat: 48.8643, lng: 2.2965, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600",
-        fullDescription: { en: `<p>Contemporary art museum hosting major fashion events.</p>`, fr: `<p>Musée d'art contemporain accueillant des événements majeurs.</p>` },
-        tip: { en: "Great Eiffel Tower views.", fr: "Superbe vue sur la Tour Eiffel." },
-        directions: { en: "Metro Iéna.", fr: "Métro Iéna." }
+        address: "13 Av. du Président Wilson, Paris", lat: 48.8643, lng: 2.2965, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600"
     },
     {
-        id: 11, name: "Cheonggu Building", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2017", episode: "Early Debut", episodeLink: "https://www.youtube.com/watch?v=vJwHIpEogEY", ytId: "vJwHIpEogEY",
-        address: "16 Hakdong-ro 30-gil", lat: 37.5144, lng: 127.0315, img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg",
-        fullDescription: { en: `<p>The cradle of BTS's career during their rookie days.</p>`, fr: `<p>Le berceau de la carrière de BTS à leurs débuts.</p>` },
-        tip: { en: "Respect current tenants.", fr: "Respectez les locataires actuels." },
-        directions: { en: "Hakdong Station Exit 7.", fr: "Station Hakdong Sortie 7." }
+        id: 11, name: "Cheonggu Building", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2017", ytId: "vJwHIpEogEY",
+        address: "16 Hakdong-ro 30-gil", lat: 37.5144, lng: 127.0315, img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg"
     },
     {
-        id: 12, name: "The First BTS Dorm", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2015", episode: "1st Birthday", episodeLink: "https://www.youtube.com/watch?v=RhJqNFQCU_Q", ytId: "RhJqNFQCU_Q",
-        address: "29 Nonhyeon-ro 119-gil", lat: 37.5133, lng: 127.0321, img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg",
-        fullDescription: { en: `<p>Where all seven members shared a single bedroom.</p>`, fr: `<p>Où les sept membres partagaient une seule chambre.</p>` },
-        tip: { en: "Private residence, do not disturb.", fr: "Résidence privée, ne pas déranger." },
-        directions: { en: "Near Hakdong Park.", fr: "Près du parc Hakdong." }
+        id: 12, name: "The First BTS Dorm", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2015", ytId: "RhJqNFQCU_Q",
+        address: "29 Nonhyeon-ro 119-gil", lat: 37.5133, lng: 127.0321, img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg"
     },
     {
-        id: 13, name: "Hyangho Beach Bus Stop", group: "BTS", member: "All", country: "South Korea", city: "Gangneung", category: "Landmarks", year: "2017", episode: "Spring Day", episodeLink: "https://www.youtube.com/watch?v=46qWWmnK4F0", ytId: "46qWWmnK4F0",
-        address: "8-55 Hyangho-ri", lat: 37.9048, lng: 128.8266, img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg",
-        fullDescription: { en: `<p>Featured in the 'Spring Day' album jacket photos.</p>`, fr: `<p>Présent dans les photos de l'album 'Spring Day'.</p>` },
-        tip: { en: "Queue up for photos.", fr: "Faites la queue pour les photos." },
-        directions: { en: "KTX to Gangneung Station.", fr: "KTX jusqu'à Gangneung." }
+        id: 13, name: "Hyangho Beach Bus Stop", group: "BTS", member: "All", country: "South Korea", city: "Gangneung", category: "Landmarks", year: "2017", ytId: "46qWWmnK4F0",
+        address: "8-55 Hyangho-ri", lat: 37.9048, lng: 128.8266, img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg"
     },
     {
-        id: 14, name: "Iryeong Station", group: "BTS", member: "All", country: "South Korea", city: "Yangju", category: "MV Location", year: "2017", episode: "Spring Day MV", episodeLink: "https://www.youtube.com/watch?v=xEeFrLSkMm8", ytId: "xEeFrLSkMm8",
-        address: "327 Samsang-ri", lat: 37.7135, lng: 126.9329, img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg",
-        fullDescription: { en: `<p>The breathtaking opening shot where V stands in the snow.</p>`, fr: `<p>Le plan d'ouverture où V apparaît dans la neige.</p>` },
-        tip: { en: "Watch out for active tracks.", fr: "Attention aux voies de train." },
-        directions: { en: "Bus 360 from Yeonsinnae.", fr: "Bus 360 depuis Yeonsinnae." }
+        id: 14, name: "Iryeong Station", group: "BTS", member: "All", country: "South Korea", city: "Yangju", category: "MV Location", year: "2017", ytId: "xEeFrLSkMm8",
+        address: "327 Samsang-ri", lat: 37.7135, lng: 126.9329, img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg"
     },
     {
-        id: 15, name: "Quinta da Francelha de Cima", group: "BTS", member: "All", country: "Portugal", city: "Prior Velho", category: "MV Location", year: "2026", episode: "NORMAL MV", episodeLink: "https://www.youtube.com/watch?v=GEk4jHwfFTA", ytId: "GEk4jHwfFTA",
-        address: "R. da Francelha de Cima", lat: 38.7844, lng: -9.1238, img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg",
-        fullDescription: { en: `<p>An 18th-century historic estate chosen for cinematic music videos.</p>`, fr: `<p>Domaine historique du 18e siècle choisi pour des clips.</p>` },
-        tip: { en: "Close to Lisbon Airport.", fr: "Près de l'aéroport de Lisbonne." },
-        directions: { en: "Taxi from Airport.", fr: "Taxi depuis l'aéroport." }
+        id: 15, name: "Quinta da Francelha de Cima", group: "BTS", member: "All", country: "Portugal", city: "Prior Velho", category: "MV Location", year: "2026", ytId: "GEk4jHwfFTA",
+        address: "R. da Francelha de Cima", lat: 38.7844, lng: -9.1238, img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg"
     },
     {
-        id: 16, name: "Sunhyewon", group: "BTS", member: "All", country: "South Korea", city: "Seoul Area", category: "MV Location", year: "2026", episode: "NORMAL Live", episodeLink: "https://www.youtube.com/watch?v=Hb06Iem3FWg", ytId: "Hb06Iem3FWg",
-        address: "Sunhyewon Estate", lat: 37.5826, lng: 126.9856, img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg",
-        fullDescription: { en: `<p>Traditional Korean architectural estate blending living quarters with nature.</p>`, fr: `<p>Domaine architectural traditionnel coréen mêlant nature et habitat.</p>` },
-        tip: { en: "Remove footwear on platforms.", fr: "Retirez vos chaussures." },
-        directions: { en: "Commuter rail & local bus.", fr: "Train et bus local." }
+        id: 16, name: "Sunhyewon", group: "BTS", member: "All", country: "South Korea", city: "Seoul Area", category: "MV Location", year: "2026", ytId: "Hb06Iem3FWg",
+        address: "Sunhyewon Estate", lat: 37.5826, lng: 126.9856, img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg"
     },
     {
-        id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "MV Location", year: "2026", episode: "Swim MV", episodeLink: "https://www.youtube.com/watch?v=b4iVv91Z6lY", ytId: "b4iVv91Z6lY",
-        address: "Praça do Império, Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg",
-        fullDescription: { en: `<p>Displays over 17,000 historical nautical items in Belém.</p>`, fr: `<p>Expose plus de 17 000 objets historiques à Belém.</p>` },
-        tip: { en: "Visit Pastéis de Belém nearby.", fr: "Goûtez les pasteis de Belém." },
-        directions: { en: "Tram 15E.", fr: "Tram 15E." }
+        id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "MV Location", year: "2026", ytId: "b4iVv91Z6lY",
+        address: "Praça do Império, Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg"
     },
     {
-        id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", episode: "Season 2", episodeLink: "https://www.youtube.com/watch?v=6qB8Nb_WO_Y", ytId: "6qB8Nb_WO_Y",
-        address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg",
-        fullDescription: { 
-            en: `<p class="drop">Hidden deep within the pine-covered mountains above Chuncheon, roughly two hours east of Seoul, sits one of the most talked-about addresses in the entire BTS fandom — a estate that doesn't appear on any tourist map, yet has been watched by tens of millions of people around the world. This is the house from <b>In the SOOP: Friendcation</b> and <b>In the SOOP BTS ver. Season 2</b>, the healing reality show built entirely around the idea of doing nothing at all.</p><h4>A house built for a show, not the other way around</h4><p>Unlike most filming locations that fans track down after the fact, this estate was never a pre-existing building the production simply rented. HYBE worked with local architects and builders in Gangwon-do to construct the space specifically for the "In the SOOP" concept: a cluster of wood-and-glass pavilions connected by open decks, a lake close enough to fish from the porch, and just enough distance between each member's private cabin to give the group room to breathe between group scenes. Every camera angle you remember from the show — the hammock by the water, the outdoor kitchen, the long wooden table where the members shared meals — was designed with filming in mind from day one.</p><h4>Why fans can't just show up</h4><p>Because the estate remains a working set and a privately operated retreat, walking up to the gate isn't an option. Since 2022, the only legitimate way to set foot on the grounds is through the official "In the SOOP Stay" package, operated in partnership with Phoenix Pyeongchang. The package recreates elements of the show's atmosphere for guests — think slow mornings, mountain air, and the same silence that made the members fall in love with the place — without pretending to be BTS's actual set piece by piece.</p><div class="quote">"We didn't want a place to relax in — we wanted a place where doing nothing felt like enough." — a sentiment the members echoed across several episodes of Season 2, describing the estate as the first time in years they didn't have anywhere to be.</div><h4>What makes this stop worth the trip</h4><p>For ARMY, the appeal isn't really the architecture — it's the contrast. This is one of the few BTS-linked locations that was built <i>for</i> the members rather than simply visited by them, which makes it feel less like a photo-op and more like a piece of the group's actual story. Combined with the surrounding Gangwon-do scenery — misty ridgelines, quiet back roads, and Chuncheon's lakeside calm — it's an easy case for the most atmospheric entry on this map, even if you can only experience it through the curated stay rather than the real cabins.</p>`, 
-            fr: `<p class="drop">Caché au cœur des montagnes de Chuncheon, à l'est de Séoul, se trouve l'un des lieux les plus célèbres du fandom de BTS — un domaine qui n'apparaît sur aucune carte touristique, mais qui a été visionné par des dizaines de millions de personnes. C'est la maison d'<b>In the SOOP</b>.</p><h4>Une maison construite pour l'émission</h4><p>Contrairement aux lieux de tournage classiques, HYBE a fait construire ce domaine sur mesure avec des architectes locaux pour les besoins de l'émission : des pavillons en bois et verre reliés par des pontons, un lac poissonneux et des cabanes individuelles.</p><div class="quote">"On ne voulait pas d'un simple lieu de repos, on voulait un endroit où ne rien faire suffisait." — BTS</div><h4>Pourquoi on ne peut pas y accéder librement</h4><p>Le site étant un lieu privé protégé, il faut réserver le forfait officiel "In the SOOP Stay" via Phoenix Pyeongchang pour y séjourner.</p>` 
-        },
-        tip: { en: "You cannot drive there yourself. You must book the official 'In the SOOP Stay' package through Phoenix Pyeongchang.", fr: "Vous ne pouvez pas vous y rendre par vous-même. Vous devez réserver le tour officiel 'In the SOOP Stay' via Phoenix Pyeongchang." },
-        directions: { en: "Take the KTX to Pyeongchang Station, and hop on the official resort shuttle.", fr: "Prenez le KTX jusqu'à la gare de Pyeongchang, puis montez dans la navette officielle." }
+        id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y",
+        address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg"
     },
     {
-        id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", episode: "Season 1 Area", episodeLink: "https://www.youtube.com/watch?v=F14vk9qPRM0", ytId: "F14vk9qPRM0",
-        address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg",
-        fullDescription: { en: `<p>Offers breathtaking views of pristine Chuncheon Lake.</p>`, fr: `<p>Offre une vue imprenable sur le lac de Chuncheon.</p>` },
-        tip: { en: "Try the Hanwoo burgers.", fr: "Goûtez les burgers au Hanwoo." },
-        directions: { en: "Taxi from Chuncheon Station.", fr: "Taxi depuis la gare de Chuncheon." }
+        id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0",
+        address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg"
     }
 ];
 
@@ -292,14 +183,9 @@ const translations = {
 };
 
 const catTranslations = {
-    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", 
-    "Restaurants": {en: "Restaurants", fr: "Restaurants"}, 
-    "Cafe": {en: "Cafe", fr: "Café"}, 
-    "Museums": {en: "Museums", fr: "Musées"}, 
-    "MV Location": "MV Location", "Concerts": "Concerts", 
-    "Fashion": {en: "Fashion", fr: "Mode"}, 
-    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, 
-    "Pop-up Store": "Pop-up Store"
+    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", "Restaurants": {en: "Restaurants", fr: "Restaurants"}, "Cafe": {en: "Cafe", fr: "Café"}, 
+    "Museums": {en: "Museums", fr: "Musées"}, "MV Location": "MV Location", "Concerts": "Concerts", "Fashion": {en: "Fashion", fr: "Mode"}, 
+    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, "Pop-up Store": "Pop-up Store"
 };
 
 function getCatName(cat) {
@@ -327,20 +213,23 @@ function updateUI() {
         if(yearOpt) yearOpt.textContent = t('allYears');
     }
 
+    // MAP.HTML logic
     if(document.getElementById('group-select')) {
         initializeFilters();
         renderLocations();
         loadTripOptions();
     }
     
-    // Si on est sur trips.html
+    // TRIPS.HTML logic
     if(document.getElementById('trip-name-display')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
         const eAuto = document.getElementById('i18n-auto-btn'); if(eAuto) eAuto.textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
-        const eOpen = document.getElementById('i18n-open-iti'); if(eOpen) eOpen.textContent = isFr ? "Ouvrir le Générateur" : "Open Generator";
+        const eOpen = document.getElementById('i18n-open-iti'); if(eOpen) eOpen.textContent = isFr ? "Ouvrir le Générateur" : "Open Auto-Itinerary Generator";
+        const eNeed = document.getElementById('i18n-need-magic'); if(eNeed) eNeed.textContent = isFr ? "Besoin de magie ?" : "Need some magic?";
         const eAct = document.getElementById('i18n-active'); if(eAct) eAct.textContent = isFr ? "Voyage actif :" : "Active Trip :";
-        const eEdit = document.getElementById('i18n-editing'); if(eEdit) eEdit.textContent = isFr ? "Édition de ce voyage" : "Editing this trip";
+        const eEditBtn = document.getElementById('i18n-edit-btn'); if(eEditBtn) eEditBtn.textContent = isFr ? "Modifier" : "Edit trip";
+        const eEditing = document.getElementById('i18n-editing'); if(eEditing) eEditing.textContent = isFr ? "✏️ Édition de ce voyage" : "✏️ Editing this trip";
         const eDur = document.getElementById('i18n-trip-duration'); if(eDur) eDur.textContent = isFr ? "Durée & Dates" : "Trip Duration & Dates";
         const eSpec = document.getElementById('i18n-opt-specific'); if(eSpec) eSpec.textContent = isFr ? "Dates Précises" : "Specific Dates";
         const eGen = document.getElementById('i18n-opt-duration'); if(eGen) eGen.textContent = isFr ? "Durée Globale" : "General Duration";
@@ -351,8 +240,10 @@ function updateUI() {
         const eCancel = document.getElementById('i18n-cancel'); if(eCancel) eCancel.textContent = isFr ? "Annuler" : "Cancel";
         const eSave = document.getElementById('i18n-save'); if(eSave) eSave.textContent = isFr ? "Sauvegarder" : "Save changes";
         const eModAdd = document.getElementById('i18n-modal-add'); if(eModAdd) eModAdd.textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
+        const eCreateTitle = document.getElementById('i18n-create-title'); if(eCreateTitle) eCreateTitle.textContent = isFr ? "Créer un nouveau voyage" : "Create a new trip";
+        const eBtnCreate = document.getElementById('i18n-btn-create'); if(eBtnCreate) eBtnCreate.textContent = isFr ? "Créer" : "Create";
         
-        if(typeof window.loadTripsSidebar === 'function') window.loadTripsSidebar();
+        if(typeof window.initTrips === 'function') window.initTrips();
     }
 }
 
@@ -412,13 +303,23 @@ function initializeFilters() {
     }
 
     // Init ITI Generator Selectors (in trips.html or map.html)
+    initItineraryGenerator();
+}
+
+// Fonction utilitaire pour le générateur d'itinéraire (appelé aussi bien dans Map que dans Trips)
+window.initItineraryGenerator = function() {
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
+    if(unlockedGroups.length === 0) availableLocs = celebLocations;
+    
     const gSelectIti = document.getElementById('iti-group');
     const cSelectIti = document.getElementById('iti-country');
     if(gSelectIti && gSelectIti.options.length === 0) {
+        const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
         availableGroups.forEach(g => gSelectIti.innerHTML += `<option value="${g}">${g}</option>`);
         [...new Set(availableLocs.map(l => l.country))].sort().forEach(c => cSelectIti.innerHTML += `<option value="${c}">${c}</option>`);
     }
-}
+};
 
 // ==========================================
 // 5. AFFICHAGE DES LIEUX (CARTE)
@@ -753,7 +654,6 @@ window.openDetailsPanel = function(id) {
     setTimeout(() => { if(map) map.invalidateSize(); }, 450);
 };
 
-// GESTION DES ÉTOILES (TIROIR SOUVENIR)
 window.setStars = function(val) {
     const memoryRatingVal = document.getElementById('memory-rating-val');
     if(!memoryRatingVal) return;
@@ -899,8 +799,8 @@ window.generateItinerary = function() {
     
     resultDiv.innerHTML = "";
     
-    // CORRECTION : S'il y a 3 lieux et 3 jours, on fait 1 lieu par jour. Math.max(1, ceil) garantit un minimum
-    const locsPerDay = Math.max(1, Math.ceil(validLocs.length / days));
+    // Rétabli comme à l'origine (Math.ceil)
+    const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     currentGeneratedItinerary = [];
     
@@ -1030,11 +930,11 @@ window.saveItineraryToTrips = function() {
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
 
-    if(window.location.pathname.includes('trips.html')) {
+    if(document.getElementById('trip-name-display')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
-        window.loadTripsSidebar();
-        document.getElementById('active-trip-select').value = newTripId;
-        window.switchTrip();
+        window.initTrips();
+        const sel = document.getElementById('active-trip-select');
+        if(sel) { sel.value = newTripId; window.switchTrip(); }
     } else {
         window.location.href = 'trips.html';
     }
@@ -1054,179 +954,64 @@ window.exportItineraryPDF = function() {
 };
 
 // ==========================================
-// 9. MODAL PANIER DEPUIS LA CARTE
-// ==========================================
-window.openCartModal = function() {
-    const modal = document.getElementById('cart-modal');
-    if(!modal) return;
-    modal.classList.remove('hidden');
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    document.querySelectorAll('.cart-checkbox').forEach(cb => {
-        cb.checked = false; 
-        const span = cb.nextElementSibling;
-        if(unlockedGroups.includes(cb.value)) { cb.disabled = true; span.style.background = "#f1f5f9"; span.style.color = "#94a3b8"; span.textContent = `${cb.value} (Purchased)`; }
-        else { cb.disabled = false; span.style.background = "white"; span.style.color = "#64748b"; span.textContent = cb.value; }
-    });
-    updateCartPrice();
-}
-
-function updateCartPrice() {
-    const selected = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
-    const priceDisplay = document.getElementById('cart-price');
-    if(priceDisplay) priceDisplay.textContent = `${(selected * 14.99).toFixed(2)} €`;
-    const btn = document.getElementById('cart-pay-btn');
-    if(btn) {
-        if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; } 
-        else { btn.disabled = true; btn.textContent = `Select a group`; }
-    }
-}
-
-document.querySelectorAll('.cart-checkbox').forEach(cb => {
-    cb.addEventListener('change', function() {
-        this.nextElementSibling.style.borderColor = this.checked ? "#D42759" : "#cbd5e1";
-        this.nextElementSibling.style.color = this.checked ? "#D42759" : "#64748b";
-        this.nextElementSibling.style.background = this.checked ? "#FCE7F0" : "white";
-        updateCartPrice();
-    });
-});
-
-const cartForm = document.getElementById('cart-form');
-if(cartForm) {
-    cartForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
-        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
-        setTimeout(() => window.location.reload(), 1000);
-    });
-}
-
-// ==========================================
-// 10. GESTION DES MODALES "LIST" (Depuis KPI)
-// ==========================================
-window.openFilteredListModal = function(type) {
-    const modal = document.getElementById('list-modal');
-    const title = document.getElementById('list-modal-title');
-    const content = document.getElementById('list-modal-content');
-    if (!modal || !content) return;
-
-    content.innerHTML = '';
-    
-    if (type === 'locations') {
-        title.textContent = currentLang === 'fr' ? "Lieux filtrés" : "Filtered Locations";
-        currentFilteredLocations.forEach(loc => {
-            content.innerHTML += `
-                <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='#D42759'" onmouseout="this.style.borderColor='#e2e8f0'" onclick="closeModal('list-modal'); window.openDetailsPanel(${loc.id}); map.flyTo([${loc.lat}, ${loc.lng}], 16);">
-                    <div style="font-weight: 700; color: #2E3644; font-size:14px; margin-bottom:2px;">${loc.name}</div>
-                    <div style="font-size: 11px; color: #64748b; text-transform:uppercase; font-weight:600;">${loc.city}, ${loc.country} &middot; <span style="color:#D42759;">${getCatName(loc.category)}</span></div>
-                </div>
-            `;
-        });
-    } else if (type === 'countries') {
-        title.textContent = currentLang === 'fr' ? "Pays filtrés" : "Filtered Countries";
-        const countries = [...new Set(currentFilteredLocations.map(l => l.country))].sort();
-        countries.forEach(c => {
-            const count = currentFilteredLocations.filter(l => l.country === c).length;
-            const textLoc = count > 1 ? (currentLang === 'fr' ? "lieux" : "locations") : (currentLang === 'fr' ? "lieu" : "location");
-            content.innerHTML += `
-                <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-weight: 700; color: #D42759; font-size:15px;">${c}</div>
-                    <div style="font-size: 12px; color: #64748b; font-weight:600;">${count} ${textLoc}</div>
-                </div>
-            `;
-        });
-    }
-    
-    modal.classList.remove('hidden');
-}
-
-window.closeModal = function(id) { 
-    const el = document.getElementById(id);
-    if(el) el.classList.add('hidden'); 
-};
-window.onclick = function(e) { 
-    if (e.target.classList.contains('modal')) e.target.classList.add('hidden'); 
-};
-
-if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
-    document.getElementById('cookie-banner').classList.remove('hidden'); 
-}
-function closeCookies() { 
-    localStorage.setItem('cookiesAccepted', 'true'); 
-    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
-}
-const btnAccept = document.getElementById('cookie-accept');
-if(btnAccept) btnAccept.addEventListener('click', closeCookies);
-const btnReject = document.getElementById('cookie-reject');
-if(btnReject) btnReject.addEventListener('click', closeCookies);
-
-// ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
-window.loadTripsSidebar = function() {
-    const listContainer = document.getElementById('trips-list-container');
-    const title = document.getElementById('sidebar-title');
-    const select = document.getElementById('active-trip-select');
-    if(!listContainer) return;
+window.initTrips = function() {
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    
+    if (trips.length === 0) {
+        document.getElementById('empty-state').innerHTML = currentLang === 'fr' 
+            ? "Vous n'avez pas encore de voyage.<br>Allez sur la carte et ajoutez des lieux !"
+            : "You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist'!";
+        document.getElementById('empty-state').classList.remove('hidden');
+        document.getElementById('trip-detail-content').style.display = 'none';
+        document.getElementById('sidebar-title').textContent = `MY TRIPS (0)`;
+        document.getElementById('trips-list-container').innerHTML = '';
+        return;
+    }
+    
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('trip-detail-content').style.display = 'block';
+    
+    // Assigne le voyage actif si non défini
+    if (!currentTrip || !trips.find(t => t.id === currentTrip.id)) {
+        currentTrip = trips[trips.length - 1];
+    }
+    if (!currentTrip.days) currentTrip.days = [];
 
+    window.renderTripsSidebar();
+    window.renderTrip();
+    window.initItineraryGenerator();
+}
+
+window.renderTripsSidebar = function() {
+    const listContainer = document.getElementById('trips-list-container');
+    if(!listContainer) return;
+    
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     
     listContainer.innerHTML = '';
-    if(select) select.innerHTML = '';
-    
-    title.textContent = `MY TRIPS (${trips.length})`;
-
-    if (trips.length === 0) {
-        document.getElementById('empty-state').innerHTML = currentLang==='fr'?"Vous n'avez pas encore créé de voyage.<br>Allez sur la carte et ajoutez des lieux à votre Wishlist !":"You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist' to create your first trip!";
-        document.getElementById('empty-state').classList.remove('hidden');
-        document.getElementById('trip-detail-content').style.display = 'none';
-        return;
-    }
-
-    document.getElementById('empty-state').classList.add('hidden');
-    document.getElementById('trip-detail-content').style.display = 'block';
+    document.getElementById('sidebar-title').textContent = `MY TRIPS (${trips.length})`;
 
     trips.forEach(t => {
-        if(select) {
-            let opt = document.createElement('option');
-            opt.value = t.id; opt.textContent = t.name;
-            select.appendChild(opt);
-        }
-
         const locCount = wList.filter(w => w.tripId === t.id).length;
         let dateStr = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.startDate || '?'} to ${t.endDate || '?'}`;
         
         let pill = document.createElement('div');
         pill.className = `trip-pill ${currentTrip && currentTrip.id === t.id ? 'active' : ''}`;
-        pill.onclick = () => { if(select) select.value = t.id; window.switchTrip(); };
+        pill.onclick = () => { 
+            currentTrip = t; 
+            if (!currentTrip.days) currentTrip.days = [];
+            window.renderTripsSidebar(); 
+            window.renderTrip(); 
+        };
         pill.innerHTML = `
             <div class="trip-pill-name">${t.name}</div>
             <div class="trip-pill-meta">${dateStr} &middot; ${locCount} locations</div>
         `;
         listContainer.appendChild(pill);
     });
-
-    if(select && !select.value && trips.length > 0) {
-        select.value = trips[trips.length - 1].id;
-    }
-    
-    if (!currentTrip || !trips.find(t => t.id === currentTrip.id)) {
-         window.switchTrip();
-    } else {
-         window.renderTrip();
-    }
-}
-
-window.switchTrip = function() {
-    const select = document.getElementById('active-trip-select');
-    if(!select) return;
-    
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    currentTrip = trips.find(t => t.id === select.value);
-    if (!currentTrip.days) currentTrip.days = []; 
-    
-    window.loadTripsSidebar(); 
 }
 
 window.renderTrip = function() {
@@ -1256,7 +1041,7 @@ window.renderTrip = function() {
         const loc = celebLocations.find(l => l.id === id);
         if (loc) locList.appendChild(window.createLocRow(loc));
     });
-    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `Lieux non assignés (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
+    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `LIEUX NON ASSIGNÉS (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
 
     const box = document.getElementById('itinerary-box');
     const addBtn = box.querySelector('.add-day-btn');
@@ -1416,7 +1201,8 @@ window.removeFromTrip = function(btn, locId) {
     wList = wList.filter(w => w.id !== locId || w.tripId !== currentTrip.id);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     btn.closest('.day-loc').remove();
-    window.saveTrip(false);
+    
+    window.saveTrip(false); // Sauvegarde silencieuse
 }
 
 window.quickAddLoc = function(locId) {
@@ -1424,11 +1210,11 @@ window.quickAddLoc = function(locId) {
     if(!wList.some(w => w.id === locId && w.tripId === currentTrip.id)) {
         wList.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-        window.saveTrip(false); 
+        window.saveTrip(false); // Rafraîchit l'UI en restant en mode edit
     }
 }
 
-window.saveTrip = function(exitEdit = true) {
+window.saveTrip = function() {
     currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
     
     const type = document.getElementById('trip-duration-type').value;
@@ -1453,18 +1239,16 @@ window.saveTrip = function(exitEdit = true) {
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
     
-    const opt = document.getElementById('active-trip-select').querySelector(`option[value="${currentTrip.id}"]`);
-    if(opt) opt.textContent = currentTrip.name;
-    
-    if (exitEdit) { editing = false; window.renderTrip(); } 
-    else { window.renderTrip(); }
+    editing = false; 
+    window.renderTripsSidebar();
+    window.renderTrip(); 
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
 window.closeAddModal = function() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-search').value = ""; }
 
 window.filterAddModal = function() {
-    const query = document.getElementById('add-search').value.toLowerCase();
+    const query = (document.getElementById('add-search').value || "").toLowerCase();
     const list = document.getElementById('add-modal-list');
     list.innerHTML = '';
     
@@ -1473,7 +1257,7 @@ window.filterAddModal = function() {
     
     celebLocations.forEach(loc => {
         if (!tripLocIds.includes(loc.id)) {
-            if(loc.name.toLowerCase().includes(query) || loc.city.toLowerCase().includes(query) || loc.category.toLowerCase().includes(query)) {
+            if(loc.name.toLowerCase().includes(query) || (loc.city && loc.city.toLowerCase().includes(query)) || (loc.category && loc.category.toLowerCase().includes(query))) {
                 list.innerHTML += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #e2e8f0;">
                         <div>
@@ -1494,14 +1278,62 @@ window.createNewTripEmpty = function() {
     if (!name) return;
 
     const newTripId = 'trip-' + Date.now();
+    let newTrip = { id: newTripId, name: name, dateType: 'duration', duration: 'Flexible', days: [] };
+    
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    trips.push({ id: newTripId, name: name, dateType: 'duration', duration: 'Flexible', days: [] });
+    trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
 
+    currentTrip = newTrip; 
+    
     document.getElementById('add-trip-modal').classList.add('hidden');
     nameInput.value = '';
     
-    window.loadTripsSidebar(); 
-    document.getElementById('active-trip-select').value = newTripId;
-    window.switchTrip(); 
+    window.initTrips(); 
+}
+
+// Panier et déconnexion
+window.openCartModal = function() {
+    const modal = document.getElementById('cart-modal');
+    if(!modal) return;
+    modal.classList.remove('hidden');
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    document.querySelectorAll('.cart-checkbox').forEach(cb => {
+        cb.checked = false; 
+        const span = cb.nextElementSibling;
+        if(unlockedGroups.includes(cb.value)) { cb.disabled = true; span.style.background = "#f1f5f9"; span.style.color = "#94a3b8"; span.textContent = `${cb.value} (Purchased)`; }
+        else { cb.disabled = false; span.style.background = "white"; span.style.color = "#64748b"; span.textContent = cb.value; }
+    });
+    updateCartPrice();
+}
+
+function updateCartPrice() {
+    const selected = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
+    const priceDisplay = document.getElementById('cart-price');
+    if(priceDisplay) priceDisplay.textContent = `${(selected * 14.99).toFixed(2)} €`;
+    const btn = document.getElementById('cart-pay-btn');
+    if(btn) {
+        if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; } 
+        else { btn.disabled = true; btn.textContent = `Select a group`; }
+    }
+}
+
+document.querySelectorAll('.cart-checkbox').forEach(cb => {
+    cb.addEventListener('change', function() {
+        this.nextElementSibling.style.borderColor = this.checked ? "#D42759" : "#cbd5e1";
+        this.nextElementSibling.style.color = this.checked ? "#D42759" : "#64748b";
+        this.nextElementSibling.style.background = this.checked ? "#FCE7F0" : "white";
+        updateCartPrice();
+    });
+});
+
+const cartForm = document.getElementById('cart-form');
+if(cartForm) {
+    cartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
+        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+        setTimeout(() => window.location.reload(), 1000);
+    });
 }
