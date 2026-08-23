@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Modules Souvenir & Wishlist */
   .memory-dropdown { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display: none; animation: slideDown 0.3s ease; }
   .memory-dropdown.open { display: block; }
   .stars { display:flex; gap:4px; cursor: pointer; }
@@ -52,7 +51,6 @@
 
 <div class="app-container">
     
-    <!-- Sidebar Gauche -->
     <aside class="sidebar" id="app-sidebar">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -70,7 +68,6 @@
                 </div>
             </a>
 
-            <!-- VUE 1 : RECHERCHE ET LISTE -->
             <div id="sidebar-main" class="sidebar-scroll-area" style="padding: 0 5px 5px 5px;">
                 <div class="card-box">
                     <div style="position:relative;">
@@ -118,7 +115,6 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
-                <!-- PIED DE PAGE -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;" data-i18n="footerText">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -184,7 +180,7 @@
                         </div>
                     </div>
 
-                    <!-- LE TIROIR SOUVENIR (VISITED) AVEC PHOTOS -->
+                    <!-- LE TIROIR SOUVENIR (VISITED) -->
                     <div id="memory-dropdown" class="memory-dropdown">
                         <span class="sub-label">Your rating</span>
                         <div class="stars" id="memory-stars">
@@ -279,7 +275,6 @@
         </div>
     </aside>
 
-    <!-- Zone Carte à Droite -->
     <main class="map-container">
         <div class="top-nav">
             <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
@@ -287,7 +282,7 @@
             </button>
             <div class="dropdown-container">
                 <button id="lang-btn" class="nav-btn" title="Langue">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </button>
                 <div id="lang-menu" class="dropdown-menu hidden">
                     <a href="#" class="dropdown-option lang-option" data-lang="en">English</a>
@@ -300,7 +295,7 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <!-- CORRECTION : Icone account comme avant (transparent avec lettre ou image) -->
+                <!-- Icone de Profil corrigé en blanc transparent avec texte -->
                 <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
@@ -328,7 +323,7 @@
     </main>
 </div>
 
-<!-- Modal Liste (Locations / Countries filtrées) -->
+<!-- Modal Liste -->
 <div id="list-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px; padding: 25px;">
         <span class="close-btn" onclick="closeModal('list-modal')">&times;</span>
@@ -352,8 +347,10 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <!-- La carte réapparaît ici ! -->
-            <div id="iti-map-container" style="height: 200px; background: #e2e8f0; border-radius: 12px; margin-bottom: 15px;"></div>
+            <!-- Ajout d'une div parent avec width:100% pour que Leaflet puisse s'afficher correctement -->
+            <div style="width: 100%; height: 200px; margin-bottom: 15px;">
+                <div id="iti-map-container" style="height: 100%; width: 100%; background: #e2e8f0; border-radius: 12px;"></div>
+            </div>
             <div id="iti-days-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
             <div style="display:flex; gap:10px;">
                 <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="background: #2E3644; flex:1; justify-content:center;" data-i18n="itiExport">Export Guide as PDF</button>
@@ -383,6 +380,17 @@
             </div>
             <button type="submit" id="cart-pay-btn" class="cta-primary" disabled style="padding:14px; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
         </form>
+    </div>
+</div>
+
+<div id="cookie-banner" class="cookie-banner hidden">
+    <div class="cookie-content">
+        <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#confidentialite" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
+        <div class="cookie-actions">
+            <button id="cookie-manage" class="cat-card" style="border:1px solid var(--primary-magenta); color:var(--primary-magenta);" data-i18n="cookieManage">Manage</button>
+            <button id="cookie-reject" class="cat-card" data-i18n="cookieReject">Reject</button>
+            <button id="cookie-accept" class="cta-primary" style="width:auto;" data-i18n="cookieAccept">Accept</button>
+        </div>
     </div>
 </div>
 
