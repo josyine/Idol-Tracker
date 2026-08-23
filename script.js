@@ -1,14 +1,15 @@
 // ==========================================
-// 1. INITIALISATION DE LA CARTE PRINCIPALE ET GESTION DU ZOOM
+// 1. INITIALISATION ROBUSTE DE L'APPLICATION
 // ==========================================
 let map = null;
 let markerGroup = null;
 let currentFilteredLocations = []; 
 let currentLocationIdForMemory = null; 
 let currentGeneratedItinerary = [];
+let currentLang = localStorage.getItem('lang') || 'en';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialise la carte Uniquement si l'élément "map" est présent (remplace le bug de l'URL)
+    // Si on est sur une page avec la carte (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -29,17 +30,77 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lance l'interface utilisateur automatiquement
+    // Gestion du menu mobile
+    window.toggleMobileMenu = function() {
+        const sidebar = document.getElementById('app-sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('open');
+            if (!sidebar.classList.contains('open')) sidebar.classList.remove('expanded');
+        }
+    };
+
+    // Initialisation des boutons communs (Langue, Profil)
+    ['lang-btn', 'profile-btn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if(btn) btn.addEventListener('click', (e) => {
+            const menuId = id.replace('-btn', '-menu');
+            document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
+            document.getElementById(menuId).classList.toggle('hidden');
+            e.stopPropagation();
+        });
+    });
+
+    document.addEventListener('click', () => { 
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
+    });
+
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.addEventListener('click', function(e) { 
+            e.preventDefault(); 
+            currentLang = this.getAttribute('data-lang'); 
+            localStorage.setItem('lang', currentLang); 
+            updateUI(); 
+        });
+    });
+
+    const profileBtn = document.getElementById('profile-btn');
+    if (profileBtn) {
+        const savedName = localStorage.getItem('userName') || 'U';
+        profileBtn.textContent = savedName.charAt(0).toUpperCase();
+    }
+
+    // Gestion des onglets de détails
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById('tab-' + btn.dataset.tab);
+            if(target) target.classList.add('active');
+        });
+    });
+
+    // Déconnexion
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('unlockedGroups');
+            window.location.href = 'index.html';
+        });
+    }
+
+    // Boutons de KPI
+    const btnShowLocs = document.getElementById('btn-show-locations');
+    if (btnShowLocs) btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); });
+    const btnShowCountries = document.getElementById('btn-show-countries');
+    if (btnShowCountries) btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); });
+
+    // Initialisation dynamique selon la page
     updateUI();
 });
-
-window.toggleMobileMenu = function() {
-    const sidebar = document.getElementById('app-sidebar');
-    if (sidebar) {
-        sidebar.classList.toggle('open');
-        if (!sidebar.classList.contains('open')) sidebar.classList.remove('expanded');
-    }
-};
 
 // ==========================================
 // 2. DONNÉES
@@ -254,9 +315,7 @@ const catTranslations = {
 };
 
 function getCatName(cat) {
-    if (catTranslations[cat] && typeof catTranslations[cat] === 'object') {
-        return catTranslations[cat][currentLang];
-    }
+    if (catTranslations[cat] && typeof catTranslations[cat] === 'object') { return catTranslations[cat][currentLang]; }
     return catTranslations[cat] || cat;
 }
 
@@ -302,66 +361,10 @@ function updateUI() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    ['lang-btn', 'profile-btn'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) btn.addEventListener('click', (e) => {
-            const menuId = id.replace('-btn', '-menu');
-            document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
-            document.getElementById(menuId).classList.toggle('hidden');
-            e.stopPropagation();
-        });
-    });
-
-    document.addEventListener('click', () => { 
-        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
-    });
-
-    document.querySelectorAll('.lang-option').forEach(opt => {
-        opt.addEventListener('click', function(e) { 
-            e.preventDefault(); 
-            currentLang = this.getAttribute('data-lang'); 
-            localStorage.setItem('lang', currentLang); 
-            updateUI(); 
-        });
-    });
-
-    const profileBtn = document.getElementById('profile-btn');
-    if (profileBtn) {
-        const savedName = localStorage.getItem('userName') || 'U';
-        profileBtn.textContent = savedName.charAt(0).toUpperCase();
-    }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            const target = document.getElementById('tab-' + btn.dataset.tab);
-            if(target) target.classList.add('active');
-        });
-    });
-
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('unlockedGroups');
-            window.location.href = 'index.html';
-        });
-    }
-
-    const btnShowLocs = document.getElementById('btn-show-locations');
-    if (btnShowLocs) { btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); }); }
-    const btnShowCountries = document.getElementById('btn-show-countries');
-    if (btnShowCountries) { btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); }); }
-});
-
 // ==========================================
-// 4. FILTRES CARTE
+// 4. FILTRES DE LA CARTE
 // ==========================================
+let activeCategory = "All"; 
 function initializeFilters() {
     const groupSelect = document.getElementById('group-select');
     const memberSelect = document.getElementById('member-select');
@@ -402,15 +405,16 @@ function initializeFilters() {
             renderLocations();
         });
     });
-}
 
-const gSelect = document.getElementById('group-select');
-if(gSelect) {
-    [gSelect, document.getElementById('member-select'), document.getElementById('year-select'), document.getElementById('country-select')].forEach(el => {
-        if(el) el.addEventListener('change', () => { if(el===gSelect) initializeFilters(); renderLocations(); });
-    });
-    const sInput = document.getElementById('search-input');
-    if(sInput) sInput.addEventListener('input', renderLocations);
+    // Fixations des event listeners à l'initialisation
+    if(!groupSelect._hasListener) {
+        groupSelect._hasListener = true;
+        [groupSelect, memberSelect, document.getElementById('year-select'), countrySelect].forEach(el => {
+            if(el) el.addEventListener('change', () => { if(el===groupSelect) initializeFilters(); renderLocations(); });
+        });
+        const sInput = document.getElementById('search-input');
+        if(sInput) sInput.addEventListener('input', renderLocations);
+    }
 }
 
 // ==========================================
@@ -496,8 +500,9 @@ function loadTripOptions() {
     
     select.innerHTML = '';
     const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    const noTripTxt = currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
-    const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
+    const lang = localStorage.getItem('lang') || 'en';
+    const noTripTxt = lang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
+    const newTripTxt = lang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
     
     select.innerHTML = `<option value="none">${noTripTxt}</option>`;
     trips.forEach(t => {
@@ -522,7 +527,7 @@ window.toggleWishlist = function() {
         wList = wList.filter(w => w.id !== currentLocationIdForMemory && w !== currentLocationIdForMemory);
     }
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    if(document.getElementById('map')) renderLocations();
+    if(map) renderLocations();
 };
 
 window.handleTripSelect = function() {
@@ -706,7 +711,7 @@ window.openDetailsPanel = function(id) {
                 document.getElementById('tab-info').classList.add('active');
             }
             localStorage.setItem('visitedLocs', JSON.stringify(list));
-            if(document.getElementById('map')) renderLocations(); 
+            if(map) renderLocations(); 
         };
     }
 
@@ -1120,10 +1125,9 @@ window.openFilteredListModal = function(type) {
     if (!modal || !content) return;
 
     content.innerHTML = '';
-    const lang = localStorage.getItem('lang') || 'en';
     
     if (type === 'locations') {
-        title.textContent = lang === 'fr' ? "Lieux filtrés" : "Filtered Locations";
+        title.textContent = currentLang === 'fr' ? "Lieux filtrés" : "Filtered Locations";
         currentFilteredLocations.forEach(loc => {
             content.innerHTML += `
                 <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='#D42759'" onmouseout="this.style.borderColor='#e2e8f0'" onclick="closeModal('list-modal'); window.openDetailsPanel(${loc.id}); map.flyTo([${loc.lat}, ${loc.lng}], 16);">
@@ -1133,11 +1137,11 @@ window.openFilteredListModal = function(type) {
             `;
         });
     } else if (type === 'countries') {
-        title.textContent = lang === 'fr' ? "Pays filtrés" : "Filtered Countries";
+        title.textContent = currentLang === 'fr' ? "Pays filtrés" : "Filtered Countries";
         const countries = [...new Set(currentFilteredLocations.map(l => l.country))].sort();
         countries.forEach(c => {
             const count = currentFilteredLocations.filter(l => l.country === c).length;
-            const textLoc = count > 1 ? (lang === 'fr' ? "lieux" : "locations") : (lang === 'fr' ? "lieu" : "location");
+            const textLoc = count > 1 ? (currentLang === 'fr' ? "lieux" : "locations") : (currentLang === 'fr' ? "lieu" : "location");
             content.innerHTML += `
                 <div style="padding: 12px; background: #faf9fc; border-radius: 8px; border: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-weight: 700; color: #D42759; font-size:15px;">${c}</div>
@@ -1159,7 +1163,7 @@ window.onclick = function(e) {
 };
 
 // ==========================================
-// 11. BANNIÈRE COOKIES ET REDIRECTION
+// 11. BANNIÈRE COOKIES ET REDIRECTION VISITED
 // ==========================================
 if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
     document.getElementById('cookie-banner').classList.remove('hidden'); 
