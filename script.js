@@ -8,7 +8,7 @@ let currentLocationIdForMemory = null;
 let currentGeneratedItinerary = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialise la carte Uniquement si on est sur la bonne vue
+    // Initialise la carte Uniquement si l'élément "map" est présent (remplace le bug de l'URL)
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Lance l'interface utilisateur automatiquement
     updateUI();
 });
 
@@ -359,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 4. FILTRES
+// 4. FILTRES CARTE
 // ==========================================
 function initializeFilters() {
     const groupSelect = document.getElementById('group-select');
@@ -413,7 +414,7 @@ if(gSelect) {
 }
 
 // ==========================================
-// 5. AFFICHAGE DES LIEUX
+// 5. AFFICHAGE DES LIEUX (CARTE)
 // ==========================================
 function renderLocations() {
     const groupSelect = document.getElementById('group-select');
@@ -425,6 +426,7 @@ function renderLocations() {
     if(!groupSelect || !map) return; 
     markerGroup.clearLayers();
     const locationListElement = document.getElementById('location-list');
+    if(!locationListElement) return;
     locationListElement.innerHTML = '';
 
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
@@ -486,7 +488,7 @@ function renderLocations() {
 }
 
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST
+// 6. GESTION DES TRIPS / WISHLIST DANS LA CARTE
 // ==========================================
 function loadTripOptions() {
     const select = document.getElementById('trip-select');
@@ -520,7 +522,7 @@ window.toggleWishlist = function() {
         wList = wList.filter(w => w.id !== currentLocationIdForMemory && w !== currentLocationIdForMemory);
     }
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    if(map) renderLocations();
+    if(document.getElementById('map')) renderLocations();
 };
 
 window.handleTripSelect = function() {
@@ -704,7 +706,7 @@ window.openDetailsPanel = function(id) {
                 document.getElementById('tab-info').classList.add('active');
             }
             localStorage.setItem('visitedLocs', JSON.stringify(list));
-            if(map) renderLocations(); 
+            if(document.getElementById('map')) renderLocations(); 
         };
     }
 
@@ -732,8 +734,11 @@ window.openDetailsPanel = function(id) {
         }
     }
 
-    document.getElementById('sidebar-main').classList.add('hidden');
-    document.getElementById('sidebar-details').classList.remove('hidden');
+    const mainSidebar = document.getElementById('sidebar-main');
+    if(mainSidebar) mainSidebar.classList.add('hidden');
+    
+    const detailsSidebar = document.getElementById('sidebar-details');
+    if(detailsSidebar) detailsSidebar.classList.remove('hidden');
     
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) { sidebar.classList.add('open'); sidebar.classList.add('expanded'); }
@@ -851,9 +856,6 @@ window.closeDetailsPanel = function() {
 // ==========================================
 // 8. AUTO-ITINERARY GENERATOR
 // ==========================================
-let itiLeafletMap = null;
-let itiLayerGroup = null;
-
 const btnOpenIti = document.getElementById('open-itinerary-btn');
 if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
