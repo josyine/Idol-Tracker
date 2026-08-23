@@ -59,7 +59,7 @@
 
         <div class="sidebar-content" style="height: 100%;">
             
-            <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
+            <a href="#" onclick="if(document.getElementById('sidebar-details') && !document.getElementById('sidebar-details').classList.contains('hidden')) { closeDetailsPanel(); } else { window.location.href='map.html'; }; return false;" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -300,12 +300,13 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <button id="profile-btn" class="nav-btn" style="background-color:#D42759; color:#fff; font-weight:bold; border:none;"></button>
+                <!-- CORRECTION : Icone account comme avant (transparent avec lettre ou image) -->
+                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
                     <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
                     <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
-                    <a href="trips.html" class="dropdown-option" data-i18n="tripsOption" style="color:#D42759; font-weight:bold;">My Trips</a>
+                    <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
                     <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;" data-i18n="logoutOption">Logout</a>
@@ -351,6 +352,7 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
+            <!-- La carte réapparaît ici ! -->
             <div id="iti-map-container" style="height: 200px; background: #e2e8f0; border-radius: 12px; margin-bottom: 15px;"></div>
             <div id="iti-days-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
             <div style="display:flex; gap:10px;">
