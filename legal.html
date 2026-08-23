@@ -57,12 +57,24 @@
   ul.plain { margin: 0 0 14px 20px; font-size: 13.5px; line-height: 1.8; color: #334155; }
   .placeholder { background: #FCE7F0; color: #D42759; padding: 1px 6px; border-radius: 5px; font-weight: 600; font-size: 12.5px; }
   .note { background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; font-size: 12.5px; color: #64748b; line-height: 1.6; margin-top: 10px; }
-
 </style>
 <script>
+    // Synchronisation du fond
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
     const elapsed = (Date.now() - parseInt(sessionStorage.getItem('bgSyncTime'))) / 1000;
     document.documentElement.style.setProperty('--sync-t', elapsed + 's');
+
+    // FONCTION RETOUR INTELLIGENTE
+    function smartBack(event) {
+        event.preventDefault();
+        // Si on a un historique ET qu'on vient bien de notre propre site
+        if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+            window.history.back();
+        } else {
+            // Sécurité : si on ouvre le lien direct, on renvoie à l'accueil
+            window.location.href = 'index.html';
+        }
+    }
 </script>
 </head>
 <body>
@@ -100,7 +112,9 @@
 
     <!-- Page Content -->
     <div class="legal-container">
-      <a href="index.html" class="back-btn">← Retour à l'accueil</a>
+      
+      <!-- BOUTON RETOUR INTELLIGENT -->
+      <a href="#" onclick="smartBack(event)" class="back-btn">← Back / Retour</a>
       
       <div class="legal-card">
         
@@ -112,7 +126,7 @@
             <a href="#cgu" onclick="setActiveTab(this)">CGU</a>
             <a href="#confidentialite" onclick="setActiveTab(this)">Politique de confidentialité</a>
             </div>
-            <button class="subnav-cookies" onclick="alert('Pour gérer vos cookies, retournez sur la carte ou ouvrez les paramètres.')">Cookies ⚙</button>
+            <button class="subnav-cookies" onclick="alert('Pour gérer vos cookies, retournez à l\'accueil ou ouvrez les paramètres.')">Cookies ⚙</button>
         </div>
 
         <h1 class="legal-title">Legal Information</h1>
