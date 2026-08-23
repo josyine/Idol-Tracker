@@ -21,8 +21,8 @@
 
         <div class="sidebar-content" style="height: 100%;">
             
-            <!-- Header avec Logo Cliquable -->
-            <a href="index.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
+            <!-- Header avec Logo Cliquable pointant vers map.html -->
+            <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -63,7 +63,7 @@
                         <div>
                             <div class="filter-item-label" data-i18n="filterYear">YEAR</div>
                             <select id="year-select" class="filter-select">
-                                <option value="All">All Years</option>
+                                <option value="All" data-i18n="allYears">All Years</option>
                                 <option value="2026">2026</option><option value="2023">2023</option>
                                 <option value="2021">2021</option><option value="2020">2020</option>
                                 <option value="2019">2019</option><option value="2018">2018</option>
@@ -81,7 +81,7 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
-                <!-- PIED DE PAGE TRADUIT -->
+                <!-- PIED DE PAGE -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;" data-i18n="footerText">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -96,7 +96,7 @@
             <!-- VUE 2 : PANNEAU DE DÉTAILS -->
             <div id="sidebar-details" class="hidden">
                 <div class="detail-hero" id="detail-hero-bg">
-                    <a class="detail-back-link" onclick="closeDetailsPanel()">← Back to list</a>
+                    <a class="detail-back-link" onclick="closeDetailsPanel()" data-i18n="backToList">← Back to list</a>
                     <div class="detail-hero-bottom">
                         <span class="detail-hero-badge" id="detail-badge">Category</span>
                         <div class="detail-hero-title" id="details-title">Location Name</div>
@@ -108,43 +108,43 @@
                 </div>
 
                 <div class="check-row">
-                    <label class="check-item"><input type="checkbox" id="details-visited" class="custom-checkbox"> I visited this place</label>
-                    <label class="check-item"><input type="checkbox" id="details-wishlist" class="custom-checkbox"> Add to Wishlist</label>
+                    <label class="check-item"><input type="checkbox" id="details-visited" class="custom-checkbox"> <span data-i18n="checkVisited">I visited this place</span></label>
+                    <label class="check-item"><input type="checkbox" id="details-wishlist" class="custom-checkbox"> <span data-i18n="checkWishlist">Add to Wishlist</span></label>
                 </div>
 
                 <div class="tabs">
-                    <button class="tab-btn active" data-tab="info">Info</button>
-                    <button class="tab-btn" data-tab="story">Story</button>
+                    <button class="tab-btn active" data-tab="info" data-i18n="tabInfo">Info</button>
+                    <button class="tab-btn" data-tab="story" data-i18n="tabStory">Story</button>
                 </div>
 
                 <!-- TAB INFO -->
                 <div class="tab-panel active" id="tab-info">
                     <div class="meta-box">
-                        <b>Group:</b> <span id="details-group"></span><br>
-                        <b>Members:</b> <span id="details-member"></span><br>
-                        <b>Country:</b> <span id="details-country"></span><br>
-                        <b>City:</b> <span id="details-city"></span><br>
-                        <b>Address:</b> <span id="details-full-address"></span><br>
-                        <b>Date:</b> <span id="details-date"></span><br>
-                        <span id="details-episode-container"><b>Episode:</b> <span id="details-episode"></span></span>
-                        <span id="details-link-container"><br><b>Watch:</b> <a id="details-episode-link" href="#" target="_blank">Official Link</a></span>
+                        <b data-i18n="lGroup">Group:</b> <span id="details-group"></span><br>
+                        <b data-i18n="lMembers">Members:</b> <span id="details-member"></span><br>
+                        <b data-i18n="lCountry">Country:</b> <span id="details-country"></span><br>
+                        <b data-i18n="lCity">City:</b> <span id="details-city"></span><br>
+                        <b data-i18n="lAddress">Address:</b> <span id="details-full-address"></span><br>
+                        <b data-i18n="lDate">Date:</b> <span id="details-date"></span><br>
+                        <span id="details-episode-container"><b data-i18n="lEpisode">Episode:</b> <span id="details-episode"></span></span>
+                        <span id="details-link-container"><br><b data-i18n="lWatch">Watch:</b> <a id="details-episode-link" href="#" target="_blank" data-i18n="lOfficialLink">Official Link</a></span>
                     </div>
 
                     <div id="details-video-section" class="media-section hidden">
-                        <span class="sub-label">Watch the Episode</span>
+                        <span class="sub-label" data-i18n="lWatchEpi">Watch the Episode</span>
                         <div class="video-wrapper" id="details-video-container"></div>
                     </div>
 
                     <div id="details-tip-section" class="tip-box hidden">
-                        <div class="tip-title">💡 The "Screen to Street" Tip</div>
+                        <div class="tip-title">💡 <span data-i18n="lTipTitle">The "Screen to Street" Tip</span></div>
                         <p id="details-tip"></p>
                     </div>
 
-                    <span class="sub-label">How to get there</span>
+                    <span class="sub-label" data-i18n="lHowToGetThere">How to get there</span>
                     <p class="directions-text" id="details-directions"></p>
                     <a class="gmaps-btn" id="details-map-link" href="#" target="_blank">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        Open in Google Maps
+                        <span data-i18n="lOpenMap">Open in Google Maps</span>
                     </a>
                 </div>
 
@@ -192,7 +192,6 @@
             </div>
         </div>
 
-        <!-- STAT PILL CLIQUABLE -->
         <div class="stat-pill" style="padding: 6px 14px;">
             <div id="btn-show-locations" style="display:flex; gap:6px; align-items:center; cursor:pointer; padding: 6px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
                 <span class="n1" id="stat-locations">0</span> <span data-i18n="locationsCount" style="font-size: 11px;">LOCATIONS</span>
@@ -235,7 +234,7 @@
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
             <div id="iti-map-container"></div>
             <div id="iti-days-list"></div>
-            <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="margin-top: 15px; background: #2E3644;">Export Guide as PDF</button>
+            <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="margin-top: 15px; background: #2E3644;" data-i18n="itiExport">Export Guide as PDF</button>
         </div>
     </div>
 </div>
