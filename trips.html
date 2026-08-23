@@ -6,7 +6,6 @@
 <title>Screen To Street — My Trips</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
   /* Base Layout */
@@ -18,27 +17,28 @@
   .brand-row { text-decoration: none; display: flex; align-items: center; cursor: pointer; gap: 10px; }
   .brand-text { font-size: 18px; font-weight: 700; color: #2E3644; }
 
-  /* STRUCTURE SPLIT */
+  /* STRUCTURE SPLIT (Comme sur le screenshot) */
   .trips-layout { display: flex; flex: 1; overflow: hidden; }
   
   /* COLONNE DE GAUCHE : LISTE DES VOYAGES */
-  .trips-sidebar { width: 320px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 25px 20px; overflow-y: auto; }
-  .sidebar-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+  .trips-sidebar { width: 320px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 30px 20px; overflow-y: auto; }
+  .sidebar-title { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; }
   
-  .trip-pill { border: 1px solid transparent; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; background: #f8fafc; }
+  .trip-pill { border: 1.5px solid transparent; border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; cursor: pointer; transition: 0.2s; background: #f8fafc; }
   .trip-pill.active { background: #FCE7F0; border-color: #D42759; }
   .trip-pill:hover:not(.active) { background: #f1f5f9; }
   .trip-pill-name { font-size: 16px; font-weight: 700; color: #212832; margin-bottom: 4px; }
   .trip-pill.active .trip-pill-name { color: #D42759; }
   .trip-pill-meta { font-size: 12px; color: #94a3b8; }
 
-  .new-trip-pill { border: 1px dashed #cbd5e1; border-radius: 16px; padding: 18px 20px; text-align: center; cursor: pointer; font-size: 13.5px; font-weight: 700; color: #D42759; transition: 0.2s; background: #fff; }
+  .new-trip-pill { border: 1.5px dashed #cbd5e1; border-radius: 16px; padding: 18px 20px; text-align: center; cursor: pointer; font-size: 13.5px; font-weight: 700; color: #D42759; transition: 0.2s; background: #fff; margin-top: 10px; }
   .new-trip-pill:hover { border-color: #D42759; background: #FCE7F0; }
 
   /* ZONE CENTRALE : DÉTAILS DU VOYAGE */
-  .trips-main { flex: 1; background: #f8fafc; overflow-y: auto; padding: 40px; }
-  .trip-hero { background: linear-gradient(135deg, #f4f0fb 0%, #faeef3 100%); border-radius: 20px; padding: 40px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.6); }
+  .trips-main { flex: 1; background: #f8fafc; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+  .trip-detail-wrapper { width: 100%; max-width: 900px; display: none; }
   
+  .trip-hero { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0;}
   .trip-head-info { display: flex; flex-direction: column; gap: 8px; }
   .trip-name { font-size: 32px; font-weight: 700; color: #212832; }
   .trip-dates { font-size: 14px; color: #64748b; font-weight: 500; }
@@ -46,8 +46,9 @@
   .gen-btn { display:inline-flex;align-items:center;gap:7px;background:#D42759;color:#fff;font-size:13.5px;font-weight:700; padding:12px 24px;border-radius:100px;box-shadow:0 8px 18px rgba(212,39,89,.22);white-space:nowrap;cursor:pointer; border:none;font-family:'Poppins',sans-serif; transition: 0.2s; }
   .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(212,39,89,.35); }
   .gen-btn.ghost {background:transparent;color:#D42759;border:1.5px solid #D42759;box-shadow:none;}
+  .gen-btn.ghost:hover { background:#FCE7F0; }
 
-  .section-label {font-size:11px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 12px 0;}
+  .section-label {font-size:11.5px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 16px 0;}
 
   /* BANDEAU D'EDITION */
   .edit-banner {display:none;background:#fff;border:1.5px dashed #D42759;border-radius:16px;padding:24px;margin-bottom:30px; box-shadow: 0 10px 30px rgba(212,39,89,.08); }
@@ -83,7 +84,7 @@
   .day-loc:active {cursor:grabbing;}
   .day-loc.dragging {opacity:.4; background: #f8fafc;}
   .day-loc:not([draggable="true"]) {cursor:default;}
-  .drag-handle {color:#cbd5e1;flex-shrink:0;}
+  .drag-handle {color:#cbd5e1;flex-shrink:0; font-size: 18px;}
   .x-btn {cursor:pointer;padding:4px;flex-shrink:0; font-size: 16px; font-weight: bold; color: #94a3b8; transition: 0.2s; margin-left:auto;}
   .x-btn:hover { color: #D42759; }
 
@@ -93,7 +94,7 @@
   }
   .add-day-btn:hover { border-color: #D42759; color: #D42759; }
 
-  .save-row {display:flex;gap:10px;margin-top:24px;}
+  .save-row {display:flex;gap:12px;margin-top:24px;}
   .save-row .gen-btn {flex:1;justify-content:center; padding: 14px;}
 
   /* MODAL ADD MORE LOCATIONS */
@@ -105,7 +106,8 @@
   .modal-search { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-family: 'Poppins', sans-serif; font-size: 13px; outline:none; }
   .modal-search:focus { border-color:#D42759; }
   .modal-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-  .empty-state { text-align: center; color: #94a3b8; padding: 40px 0; font-size: 15px; }
+  
+  .empty-state { text-align: center; color: #94a3b8; padding: 80px 0; font-size: 15px; width: 100%; }
 </style>
 </head>
 <body>
@@ -127,7 +129,8 @@
         <button class="nav-btn" style="background:#f1f5f9; border:none; padding:8px; border-radius:50%; cursor:pointer;" onclick="window.location.href='map.html'" title="Back to Map">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         </button>
-        <button id="profile-btn" class="nav-btn" style="background-color: #D42759; color: #fff; font-weight: bold; border: none; padding:8px 14px; border-radius:50%; cursor:pointer;">U</button>
+        <!-- Icone de Profil -->
+        <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: none; padding:8px 14px; border-radius:50%; cursor:pointer; background-color: transparent; color: #212832; font-weight: bold; border: 1px solid #cbd5e1;">U</button>
     </div>
 </div>
 
@@ -149,7 +152,7 @@
             Loading your trips...
         </div>
 
-        <div id="trip-detail-content" style="display:none; max-width: 900px; margin: 0 auto;">
+        <div id="trip-detail-content" class="trip-detail-wrapper">
             
             <div class="trip-hero">
                 <div class="trip-head-info">
@@ -158,7 +161,6 @@
                     <div class="trip-dates" id="dates-display">Dates · 0 locations</div>
                 </div>
                 <button class="gen-btn" id="edit-toggle" onclick="toggleEdit()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                     <span id="i18n-edit-btn">Edit trip</span>
                 </button>
             </div>
@@ -189,8 +191,7 @@
             <div class="itinerary-box" id="itinerary-box">
                 <!-- Les jours apparaîtront ici -->
                 <button class="add-day-btn edit-only" style="display:none;" onclick="addDay()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                    <span id="i18n-add-day">Add an empty day</span>
+                    <span id="i18n-add-day">+ Add an empty day</span>
                 </button>
             </div>
 
@@ -239,7 +240,7 @@
     </div>
 </div>
 
-<!-- Modal CREATE NEW TRIP -->
+<!-- Modal CREATE NEW TRIP (Vierge) -->
 <div class="modal-overlay hidden" id="add-trip-modal">
     <div class="modal-box">
         <div class="modal-header">
@@ -251,7 +252,7 @@
     </div>
 </div>
 
-<!-- Modal Auto-Itinerary (Réparé avec la carte !) -->
+<!-- Modal Auto-Itinerary -->
 <div class="modal-overlay hidden" id="itinerary-modal">
     <div class="modal-box" style="width:650px;">
         <div class="modal-header">
@@ -268,8 +269,9 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <!-- La carte réapparaît ici ! -->
-            <div id="iti-map-container" style="height: 200px; background: #e2e8f0; border-radius: 12px; margin-bottom: 15px;"></div>
+            <div style="width: 100%; height: 200px; margin-bottom: 15px;">
+                <div id="iti-map-container" style="height: 100%; width: 100%; background: #e2e8f0; border-radius: 12px;"></div>
+            </div>
             <div id="iti-days-list" style="max-height:30vh; overflow-y:auto; margin-bottom:15px; padding-right:10px;"></div>
             <div style="display:flex; gap:10px;">
                 <button class="gen-btn" onclick="saveItineraryToTrips()" style="flex:1; justify-content:center;" id="i18n-itiSave">Save to My Trips</button>
@@ -280,5 +282,6 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
