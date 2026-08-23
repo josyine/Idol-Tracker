@@ -10,12 +10,10 @@ let currentLang = localStorage.getItem('lang') || 'en';
 
 // Variables globales pour trips.html
 let currentTrip = null;
-let editing = false;
 let draggedEl = null;
 let tripIdToDelete = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Si la page contient une carte Leaflet (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -44,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Boutons communs
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -59,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
     });
 
-    // Profil avec initiale noire sur fond transparent
     const profileBtn = document.getElementById('profile-btn');
     if (profileBtn) {
         const savedName = localStorage.getItem('userName') || 'U';
@@ -237,14 +233,9 @@ const translations = {
 };
 
 const catTranslations = {
-    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", 
-    "Restaurants": {en: "Restaurants", fr: "Restaurants"}, 
-    "Cafe": {en: "Cafe", fr: "Café"}, 
-    "Museums": {en: "Museums", fr: "Musées"}, 
-    "MV Location": "MV Location", "Concerts": "Concerts", 
-    "Fashion": {en: "Fashion", fr: "Mode"}, 
-    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, 
-    "Pop-up Store": "Pop-up Store"
+    "Run BTS": "Run BTS", "Bon Voyage": "Bon Voyage", "Restaurants": {en: "Restaurants", fr: "Restaurants"}, "Cafe": {en: "Cafe", fr: "Café"}, 
+    "Museums": {en: "Museums", fr: "Musées"}, "MV Location": "MV Location", "Concerts": "Concerts", "Fashion": {en: "Fashion", fr: "Mode"}, 
+    "Landmarks": {en: "Landmarks", fr: "Lieux mythiques"}, "Pop-up Store": "Pop-up Store"
 };
 
 function getCatName(cat) {
@@ -277,13 +268,13 @@ function updateUI() {
         renderLocations();
     }
     
+    // Si on est sur trips.html
     if(document.getElementById('trip-name-display')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
         const eAuto = document.getElementById('i18n-auto-btn'); if(eAuto) eAuto.textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
         const eOpen = document.getElementById('i18n-open-iti'); if(eOpen) eOpen.textContent = isFr ? "Ouvrir le Générateur" : "Open Auto-Itinerary Generator";
         const eNeed = document.getElementById('i18n-need-magic'); if(eNeed) eNeed.textContent = isFr ? "Besoin de magie ?" : "Need some magic?";
-        const eEditBtn = document.getElementById('i18n-edit-btn'); if(eEditBtn) eEditBtn.textContent = isFr ? "Modifier" : "Edit trip";
         const eEditing = document.getElementById('i18n-editing'); if(eEditing) eEditing.textContent = isFr ? "✏️ Édition de ce voyage" : "✏️ Editing this trip";
         const eDur = document.getElementById('i18n-trip-duration'); if(eDur) eDur.textContent = isFr ? "Durée & Dates" : "Trip Duration & Dates";
         const eSpec = document.getElementById('i18n-opt-specific'); if(eSpec) eSpec.textContent = isFr ? "Dates Précises" : "Specific Dates";
@@ -297,6 +288,7 @@ function updateUI() {
         const eModAdd = document.getElementById('i18n-modal-add'); if(eModAdd) eModAdd.textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
         const eCreateTitle = document.getElementById('i18n-create-title'); if(eCreateTitle) eCreateTitle.textContent = isFr ? "Créer un nouveau voyage" : "Create a new trip";
         const eBtnCreate = document.getElementById('i18n-btn-create'); if(eBtnCreate) eBtnCreate.textContent = isFr ? "Créer" : "Create";
+        const eDelBtn = document.getElementById('i18n-delete-trip'); if(eDelBtn) eDelBtn.textContent = isFr ? "Supprimer" : "Delete";
         const eDelTitle = document.getElementById('i18n-del-title'); if(eDelTitle) eDelTitle.textContent = isFr ? "Supprimer ce voyage ?" : "Delete this trip?";
         const eDelDesc = document.getElementById('i18n-del-desc'); if(eDelDesc) eDelDesc.textContent = isFr ? "Êtes-vous sûr de vouloir supprimer ce voyage ? Cette action est irréversible." : "Are you sure you want to delete this trip? This cannot be undone.";
         const eDelCancel = document.getElementById('i18n-del-cancel'); if(eDelCancel) eDelCancel.textContent = isFr ? "Annuler" : "Cancel";
@@ -305,6 +297,7 @@ function updateUI() {
         if(typeof window.initTrips === 'function') window.initTrips();
     }
 
+    // Init ITI Selectors (Map et Trips)
     window.initItineraryGenerator();
 }
 
@@ -455,6 +448,22 @@ function renderLocations() {
 // ==========================================
 // 6. GESTION DES TRIPS / WISHLIST DANS LA CARTE
 // ==========================================
+function loadTripOptions() {
+    const select = document.getElementById('trip-select');
+    if(!select) return;
+    
+    select.innerHTML = '';
+    const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const noTripTxt = currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
+    const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
+    
+    select.innerHTML = `<option value="none">${noTripTxt}</option>`;
+    trips.forEach(t => {
+        select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+    });
+    select.innerHTML += `<option value="new">${newTripTxt}</option>`;
+}
+
 window.toggleWishlist = function() {
     const checked = document.getElementById('details-wishlist').checked;
     const box = document.getElementById('trip-box');
@@ -515,15 +524,8 @@ window.createTrip = function() {
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
 
-    // Met à jour la liste sans doublons
-    const select = document.getElementById('trip-select');
-    if(select) {
-        let opt = document.createElement('option');
-        opt.value = newTripId; opt.textContent = label;
-        select.insertBefore(opt, select.lastElementChild);
-        select.value = newTripId;
-    }
-    
+    loadTripOptions(); 
+    document.getElementById('trip-select').value = newTripId;
     window.handleTripSelect(); 
     window.cancelNewTrip();
 };
@@ -817,7 +819,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR (RÉPARÉ)
+// 8. AUTO-ITINERARY GENERATOR (RESTAURÉ COMME A L'ORIGINE)
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -858,6 +860,7 @@ window.generateItinerary = function() {
     
     resultDiv.innerHTML = "";
     
+    // Le calcul original qui répartissait équitablement
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     currentGeneratedItinerary = [];
@@ -938,7 +941,6 @@ window.generateItinerary = function() {
                  .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
             });
             
-            // Sécurité pour le zoom
             if(coordsForMap.length > 1) {
                 L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
                 itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
@@ -983,10 +985,9 @@ window.saveItineraryToTrips = function() {
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    localStorage.setItem('activeTripId', newTripId); // L'ouvre directement
+    localStorage.setItem('activeTripId', newTripId);
 
-    // Redirige vers trips.html s'il n'est pas déjà dessus
-    if(window.location.pathname.includes('trips.html')) {
+    if(document.getElementById('trip-name-display')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
         window.initTrips();
     } else {
@@ -1173,7 +1174,6 @@ window.renderTripsSidebar = function() {
             window.initTrips();
         };
 
-        // Bouton supprimer le voyage
         pill.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div class="trip-pill-name">${t.name}</div>
@@ -1185,13 +1185,13 @@ window.renderTripsSidebar = function() {
     });
 }
 
-// LOGIQUE DRAG & DROP POUR REORGANISER LES VOYAGES
+// DRAG & DROP DES VOYAGES
 window.dragTripStart = function(e, id) { e.dataTransfer.setData('text/plain', id); e.currentTarget.style.opacity = '0.4'; }
-window.dragTripOver = function(e) { e.preventDefault(); e.currentTarget.style.borderTop = "2px solid #D42759"; }
-window.dragTripLeave = function(e) { e.currentTarget.style.borderTop = "1.5px solid transparent"; }
+window.dragTripOver = function(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over-trip'); }
+window.dragTripLeave = function(e) { e.currentTarget.classList.remove('drag-over-trip'); }
 window.dropTrip = function(e, targetId) {
     e.preventDefault();
-    e.currentTarget.style.borderTop = "1.5px solid transparent";
+    e.currentTarget.classList.remove('drag-over-trip');
     const draggedId = e.dataTransfer.getData('text/plain');
     if(draggedId && draggedId !== targetId) {
         let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
@@ -1201,7 +1201,7 @@ window.dropTrip = function(e, targetId) {
             const [moved] = trips.splice(fromIdx, 1);
             trips.splice(toIdx, 0, moved);
             localStorage.setItem('myTrips', JSON.stringify(trips));
-            window.loadTripsSidebar();
+            window.renderTripsSidebar();
         }
     }
     document.querySelectorAll('.trip-pill').forEach(p => p.style.opacity = '1');
@@ -1210,8 +1210,10 @@ window.dropTrip = function(e, targetId) {
 window.renderTrip = function() {
     if (!currentTrip) return;
 
-    document.getElementById('trip-name-display').textContent = currentTrip.name;
+    // Edition permanente : On met à jour les champs directement
     document.getElementById('edit-trip-name').value = currentTrip.name;
+    document.getElementById('edit-trip-name').style.display = 'block';
+    document.getElementById('trip-name-display').style.display = 'none';
     
     if(currentTrip.dateType === 'duration') {
         document.getElementById('trip-duration-type').value = 'duration';
@@ -1222,6 +1224,7 @@ window.renderTrip = function() {
         document.getElementById('date-end').value = currentTrip.endDate || '';
     }
     window.toggleDateType();
+    document.getElementById('edit-banner').classList.add('open');
     
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     let tripLocIdsFromWishlist = wList.filter(w => w.tripId === currentTrip.id).map(w => w.id);
@@ -1257,7 +1260,7 @@ window.renderTrip = function() {
         card.innerHTML = `
             <div class="day-header">
                 <div class="day-title">${currentLang==='fr'?'Jour':'Day'} ${index + 1}</div>
-                <div class="x-btn edit-only" style="display:none;" onclick="removeDay(this)">✕</div>
+                <div class="x-btn edit-only" style="display:block;" onclick="removeDay(this)">✕</div>
             </div>
             <div class="day-items">${itemsHtml}</div>
         `;
@@ -1282,7 +1285,7 @@ window.renderTrip = function() {
                         <div class="loc-row">
                             <div class="loc-thumb" style="background-image:url('${loc.img}');"></div>
                             <div style="flex:1;"><div class="loc-name">${loc.name}</div><div class="loc-meta">${loc.city}, ${loc.country} &middot; ${getCatName(loc.category)}</div></div>
-                            <button class="add-to-trip-btn edit-only" style="display:none;" onclick="quickAddLoc(${loc.id})">+ Add</button>
+                            <button class="add-to-trip-btn edit-only" style="display:block;" onclick="quickAddLoc(${loc.id})">+ Add</button>
                         </div>
                     `;
                     recoCount++;
@@ -1292,11 +1295,9 @@ window.renderTrip = function() {
     }
     document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
 
-    const total = allAssignedIds.length + unassignedIds.length;
-    let datesTxt = currentTrip.dateType === 'duration' ? (currentTrip.duration || 'Flexible') : `${currentTrip.startDate || '?'} to ${currentTrip.endDate || '?'}`;
-    document.getElementById('dates-display').textContent = `${datesTxt} · ${total} location(s)`;
-
-    window.applyEditState();
+    // Les éléments d'édition sont toujours visibles
+    document.querySelectorAll('.edit-only').forEach(el => el.style.display = 'flex');
+    document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', 'true'));
 }
 
 window.toggleDateType = function() {
@@ -1310,48 +1311,39 @@ window.createLocRow = function(loc) {
     const div = document.createElement('div');
     div.className = 'day-loc';
     div.dataset.id = loc.id;
-    div.setAttribute('draggable', editing ? 'true' : 'false');
+    div.setAttribute('draggable', 'true');
     div.setAttribute('ondragstart', 'dragStart(event)');
     div.setAttribute('ondragend', 'dragEnd(event)');
     div.innerHTML = `
-        <span class="drag-handle edit-only" style="display:${editing ? 'inline' : 'none'};">⠿</span>
+        <span class="drag-handle edit-only" style="display:inline;">⠿</span>
         ${loc.name}
-        <span class="x-btn edit-only" style="display:${editing ? 'inline' : 'none'};" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+        <span class="x-btn edit-only" style="display:inline;" onclick="removeFromTrip(this, ${loc.id})">✕</span>
     `;
     return div;
 }
 
 window.createLocRowHtml = function(loc) {
     return `
-        <div class="day-loc" data-id="${loc.id}" draggable="${editing ? 'true' : 'false'}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-            <span class="drag-handle edit-only" style="display:${editing ? 'inline' : 'none'};">⠿</span>
+        <div class="day-loc" data-id="${loc.id}" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+            <span class="drag-handle edit-only" style="display:inline;">⠿</span>
             ${loc.name}
-            <span class="x-btn edit-only" style="display:${editing ? 'inline' : 'none'};" onclick="removeFromTrip(this, ${loc.id})">✕</span>
+            <span class="x-btn edit-only" style="display:inline;" onclick="removeFromTrip(this, ${loc.id})">✕</span>
         </div>
     `;
 }
 
-window.toggleEdit = function() { editing = true; window.applyEditState(); }
-window.cancelEdit = function() { editing = false; window.renderTrip(); }
-
-window.applyEditState = function() {
-    document.getElementById('edit-banner').classList.toggle('open', editing);
-    document.getElementById('trip-name-display').style.display = editing ? 'none' : 'block';
-    document.getElementById('edit-trip-name').style.display = editing ? 'block' : 'none';
-    
-    document.querySelectorAll('.edit-only').forEach(el => el.style.display = editing ? 'flex' : 'none');
-    document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', editing ? 'true' : 'false'));
-    
-    document.getElementById('edit-toggle').style.display = editing ? 'none' : 'inline-flex';
-    document.getElementById('loc-list').style.borderColor = editing ? '#cbd5e1' : 'transparent';
-    document.querySelectorAll('.add-to-trip-btn').forEach(el => el.style.display = editing ? 'block' : 'none');
-}
-
-window.dragStart = function(e) { if(!editing) { e.preventDefault(); return; } draggedEl = e.currentTarget; draggedEl.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
-window.dragEnd = function(e) { if(draggedEl) draggedEl.classList.remove('dragging'); document.querySelectorAll('.day-card, #loc-list').forEach(d => d.classList.remove('drag-over')); draggedEl = null; }
-window.allowDrop = function(e) { if(!editing) return; e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+// DRAG & DROP DES LIEUX
+window.dragStart = function(e) { draggedEl = e.currentTarget; draggedEl.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+window.dragEnd = function(e) { if(draggedEl) draggedEl.classList.remove('dragging'); document.querySelectorAll('.day-card, #loc-list').forEach(d => d.classList.remove('drag-over')); draggedEl = null; window.saveTrip(); }
+window.allowDrop = function(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
 window.dragLeave = function(e) { e.currentTarget.classList.remove('drag-over'); }
-window.drop = function(e) { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if(draggedEl) { if (e.currentTarget.id === 'loc-list') { e.currentTarget.appendChild(draggedEl); } else { e.currentTarget.querySelector('.day-items').appendChild(draggedEl); } } }
+window.drop = function(e) { 
+    e.preventDefault(); e.currentTarget.classList.remove('drag-over'); 
+    if(draggedEl) { 
+        if (e.currentTarget.id === 'loc-list') { e.currentTarget.appendChild(draggedEl); } 
+        else { e.currentTarget.querySelector('.day-items').appendChild(draggedEl); } 
+    } 
+}
 
 window.addDay = function() {
     const box = document.getElementById('itinerary-box');
@@ -1372,6 +1364,7 @@ window.addDay = function() {
         <div class="day-items"></div>
     `;
     box.insertBefore(card, addBtn);
+    window.saveTrip();
 }
 
 window.removeDay = function(btn) {
@@ -1386,6 +1379,7 @@ window.removeDay = function(btn) {
         c.dataset.day = index + 1;
         c.querySelector('.day-title').textContent = `${currentLang==='fr'?'Jour':'Day'} ${index + 1}`;
     });
+    window.saveTrip();
 }
 
 window.removeFromTrip = function(btn, locId) {
@@ -1394,8 +1388,7 @@ window.removeFromTrip = function(btn, locId) {
     wList = wList.filter(w => w.id !== locId || w.tripId !== currentTrip.id);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     btn.closest('.day-loc').remove();
-    
-    window.saveTrip(false); 
+    window.saveTrip(); 
 }
 
 window.quickAddLoc = function(locId) {
@@ -1403,11 +1396,11 @@ window.quickAddLoc = function(locId) {
     if(!wList.some(w => w.id === locId && w.tripId === currentTrip.id)) {
         wList.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-        window.saveTrip(false); 
+        window.saveTrip(); 
     }
 }
 
-window.saveTrip = function(exitEdit = true) {
+window.saveTrip = function() {
     currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
     
     const type = document.getElementById('trip-duration-type').value;
@@ -1432,8 +1425,7 @@ window.saveTrip = function(exitEdit = true) {
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
     
-    if (exitEdit) { editing = false; window.initTrips(); } 
-    else { window.initTrips(); }
+    window.renderTripsSidebar();
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
