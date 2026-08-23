@@ -59,7 +59,6 @@
 
         <div class="sidebar-content" style="height: 100%;">
             
-            <!-- CORRECTION : Le logo renvoie vers map.html ! -->
             <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
@@ -301,7 +300,7 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; text-align:center; font-weight:bold; color:#fff;"></button>
+                <button id="profile-btn" class="nav-btn" style="background-color:#D42759; color:#fff; font-weight:bold; border:none;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
                     <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
@@ -352,7 +351,7 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <div id="iti-map-container"></div>
+            <div id="iti-map-container" style="height: 200px; background: #e2e8f0; border-radius: 12px; margin-bottom: 15px;"></div>
             <div id="iti-days-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
             <div style="display:flex; gap:10px;">
                 <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="background: #2E3644; flex:1; justify-content:center;" data-i18n="itiExport">Export Guide as PDF</button>
