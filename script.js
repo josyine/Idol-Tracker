@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION ROBUSTE DE L'APPLICATION
+// 1. INITIALISATION DE L'APPLICATION
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -7,6 +7,11 @@ let currentFilteredLocations = [];
 let currentLocationIdForMemory = null; 
 let currentGeneratedItinerary = [];
 let currentLang = localStorage.getItem('lang') || 'en';
+
+// Variables globales pour trips.html
+let currentTrip = null;
+let editing = false;
+let draggedEl = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Si la page contient une carte Leaflet (map.html), on l'initialise
@@ -30,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Gestion du menu mobile
     window.toggleMobileMenu = function() {
         const sidebar = document.getElementById('app-sidebar');
         if (sidebar) {
@@ -38,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Boutons communs
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -84,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnShowCountries = document.getElementById('btn-show-countries');
     if (btnShowCountries) btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); });
 
+    // Initialisation
     updateUI();
 });
 
@@ -125,8 +133,8 @@ let celebLocations = [
         id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1",
         address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
         fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` },
-        tip: { en: "Arrive early to secure a spot.", fr: "Arrivez tôt pour être sur la liste d'attente." },
-        directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." }
+        tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." },
+        directions: { en: "Take Line 8 or 9 to Songpanaru Station.", fr: "Prenez la ligne 8 ou 9 jusqu'à Songpanaru." }
     },
     {
         id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", ytId: "d--MDCCJ3jg",
@@ -264,13 +272,14 @@ function updateUI() {
         if(yearOpt) yearOpt.textContent = t('allYears');
     }
 
+    // MAP.HTML logic
     if(document.getElementById('group-select')) {
         initializeFilters();
         renderLocations();
-        loadTripOptions();
+        window.loadMapTripOptions();
     }
     
-    // Si on est sur trips.html
+    // TRIPS.HTML logic
     if(document.getElementById('trip-name-display')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
@@ -295,12 +304,14 @@ function updateUI() {
         
         if(typeof window.initTrips === 'function') window.initTrips();
     }
+
+    // Init ITI Selectors
+    window.initItineraryGenerator();
 }
 
 // ==========================================
 // 4. FILTRES DE LA CARTE
 // ==========================================
-let activeCategory = "All"; 
 function initializeFilters() {
     const groupSelect = document.getElementById('group-select');
     const memberSelect = document.getElementById('member-select');
@@ -351,10 +362,9 @@ function initializeFilters() {
         const sInput = document.getElementById('search-input');
         if(sInput) sInput.addEventListener('input', renderLocations);
     }
-
-    window.initItineraryGenerator();
 }
 
+// Fonction utilitaire pour le générateur d'itinéraire
 window.initItineraryGenerator = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
@@ -401,10 +411,8 @@ function renderLocations() {
 
     const cSidebar = document.getElementById('location-count-sidebar');
     if(cSidebar) cSidebar.textContent = filteredLocations.length;
-    
     const sLocations = document.getElementById('stat-locations');
     if(sLocations) sLocations.textContent = filteredLocations.length;
-    
     const sCountries = document.getElementById('stat-countries');
     if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
@@ -444,9 +452,9 @@ function renderLocations() {
 }
 
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST DANS LA CARTE
+// 6. GESTION DES TRIPS / WISHLIST DANS MAP.HTML
 // ==========================================
-function loadTripOptions() {
+window.loadMapTripOptions = function() {
     const select = document.getElementById('trip-select');
     if(!select) return;
     
@@ -456,11 +464,9 @@ function loadTripOptions() {
     const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
     
     select.innerHTML = `<option value="none">${noTripTxt}</option>`;
-    trips.forEach(t => {
-        select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
-    });
+    trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
     select.innerHTML += `<option value="new">${newTripTxt}</option>`;
-}
+};
 
 window.toggleWishlist = function() {
     const checked = document.getElementById('details-wishlist').checked;
@@ -521,8 +527,9 @@ window.createTrip = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    localStorage.setItem('activeTripId', newTripId);
 
-    loadTripOptions(); 
+    window.loadMapTripOptions(); 
     document.getElementById('trip-select').value = newTripId;
     window.handleTripSelect(); 
     window.cancelNewTrip();
@@ -714,6 +721,7 @@ window.setStars = function(val) {
         }
     });
 }
+
 document.querySelectorAll('#memory-stars .star').forEach(star => {
     star.addEventListener('click', function() { window.setStars(parseInt(this.getAttribute('data-val'))); });
 });
@@ -805,7 +813,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR (RÉPARÉ)
+// 8. AUTO-ITINERARY GENERATOR
 // ==========================================
 let itiLeafletMap = null;
 let itiLayerGroup = null;
@@ -815,7 +823,6 @@ if(btnOpenIti) {
     btnOpenIti.addEventListener('click', () => {
         document.getElementById('iti-result').classList.add('hidden');
         document.getElementById('itinerary-modal').classList.remove('hidden');
-        window.initItineraryGenerator();
     });
 }
 
@@ -847,25 +854,34 @@ window.generateItinerary = function() {
     
     resultDiv.innerHTML = "";
     
-    // CORRECTION du générateur : On force un minimum de 1 lieu par jour pour s'assurer que ça s'affiche
-    const locsPerDay = Math.max(1, Math.ceil(validLocs.length / days));
+    // Le calcul original qui répartissait équitablement
+    const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     currentGeneratedItinerary = [];
     
+    const txt = {
+        en: { day: "Day", transit: "Transit to next location (~30 mins)", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
+        fr: { day: "Jour", transit: "Trajet vers le prochain lieu (~30 mins)", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
+    }[currentLang];
+
     for(let i = 0; i < days; i++) {
         const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
         if(dayLocs.length === 0) continue;
         
         currentGeneratedItinerary.push(dayLocs);
         
+        let mapLink = "";
         if(dayLocs.length === 1) {
+            mapLink = `https://www.google.com/maps/search/?api=1&query=${dayLocs[0].lat},${dayLocs[0].lng}`;
             coordsForMap.push([dayLocs[0].lat, dayLocs[0].lng]);
         } else {
+            let waypoints = dayLocs.map(l => `${l.lat},${l.lng}`).join('|');
+            mapLink = `https://www.google.com/maps/dir/?api=1&origin=${dayLocs[0].lat},${dayLocs[0].lng}&destination=${dayLocs[dayLocs.length-1].lat},${dayLocs[dayLocs.length-1].lng}&waypoints=${waypoints}&travelmode=driving`;
             dayLocs.forEach(l => coordsForMap.push([l.lat, l.lng]));
         }
         
         let html = `<div class="iti-day-card" style="padding: 18px 16px;">
-            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Day ${i + 1}</div>`;
+            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">${txt.day} ${i + 1}</div>`;
         
         let currentTime = new Date();
         currentTime.setHours(10, 0, 0);
@@ -887,7 +903,7 @@ window.generateItinerary = function() {
             html += `</div>`;
 
             if (idx < dayLocs.length - 1) {
-                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">Transit</span></div>`;
+                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
                 currentTime.setMinutes(currentTime.getMinutes() + 30);
             }
         });
@@ -916,6 +932,7 @@ window.generateItinerary = function() {
                  .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
             });
             
+            // Sécurité pour le zoom : un point = vue fixe, plusieurs points = vue englobante
             if(coordsForMap.length > 1) {
                 L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
                 itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
@@ -928,6 +945,7 @@ window.generateItinerary = function() {
     }
 }
 
+// Bouton Sauvegarder dans My Trips
 window.saveItineraryToTrips = function() {
     const country = document.getElementById('iti-country').value;
     const daysCount = parseInt(document.getElementById('iti-days').value);
@@ -960,12 +978,11 @@ window.saveItineraryToTrips = function() {
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    localStorage.setItem('activeTripId', newTripId); // Force l'ouverture sur trips.html
 
-    if(window.location.pathname.includes('trips.html')) {
+    if(document.getElementById('trip-name-display')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
-        window.loadTripsSidebar();
-        document.getElementById('active-trip-select').value = newTripId;
-        window.switchTrip();
+        window.initTrips();
     } else {
         window.location.href = 'trips.html';
     }
@@ -1079,85 +1096,66 @@ window.onclick = function(e) {
     if (e.target.classList.contains('modal')) e.target.classList.add('hidden'); 
 };
 
-if(!localStorage.getItem('cookiesAccepted') && document.getElementById('cookie-banner')) { 
-    document.getElementById('cookie-banner').classList.remove('hidden'); 
-}
-function closeCookies() { 
-    localStorage.setItem('cookiesAccepted', 'true'); 
-    if(document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden'); 
-}
-const btnAccept = document.getElementById('cookie-accept');
-if(btnAccept) btnAccept.addEventListener('click', closeCookies);
-const btnReject = document.getElementById('cookie-reject');
-if(btnReject) btnReject.addEventListener('click', closeCookies);
-
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
-window.loadTripsSidebar = function() {
-    const listContainer = document.getElementById('trips-list-container');
-    const title = document.getElementById('sidebar-title');
-    const select = document.getElementById('active-trip-select');
-    if(!listContainer) return;
+window.initTrips = function() {
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    
+    if (trips.length === 0) {
+        document.getElementById('empty-state').innerHTML = currentLang === 'fr' 
+            ? "Vous n'avez pas encore de voyage.<br>Allez sur la carte et ajoutez des lieux !"
+            : "You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist'!";
+        document.getElementById('empty-state').classList.remove('hidden');
+        document.getElementById('trip-detail-content').style.display = 'none';
+        document.getElementById('sidebar-title').textContent = `MY TRIPS (0)`;
+        document.getElementById('trips-list-container').innerHTML = '';
+        return;
+    }
+    
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('trip-detail-content').style.display = 'block';
+    
+    let activeId = localStorage.getItem('activeTripId');
+    if (activeId) {
+        currentTrip = trips.find(t => t.id === activeId);
+    }
+    if (!currentTrip) {
+        currentTrip = trips[trips.length - 1];
+    }
+    
+    if (!currentTrip.days) currentTrip.days = [];
 
+    window.renderTripsSidebar();
+    window.renderTrip();
+}
+
+window.renderTripsSidebar = function() {
+    const listContainer = document.getElementById('trips-list-container');
+    if(!listContainer) return;
+    
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     
     listContainer.innerHTML = '';
-    if(select) select.innerHTML = '';
-    
-    title.textContent = `MY TRIPS (${trips.length})`;
-
-    if (trips.length === 0) {
-        document.getElementById('empty-state').innerHTML = currentLang==='fr'?"Vous n'avez pas encore créé de voyage.<br>Allez sur la carte et ajoutez des lieux à votre Wishlist !":"You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist' to create your first trip!";
-        document.getElementById('empty-state').classList.remove('hidden');
-        document.getElementById('trip-detail-content').style.display = 'none';
-        return;
-    }
-
-    document.getElementById('empty-state').classList.add('hidden');
-    document.getElementById('trip-detail-content').style.display = 'block';
+    document.getElementById('sidebar-title').textContent = `MY TRIPS (${trips.length})`;
 
     trips.forEach(t => {
-        if(select) {
-            let opt = document.createElement('option');
-            opt.value = t.id; opt.textContent = t.name;
-            select.appendChild(opt);
-        }
-
         const locCount = wList.filter(w => w.tripId === t.id).length;
         let dateStr = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.startDate || '?'} to ${t.endDate || '?'}`;
         
         let pill = document.createElement('div');
         pill.className = `trip-pill ${currentTrip && currentTrip.id === t.id ? 'active' : ''}`;
-        pill.onclick = () => { if(select) select.value = t.id; window.switchTrip(); };
+        pill.onclick = () => { 
+            localStorage.setItem('activeTripId', t.id);
+            window.initTrips();
+        };
         pill.innerHTML = `
             <div class="trip-pill-name">${t.name}</div>
             <div class="trip-pill-meta">${dateStr} &middot; ${locCount} locations</div>
         `;
         listContainer.appendChild(pill);
     });
-
-    if(select && !select.value && trips.length > 0) {
-        select.value = trips[trips.length - 1].id;
-    }
-    
-    if (!currentTrip || !trips.find(t => t.id === currentTrip.id)) {
-         window.switchTrip();
-    } else {
-         window.renderTrip();
-    }
-}
-
-window.switchTrip = function() {
-    const select = document.getElementById('active-trip-select');
-    if(!select) return;
-    
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    currentTrip = trips.find(t => t.id === select.value);
-    if (!currentTrip.days) currentTrip.days = []; 
-    
-    window.loadTripsSidebar(); 
 }
 
 window.renderTrip = function() {
@@ -1187,7 +1185,7 @@ window.renderTrip = function() {
         const loc = celebLocations.find(l => l.id === id);
         if (loc) locList.appendChild(window.createLocRow(loc));
     });
-    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `Lieux non assignés (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
+    document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `LIEUX NON ASSIGNÉS (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
 
     const box = document.getElementById('itinerary-box');
     const addBtn = box.querySelector('.add-day-btn');
@@ -1385,11 +1383,8 @@ window.saveTrip = function(exitEdit = true) {
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
     
-    const opt = document.getElementById('active-trip-select').querySelector(`option[value="${currentTrip.id}"]`);
-    if(opt) opt.textContent = currentTrip.name;
-    
-    if (exitEdit) { editing = false; window.renderTripsSidebar(); window.renderTrip(); } 
-    else { window.renderTripsSidebar(); window.renderTrip(); }
+    if (exitEdit) { editing = false; window.initTrips(); } 
+    else { window.initTrips(); }
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
@@ -1431,13 +1426,10 @@ window.createNewTripEmpty = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    localStorage.setItem('activeTripId', newTripId); // Force l'ouverture de ce voyage
 
-    currentTrip = newTrip; 
-    
     document.getElementById('add-trip-modal').classList.add('hidden');
     nameInput.value = '';
     
-    window.loadTripsSidebar(); 
-    document.getElementById('active-trip-select').value = newTripId;
-    window.switchTrip(); 
+    window.initTrips(); 
 }
