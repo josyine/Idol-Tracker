@@ -54,7 +54,7 @@
 
         <div class="sidebar-content" style="height: 100%;">
             
-            <a href="map.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
+            <a href="index.html" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -113,7 +113,7 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
-                <!-- PIED DE PAGE -->
+                <!-- PIED DE PAGE TRADUIT -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;" data-i18n="footerText">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -148,9 +148,7 @@
                     <!-- LE TIROIR WISHLIST / TRIP -->
                     <div class="trip-box" id="trip-box">
                         <span class="sub-label" data-i18n="tripWhich">Which trip is this for?</span>
-                        <select id="trip-select" class="trip-select" onchange="handleTripSelect()">
-                            <!-- Options injectées par JS -->
-                        </select>
+                        <select id="trip-select" class="trip-select" onchange="handleTripSelect()"></select>
 
                         <div class="new-trip-field" id="new-trip-field">
                             <span class="sub-label" data-i18n="tripName">Trip name</span>
@@ -290,6 +288,7 @@
                     <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
                     <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
                     <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
+                    <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
                     <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;" data-i18n="logoutOption">Logout</a>
@@ -311,7 +310,7 @@
     </main>
 </div>
 
-<!-- Modales diverses ... -->
+<!-- Modal Liste (Locations / Countries filtrées) -->
 <div id="list-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px; padding: 25px;">
         <span class="close-btn" onclick="closeModal('list-modal')">&times;</span>
@@ -320,17 +319,20 @@
     </div>
 </div>
 
+<!-- Modal Itinéraire -->
 <div id="itinerary-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 650px;">
         <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
         <h2 style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 5px;" data-i18n="itiTitle">Auto-Itinerary Generator</h2>
         <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay.</p>
+        
         <div id="iti-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
             <select id="iti-group" class="filter-select" style="padding:12px;"></select>
             <select id="iti-country" class="filter-select" style="padding:12px;"></select>
             <input type="number" id="iti-days" min="1" max="7" value="3" class="filter-select" style="padding:12px;">
             <button class="cta-primary" onclick="generateItinerary()" style="padding:14px; font-size:14px;" data-i18n="itiCreateBtn">Create My Guide</button>
         </div>
+
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
             <div id="iti-map-container"></div>
             <div id="iti-days-list"></div>
@@ -339,11 +341,13 @@
     </div>
 </div>
 
+<!-- Modal Panier -->
 <div id="cart-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px;">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
         <h2 style="color: #1e293b; margin-bottom: 5px;" data-i18n="cartTitle">Unlock New Passes</h2>
         <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
+        
         <form id="cart-form">
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
                 <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
