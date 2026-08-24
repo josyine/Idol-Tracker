@@ -8,10 +8,9 @@ let currentLocationIdForMemory = null;
 let currentGeneratedItinerary = [];
 let currentLang = localStorage.getItem('lang') || 'en';
 
-// Variables globales
 let currentTrip = null;
 let draggedEl = null;
-let dragType = null; // 'loc' ou 'day'
+let dragType = null; 
 let tripIdToDelete = null;
 let locToRemoveData = null; 
 let dayToRemoveBtn = null; 
@@ -20,7 +19,6 @@ let tripPageLayer = null;
 let tripMainLayerGroup = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- GESTION DE L'AVATAR (ICÔNE DE COMPTE) ---
     const userAvatarEls = document.querySelectorAll('.user-avatar-btn');
     if (userAvatarEls.length > 0) {
         const savedPhoto = localStorage.getItem('userPhoto');
@@ -37,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Si la page contient une carte Leaflet principale (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -69,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['lang-btn', 'profile-btn', 'cart-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
-            if(id === 'cart-btn') return; // Géré séparément
+            if(id === 'cart-btn') return; 
             const menuId = id.replace('-btn', '-menu');
             document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
             const targetMenu = document.getElementById(menuId);
@@ -597,6 +594,7 @@ function drawTripOnMap(trip, targetMap, targetLayerGroup) {
         targetMap.fitBounds(L.polyline(allPoints).getBounds(), { padding: [40, 40], maxZoom: 16 });
     }
 }
+
 
 // ==========================================
 // 6. DETAILS PANEL, WISHLIST, ETC.
@@ -1346,6 +1344,12 @@ window.initTrips = function() {
     }
     if (!currentTrip.days) currentTrip.days = [];
 
+    if(document.getElementById('trip-map-container') && !tripPageMap) {
+        tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(tripPageMap);
+        tripPageLayer = L.featureGroup().addTo(tripPageMap);
+    }
+
     window.renderTripsSidebar();
     window.renderTrip();
 }
@@ -1607,6 +1611,10 @@ window.renderTrip = function() {
     }
     document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
     document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', 'true'));
+    
+    if(tripPageMap) {
+        setTimeout(() => { tripPageMap.invalidateSize(); drawTripOnMap(currentTrip, tripPageMap, tripPageLayer); }, 200);
+    }
 }
 
 window.switchEditDateTab = function(tab) {
@@ -1848,6 +1856,10 @@ window.saveTrip = function() {
     localStorage.setItem('myTrips', JSON.stringify(trips));
     
     window.renderTripsSidebar();
+    
+    if(tripPageMap) {
+        drawTripOnMap(currentTrip, tripPageMap, tripPageLayer);
+    }
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
