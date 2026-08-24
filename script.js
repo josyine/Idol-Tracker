@@ -1,5 +1,5 @@
 // ==========================================
-// 1. INITIALISATION DE L'APPLICATION
+// 1. INITIALISATION ROBUSTE DE L'APPLICATION
 // ==========================================
 let map = null;
 let markerGroup = null;
@@ -14,7 +14,6 @@ let draggedEl = null;
 let tripIdToDelete = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Si la page contient une carte Leaflet (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Boutons communs
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -283,6 +281,7 @@ function updateUI() {
         const eAuto = document.getElementById('i18n-auto-btn'); if(eAuto) eAuto.textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
         const eOpen = document.getElementById('i18n-open-iti'); if(eOpen) eOpen.textContent = isFr ? "Ouvrir le Générateur" : "Open Auto-Itinerary Generator";
         const eNeed = document.getElementById('i18n-need-magic'); if(eNeed) eNeed.textContent = isFr ? "Besoin de magie ?" : "Need some magic?";
+        const eAct = document.getElementById('i18n-active'); if(eAct) eAct.textContent = isFr ? "Voyage actif :" : "Active Trip :";
         const eEditing = document.getElementById('i18n-editing'); if(eEditing) eEditing.textContent = isFr ? "✏️ Édition de ce voyage" : "✏️ Editing this trip";
         const eDur = document.getElementById('i18n-trip-duration'); if(eDur) eDur.textContent = isFr ? "Durée & Dates" : "Trip Duration & Dates";
         const eSpec = document.getElementById('i18n-opt-specific'); if(eSpec) eSpec.textContent = isFr ? "Dates Précises" : "Specific Dates";
@@ -296,7 +295,6 @@ function updateUI() {
         const eModAdd = document.getElementById('i18n-modal-add'); if(eModAdd) eModAdd.textContent = isFr ? "Ajouter au voyage" : "Add to this Trip";
         const eCreateTitle = document.getElementById('i18n-create-title'); if(eCreateTitle) eCreateTitle.textContent = isFr ? "Créer un nouveau voyage" : "Create a new trip";
         const eBtnCreate = document.getElementById('i18n-btn-create'); if(eBtnCreate) eBtnCreate.textContent = isFr ? "Créer" : "Create";
-        const eDelBtn = document.getElementById('i18n-delete-trip'); if(eDelBtn) eDelBtn.textContent = isFr ? "Supprimer" : "Delete";
         const eDelTitle = document.getElementById('i18n-del-title'); if(eDelTitle) eDelTitle.textContent = isFr ? "Supprimer ce voyage ?" : "Delete this trip?";
         const eDelDesc = document.getElementById('i18n-del-desc'); if(eDelDesc) eDelDesc.textContent = isFr ? "Êtes-vous sûr de vouloir supprimer ce voyage ? Cette action est irréversible." : "Are you sure you want to delete this trip? This cannot be undone.";
         const eDelCancel = document.getElementById('i18n-del-cancel'); if(eDelCancel) eDelCancel.textContent = isFr ? "Annuler" : "Cancel";
@@ -305,6 +303,7 @@ function updateUI() {
         if(typeof window.initTrips === 'function') window.initTrips();
     }
 
+    // Init ITI Selectors (Map et Trips)
     window.initItineraryGenerator();
 }
 
@@ -1208,9 +1207,8 @@ window.dropTrip = function(e, targetId) {
 window.renderTrip = function() {
     if (!currentTrip) return;
 
-    // Edition permanente
+    // Edition permanente : On met à jour les champs directement
     document.getElementById('edit-trip-name').value = currentTrip.name;
-    document.getElementById('edit-trip-name').style.display = 'block';
     
     if(currentTrip.dateType === 'duration') {
         document.getElementById('trip-duration-type').value = 'duration';
@@ -1221,7 +1219,6 @@ window.renderTrip = function() {
         document.getElementById('date-end').value = currentTrip.endDate || '';
     }
     window.toggleDateType();
-    document.getElementById('edit-banner').classList.add('open');
     
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     let tripLocIdsFromWishlist = wList.filter(w => w.tripId === currentTrip.id).map(w => w.id);
@@ -1291,9 +1288,6 @@ window.renderTrip = function() {
         });
     }
     document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
-
-    // Rendre les éléments déplaçables
-    document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', 'true'));
 }
 
 window.toggleDateType = function() {
@@ -1428,6 +1422,7 @@ window.openAddModal = function() { document.getElementById('add-modal').classLis
 window.closeAddModal = function() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-search').value = ""; }
 
 window.filterAddModal = function() {
+    if(!currentTrip) return;
     const query = (document.getElementById('add-search').value || "").toLowerCase();
     const list = document.getElementById('add-modal-list');
     list.innerHTML = '';
@@ -1452,13 +1447,68 @@ window.filterAddModal = function() {
     });
 }
 
-window.createNewTripEmpty = function() {
+// LOGIQUE GOOGLE FLIGHTS STYLE TABS
+window.openNewTripModal = function() {
+    document.getElementById('add-trip-modal').classList.remove('hidden');
+    const gSelect = document.getElementById('create-trip-group');
+    if(gSelect && gSelect.options.length <= 1) {
+        const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
+        if(unlockedGroups.length === 0) availableLocs = celebLocations;
+        const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
+        availableGroups.forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
+    }
+}
+
+window.switchTripDateTab = function(tab) {
+    document.querySelectorAll('.date-tab').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.date-tab[data-tab="${tab}"]`).classList.add('active');
+    
+    if(tab === 'specific') {
+        document.getElementById('trip-date-specific-panel').classList.remove('hidden');
+        document.getElementById('trip-date-flexible-panel').classList.add('hidden');
+    } else {
+        document.getElementById('trip-date-specific-panel').classList.add('hidden');
+        document.getElementById('trip-date-flexible-panel').classList.remove('hidden');
+    }
+}
+
+window.selectPill = function(btn, type) {
+    document.querySelectorAll(`.pill-btn[data-type="${type}"]`).forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+window.createNewTripAdvanced = function() {
     const nameInput = document.getElementById('create-trip-name');
     const name = nameInput.value.trim();
-    if (!name) return;
+    if (!name) { alert("Please enter a trip name."); return; }
+
+    const isFlexible = document.querySelector('.date-tab[data-tab="flexible"]').classList.contains('active');
+    
+    let dateType = isFlexible ? 'duration' : 'specific';
+    let duration = "";
+    let startDate = "";
+    let endDate = "";
+
+    if (isFlexible) {
+        const month = document.querySelector('.pill-btn[data-type="month"].active')?.textContent || '';
+        const length = document.querySelector('.pill-btn[data-type="duration"].active')?.textContent || '';
+        duration = `${length} in ${month}`;
+    } else {
+        startDate = document.getElementById('create-trip-start').value;
+        endDate = document.getElementById('create-trip-end').value;
+    }
 
     const newTripId = 'trip-' + Date.now();
-    let newTrip = { id: newTripId, name: name, dateType: 'duration', duration: '1 Week', days: [] };
+    let newTrip = { 
+        id: newTripId, 
+        name: name, 
+        dateType: dateType, 
+        duration: duration, 
+        startDate: startDate, 
+        endDate: endDate, 
+        days: [] 
+    };
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push(newTrip);
@@ -1472,7 +1522,7 @@ window.createNewTripEmpty = function() {
     window.initTrips(); 
 }
 
-// LOGIQUE DE SUPPRESSION
+// LOGIQUE DE SUPPRESSION (MODAL CUSTOM)
 window.openDeleteModal = function(id = null, event = null) {
     if(event) event.stopPropagation();
     tripIdToDelete = id || currentTrip.id;
