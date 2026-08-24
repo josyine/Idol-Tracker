@@ -55,28 +55,31 @@
   .standalone-container { padding-top: 120px; padding-bottom: 50px; max-width: 600px; margin: 0 auto; position: relative; z-index: 10; width: 90%; }
   .glass-card { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(80,60,120,.05); }
   
-  .page-title { color: #D42759; margin-bottom: 30px; font-size: 24px; font-weight: 700; border-bottom: 2px solid #FCE7F0; padding-bottom: 15px; text-align: center;}
-  .back-btn { display: inline-block; margin-bottom: 20px; color: #D42759; text-decoration: none; font-weight: bold; font-size: 13px; }
+  .page-title { color: #D42759; margin-bottom: 20px; font-size: 28px; font-weight: 700; border-bottom: 2px solid #FCE7F0; padding-bottom: 15px; text-align: center;}
+  .back-btn { display: inline-block; margin-bottom: 20px; color: #D42759; text-decoration: none; font-weight: bold; font-size: 13.5px; }
   .back-btn:hover { text-decoration: underline; }
 
-  /* ÉLÉMENTS SETTINGS (Thème clair) */
-  .section-title-set {font-size:10.5px;font-weight:700;letter-spacing:.6px;color:#94a3b8;text-transform:uppercase;margin-bottom:10px;}
-  .box-container {border:1px solid #e2e8f0;border-radius:14px;padding:4px 20px;margin-bottom:22px;background:#fff;}
-  .row {display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f1f5f9;}
-  .row-label {font-size:13.5px;font-weight:700;color:#212832;}
-  .row-sub {font-size:10.5px;color:#94a3b8;margin-top:2px;}
-  select.lang-select {border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;font-size:12px;color:#334155;font-family:'Poppins',sans-serif;background:#f8fafc;outline:none;}
-  .btn-outline {border:1.5px solid #cbd5e1;color:#334155;font-size:11.5px;font-weight:700;padding:8px 14px;border-radius:100px;background:#fff;cursor:pointer;transition:0.2s;}
-  .btn-outline:hover {border-color:#D42759;color:#D42759;}
-  .provider-badge {display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#334155;background:#f8fafc;padding:6px 12px;border-radius:100px;border:1px solid #e2e8f0;}
+  /* ELEMENTS SETTINGS */
+  .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid rgba(203,213,225, 0.4); }
+  .setting-item:last-of-type { border-bottom: none; }
+  .setting-item strong { font-size: 1.05rem; color: #212832; }
+  
+  .action-btn-set { background: #fff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 100px; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.2s;}
+  .action-btn-set:hover { border-color: #D42759; color: #D42759; }
+  
+  .danger-btn { background: #ef4444; color: white; border: none; padding: 12px 16px; border-radius: 100px; cursor: pointer; font-weight: bold; font-size: 13.5px; margin-top: 30px; width: 100%; transition: 0.2s; box-shadow: 0 6px 15px rgba(239,68,68,0.2);}
+  .danger-btn:hover { background: #dc2626; transform: translateY(-2px); }
+
+  select.lang-select { padding: 8px 16px; border-radius: 100px; border: 1px solid #cbd5e1; font-size: 12px; color: #334155; outline: none; background: #fff; font-weight: 600; cursor: pointer; transition: 0.2s;}
+  select.lang-select:focus { border-color: #D42759; }
 
   /* Toggle Switch */
-  .toggle {width:40px;height:22px;border-radius:100px;position:relative;cursor:pointer;flex-shrink:0;transition:0.3s;}
-  .toggle.on {background:#D42759;}
-  .toggle.off {background:#cbd5e1;}
-  .toggle::after {content:'';position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.3s;}
-  .toggle.on::after {right:3px;}
-  .toggle.off::after {left:3px;}
+  .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+  input:checked + .slider { background-color: #D42759; }
+  input:checked + .slider:before { transform: translateX(20px); }
 </style>
 <script>
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
@@ -102,22 +105,19 @@
     </svg>
 </div>
 
-<!-- HEADER UNIVERSEL -->
-<div class="universal-header">
-    <div class="header-left">
-        <a href="map.html" class="brand-row">
-            <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
-                <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
-                <circle cx="200" cy="150" r="26" fill="#D42759"/>
-            </svg>
-            <div>
-                <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
-                <div class="tagline" data-i18n="subtitle">Following the footsteps of your favorite artists</div>
-            </div>
-        </a>
-    </div>
+<div class="top-nav-standalone">
+    <a href="map.html" class="brand-row">
+        <svg width="34" height="34" viewBox="0 0 400 400" style="flex-shrink:0;">
+            <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+            <circle cx="200" cy="150" r="26" fill="#D42759"/>
+        </svg>
+        <div>
+            <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
+            <div class="tagline" data-i18n="subtitle">Following the footsteps of your favorite artists</div>
+        </div>
+    </a>
     
-    <div class="header-right">
+    <div class="header-actions">
         <div class="dropdown-container">
             <button id="lang-btn" class="header-icon-btn" title="Langue">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
@@ -153,45 +153,36 @@
 <div class="standalone-container">
     <div class="glass-card">
         <a href="map.html" class="back-btn">← Back to Map</a>
-        <h1 class="page-title">Settings</h1>
+        <h1 class="page-title" data-i18n="settingsOption">Settings</h1>
         
-        <div class="section-title-set">Account &amp; Security</div>
-        <div class="box-container">
-            <div class="row"><div><div class="row-label">Password</div><div class="row-sub">Last changed 3 months ago</div></div><button class="btn-outline">Change</button></div>
-            <div class="row" style="border-bottom:none;"><div class="row-label">Signed in with</div><div class="provider-badge">🔵 Google</div></div>
+        <div class="setting-item">
+            <strong>Language</strong>
+            <select id="lang-select" class="lang-select" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
+        
+        <div class="setting-item">
+            <strong>Email Notifications</strong>
+            <label class="switch">
+                <input type="checkbox" id="notif-toggle" checked>
+                <span class="slider"></span>
+            </label>
         </div>
 
-        <div class="section-title-set">Preferences</div>
-        <div class="box-container">
-            <div class="row"><div class="row-label">Language</div>
-                <select class="lang-select" id="lang-select" onchange="changeLanguage(this.value)">
-                    <option value="en">English</option>
-                    <option value="fr">Français</option>
-                </select>
-            </div>
-            <div class="row"><div class="row-label">Currency</div><select class="lang-select"><option>EUR (€)</option></select></div>
-            <div class="row"><div class="row-label">Distance units</div><select class="lang-select"><option>Kilometers</option></select></div>
-            <div class="row"><div class="row-label">Email notifications</div><div class="toggle on" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
-            <div class="row" style="border-bottom:none;"><div class="row-label">Push notifications</div><div class="toggle off" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
+        <div class="setting-item">
+            <strong>Cookie Preferences</strong>
+            <button class="action-btn-set" onclick="resetCookies()">Reset Banners</button>
         </div>
 
-        <div class="section-title-set">Privacy</div>
-        <div class="box-container">
-            <div class="row"><div class="row-label">Cookie Preferences</div><button class="btn-outline" onclick="resetCookies()">Reset Banners</button></div>
-            <div class="row" style="border-bottom:none;"><div><div class="row-label">Download my data</div><div class="row-sub">Export everything in JSON</div></div><button class="btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</button></div>
-        </div>
-
-        <div class="section-title-set">Danger zone</div>
-        <div style="border:1.5px solid #FBD5DC;background:#FFF7F8;border-radius:14px;padding:18px 20px;">
-            <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span style="font-size:13px;font-weight:700;color:#D42759;">Delete account</span></div>
-            <p style="font-size:11.5px;color:#94a3b8;margin-bottom:14px;">This permanently deletes your trips, wishlist and unlocked passes.</p>
-            <button style="width:100%;background:#ef4444;color:#fff;border:none;border-radius:100px;padding:12px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;box-shadow:0 6px 15px rgba(239,68,68,0.2);">Delete Account</button>
-        </div>
+        <button class="danger-btn" onclick="alert('Are you sure? This action cannot be undone.')">Delete Account</button>
     </div>
 </div>
 
 <script src="script.js"></script>
 <script>
+    // Initialise le select de langue de cette page selon le localStorage
     const savedLang = localStorage.getItem('lang') || 'en';
     const sel = document.getElementById('lang-select');
     if(sel) sel.value = savedLang;
@@ -200,6 +191,7 @@
         localStorage.setItem('lang', val);
         window.location.reload();
     }
+
     function resetCookies() {
         localStorage.removeItem('cookiesAccepted');
         alert('Cookie banner has been reset. It will appear next time you open the site.');
