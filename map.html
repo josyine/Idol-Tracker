@@ -117,6 +117,7 @@
                     <div class="location-list" id="location-list"></div>
                 </div>
 
+                <!-- PIED DE PAGE -->
                 <div class="sidebar-footer" style="text-align: center; color: var(--muted-text); font-size: 11px; padding: 15px 0 5px 0; border-top: 1px solid #f1f5f9;">
                     <p style="margin-bottom: 5px;" data-i18n="footerText">Screen To Street is an independent fan-made guide.</p>
                     <div class="sidebar-footer-links" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -182,7 +183,7 @@
                         </div>
                     </div>
 
-                    <!-- LE TIROIR SOUVENIR (VISITED) -->
+                    <!-- LE TIROIR SOUVENIR (VISITED) AVEC PHOTOS -->
                     <div id="memory-dropdown" class="memory-dropdown">
                         <span class="sub-label">Your rating</span>
                         <div class="stars" id="memory-stars">
@@ -279,19 +280,17 @@
 
     <!-- Zone Carte à Droite -->
     <main class="map-container">
-        <!-- TOP NAV IDENTIQUE A TRIPS.HTML -->
         <div class="top-nav">
             <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div style="flex:1;"></div>
             <div class="dropdown-container">
-                <button id="lang-btn" class="nav-btn" title="Langue" onclick="document.getElementById('lang-menu').classList.toggle('hidden')">
+                <button id="lang-btn" class="nav-btn" title="Langue">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </button>
-                <div id="lang-menu" class="dropdown-menu hidden" style="position:absolute; right:110px; top:60px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                    <a href="#" class="dropdown-option" style="display:block; padding:8px 16px; color:#334155;" onclick="changeLang('en'); document.getElementById('lang-menu').classList.add('hidden'); return false;">English</a>
-                    <a href="#" class="dropdown-option" style="display:block; padding:8px 16px; color:#334155;" onclick="changeLang('fr'); document.getElementById('lang-menu').classList.add('hidden'); return false;">Français</a>
+                <div id="lang-menu" class="dropdown-menu hidden">
+                    <a href="#" class="dropdown-option lang-option" data-lang="en">English</a>
+                    <a href="#" class="dropdown-option lang-option" data-lang="fr">Français</a>
                 </div>
             </div>
             <div class="dropdown-container">
@@ -300,19 +299,19 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <!-- Icone Profil Blanche avec texte noir -->
-                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: 1px solid #cbd5e1; background-color: transparent; color: #212832; font-weight: bold;" onclick="document.getElementById('profile-menu').classList.toggle('hidden')">U</button>
+                <!-- Icon Profil transparent, lettre noire -->
+                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: 1px solid #cbd5e1; background-color: transparent; color: #212832; font-weight: bold;"></button>
                 <div id="profile-menu" class="dropdown-menu hidden">
-                    <a href="map-destinations.html" class="dropdown-option" id="i18n-dest">Explore Destinations</a>
-                    <a href="map-artists.html" class="dropdown-option" id="i18n-art">Explore Artists</a>
+                    <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
+                    <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
                     <div class="dropdown-divider"></div>
-                    <a href="account.html" class="dropdown-option">Your Account</a>
-                    <a href="visited.html" class="dropdown-option">My Visited Places</a>
-                    <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
-                    <a href="trips.html" class="dropdown-option" style="color:#212832;">My Trips</a>
-                    <a href="settings.html" class="dropdown-option">Settings</a>
+                    <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
+                    <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
+                    <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
+                    <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
+                    <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
                     <div class="dropdown-divider"></div>
-                    <a href="index.html" class="dropdown-option" style="color:var(--primary-magenta); font-weight:bold;">Logout</a>
+                    <a href="#" class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;" data-i18n="logoutOption">Logout</a>
                 </div>
             </div>
         </div>
@@ -331,7 +330,7 @@
     </main>
 </div>
 
-<!-- Modal Liste (Locations / Countries filtrées) -->
+<!-- Modal Liste -->
 <div id="list-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px; padding: 25px;">
         <span class="close-btn" onclick="closeModal('list-modal')">&times;</span>
@@ -340,7 +339,7 @@
     </div>
 </div>
 
-<!-- Modal Itinéraire (CARTE CORRIGÉE - Strictement comme l'originale mais sans dépassement) -->
+<!-- Modal Itinéraire (CARTE CORRIGÉE - Ne déborde plus) -->
 <div id="itinerary-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 650px;">
         <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
@@ -355,7 +354,7 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <div style="width: 100%; height: 250px; margin-bottom: 15px; position:relative; overflow:hidden; border-radius: 12px; z-index:10; background: #e2e8f0;">
+            <div style="width: 100%; height: 250px; background: #e2e8f0; border-radius: 12px; margin-bottom: 15px; position: relative; z-index: 10; overflow: hidden;">
                 <div id="iti-map-container" style="height: 100%; width: 100%;"></div>
             </div>
             <div id="iti-days-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
