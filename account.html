@@ -11,7 +11,6 @@
 a{text-decoration:none;}
 body{background:#E7E9EC;padding:0; height:100vh; overflow-y:auto;}
 
-/* FOND ANIMÉ */
 .hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; }
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: float 12s infinite ease-in-out alternate; }
@@ -19,24 +18,22 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-y:auto;}
 .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
 .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
 
-/* HEADER UNIVERSEL */
 .top-nav-standalone { position: fixed; top: 0; left: 0; width: 100%; height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px 0 20px; z-index: 2000; background: transparent; }
 .header-left { width: 360px; display: flex; align-items: center; padding-top: 5px; }
 .brand-row { text-decoration: none; display: flex; align-items: center; cursor: pointer; gap: 12px; }
 .brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
 .tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
 .header-right { display: flex; align-items: center; gap: 14px; }
-.dropdown-container { position: relative; display: inline-block; }
+.dropdown-container { position: relative; display: inline-block; z-index: 3000; }
 .header-icon-btn { width: 42px; height: 42px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #2E3644; border: 1px solid #cbd5e1; cursor: pointer; transition: 0.2s; font-size: 16px; font-weight: bold; box-shadow: 0 4px 14px rgba(80,60,120,.05); }
 .header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: #D42759; transform: translateY(-2px);}
 .user-avatar-btn { color: #000000 !important; overflow: hidden; padding: 0;}
 
-.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 3000; }
+.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 4000; }
 .dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: #1e293b; transition: 0.2s; border-radius: 8px; display: block; text-align: left; text-decoration: none;}
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-/* CENTRAGE ET AGRANDISSEMENT DES BLOCS */
 .page { padding: 120px 20px 80px 20px; position: relative; z-index: 10; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
 .card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); }
 
@@ -68,7 +65,6 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
     <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
 </div>
 
-<!-- HEADER UNIVERSEL -->
 <div class="top-nav-standalone">
     <div class="header-left">
         <a href="map.html" class="brand-row">
@@ -184,6 +180,18 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
             setTimeout(() => { actionBtn.style.background = '#D42759'; actionBtn.textContent = 'Edit Profile'; }, 2000);
         }
     }
+
+    ['lang-btn', 'profile-btn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if(btn) btn.addEventListener('click', (e) => {
+            const menuId = id.replace('-btn', '-menu');
+            document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
+            const targetMenu = document.getElementById(menuId);
+            if(targetMenu) targetMenu.classList.toggle('hidden');
+            e.stopPropagation();
+        });
+    });
+    document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
 </script>
 </body>
 </html>
