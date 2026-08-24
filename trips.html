@@ -11,34 +11,52 @@
 <style>
   body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #fdfbfb; }
 
-  /* FOND ANIMÉ */
-  .hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; }
+  /* FOND ANIMÉ EXACTEMENT COMME INDEX.HTML */
+  .hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; }
+  @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
   .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: float 12s infinite ease-in-out alternate; }
   .blob-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: #e3d5f8; }
   .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
   .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
   .bg-route { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.5; }
-  .dot { animation: pulse 3s infinite; }
-  
-  /* SYNCHRONISATION DU FOND ANIMÉ */
+  .route-line { stroke-dasharray: 1 12; animation: flow 14s linear infinite; }
+  @keyframes flow { to { stroke-dashoffset: -260; } }
+  .dot { transform-box: fill-box; transform-origin: center; }
+  .dot-a { animation: floatA 3.2s ease-in-out infinite; }
+  .dot-b { animation: floatB 3.6s ease-in-out infinite; animation-delay: .4s; }
+  .dot-c { animation: floatC 2.8s ease-in-out infinite; animation-delay: .7s; }
+  .dot-d { animation: floatD 4s ease-in-out infinite; animation-delay: .2s; }
+  .dot-e { animation: floatA 3.4s ease-in-out infinite; animation-delay: 1s; }
+  .dot-f { animation: floatB 3s ease-in-out infinite; animation-delay: .5s; }
+  .dot-g { animation: floatC 3.8s ease-in-out infinite; animation-delay: 1.3s; }
+  @keyframes floatA{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(16px,-20px);} }
+  @keyframes floatB{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-18px,18px);} }
+  @keyframes floatC{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(14px,16px) scale(1.35);} }
+  @keyframes floatD{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-20px,-14px) scale(.75);} }
+  @keyframes float { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(30px) scale(1.05); } }
+
   .hero-background { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
   .blob-1 { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
   .blob-2 { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
   .blob-3 { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
   .route-line { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
-  @keyframes float { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(30px) scale(1.05); } }
 
   .app-container { background: transparent; z-index: 10; position: relative; display: flex; height: 100vh; width: 100vw; }
   .sidebar { background: rgba(255, 255, 255, 0.85) !important; backdrop-filter: blur(12px); border-right: 1px solid rgba(255,255,255,0.5); }
 
-  /* SCROLL AREA POUR LES TRIPS */
+  /* SCROLL AREA INVISIBLE SCROLLBAR */
   .trips-main { 
       width: 100%; max-width: 900px; margin: 0 auto; 
       padding: 90px 40px 40px 40px; 
       height: 100%; overflow-y: auto; flex: 1; 
+      -ms-overflow-style: none; scrollbar-width: none;
   }
-  .trips-main::-webkit-scrollbar { width: 6px; }
-  .trips-main::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  .trips-main::-webkit-scrollbar { display: none; }
+
+  .sidebar-scroll-area {
+      -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .sidebar-scroll-area::-webkit-scrollbar { display: none; }
 
   /* ELEMENTS SPECIFIQUES A TRIPS */
   .sidebar-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin: 10px 10px 5px 10px; }
@@ -61,8 +79,7 @@
   .trip-head-info { display: flex; flex-direction: column; gap: 8px; flex: 1; }
   .trip-name-input { width: 100%; font-size: 32px; font-weight: 700; color: #212832; border: 1px solid transparent; background: transparent; border-radius: 8px; padding: 4px 8px; margin-left: -8px; outline: none; transition: 0.2s;}
   .trip-name-input:focus, .trip-name-input:hover { border-color: #cbd5e1; background: #fff; }
-  .trip-dates { font-size: 13px; font-weight: 600; color: #D42759; background: #FCE7F0; padding: 6px 12px; border-radius: 100px; display: inline-flex; align-items: center; gap: 8px; width: max-content;}
-
+  
   .gen-btn { display:inline-flex;align-items:center;gap:7px;background:#D42759;color:#fff;font-size:13.5px;font-weight:700; padding:12px 24px;border-radius:100px;box-shadow:0 8px 18px rgba(212,39,89,.22);cursor:pointer; border:none; transition: 0.2s; }
   .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(212,39,89,.35); }
   .gen-btn.ghost {background:transparent;color:#D42759;border:1.5px solid #D42759;box-shadow:none;}
@@ -70,7 +87,7 @@
 
   .section-label {font-size:11.5px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 16px 0;}
   
-  .edit-banner { background:#faf9fc; border:1px solid #e2e8f0; border-radius:16px; padding:24px; margin-bottom:30px;}
+  .edit-banner { background:#faf9fc; border:1px solid #e2e8f0; border-radius:16px; padding:24px;}
   .date-tabs { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; }
   .date-tab { flex: 1; text-align: center; padding: 10px 15px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: 0.2s; }
   .date-tab.active { color: #D42759; border-bottom-color: #D42759; }
@@ -134,7 +151,6 @@
 </head>
 <body>
 
-<!-- LE FOND ANIMÉ FIXÉ EN ARRIÈRE-PLAN -->
 <div class="hero-background">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -144,15 +160,17 @@
       <circle class="dot dot-a" cx="380" cy="340" r="6" fill="#B9A8DA"/>
       <circle class="dot dot-b" cx="820" cy="300" r="6" fill="#B9A8DA"/>
       <circle class="dot dot-c" cx="1040" cy="240" r="8" fill="#D42759"/>
+      <circle class="dot dot-d" cx="420" cy="150" r="5" fill="#C6B8E3"/>
+      <circle class="dot dot-e" cx="840" cy="140" r="6" fill="#B9A8DA"/>
+      <circle class="dot dot-f" cx="150" cy="240" r="5" fill="#D9CDEE"/>
+      <circle class="dot dot-g" cx="640" cy="380" r="7" fill="#D42759"/>
     </svg>
 </div>
 
 <div class="app-container">
 
-    <!-- COLONNE DE GAUCHE : EXACTEMENT COMME LA CARTE -->
     <aside class="sidebar" id="app-sidebar">
         <div class="sidebar-content" style="height: 100%; display: flex; flex-direction: column;">
-            
             <div class="sidebar-header">
                 <a href="map.html" class="brand-row">
                     <svg width="34" height="34" viewBox="0 0 400 400" style="flex-shrink:0;">
@@ -161,11 +179,11 @@
                     </svg>
                     <div>
                         <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
+                        <div class="tagline" data-i18n="subtitle" style="color: #5B6472;">Following the footsteps of your favorite artists</div>
                     </div>
                 </a>
             </div>
 
-            <!-- Contenu spécifique Sidebar Trips -->
             <div class="sidebar-scroll-area" style="padding: 0 20px 20px 20px; flex:1; overflow-y:auto; display:flex; flex-direction:column;">
                 <div class="sidebar-title" id="sidebar-title">MY TRIPS (0)</div>
                 <div id="trips-list-container"></div>
@@ -174,10 +192,8 @@
         </div>
     </aside>
 
-    <!-- ZONE CENTRALE -->
     <main class="map-container" style="background: transparent;">
 
-        <!-- TOP NAV : 3 ICONES COMME LA CARTE -->
         <div class="top-nav">
             <div class="dropdown-container">
                 <button id="lang-btn" class="header-icon-btn" title="Langue">
@@ -217,21 +233,19 @@
                 <div class="trip-hero">
                     <div class="trip-head-info">
                         <input type="text" id="edit-trip-name" class="trip-name-input" placeholder="Trip Name" onchange="saveTrip()">
-                        <div class="trip-dates" id="dates-display"></div>
                     </div>
                     <div>
                         <button class="gen-btn ghost" style="border-color:#ef4444; color:#ef4444;" onclick="openDeleteModal()" id="i18n-delete-trip">Delete</button>
                     </div>
                 </div>
 
-                <div class="edit-banner open" id="edit-banner">
-                    <div class="section-label" style="margin-top:0;" id="i18n-trip-duration">Trip Duration & Dates</div>
+                <div class="edit-banner" style="margin-bottom:30px;">
+                    <div class="section-label" style="margin-top:0;">Trip Duration & Dates</div>
                     <div class="date-tabs">
                         <div class="date-tab active" data-tab="edit-specific" onclick="switchEditDateTab('specific')">Specific dates</div>
                         <div class="date-tab" data-tab="edit-flexible" onclick="switchEditDateTab('flexible')">Flexible dates</div>
                     </div>
 
-                    <!-- HARMONISATION DES INPUTS DATES ICI -->
                     <div id="edit-date-specific-panel" style="display:flex; gap:10px; margin-bottom:10px;">
                         <input type="date" id="date-start" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="saveTrip()">
                         <input type="date" id="date-end" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="saveTrip()">
@@ -253,6 +267,19 @@
                     </div>
                 </div>
 
+                <!-- FILTRES INTEGRES POUR AFFICHER LES UNASSIGNED LOCATIONS -->
+                <div class="edit-banner" style="margin-bottom:30px;">
+                    <div class="section-label" style="margin-top:0;">Location Filters</div>
+                    <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                         <select id="edit-trip-group" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('group')"></select>
+                         <select id="edit-trip-member" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('member')"></select>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                         <select id="edit-trip-country" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('country')"></select>
+                         <select id="edit-trip-city" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('city')"></select>
+                    </div>
+                </div>
+
                 <div class="section-label" id="i18n-your-iti">YOUR ITINERARY</div>
                 <div class="itinerary-box" id="itinerary-box">
                     <button class="add-day-btn" onclick="addDay()">
@@ -263,20 +290,6 @@
                 <div class="section-label" id="saved-locs-label" style="margin-top: 40px;">UNASSIGNED LOCATIONS (0)</div>
                 <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed #cbd5e1; background: #fff; border-radius: 12px;"></div>
 
-                <button class="gen-btn ghost" style="margin-top:15px;" onclick="openAddModal()">
-                    <span id="i18n-add-more">+ Add more locations</span>
-                </button>
-
-                <!-- Recommandations Intelligentes -->
-                <div id="reco-section" style="display: none; margin-top: 30px;">
-                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP (SAME COUNTRY)</div>
-                    <div id="reco-list"></div>
-                </div>
-
-                <div style="display:flex; justify-content:center; margin-top:24px;">
-                    <button class="gen-btn" onclick="saveTrip()" id="i18n-save" style="font-size: 15px;">Save changes</button>
-                </div>
-
                 <!-- Bouton pour le Générateur d'itinéraire -->
                 <div style="text-align:center; margin-top: 60px;">
                     <p style="font-size:12px; color:#64748b; margin-bottom:10px;" id="i18n-need-magic">Need some magic?</p>
@@ -285,16 +298,6 @@
             </div>
         </div>
     </main>
-</div>
-
-<!-- Modal Add More Locations -->
-<div class="modal hidden" id="add-modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAddModal()">&times;</span>
-        <h2 style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 15px;" id="i18n-modal-add">Add to this Trip</h2>
-        <input type="text" id="add-search" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:20px; outline:none;" placeholder="Search by name, city or category..." onkeyup="filterAddModal()">
-        <div id="add-modal-list" style="max-height: 60vh; overflow-y: auto;"></div>
-    </div>
 </div>
 
 <!-- Modal CREATE NEW TRIP -->
@@ -399,28 +402,6 @@
             <!-- Les boutons seront injectés dynamiquement par script.js selon la page -->
             <div id="iti-actions-container" style="display:flex; gap:10px;"></div>
         </div>
-    </div>
-</div>
-
-<!-- Modal Panier -->
-<div id="cart-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 500px;">
-        <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 style="color: #1e293b; margin-bottom: 5px;" data-i18n="cartTitle">Unlock New Passes</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
-        <form id="cart-form">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
-                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
-                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
-            </div>
-            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
-        </form>
     </div>
 </div>
 
