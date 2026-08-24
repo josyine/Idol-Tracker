@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Modules Souvenir & Wishlist */
   .memory-dropdown { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display: none; animation: slideDown 0.3s ease; }
   .memory-dropdown.open { display: block; }
   .stars { display:flex; gap:4px; cursor: pointer; }
@@ -47,7 +46,6 @@
   .btn-primary-sm:disabled { background:#e2e8f0; color:#94a3b8; cursor:not-allowed; }
   .btn-ghost-sm { background:none; color:#64748b; border:none; font-size:11.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; padding:9px 6px; }
 
-  /* STYLE AVATAR (Pour garantir la cohérence depuis map.html si besoin) */
   .user-avatar-btn {
       width: 40px !important;
       height: 40px !important;
@@ -76,7 +74,6 @@
 
 <div class="app-container">
     
-    <!-- Sidebar Gauche -->
     <aside class="sidebar" id="app-sidebar">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -101,10 +98,16 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:14px; top:12px;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         <input type="text" id="search-input" class="input-field" style="padding-left:36px;" placeholder="Search a location...">
                     </div>
-                    <button id="open-itinerary-btn" class="cta-primary">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8 19h6a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4h-1"/></svg> 
-                        <span data-i18n="btnGenerateIti">Auto-Itinerary Generator</span>
-                    </button>
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <button id="open-itinerary-btn" class="gen-btn" style="flex:1; padding: 10px 14px; font-size:12px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8 19h6a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4h-1"/></svg> 
+                            <span data-i18n="btnGenerateIti">Auto-Itinerary</span>
+                        </button>
+                        <button class="gen-btn ghost" style="flex:1; padding: 10px 14px; font-size:12px;" onclick="openViewTripModal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            View My Trip
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card-box">
@@ -305,7 +308,12 @@
     <!-- Zone Carte à Droite -->
     <main class="map-container">
         
-        <!-- Top Nav : MISE À JOUR AVEC CLASSE user-avatar-btn -->
+        <!-- BANNIERE VIEW MY TRIP -->
+        <div id="active-trip-banner" class="hidden" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); background:#2E3644; color:#fff; padding:10px 20px; border-radius:100px; z-index:2000; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:600; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+            Viewing Trip: <span id="active-trip-name-display" style="color:#FCE7F0;"></span>
+            <button onclick="clearTripFromMainMap()" style="background:#D42759; color:#fff; border:none; padding:4px 10px; border-radius:100px; cursor:pointer; font-weight:bold; font-size:11px; margin-left:10px;">✕ Close</button>
+        </div>
+
         <div class="top-nav">
             <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -325,7 +333,6 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <!-- LE BOUTON PROFIL GÉRÉ DYNAMIQUEMENT PAR SCRIPT.JS -->
                 <button id="profile-btn" class="nav-btn user-avatar-btn" title="Account">U</button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
@@ -343,17 +350,28 @@
         </div>
 
         <div class="stat-pill" style="padding: 6px 14px;">
-            <div id="btn-show-locations" style="display:flex; gap:6px; align-items:center; cursor:pointer; padding: 6px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+            <div id="btn-show-locations" class="stat-pill-btn">
                 <span class="n1" id="stat-locations">0</span> <span data-i18n="locationsCount" style="font-size: 11px;">LOCATIONS</span>
             </div>
             <span class="sep">|</span> 
-            <div id="btn-show-countries" style="display:flex; gap:6px; align-items:center; cursor:pointer; padding: 6px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+            <div id="btn-show-countries" class="stat-pill-btn">
                 <span class="n1" id="stat-countries" style="color:var(--primary-magenta);">0</span> <span data-i18n="statsCountries" style="font-size: 11px;">COUNTRIES</span>
             </div>
         </div>
         
         <div id="map"></div>
     </main>
+</div>
+
+<!-- Modal View My Trip sur la Map -->
+<div id="view-trip-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 450px;">
+        <span class="close-btn" onclick="closeModal('view-trip-modal')">&times;</span>
+        <h2 style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 15px;">View My Trip</h2>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select a trip to display its route on the map.</p>
+        <select id="main-map-trip-select" class="filter-select" style="padding:12px; margin-bottom:20px;"></select>
+        <button class="gen-btn" style="width:100%; justify-content:center;" onclick="displayTripOnMainMap()">Show on map</button>
+    </div>
 </div>
 
 <!-- Modal Liste (Locations / Countries filtrées) -->
@@ -376,7 +394,7 @@
             <select id="iti-group" class="filter-select" style="padding:12px;"></select>
             <select id="iti-country" class="filter-select" style="padding:12px;"></select>
             <input type="number" id="iti-days" min="1" max="7" value="3" class="filter-select" style="padding:12px;">
-            <button class="cta-primary" onclick="generateItinerary()" style="padding:14px; font-size:14px; justify-content:center;" data-i18n="itiCreateBtn">Create My Guide</button>
+            <button class="gen-btn" onclick="generateItinerary()" style="padding:14px; font-size:14px; justify-content:center;" data-i18n="itiCreateBtn">Create My Guide</button>
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
@@ -384,10 +402,7 @@
                 <div id="iti-map-container" style="height: 100%; width: 100%;"></div>
             </div>
             <div id="iti-days-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
-            <div style="display:flex; gap:10px;">
-                <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="background: #2E3644; flex:1; justify-content:center;" data-i18n="itiExport">Export Guide as PDF</button>
-                <button id="save-trip-btn" class="cta-primary" onclick="saveItineraryToTrips()" style="flex:1; justify-content:center;" data-i18n="itiSave">Save to My Trips</button>
-            </div>
+            <div id="iti-actions-container" style="display:flex; gap:10px;"></div>
         </div>
     </div>
 </div>
@@ -410,7 +425,7 @@
                 <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
                 <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
             </div>
-            <button type="submit" id="cart-pay-btn" class="cta-primary" disabled style="padding:14px; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
+            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
         </form>
     </div>
 </div>
@@ -421,7 +436,7 @@
         <div class="cookie-actions">
             <button id="cookie-manage" class="cat-card" style="border:1px solid var(--primary-magenta); color:var(--primary-magenta);" data-i18n="cookieManage">Manage</button>
             <button id="cookie-reject" class="cat-card" data-i18n="cookieReject">Reject</button>
-            <button id="cookie-accept" class="cta-primary" style="width:auto;" data-i18n="cookieAccept">Accept</button>
+            <button id="cookie-accept" class="gen-btn" style="width:auto;" data-i18n="cookieAccept">Accept</button>
         </div>
     </div>
 </div>
