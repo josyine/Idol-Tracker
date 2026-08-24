@@ -133,9 +133,9 @@ const filterData = {
     "General": { categories: ["Cafe", "Concerts", "Fashion", "Landmarks", "Museums", "Restaurants", "Pop-up Store"] }
 };
 
-// ====================================================================
-// ▼ ▼ ▼ COLLES TES 1700 LIGNES DE LIEUX ICI POUR REMPLACER CEUX LÀ ▼ ▼ ▼
-// ====================================================================
+// =========================================================================================
+// /!\ ATTENTION : C'EST ICI QUE TU DOIS COLLER TES 1700 LIGNES DE LIEUX (celebLocations) /!\ 
+// =========================================================================================
 let celebLocations = [
     { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` }, tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." }, directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." } },
     { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600", fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` }, tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." }, directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." } },
@@ -157,9 +157,7 @@ let celebLocations = [
     { id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y", address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg" },
     { id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0", address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg" }
 ];
-// ====================================================================
-// ▲ ▲ ▲ COLLES TES 1700 LIGNES ICI ▲ ▲ ▲
-// ====================================================================
+// =========================================================================================
 
 // ==========================================
 // 3. LOGIQUE UI ET LANGUES
@@ -371,7 +369,7 @@ window.updateItiCity = function() {
 }
 
 // ==========================================
-// 5. AFFICHAGE DES LIEUX (CARTE)
+// 5. AFFICHAGE DES LIEUX (CARTE PRINCIPALE)
 // ==========================================
 function renderLocations() {
     const groupSelect = document.getElementById('group-select');
@@ -968,7 +966,6 @@ window.generateItinerary = function() {
     }
 }
 
-// Nouvelle fonction spécifiquement appelée depuis Trips
 window.addSelectedDaysToTrip = function() {
     const checkboxes = document.querySelectorAll('.iti-day-checkbox:checked');
     if (checkboxes.length === 0) { 
@@ -1170,6 +1167,43 @@ if(btnReject) btnReject.addEventListener('click', closeCookies);
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
+let tripPageMap = null;
+let tripPageLayer = null;
+
+function drawTripOnMap(trip, targetMap, targetLayerGroup) {
+    if(!targetLayerGroup) return;
+    targetLayerGroup.clearLayers();
+    if(!trip || !trip.days || trip.days.length === 0) return;
+    
+    const dayColors = ['#D42759', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#14b8a6', '#f43f5e', '#6366f1', '#84cc16'];
+    let allPoints = [];
+    
+    trip.days.forEach((dayIds, idx) => {
+        const color = dayColors[idx % dayColors.length];
+        let coords = [];
+        dayIds.forEach((id, locIdx) => {
+            const loc = celebLocations.find(l => Number(l.id) === Number(id));
+            if(loc) {
+                coords.push([loc.lat, loc.lng]);
+                allPoints.push([loc.lat, loc.lng]);
+                
+                const markerHtml = `<div style="background:${color}; width:28px; height:28px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:bold; box-shadow:0 3px 6px rgba(0,0,0,0.3);">${idx+1}.${locIdx + 1}</div>`;
+                const icon = L.divIcon({ className: '', html: markerHtml, iconSize: [28,28], iconAnchor: [14,14] });
+                const m = L.marker([loc.lat, loc.lng], {icon: icon}).addTo(targetLayerGroup);
+                
+                m.on('click', () => { if(window.openDetailsPanel) window.openDetailsPanel(loc.id); });
+            }
+        });
+        if(coords.length > 1) {
+            L.polyline(coords, { color: color, weight: 4, opacity: 0.8, dashArray: '8, 6' }).addTo(targetLayerGroup);
+        }
+    });
+    
+    if(allPoints.length > 0 && targetMap) {
+        targetMap.fitBounds(L.polyline(allPoints).getBounds(), { padding: [40, 40], maxZoom: 16 });
+    }
+}
+
 window.initTrips = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     
@@ -1195,6 +1229,12 @@ window.initTrips = function() {
         currentTrip = trips[trips.length - 1];
     }
     if (!currentTrip.days) currentTrip.days = [];
+
+    if(document.getElementById('trip-map-container') && !tripPageMap) {
+        tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(tripPageMap);
+        tripPageLayer = L.featureGroup().addTo(tripPageMap);
+    }
 
     window.renderTripsSidebar();
     window.renderTrip();
@@ -1457,14 +1497,18 @@ window.renderTrip = function() {
     }
     document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
     document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', 'true'));
+    
+    if(tripPageMap) {
+        setTimeout(() => { tripPageMap.invalidateSize(); drawTripOnMap(currentTrip, tripPageMap, tripPageLayer); }, 200);
+    }
 }
 
 window.switchEditDateTab = function(tab) {
     if(tab === 'specific') {
         document.getElementById('edit-date-specific-panel').classList.remove('hidden');
         document.getElementById('edit-date-flexible-panel').classList.add('hidden');
-        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.remove('active');
-        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.add('active');
+        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.add('active');
+        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.remove('active');
     } else {
         document.getElementById('edit-date-specific-panel').classList.add('hidden');
         document.getElementById('edit-date-flexible-panel').classList.remove('hidden');
@@ -1698,6 +1742,10 @@ window.saveTrip = function() {
     localStorage.setItem('myTrips', JSON.stringify(trips));
     
     window.renderTripsSidebar();
+    
+    if(tripPageMap) {
+        drawTripOnMap(currentTrip, tripPageMap, tripPageLayer);
+    }
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
@@ -1912,4 +1960,68 @@ window.confirmDeleteTrip = function() {
     tripIdToDelete = null;
     document.getElementById('delete-trip-modal').classList.add('hidden');
     window.initTrips();
+}
+
+// ==========================================
+// 13. VIEW MY TRIP SUR LA CARTE PRINCIPALE
+// ==========================================
+let tripMainLayerGroup = null;
+
+window.openViewTripModal = function() {
+    const modal = document.getElementById('view-trip-modal');
+    const select = document.getElementById('main-map-trip-select');
+    if(!modal || !select) return;
+
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    select.innerHTML = '';
+    
+    if(trips.length === 0) {
+        select.innerHTML = `<option value="">${currentLang === 'fr' ? 'Aucun voyage créé' : 'No trips created yet'}</option>`;
+    } else {
+        trips.forEach(t => {
+            select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+        });
+    }
+
+    modal.classList.remove('hidden');
+}
+
+window.displayTripOnMainMap = function() {
+    const select = document.getElementById('main-map-trip-select');
+    if(!select || !select.value) return;
+
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const selectedTrip = trips.find(t => t.id === select.value);
+    if(!selectedTrip) return;
+
+    closeModal('view-trip-modal');
+
+    if(markerGroup) {
+        markerGroup.clearLayers();
+    }
+
+    if(!tripMainLayerGroup) {
+        tripMainLayerGroup = L.featureGroup().addTo(map);
+    } else {
+        tripMainLayerGroup.clearLayers();
+    }
+
+    drawTripOnMap(selectedTrip, map, tripMainLayerGroup);
+
+    const banner = document.getElementById('active-trip-banner');
+    const nameDisplay = document.getElementById('active-trip-name-display');
+    if(banner && nameDisplay) {
+        nameDisplay.textContent = selectedTrip.name;
+        banner.classList.remove('hidden');
+    }
+}
+
+window.clearTripFromMainMap = function() {
+    if(tripMainLayerGroup) {
+        tripMainLayerGroup.clearLayers();
+    }
+    const banner = document.getElementById('active-trip-banner');
+    if(banner) banner.classList.add('hidden');
+    
+    renderLocations();
 }
