@@ -12,6 +12,7 @@ let currentLang = localStorage.getItem('lang') || 'en';
 let currentTrip = null;
 let draggedEl = null;
 let tripIdToDelete = null;
+let locToRemoveData = null; // Pour la modale de suppression d'un lieu
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- GESTION DE L'AVATAR (ICÔNE DE COMPTE) ---
@@ -249,6 +250,11 @@ function updateUI() {
         const eDelCancel = document.getElementById('i18n-del-cancel'); if(eDelCancel) eDelCancel.textContent = isFr ? "Annuler" : "Cancel";
         const eDelConfirm = document.getElementById('i18n-del-confirm'); if(eDelConfirm) eDelConfirm.textContent = isFr ? "Supprimer" : "Delete";
         
+        const eRmLocTitle = document.getElementById('i18n-rm-loc-title'); if(eRmLocTitle) eRmLocTitle.textContent = isFr ? "Retirer ce lieu ?" : "Remove location?";
+        const eRmLocDesc = document.getElementById('i18n-rm-loc-desc'); if(eRmLocDesc) eRmLocDesc.textContent = isFr ? "Êtes-vous sûr de vouloir retirer ce lieu de votre voyage ?" : "Are you sure you want to remove this location from your trip?";
+        const eRmLocCancel = document.getElementById('i18n-rm-loc-cancel'); if(eRmLocCancel) eRmLocCancel.textContent = isFr ? "Annuler" : "Cancel";
+        const eRmLocConfirm = document.getElementById('i18n-rm-loc-confirm'); if(eRmLocConfirm) eRmLocConfirm.textContent = isFr ? "Retirer" : "Remove";
+
         if(typeof window.initTrips === 'function') window.initTrips();
     }
 
@@ -940,6 +946,7 @@ window.addSelectedDaysToTrip = function() {
         return; 
     }
     
+    window.saveTrip(); // Sauvegarde le DOM avant de le modifier pour ne rien perdre
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     
     checkboxes.forEach(cb => {
@@ -959,8 +966,13 @@ window.addSelectedDaysToTrip = function() {
     });
     
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    window.saveTrip(); // Sauvegarde et met à jour la barre latérale
-    window.renderTrip(); // Recharge l'affichage du voyage en cours
+    
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
+    if(tripIndex !== -1) trips[tripIndex] = currentTrip;
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+    
+    window.renderTrip(); // Recharge l'affichage du voyage avec les nouveaux jours
     closeModal('itinerary-modal');
 };
 
@@ -1224,14 +1236,18 @@ window.renderTrip = function() {
     // Edition permanente : Nom
     document.getElementById('edit-trip-name').value = currentTrip.name;
     
-    // NOUVEAU : Affichage des Métadonnées liées (Groupe, Pays, Locations)
+    // Affichage des Métadonnées liées (Groupe, Pays, Locations)
     let metaText = "";
     if (currentTrip.group) metaText += currentTrip.group + " • ";
     if (currentTrip.country) metaText += currentTrip.country + " • ";
     let allAssignedIds = currentTrip.days.flat();
     metaText += `${allAssignedIds.length} location${allAssignedIds.length > 1 ? 's' : ''}`;
     const datesDisplay = document.getElementById('dates-display');
-    if(datesDisplay) datesDisplay.textContent = metaText;
+    if(datesDisplay) {
+        datesDisplay.textContent = metaText;
+        if(metaText.trim() === '0 location') datesDisplay.style.display = 'none';
+        else datesDisplay.style.display = 'inline-flex';
+    }
 
     if(currentTrip.dateType === 'duration') {
         document.querySelectorAll('.edit-banner .pill-btn[data-type="edit-duration"], .edit-banner .pill-btn[data-type="edit-month"]').forEach(el => el.classList.remove('active'));
@@ -1406,14 +1422,24 @@ window.removeDay = function(btn) {
     window.saveTrip();
 }
 
+// L'OUVERTURE DE LA MODALE CUSTOM "REMOVE LOCATION"
 window.removeFromTrip = function(btn, locId) {
-    if(!confirm(currentLang === 'fr' ? "Retirer ce lieu du voyage ?" : "Remove this location from the trip?")) return;
-    locId = Number(locId);
+    locToRemoveData = { btn: btn, id: Number(locId) };
+    document.getElementById('remove-loc-modal').classList.remove('hidden');
+}
+
+// LA CONFIRMATION DU BOUTON REMOVE
+window.confirmRemoveLoc = function() {
+    if(!locToRemoveData) return;
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-    wList = wList.filter(w => Number(w.id) !== locId || w.tripId !== currentTrip.id);
+    wList = wList.filter(w => Number(w.id) !== locToRemoveData.id || w.tripId !== currentTrip.id);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    btn.closest('.day-loc').remove();
+    
+    if(locToRemoveData.btn) locToRemoveData.btn.closest('.day-loc').remove();
+    
     window.saveTrip(); 
+    closeModal('remove-loc-modal');
+    locToRemoveData = null;
 }
 
 window.quickAddLoc = function(locId) {
