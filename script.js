@@ -131,89 +131,25 @@ const filterData = {
 };
 
 let celebLocations = [
-    {
-        id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020",
-        episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0",
-        address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", 
-        fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` },
-        tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." },
-        directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." }
-    },
-    {
-        id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1",
-        address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
-        fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` },
-        tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." },
-        directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." }
-    },
-    {
-        id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", ytId: "d--MDCCJ3jg",
-        address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg"
-    },
-    {
-        id: 4, name: "Ahwon Museum & Hotel", group: "BTS", member: "All", country: "South Korea", city: "Wanju", category: "Museums", year: "2019", ytId: "h1jUtpEzxxA",
-        address: "516-7 Songgwangsuman-ro", lat: 35.8455, lng: 127.1895, img: "https://img.youtube.com/vi/h1jUtpEzxxA/hqdefault.jpg"
-    },
-    {
-        id: 5, name: "Cafe Kitsuné Seoul", group: "Blackpink", member: "Jennie", country: "South Korea", city: "Seoul", category: "Cafe", year: "2021", ytId: "Kitsune1",
-        address: "23 Dosan-daero 13-gil", lat: 37.5197, lng: 127.0229, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600"
-    },
-    {
-        id: 6, name: "Pozzetto", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Cafe", year: "2019", ytId: "Pozzetto1",
-        address: "39 Rue du Roi de Sicile, Paris", lat: 48.8569, lng: 2.3572, img: "https://images.unsplash.com/photo-1557142046-c704a3adf365?w=600"
-    },
-    {
-        id: 7, name: "Musée Nissim de Camondo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Fashion", year: "2026", ytId: "1TdxCtgX53w",
-        address: "63 Rue de Monceau, Paris", lat: 48.8795, lng: 2.3117, img: "https://img.youtube.com/vi/1TdxCtgX53w/hqdefault.jpg"
-    },
-    {
-        id: 8, name: "Montmartre Stairs", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "Montmartre1",
-        address: "Rue Foyatier, Paris", lat: 48.8856, lng: 2.3432, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600"
-    },
-    {
-        id: 9, name: "Wall of Love", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "WallOfLove1",
-        address: "Square Jehan Rictus, Paris", lat: 48.8848, lng: 2.3386, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600"
-    },
-    {
-        id: 10, name: "Palais de Tokyo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Museums", year: "2023", ytId: "PalaisTokyo1",
-        address: "13 Av. du Président Wilson, Paris", lat: 48.8643, lng: 2.2965, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600"
-    },
-    {
-        id: 11, name: "Cheonggu Building", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2017", ytId: "vJwHIpEogEY",
-        address: "16 Hakdong-ro 30-gil", lat: 37.5144, lng: 127.0315, img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg"
-    },
-    {
-        id: 12, name: "The First BTS Dorm", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2015", ytId: "RhJqNFQCU_Q",
-        address: "29 Nonhyeon-ro 119-gil", lat: 37.5133, lng: 127.0321, img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg"
-    },
-    {
-        id: 13, name: "Hyangho Beach Bus Stop", group: "BTS", member: "All", country: "South Korea", city: "Gangneung", category: "Landmarks", year: "2017", ytId: "46qWWmnK4F0",
-        address: "8-55 Hyangho-ri", lat: 37.9048, lng: 128.8266, img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg"
-    },
-    {
-        id: 14, name: "Iryeong Station", group: "BTS", member: "All", country: "South Korea", city: "Yangju", category: "MV Location", year: "2017", ytId: "xEeFrLSkMm8",
-        address: "327 Samsang-ri", lat: 37.7135, lng: 126.9329, img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg"
-    },
-    {
-        id: 15, name: "Quinta da Francelha de Cima", group: "BTS", member: "All", country: "Portugal", city: "Prior Velho", category: "MV Location", year: "2026", ytId: "GEk4jHwfFTA",
-        address: "R. da Francelha de Cima", lat: 38.7844, lng: -9.1238, img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg"
-    },
-    {
-        id: 16, name: "Sunhyewon", group: "BTS", member: "All", country: "South Korea", city: "Seoul Area", category: "MV Location", year: "2026", ytId: "Hb06Iem3FWg",
-        address: "Sunhyewon Estate", lat: 37.5826, lng: 126.9856, img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg"
-    },
-    {
-        id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "MV Location", year: "2026", ytId: "b4iVv91Z6lY",
-        address: "Praça do Império, Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg"
-    },
-    {
-        id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y",
-        address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg"
-    },
-    {
-        id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0",
-        address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg"
-    }
+    { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` }, tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." }, directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." } },
+    { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600", fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` }, tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." }, directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." } },
+    { id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", ytId: "d--MDCCJ3jg", address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg" },
+    { id: 4, name: "Ahwon Museum & Hotel", group: "BTS", member: "All", country: "South Korea", city: "Wanju", category: "Museums", year: "2019", ytId: "h1jUtpEzxxA", address: "516-7 Songgwangsuman-ro", lat: 35.8455, lng: 127.1895, img: "https://img.youtube.com/vi/h1jUtpEzxxA/hqdefault.jpg" },
+    { id: 5, name: "Cafe Kitsuné Seoul", group: "Blackpink", member: "Jennie", country: "South Korea", city: "Seoul", category: "Cafe", year: "2021", ytId: "Kitsune1", address: "23 Dosan-daero 13-gil", lat: 37.5197, lng: 127.0229, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600" },
+    { id: 6, name: "Pozzetto", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Cafe", year: "2019", ytId: "Pozzetto1", address: "39 Rue du Roi de Sicile, Paris", lat: 48.8569, lng: 2.3572, img: "https://images.unsplash.com/photo-1557142046-c704a3adf365?w=600" },
+    { id: 7, name: "Musée Nissim de Camondo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Fashion", year: "2026", ytId: "1TdxCtgX53w", address: "63 Rue de Monceau, Paris", lat: 48.8795, lng: 2.3117, img: "https://img.youtube.com/vi/1TdxCtgX53w/hqdefault.jpg" },
+    { id: 8, name: "Montmartre Stairs", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "Montmartre1", address: "Rue Foyatier, Paris", lat: 48.8856, lng: 2.3432, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600" },
+    { id: 9, name: "Wall of Love", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "WallOfLove1", address: "Square Jehan Rictus, Paris", lat: 48.8848, lng: 2.3386, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600" },
+    { id: 10, name: "Palais de Tokyo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Museums", year: "2023", ytId: "PalaisTokyo1", address: "13 Av. du Président Wilson, Paris", lat: 48.8643, lng: 2.2965, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600" },
+    { id: 11, name: "Cheonggu Building", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2017", ytId: "vJwHIpEogEY", address: "16 Hakdong-ro 30-gil", lat: 37.5144, lng: 127.0315, img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg" },
+    { id: 12, name: "The First BTS Dorm", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2015", ytId: "RhJqNFQCU_Q", address: "29 Nonhyeon-ro 119-gil", lat: 37.5133, lng: 127.0321, img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg" },
+    { id: 13, name: "Hyangho Beach Bus Stop", group: "BTS", member: "All", country: "South Korea", city: "Gangneung", category: "Landmarks", year: "2017", ytId: "46qWWmnK4F0", address: "8-55 Hyangho-ri", lat: 37.9048, lng: 128.8266, img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg" },
+    { id: 14, name: "Iryeong Station", group: "BTS", member: "All", country: "South Korea", city: "Yangju", category: "MV Location", year: "2017", ytId: "xEeFrLSkMm8", address: "327 Samsang-ri", lat: 37.7135, lng: 126.9329, img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg" },
+    { id: 15, name: "Quinta da Francelha de Cima", group: "BTS", member: "All", country: "Portugal", city: "Prior Velho", category: "MV Location", year: "2026", ytId: "GEk4jHwfFTA", address: "R. da Francelha de Cima", lat: 38.7844, lng: -9.1238, img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg" },
+    { id: 16, name: "Sunhyewon", group: "BTS", member: "All", country: "South Korea", city: "Seoul Area", category: "MV Location", year: "2026", ytId: "Hb06Iem3FWg", address: "Sunhyewon Estate", lat: 37.5826, lng: 126.9856, img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg" },
+    { id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "MV Location", year: "2026", ytId: "b4iVv91Z6lY", address: "Praça do Império, Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg" },
+    { id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y", address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg" },
+    { id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0", address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg" }
 ];
 
 // ==========================================
@@ -375,7 +311,6 @@ function initializeFilters() {
     }
 }
 
-// Fonction globale d'ouverture du générateur
 window.openItineraryModal = function() {
     document.getElementById('iti-result').classList.add('hidden');
     document.getElementById('itinerary-modal').classList.remove('hidden');
@@ -881,9 +816,11 @@ window.generateItinerary = function() {
     currentGeneratedItinerary = [];
     
     const txt = {
-        en: { day: "Day", transit: "Transit to next location", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
-        fr: { day: "Jour", transit: "Trajet vers le prochain lieu", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
+        en: { day: "Day", transit: "Transit to next location", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site", cancel: "Cancel", add: "Add Selected Days", export: "Export Guide as PDF", save: "Save to My Trips" },
+        fr: { day: "Jour", transit: "Trajet vers le prochain lieu", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu", cancel: "Annuler", add: "Ajouter la sélection", export: "Exporter en PDF", save: "Sauvegarder dans My Trips" }
     }[currentLang];
+
+    const isTripsPage = !!document.getElementById('edit-trip-name');
 
     for(let i = 0; i < days; i++) {
         const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
@@ -902,7 +839,10 @@ window.generateItinerary = function() {
         }
         
         let html = `<div class="iti-day-card" style="padding: 18px 16px;">
-            <div class="iti-day-title" style="font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">${txt.day} ${i + 1}</div>`;
+            <div class="iti-day-title" style="display:flex; justify-content:space-between; align-items:center; font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                <span>${txt.day} ${i + 1}</span>
+                ${isTripsPage ? `<input type="checkbox" class="iti-day-checkbox" value="${i}" checked style="width:18px; height:18px; cursor:pointer; accent-color:#D42759;">` : ''}
+            </div>`;
         
         let currentTime = new Date();
         currentTime.setHours(10, 0, 0);
@@ -938,6 +878,30 @@ window.generateItinerary = function() {
     
     document.getElementById('iti-result').classList.remove('hidden');
 
+    // Mettre à jour les boutons du bas selon la page (Trips ou Map)
+    let actionsContainer = document.getElementById('iti-actions-container');
+    if (!actionsContainer) {
+        const saveBtn = document.getElementById('save-trip-btn');
+        if (saveBtn) {
+            actionsContainer = saveBtn.parentElement;
+            actionsContainer.id = 'iti-actions-container';
+        }
+    }
+    
+    if (actionsContainer) {
+        if (isTripsPage) {
+            actionsContainer.innerHTML = `
+                <button class="gen-btn ghost" onclick="closeModal('itinerary-modal')" style="flex:1; justify-content:center;">${txt.cancel}</button>
+                <button class="gen-btn" onclick="addSelectedDaysToTrip()" style="flex:1; justify-content:center;">${txt.add}</button>
+            `;
+        } else {
+            actionsContainer.innerHTML = `
+                <button id="export-pdf-btn" class="cta-primary" onclick="exportItineraryPDF()" style="background: #2E3644; flex:1; justify-content:center;">${txt.export}</button>
+                <button id="save-trip-btn" class="cta-primary" onclick="saveItineraryToTrips()" style="flex:1; justify-content:center;">${txt.save}</button>
+            `;
+        }
+    }
+
     const modalContent = document.querySelector('#itinerary-modal .modal-content');
     if(modalContent) modalContent.scrollTo({ top: modalContent.scrollHeight, behavior: 'smooth' });
 
@@ -967,6 +931,38 @@ window.generateItinerary = function() {
         }, 250);
     }
 }
+
+// Nouvelle fonction spécifiquement appelée depuis Trips
+window.addSelectedDaysToTrip = function() {
+    const checkboxes = document.querySelectorAll('.iti-day-checkbox:checked');
+    if (checkboxes.length === 0) { 
+        alert(currentLang === 'fr' ? 'Sélectionnez au moins un jour.' : 'Select at least one day.'); 
+        return; 
+    }
+    
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    
+    checkboxes.forEach(cb => {
+        const dayIndex = parseInt(cb.value);
+        const dayLocs = currentGeneratedItinerary[dayIndex];
+        if (dayLocs && dayLocs.length > 0) {
+            let dayIds = [];
+            dayLocs.forEach(loc => {
+                dayIds.push(loc.id);
+                // Lie ce lieu au voyage dans la wishlist (s'il n'y est pas déjà)
+                if (!wList.some(w => Number(w.id) === Number(loc.id) && w.tripId === currentTrip.id)) {
+                    wList.push({ id: Number(loc.id), dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
+                }
+            });
+            currentTrip.days.push(dayIds);
+        }
+    });
+    
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    window.saveTrip(); // Sauvegarde et met à jour la barre latérale
+    window.renderTrip(); // Recharge l'affichage du voyage en cours
+    closeModal('itinerary-modal');
+};
 
 window.saveItineraryToTrips = function() {
     const country = document.getElementById('iti-country').value;
@@ -1225,28 +1221,33 @@ window.dropTrip = function(e, targetId) {
 window.renderTrip = function() {
     if (!currentTrip) return;
 
-    // Edition permanente
+    // Edition permanente : Nom
     document.getElementById('edit-trip-name').value = currentTrip.name;
     
+    // NOUVEAU : Affichage des Métadonnées liées (Groupe, Pays, Locations)
+    let metaText = "";
+    if (currentTrip.group) metaText += currentTrip.group + " • ";
+    if (currentTrip.country) metaText += currentTrip.country + " • ";
+    let allAssignedIds = currentTrip.days.flat();
+    metaText += `${allAssignedIds.length} location${allAssignedIds.length > 1 ? 's' : ''}`;
+    const datesDisplay = document.getElementById('dates-display');
+    if(datesDisplay) datesDisplay.textContent = metaText;
+
     if(currentTrip.dateType === 'duration') {
-        document.getElementById('trip-duration-type').value = 'duration';
         document.querySelectorAll('.edit-banner .pill-btn[data-type="edit-duration"], .edit-banner .pill-btn[data-type="edit-month"]').forEach(el => el.classList.remove('active'));
     } else {
-        document.getElementById('trip-duration-type').value = 'specific';
         document.getElementById('date-start').value = currentTrip.startDate || '';
         document.getElementById('date-end').value = currentTrip.endDate || '';
     }
-    window.toggleDateType();
     
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     let tripLocIdsFromWishlist = wList.filter(w => w.tripId === currentTrip.id).map(w => w.id);
-    let allAssignedIds = currentTrip.days.flat();
-    let unassignedIds = tripLocIdsFromWishlist.filter(id => !allAssignedIds.includes(id));
+    let unassignedIds = tripLocIdsFromWishlist.filter(id => !allAssignedIds.includes(Number(id)));
 
     const locList = document.getElementById('loc-list');
     locList.innerHTML = '';
     unassignedIds.forEach(id => {
-        const loc = celebLocations.find(l => l.id === id);
+        const loc = celebLocations.find(l => l.id === Number(id));
         if (loc) locList.appendChild(window.createLocRow(loc));
     });
     document.getElementById('saved-locs-label').textContent = currentLang === 'fr' ? `Lieux non assignés (${unassignedIds.length})` : `UNASSIGNED LOCATIONS (${unassignedIds.length})`;
@@ -1265,7 +1266,7 @@ window.renderTrip = function() {
         
         let itemsHtml = '';
         dayIds.forEach(id => {
-            const loc = celebLocations.find(l => l.id === id);
+            const loc = celebLocations.find(l => l.id === Number(id));
             if (loc) itemsHtml += window.createLocRowHtml(loc);
         });
 
@@ -1281,7 +1282,7 @@ window.renderTrip = function() {
     box.appendChild(addBtn); 
 
     let tripCountries = [...new Set(tripLocIdsFromWishlist.map(id => {
-        let loc = celebLocations.find(l => l.id === id);
+        let loc = celebLocations.find(l => l.id === Number(id));
         return loc ? loc.country : null;
     }).filter(Boolean))];
 
@@ -1291,7 +1292,7 @@ window.renderTrip = function() {
     
     if(tripCountries.length > 0) {
         celebLocations.forEach(loc => {
-            if (tripCountries.includes(loc.country) && !tripLocIdsFromWishlist.includes(loc.id)) {
+            if (tripCountries.includes(loc.country) && !tripLocIdsFromWishlist.includes(Number(loc.id))) {
                 if (recoCount < 4) {
                     recoList.innerHTML += `
                         <div class="loc-row">
@@ -1310,30 +1311,18 @@ window.renderTrip = function() {
     document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', 'true'));
 }
 
-window.toggleDateType = function() {
-    const type = document.getElementById('trip-duration-type').value;
-    const isDuration = type === 'duration';
-    
-    const flexPanel = document.getElementById('edit-date-flexible-panel');
-    const specPanel = document.getElementById('edit-date-specific-panel');
-    if(flexPanel && specPanel) {
-        if(isDuration) {
-            flexPanel.classList.remove('hidden');
-            specPanel.classList.add('hidden');
-            document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.add('active');
-            document.querySelector('.date-tab[data-tab="edit-specific"]').classList.remove('active');
-        } else {
-            flexPanel.classList.add('hidden');
-            specPanel.classList.remove('hidden');
-            document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.remove('active');
-            document.querySelector('.date-tab[data-tab="edit-specific"]').classList.add('active');
-        }
-    }
-}
-
 window.switchEditDateTab = function(tab) {
-    document.getElementById('trip-duration-type').value = (tab === 'flexible') ? 'duration' : 'specific';
-    window.toggleDateType();
+    if(tab === 'specific') {
+        document.getElementById('edit-date-specific-panel').classList.remove('hidden');
+        document.getElementById('edit-date-flexible-panel').classList.add('hidden');
+        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.add('active');
+        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.remove('active');
+    } else {
+        document.getElementById('edit-date-specific-panel').classList.add('hidden');
+        document.getElementById('edit-date-flexible-panel').classList.remove('hidden');
+        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.remove('active');
+        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.add('active');
+    }
     window.saveTrip();
 }
 
@@ -1419,16 +1408,18 @@ window.removeDay = function(btn) {
 
 window.removeFromTrip = function(btn, locId) {
     if(!confirm(currentLang === 'fr' ? "Retirer ce lieu du voyage ?" : "Remove this location from the trip?")) return;
+    locId = Number(locId);
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-    wList = wList.filter(w => w.id !== locId || w.tripId !== currentTrip.id);
+    wList = wList.filter(w => Number(w.id) !== locId || w.tripId !== currentTrip.id);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     btn.closest('.day-loc').remove();
     window.saveTrip(); 
 }
 
 window.quickAddLoc = function(locId) {
+    locId = Number(locId); // Sécurité anti-bug
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-    if(!wList.some(w => w.id === locId && w.tripId === currentTrip.id)) {
+    if(!wList.some(w => Number(w.id) === locId && w.tripId === currentTrip.id)) {
         wList.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
         window.renderTrip(); 
@@ -1442,13 +1433,15 @@ window.quickAddLoc = function(locId) {
 window.saveTrip = function() {
     currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
     
-    const type = document.getElementById('trip-duration-type').value;
-    currentTrip.dateType = type;
-    if(type === 'duration') {
+    const isFlexible = document.querySelector('.edit-banner .date-tab[data-tab="edit-flexible"]')?.classList.contains('active');
+    
+    if(isFlexible) {
+        currentTrip.dateType = 'duration';
         const month = document.querySelector('.edit-banner .pill-btn[data-type="edit-month"].active')?.textContent || '';
         const length = document.querySelector('.edit-banner .pill-btn[data-type="edit-duration"].active')?.textContent || '';
         currentTrip.duration = `${length} in ${month}`;
     } else {
+        currentTrip.dateType = 'specific';
         currentTrip.startDate = document.getElementById('date-start').value;
         currentTrip.endDate = document.getElementById('date-end').value;
     }
@@ -1479,10 +1472,10 @@ window.filterAddModal = function() {
     list.innerHTML = '';
     
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-    let tripLocIds = wList.filter(w => w.tripId === currentTrip.id).map(w => w.id);
+    let tripLocIds = wList.filter(w => w.tripId === currentTrip.id).map(w => Number(w.id));
     
     celebLocations.forEach(loc => {
-        if (!tripLocIds.includes(loc.id)) {
+        if (!tripLocIds.includes(Number(loc.id))) {
             if(loc.name.toLowerCase().includes(query) || (loc.city && loc.city.toLowerCase().includes(query)) || (loc.category && loc.category.toLowerCase().includes(query))) {
                 list.innerHTML += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #e2e8f0;">
@@ -1597,7 +1590,8 @@ window.createNewTripAdvanced = function() {
 
     const newTripId = 'trip-' + Date.now();
     let newTrip = { 
-        id: newTripId, name: name, dateType: dateType, duration: duration, startDate: startDate, endDate: endDate, days: [] 
+        id: newTripId, name: name, dateType: dateType, duration: duration, startDate: startDate, endDate: endDate, days: [],
+        group: group, country: country // NOUVEAU: ON SAUVEGARDE CES CHAMPS !
     };
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
