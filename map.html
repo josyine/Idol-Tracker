@@ -46,6 +46,30 @@
   .btn-primary-sm { background:#D42759; color:#fff; border:none; border-radius:7px; padding:9px 16px; font-size:11.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; }
   .btn-primary-sm:disabled { background:#e2e8f0; color:#94a3b8; cursor:not-allowed; }
   .btn-ghost-sm { background:none; color:#64748b; border:none; font-size:11.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; padding:9px 6px; }
+
+  /* STYLE AVATAR (Pour garantir la cohérence depuis map.html si besoin) */
+  .user-avatar-btn {
+      width: 40px !important;
+      height: 40px !important;
+      border-radius: 50%;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #cbd5e1 !important;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: 0.2s ease;
+      padding: 0 !important;
+  }
+  .user-avatar-btn:hover {
+      border-color: #D42759 !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
 </style>
 </head>
 <body>
@@ -281,7 +305,7 @@
     <!-- Zone Carte à Droite -->
     <main class="map-container">
         
-        <!-- Top Nav : Aucun onclick inline, tout est propre -->
+        <!-- Top Nav : MISE À JOUR AVEC CLASSE user-avatar-btn -->
         <div class="top-nav">
             <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -301,7 +325,8 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <button id="profile-btn" class="nav-btn" style="background-color: transparent; color: #212832; font-weight: bold; border: none;"></button>
+                <!-- LE BOUTON PROFIL GÉRÉ DYNAMIQUEMENT PAR SCRIPT.JS -->
+                <button id="profile-btn" class="nav-btn user-avatar-btn" title="Account">U</button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
                     <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
@@ -340,7 +365,7 @@
     </div>
 </div>
 
-<!-- Modal Itinéraire (CARTE CORRIGÉE - Ne déborde plus) -->
+<!-- Modal Itinéraire -->
 <div id="itinerary-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 650px;">
         <span class="close-btn" onclick="closeModal('itinerary-modal')">&times;</span>
