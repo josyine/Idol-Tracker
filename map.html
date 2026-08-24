@@ -52,14 +52,10 @@
   /* ==========================================
      STYLES DES ONGLETS EXPLORE / MY ITINERARY
      ========================================== */
-  .sidebar-top-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin: 0 20px 20px 20px; }
+  .sidebar-top-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin: 0 5px 20px 5px; }
   .top-tab-btn { flex: 1; background: none; border: none; padding: 10px 0; font-size: 13px; font-weight: 600; color: #94a3b8; cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: 0.2s; outline: none;}
   .top-tab-btn:hover { color: #D42759; }
   .top-tab-btn.active { color: #D42759; font-weight: 700; border-bottom-color: #D42759; }
-
-  .sidebar-main-panel { display: none; flex-direction: column; height: 100%; flex: 1; overflow-y: auto; padding: 0 20px; -ms-overflow-style: none; scrollbar-width: none;}
-  .sidebar-main-panel::-webkit-scrollbar { display: none; }
-  .sidebar-main-panel.active { display: flex; }
 
   /* ==========================================
      STYLE DE LA TIMELINE "MY ITINERARY"
@@ -72,51 +68,76 @@
   .timeline-loc:hover .timeline-loc-name { color: #D42759; }
   .timeline-loc-name { font-size: 13px; font-weight: 600; color: #334155; transition: 0.2s;}
   .timeline-loc-city { font-size: 11px; color: #94a3b8; text-align: right; flex-shrink: 0;}
-
-  /* HEADER ALIGNÉ */
-  .header-icon-btn {
-      width: 42px; height: 42px; border-radius: 50%; background: #ffffff;
-      display: flex; align-items: center; justify-content: center;
-      color: #2E3644; border: 1px solid #cbd5e1; cursor: pointer;
-      transition: 0.2s; font-size: 16px; font-weight: bold; box-shadow: 0 4px 14px rgba(80,60,120,.05);
-  }
-  .header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: #D42759; transform: translateY(-2px);}
-  .user-avatar-btn { color: #000000 !important; overflow: hidden; padding: 0;}
 </style>
 </head>
 <body>
 
 <div class="app-container">
-    
-    <!-- Sidebar Gauche -->
-    <aside class="sidebar" id="app-sidebar" style="padding: 20px 0;">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
 
-        <div class="sidebar-content" style="height: 100%;">
-            
-            <a href="#" onclick="if(document.getElementById('sidebar-details') && !document.getElementById('sidebar-details').classList.contains('hidden')) { closeDetailsPanel(); } else { window.location.href='map.html'; }; return false;" class="brand-row" style="padding-top: 5px; padding-left: 20px; text-decoration: none; display: flex; cursor: pointer;">
+    <!-- HEADER UNIVERSEL (ALIGNE TOUTES LES PAGES) -->
+    <div class="universal-header">
+        <div class="header-left">
+            <a href="#" onclick="if(document.getElementById('sidebar-details') && !document.getElementById('sidebar-details').classList.contains('hidden')) { closeDetailsPanel(); } else { window.location.href='map.html'; }; return false;" class="brand-row">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
                 </svg>
                 <div>
-                    <div class="brand-text" style="color: #2E3644;">Screen To <b style="color: #D42759;">Street</b></div>
-                    <div class="tagline" data-i18n="subtitle" style="color: #5B6472;">Following the footsteps of your favorite artists</div>
+                    <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
+                    <div class="tagline" data-i18n="subtitle">Following the footsteps of your favorite artists</div>
                 </div>
             </a>
+        </div>
 
+        <div class="header-right">
+            <div class="dropdown-container">
+                <button id="lang-btn" class="header-icon-btn" title="Langue">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </button>
+                <div id="lang-menu" class="dropdown-menu hidden">
+                    <a href="#" class="dropdown-option lang-option" data-lang="en">English</a>
+                    <a href="#" class="dropdown-option lang-option" data-lang="fr">Français</a>
+                </div>
+            </div>
+            <div class="dropdown-container">
+                <button id="cart-btn" class="header-icon-btn" onclick="openCartModal()" title="Unlock Passes">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </button>
+            </div>
+            <div class="dropdown-container">
+                <button id="profile-btn" class="header-icon-btn user-avatar-btn" title="Account">U</button>
+                <div id="profile-menu" class="dropdown-menu hidden">
+                    <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
+                    <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
+                    <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
+                    <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
+                    <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
+                    <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="index.html" class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;" data-i18n="logoutOption">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar Gauche -->
+    <aside class="sidebar" id="app-sidebar">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+
+        <div class="sidebar-content" style="height: 100%;">
             <!-- Les 2 Onglets (Explore / My Itinerary) -->
-            <div class="sidebar-top-tabs" style="margin-top: 15px;">
+            <div class="sidebar-top-tabs">
                 <button id="tab-explore-btn" class="top-tab-btn active" onclick="switchMainTab('explore')">Explore</button>
                 <button id="tab-itinerary-btn" class="top-tab-btn" onclick="switchMainTab('itinerary')">My Itinerary</button>
             </div>
 
-            <!-- CONTENEUR PRINCIPAL DES ONGLETS -->
             <div id="sidebar-main" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
                 
                 <!-- ONGLET 1 : EXPLORE -->
-                <div id="sidebar-explore" class="sidebar-main-panel active" style="gap: 20px;">
+                <div id="sidebar-explore" class="sidebar-main-panel active">
                     
                     <div style="position:relative;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:14px; top:12px;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -182,8 +203,8 @@
                         </div>
                         <div id="iti-view-meta" style="font-size:11px; color:#94a3b8; margin-bottom: 15px;">3 countries · 19 total locations saved</div>
 
-                        <button class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:24px; padding:12px; border-radius: 8px;">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 2v6h6"></path></svg>
+                        <button class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:24px; padding:12px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/><path d="M19 19l2 2"/><path d="M5 19l-2 2"/></svg>
                             Regenerate itinerary
                         </button>
 
@@ -318,53 +339,16 @@
     <!-- Zone Carte à Droite -->
     <main class="map-container">
         
-        <!-- BANNIERE DE MAP STATS (En haut à gauche) -->
-        <div style="position: absolute; top: 20px; left: 20px; z-index: 2000; display: flex; gap: 15px;">
-            <div style="background: #fff; border-radius: 100px; padding: 10px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 13px; font-weight: 700;">
-                <div id="btn-show-locations" class="stat-pill-btn" onclick="openFilteredListModal('locations')" style="color: #D42759; cursor:pointer;"><span id="stat-locations">0</span> <span style="color: #212832;">LOCATIONS</span></div>
-                <span style="color: #cbd5e1;">|</span>
-                <div id="btn-show-countries" class="stat-pill-btn" onclick="openFilteredListModal('countries')" style="color: #212832; cursor:pointer;"><span id="stat-countries">0</span> COUNTRIES</div>
+        <div class="map-overlay-stats">
+            <div class="stat-pill">
+                <div id="btn-show-locations" class="stat-pill-btn" onclick="openFilteredListModal('locations')"><span id="stat-locations">0</span> <span data-i18n="locationsCount">LOCATIONS</span></div>
+                <span class="sep">|</span> 
+                <div id="btn-show-countries" class="stat-pill-btn" onclick="openFilteredListModal('countries')"><span id="stat-countries">0</span> <span data-i18n="statsCountries">COUNTRIES</span></div>
             </div>
             
-            <!-- BANNIERE VIEWING TRIP -->
             <div id="active-trip-banner" class="hidden" style="background: #2E3644; color: #fff; border-radius: 100px; padding: 8px 12px 8px 20px; display: flex; align-items: center; gap: 15px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                 <span>Viewing Trip: <span id="active-trip-name-display" style="color: #fff; font-weight: 700;"></span></span>
                 <button onclick="clearTripFromMainMap()" style="background: #D42759; color: #fff; border: none; border-radius: 100px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s;">✕ Close</button>
-            </div>
-        </div>
-
-        <div class="top-nav">
-            <button id="mobile-menu-btn" class="header-icon-btn hamburger-btn" style="display: none;" onclick="toggleMobileMenu()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-            <div class="dropdown-container">
-                <button id="lang-btn" class="header-icon-btn" title="Langue">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                </button>
-                <div id="lang-menu" class="dropdown-menu hidden">
-                    <a href="#" class="dropdown-option lang-option" data-lang="en">English</a>
-                    <a href="#" class="dropdown-option lang-option" data-lang="fr">Français</a>
-                </div>
-            </div>
-            <div class="dropdown-container">
-                <button id="cart-btn" class="header-icon-btn" onclick="openCartModal()" title="Unlock Passes">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                </button>
-            </div>
-            <div class="dropdown-container">
-                <button id="profile-btn" class="header-icon-btn user-avatar-btn" title="Account">U</button>
-                <div id="profile-menu" class="dropdown-menu hidden">
-                    <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
-                    <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
-                    <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
-                    <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
-                    <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
-                    <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="index.html" class="dropdown-option" id="logout-btn" style="color:var(--primary-magenta); font-weight:bold;" data-i18n="logoutOption">Logout</a>
-                </div>
             </div>
         </div>
         
@@ -389,8 +373,9 @@
         <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="itiDesc">Select a group, a country, and how many days you stay.</p>
         
         <div id="iti-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
-            <select id="iti-group" class="filter-select" style="padding:12px;"></select>
-            <select id="iti-country" class="filter-select" style="padding:12px;"></select>
+            <select id="iti-group" class="filter-select" style="padding:12px;" onchange="updateItiCity()"></select>
+            <select id="iti-country" class="filter-select" style="padding:12px;" onchange="updateItiCity()"></select>
+            <select id="iti-city" class="filter-select" style="padding:12px;"><option value="">All Cities (Optional)</option></select>
             <input type="number" id="iti-days" min="1" max="7" value="3" class="filter-select" style="padding:12px;">
             <button class="gen-btn" onclick="generateItinerary()" style="padding:14px; font-size:14px; justify-content:center;" data-i18n="itiCreateBtn">Create My Guide</button>
         </div>
@@ -425,6 +410,17 @@
             </div>
             <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
         </form>
+    </div>
+</div>
+
+<div id="cookie-banner" class="cookie-banner hidden">
+    <div class="cookie-content">
+        <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#confidentialite" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
+        <div class="cookie-actions">
+            <button id="cookie-manage" class="cat-card" style="border:1px solid var(--primary-magenta); color:var(--primary-magenta);" data-i18n="cookieManage">Manage</button>
+            <button id="cookie-reject" class="cat-card" data-i18n="cookieReject">Reject</button>
+            <button id="cookie-accept" class="gen-btn" style="width:auto;" data-i18n="cookieAccept">Accept</button>
+        </div>
     </div>
 </div>
 
