@@ -17,8 +17,6 @@
   
   /* COLONNE DE GAUCHE : LISTE DES VOYAGES */
   .sidebar { width: 380px; height: 100%; background: #fff; box-shadow: 2px 0 20px rgba(0,0,0,0.05); z-index: 100; position: relative; display: flex; flex-direction: column; }
-  
-  /* En-tête de la sidebar (Logo fixe) */
   .sidebar-header { padding: 10px 15px; }
   .brand-row { text-decoration: none; display: flex; align-items: center; cursor: pointer; gap: 10px; }
   .brand-text { font-size: 18px; font-weight: 700; color: #2E3644; }
@@ -42,11 +40,12 @@
   .new-trip-pill:hover { border-color: #D42759; background: #FCE7F0; }
 
   /* ZONE CENTRALE : DÉTAILS DU VOYAGE */
-  .trips-main-container { flex: 1; position: relative; background: #f8fafc; display: flex; flex-direction: column; overflow: hidden; align-items: center; }
+  .map-container { flex: 1; position: relative; background: #f8fafc; display: flex; flex-direction: column; overflow: hidden; }
   
-  .trips-main { width: 100%; max-width: 900px; padding: 40px; padding-top: 80px; overflow-y: auto; flex: 1;}
+  .trips-main { width: 100%; overflow-y: auto; flex: 1; display: flex; flex-direction: column; align-items: center; padding-bottom: 100px; }
+  .trip-detail-wrapper { width: 100%; max-width: 900px; padding: 40px; display: none; }
   
-  .trip-hero { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #e2e8f0; }
+  .trip-hero { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #e2e8f0; }
   .trip-head-info { display: flex; flex-direction: column; gap: 8px; flex: 1; }
   
   /* MODE EDITION PERMANENT */
@@ -60,11 +59,16 @@
 
   .section-label {font-size:11.5px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 16px 0;}
 
-  /* BANDEAU DE DATES PERMANENT */
+  /* BANDEAU DE DATES (STYLE GOOGLE FLIGHTS) */
   .edit-banner { background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin-bottom:30px; }
-  .date-inputs {display:flex;gap:12px; align-items: center; flex-wrap: wrap;}
-  .date-inputs select, .date-inputs input {flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:12px 14px;font-size:13.5px;font-family:'Poppins',sans-serif; background: #fff; outline:none;}
-  .date-inputs select:focus, .date-inputs input:focus {border-color:#D42759;}
+  .date-tabs { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; }
+  .date-tab { flex: 1; text-align: center; padding: 10px 15px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: 0.2s; }
+  .date-tab.active { color: #D42759; border-bottom-color: #D42759; }
+  .pill-btn { border: 1px solid #cbd5e1; border-radius: 20px; padding: 8px 16px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s; background: #fff; }
+  .pill-btn.active { background: #FCE7F0; border-color: #D42759; color: #D42759; }
+
+  .date-inputs input, .date-inputs select {flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:12px 14px;font-size:13.5px;font-family:'Poppins',sans-serif; background: #fff; outline:none;}
+  .date-inputs input:focus, .date-inputs select:focus {border-color:#D42759;}
 
   /* LIEUX SAUVEGARDÉS */
   .loc-row {display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9; position: relative;}
@@ -101,12 +105,9 @@
   }
   .add-day-btn:hover { border-color: #D42759; color: #D42759; }
 
-  .save-row {display:flex;gap:12px;margin-top:24px;}
-  .save-row .gen-btn {flex:1;justify-content:center; padding: 14px;}
-
   /* MODALS */
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-  .modal-box { background: #fff; width: 550px; max-width: 90%; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 80vh; display: flex; flex-direction: column;}
+  .modal-box { background: #fff; width: 550px; max-width: 90%; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 85vh; display: flex; flex-direction: column;}
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
   .modal-title { font-size: 20px; font-weight: 700; color: #212832; }
   .modal-close { cursor: pointer; font-size: 24px; color: #64748b; }
@@ -115,13 +116,6 @@
   .modal-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
   
   .empty-state { text-align: center; color: #94a3b8; padding: 80px 0; font-size: 15px; width: 100%; }
-
-  /* Google Flights Style Tabs for Modal */
-  .date-tabs { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; }
-  .date-tab { flex: 1; text-align: center; padding: 10px 15px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: 0.2s; }
-  .date-tab.active { color: #D42759; border-bottom-color: #D42759; }
-  .pill-btn { border: 1px solid #cbd5e1; border-radius: 20px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s; }
-  .pill-btn.active { background: #FCE7F0; border-color: #D42759; color: #D42759; }
 </style>
 </head>
 <body>
@@ -131,7 +125,7 @@
     <!-- COLONNE DE GAUCHE -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <a href="map.html" class="brand-row" style="padding-top: 10px; margin-bottom: 10px;">
+            <a href="#" onclick="window.location.href='map.html'; return false;" class="brand-row" style="padding-top: 10px; margin-bottom: 10px;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -155,10 +149,13 @@
     </aside>
 
     <!-- ZONE CENTRALE -->
-    <main class="trips-main-container">
+    <main class="map-container">
         
-        <!-- Top Nav (Strictement identique à Map.html, avec Account, Artists, Destinations) -->
+        <!-- Top Nav (Strictement identique à Map.html pour l'alignement) -->
         <div class="top-nav" style="width: 100%; position: sticky; top:0; z-index:90;">
+            <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
             <div style="flex:1;"></div>
             <div class="dropdown-container">
                 <button id="lang-btn" class="nav-btn" title="Langue" onclick="document.getElementById('lang-menu').classList.toggle('hidden')">
@@ -168,7 +165,9 @@
                     <a href="#" class="dropdown-option" style="display:block; padding:8px 16px; color:#334155;" onclick="changeLang('en'); document.getElementById('lang-menu').classList.add('hidden'); return false;">English</a>
                     <a href="#" class="dropdown-option" style="display:block; padding:8px 16px; color:#334155;" onclick="changeLang('fr'); document.getElementById('lang-menu').classList.add('hidden'); return false;">Français</a>
                 </div>
-                <button class="nav-btn" style="background:#f1f5f9; border:none; padding:8px; border-radius:50%; cursor:pointer;" onclick="window.location.href='map.html'" title="Back to Map">
+            </div>
+            <div class="dropdown-container">
+                <button class="nav-btn" title="Back to Map" onclick="window.location.href='map.html'">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 </button>
             </div>
@@ -201,28 +200,42 @@
                 <div class="trip-hero">
                     <div class="trip-head-info">
                         <input type="text" id="edit-trip-name" class="trip-name-input" placeholder="Trip Name" onchange="saveTrip()">
+                        <div class="trip-dates" id="dates-display">0 locations</div>
                     </div>
                     <div>
                         <button class="gen-btn ghost" style="border-color:#ef4444; color:#ef4444;" onclick="openDeleteModal()" id="i18n-delete-trip">Delete</button>
                     </div>
                 </div>
 
-                <!-- BANDEAU D'EDITION (Dates & Calendrier) EN PERMANENCE -->
-                <div class="edit-banner open" id="edit-banner">
+                <!-- BANDEAU D'EDITION (Dates & Calendrier Google Flights) -->
+                <div class="edit-banner" id="edit-banner">
                     <div class="section-label" style="margin-top:0;" id="i18n-trip-duration">Trip Duration & Dates</div>
-                    <div class="date-inputs">
-                        <select id="trip-duration-type" onchange="toggleDateType(); saveTrip();">
-                            <option value="specific" id="i18n-opt-specific">Specific Dates</option>
-                            <option value="duration" id="i18n-opt-duration">General Duration</option>
-                        </select>
-                        <input type="date" id="date-start" class="date-specific" onchange="saveTrip()">
-                        <input type="date" id="date-end" class="date-specific" onchange="saveTrip()">
-                        <select id="duration-length" class="date-duration" style="display:none;" onchange="saveTrip()">
-                            <option value="1 Week">1 Week</option>
-                            <option value="2 Weeks">2 Weeks</option>
-                            <option value="A Few Days">A Few Days</option>
-                            <option value="Someday">Someday</option>
-                        </select>
+                    
+                    <div class="date-tabs">
+                        <div class="date-tab active" data-tab="edit-specific" onclick="switchEditDateTab('specific')">Specific dates</div>
+                        <div class="date-tab" data-tab="edit-flexible" onclick="switchEditDateTab('flexible')">Flexible dates</div>
+                    </div>
+
+                    <!-- Mode Spécifique (Calendrier) -->
+                    <div id="edit-date-specific-panel" style="display:flex; gap:10px; margin-bottom:10px;">
+                        <input type="date" id="date-start" class="modal-search" style="margin-bottom:0;" onchange="saveTrip()">
+                        <input type="date" id="date-end" class="modal-search" style="margin-bottom:0;" onchange="saveTrip()">
+                    </div>
+
+                    <!-- Mode Flexible (Bulles) -->
+                    <div id="edit-date-flexible-panel" class="hidden" style="margin-bottom:10px;">
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                             <div class="pill-btn active" data-type="edit-duration" onclick="selectEditPill(this, 'edit-duration'); saveTrip();">Weekend</div>
+                             <div class="pill-btn" data-type="edit-duration" onclick="selectEditPill(this, 'edit-duration'); saveTrip();">1 week</div>
+                             <div class="pill-btn" data-type="edit-duration" onclick="selectEditPill(this, 'edit-duration'); saveTrip();">2 weeks</div>
+                             <div class="pill-btn" data-type="edit-duration" onclick="selectEditPill(this, 'edit-duration'); saveTrip();">1 month</div>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; justify-content:center;">
+                             <div class="pill-btn active" data-type="edit-month" onclick="selectEditPill(this, 'edit-month'); saveTrip();">August</div>
+                             <div class="pill-btn" data-type="edit-month" onclick="selectEditPill(this, 'edit-month'); saveTrip();">September</div>
+                             <div class="pill-btn" data-type="edit-month" onclick="selectEditPill(this, 'edit-month'); saveTrip();">October</div>
+                             <div class="pill-btn" data-type="edit-month" onclick="selectEditPill(this, 'edit-month'); saveTrip();">Next 6 months</div>
+                        </div>
                     </div>
                 </div>
 
@@ -241,7 +254,7 @@
                 </button>
 
                 <div id="reco-section" style="display: none; margin-top: 30px;">
-                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP (SAME COUNTRY)</div>
+                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP</div>
                     <div id="reco-list"></div>
                 </div>
 
@@ -252,7 +265,7 @@
                 <!-- Bouton pour le Générateur d'itinéraire -->
                 <div style="text-align:center; margin-top: 60px;">
                     <p style="font-size:12px; color:#64748b; margin-bottom:10px;" id="i18n-need-magic">Need some magic?</p>
-                    <button class="gen-btn ghost" onclick="document.getElementById('itinerary-modal').classList.remove('hidden')" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
+                    <button class="gen-btn ghost" onclick="openItineraryModal()" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
                 </div>
 
             </div>
@@ -272,7 +285,7 @@
     </div>
 </div>
 
-<!-- Modal CREATE NEW TRIP (Refondu : Style Google Flights) -->
+<!-- Modal CREATE NEW TRIP (Refondu : Style Google Flights + Filtres) -->
 <div class="modal-overlay hidden" id="add-trip-modal">
     <div class="modal-box" style="width: 600px;">
         <div class="modal-header">
@@ -282,41 +295,46 @@
         
         <input type="text" id="create-trip-name" class="modal-search" placeholder="Trip Name (e.g. Japan 2027)">
 
+        <!-- Filtres Dynamiques (Group, Member, Country, City) -->
         <div style="display:flex; gap:10px; margin-bottom: 15px;">
-             <select id="create-trip-group" class="modal-search" style="margin-bottom:0; flex:1;">
+             <select id="create-trip-group" class="modal-search" style="margin-bottom:0; flex:1;" onchange="updateCreateTripOptions()">
                   <option value="">Select Group</option>
              </select>
              <select id="create-trip-member" class="modal-search" style="margin-bottom:0; flex:1;">
-                  <option value="All">All Members</option>
+                  <option value="All">All Members (Optional)</option>
              </select>
         </div>
         <div style="display:flex; gap:10px; margin-bottom: 20px;">
-             <input type="text" id="create-trip-country" class="modal-search" style="margin-bottom:0; flex:1;" placeholder="Country">
-             <input type="text" id="create-trip-city" class="modal-search" style="margin-bottom:0; flex:1;" placeholder="City (optional)">
+             <select id="create-trip-country" class="modal-search" style="margin-bottom:0; flex:1;" onchange="updateCreateTripOptions()">
+                  <option value="">Select Country</option>
+             </select>
+             <select id="create-trip-city" class="modal-search" style="margin-bottom:0; flex:1;">
+                  <option value="">Select City (Optional)</option>
+             </select>
         </div>
 
         <div class="date-tabs">
-            <div class="date-tab active" data-tab="specific" onclick="switchTripDateTab('specific')">Specific dates</div>
-            <div class="date-tab" data-tab="flexible" onclick="switchTripDateTab('flexible')">Flexible dates</div>
+            <div class="date-tab active" data-tab="create-specific" onclick="switchCreateDateTab('specific')">Specific dates</div>
+            <div class="date-tab" data-tab="create-flexible" onclick="switchCreateDateTab('flexible')">Flexible dates</div>
         </div>
 
-        <div id="trip-date-specific-panel" style="display:flex; gap:10px; margin-bottom:20px;">
+        <div id="create-date-specific-panel" style="display:flex; gap:10px; margin-bottom:20px;">
             <input type="date" id="create-trip-start" class="modal-search" style="margin-bottom:0;">
             <input type="date" id="create-trip-end" class="modal-search" style="margin-bottom:0;">
         </div>
 
-        <div id="trip-date-flexible-panel" class="hidden" style="margin-bottom:20px;">
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:15px; justify-content:center;">
-                 <div class="pill-btn active" data-type="month" onclick="selectPill(this, 'month')">August</div>
-                 <div class="pill-btn" data-type="month" onclick="selectPill(this, 'month')">September</div>
-                 <div class="pill-btn" data-type="month" onclick="selectPill(this, 'month')">October</div>
-                 <div class="pill-btn" data-type="month" onclick="selectPill(this, 'month')">November</div>
-                 <div class="pill-btn" data-type="month" onclick="selectPill(this, 'month')">Next 6 months</div>
-            </div>
+        <div id="create-date-flexible-panel" class="hidden" style="margin-bottom:20px;">
             <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-                 <div class="pill-btn" data-type="duration" onclick="selectPill(this, 'duration')">Weekend</div>
-                 <div class="pill-btn active" data-type="duration" onclick="selectPill(this, 'duration')">1 week</div>
-                 <div class="pill-btn" data-type="duration" onclick="selectPill(this, 'duration')">2 weeks</div>
+                 <div class="pill-btn active" data-type="create-duration" onclick="selectCreatePill(this, 'create-duration')">Weekend</div>
+                 <div class="pill-btn" data-type="create-duration" onclick="selectCreatePill(this, 'create-duration')">1 week</div>
+                 <div class="pill-btn" data-type="create-duration" onclick="selectCreatePill(this, 'create-duration')">2 weeks</div>
+                 <div class="pill-btn" data-type="create-duration" onclick="selectCreatePill(this, 'create-duration')">1 month</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; justify-content:center;">
+                 <div class="pill-btn active" data-type="create-month" onclick="selectCreatePill(this, 'create-month')">August</div>
+                 <div class="pill-btn" data-type="create-month" onclick="selectCreatePill(this, 'create-month')">September</div>
+                 <div class="pill-btn" data-type="create-month" onclick="selectCreatePill(this, 'create-month')">October</div>
+                 <div class="pill-btn" data-type="create-month" onclick="selectCreatePill(this, 'create-month')">Next 6 months</div>
             </div>
         </div>
 
@@ -353,8 +371,9 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <!-- La carte est restaurée et ne débordera plus grâce à overflow: hidden -->
-            <div id="iti-map-container" style="height: 250px; border-radius: 12px; margin-bottom: 15px; background: #e2e8f0; position: relative; z-index: 10; overflow: hidden;"></div>
+            <div style="width: 100%; height: 200px; margin-bottom: 15px;">
+                <div id="iti-map-container" style="height: 100%; width: 100%; background: #e2e8f0; border-radius: 12px; position: relative; z-index: 10; overflow: hidden;"></div>
+            </div>
             <div id="iti-days-list" style="max-height:30vh; overflow-y:auto; margin-bottom:15px; padding-right:10px;"></div>
             <div style="display:flex; gap:10px;">
                 <button class="gen-btn ghost" onclick="exportItineraryPDF()" style="flex:1; justify-content:center;" id="i18n-itiExport">Export Guide as PDF</button>
