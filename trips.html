@@ -29,9 +29,9 @@
   .trip-pill.active { background: #FCE7F0; border-color: #D42759; }
   .trip-pill:hover:not(.active) { background: #f1f5f9; }
   .trip-pill.drag-over-trip { border-top: 3px solid #D42759; }
-  .trip-pill-name { font-size: 16px; font-weight: 700; color: #212832; margin-bottom: 4px; padding-right: 20px; }
+  .trip-pill-name { font-size: 16px; font-weight: 700; color: #212832; margin-bottom: 4px; padding-right: 20px; pointer-events: none;}
   .trip-pill.active .trip-pill-name { color: #D42759; }
-  .trip-pill-meta { font-size: 12px; color: #94a3b8; }
+  .trip-pill-meta { font-size: 12px; color: #94a3b8; pointer-events: none;}
   
   .del-trip-btn { position: absolute; top: 12px; right: 14px; font-size: 16px; font-weight: bold; color: #94a3b8; cursor: pointer; transition: 0.2s; padding: 2px 6px; border-radius: 6px; z-index: 10; }
   .del-trip-btn:hover { background: #fff; color: #ef4444; }
@@ -40,10 +40,10 @@
   .new-trip-pill:hover { border-color: #D42759; background: #FCE7F0; }
 
   /* ZONE CENTRALE : DÉTAILS DU VOYAGE */
-  .map-container { flex: 1; position: relative; background: #f8fafc; display: flex; flex-direction: column; overflow: hidden; }
+  .map-container { flex: 1; position: relative; background: #f8fafc; display: flex; flex-direction: column; overflow: hidden; align-items: center; }
   
-  .trips-main { width: 100%; overflow-y: auto; flex: 1; display: flex; flex-direction: column; align-items: center; padding-bottom: 100px; }
-  .trip-detail-wrapper { width: 100%; max-width: 900px; padding: 40px; display: none; }
+  .trips-main { width: 100%; max-width: 900px; padding: 40px; padding-top: 80px; overflow-y: auto; flex: 1;}
+  .trip-detail-wrapper { width: 100%; display: none; }
   
   .trip-hero { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #e2e8f0; }
   .trip-head-info { display: flex; flex-direction: column; gap: 8px; flex: 1; }
@@ -60,7 +60,7 @@
   .section-label {font-size:11.5px;font-weight:700;letter-spacing:.7px;color:#94a3b8;text-transform:uppercase;margin:24px 0 16px 0;}
 
   /* BANDEAU DE DATES (STYLE GOOGLE FLIGHTS) */
-  .edit-banner { background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin-bottom:30px; }
+  .edit-banner { background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin-bottom:30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
   .date-tabs { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; }
   .date-tab { flex: 1; text-align: center; padding: 10px 15px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: 0.2s; }
   .date-tab.active { color: #D42759; border-bottom-color: #D42759; }
@@ -76,7 +76,7 @@
   .loc-thumb {width:44px;height:44px;border-radius:9px;background-size:cover;background-position:center;flex-shrink:0;}
   .loc-name {font-size:13.5px;font-weight:700;color:#212832;}
   .loc-meta {font-size:11px;color:#94a3b8;}
-  .add-to-trip-btn { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; }
+  .add-to-trip-btn { margin-left: auto; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; }
   .add-to-trip-btn:hover { background: #D42759; color: #fff; border-color: #D42759; }
 
   /* ITINÉRAIRE MODULABLE */
@@ -128,7 +128,7 @@
     <!-- COLONNE DE GAUCHE -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <a href="map.html" class="brand-row" style="padding-top: 10px; margin-bottom: 10px;">
+            <a href="#" onclick="window.location.href='map.html'; return false;" class="brand-row" style="padding-top: 10px; margin-bottom: 10px;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -154,8 +154,8 @@
     <!-- ZONE CENTRALE -->
     <main class="map-container">
         
-        <!-- Top Nav (Strictement identique à Map.html) -->
-        <div class="top-nav" style="width: 100%; position: sticky; top:0; z-index:90;">
+        <!-- Top Nav (STRICTEMENT IDENTIQUE À MAP.HTML) -->
+        <div class="top-nav" style="width: 100%; position: absolute; top:0; z-index:90;">
             <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()" style="visibility:hidden;">
                 <!-- Gardé invisible pour l'alignement flexbox -->
             </button>
@@ -175,7 +175,6 @@
                 </button>
             </div>
             <div class="dropdown-container">
-                <!-- Icon Profil transparent, lettre noire -->
                 <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: 1px solid #cbd5e1; background-color: transparent; color: #212832; font-weight: bold;" onclick="document.getElementById('profile-menu').classList.toggle('hidden')">U</button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="map-destinations.html" class="dropdown-option" id="i18n-dest">Explore Destinations</a>
@@ -203,7 +202,6 @@
                 <div class="trip-hero">
                     <div class="trip-head-info">
                         <input type="text" id="edit-trip-name" class="trip-name-input" placeholder="Trip Name" onchange="saveTrip()">
-                        <div class="trip-dates" id="dates-display">0 locations</div>
                     </div>
                     <div>
                         <button class="gen-btn ghost" style="border-color:#ef4444; color:#ef4444;" onclick="openDeleteModal()" id="i18n-delete-trip">Delete</button>
@@ -211,7 +209,7 @@
                 </div>
 
                 <!-- BANDEAU D'EDITION (Dates & Calendrier Google Flights) -->
-                <div class="edit-banner open" id="edit-banner">
+                <div class="edit-banner" id="edit-banner" style="display:block;">
                     <div class="section-label" style="margin-top:0;" id="i18n-trip-duration">Trip Duration & Dates</div>
                     
                     <div class="date-tabs">
@@ -221,8 +219,8 @@
 
                     <!-- Mode Spécifique (Calendrier) -->
                     <div id="edit-date-specific-panel" style="display:flex; gap:10px; margin-bottom:10px;">
-                        <input type="date" id="date-start" class="modal-search" style="margin-bottom:0;" onchange="saveTrip()">
-                        <input type="date" id="date-end" class="modal-search" style="margin-bottom:0;" onchange="saveTrip()">
+                        <input type="date" id="date-start" class="date-specific" onchange="saveTrip()">
+                        <input type="date" id="date-end" class="date-specific" onchange="saveTrip()">
                     </div>
 
                     <!-- Mode Flexible (Bulles) -->
@@ -244,24 +242,20 @@
 
                 <div class="section-label" id="i18n-your-iti">YOUR ITINERARY</div>
                 <div class="itinerary-box" id="itinerary-box">
-                    <!-- Les jours apparaîtront ici -->
                     <button class="add-day-btn" onclick="addDay()">
                         <span id="i18n-add-day">+ Add an empty day</span>
                     </button>
                 </div>
 
                 <div class="section-label" id="saved-locs-label" style="margin-top: 40px;">UNASSIGNED LOCATIONS (0)</div>
-                <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent; background: #fff; border-radius: 12px;">
-                    <!-- Lieux non assignés -->
-                </div>
+                <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent; background: #fff; border-radius: 12px;"></div>
                 
                 <button class="gen-btn ghost" style="margin-top:15px;" onclick="openAddModal()">
                     <span id="i18n-add-more">+ Add more locations</span>
                 </button>
 
-                <!-- Recommandations Intelligentes -->
                 <div id="reco-section" style="display: none; margin-top: 30px;">
-                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP (SAME COUNTRY)</div>
+                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP</div>
                     <div id="reco-list"></div>
                 </div>
 
@@ -272,7 +266,7 @@
                 <!-- Bouton pour le Générateur d'itinéraire -->
                 <div style="text-align:center; margin-top: 60px;">
                     <p style="font-size:12px; color:#64748b; margin-bottom:10px;" id="i18n-need-magic">Need some magic?</p>
-                    <button class="gen-btn ghost" onclick="document.getElementById('itinerary-modal').classList.remove('hidden')" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
+                    <button class="gen-btn ghost" onclick="openItineraryModal()" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
                 </div>
 
             </div>
@@ -288,13 +282,11 @@
             <div class="modal-close" onclick="closeAddModal()">&times;</div>
         </div>
         <input type="text" id="add-search" class="modal-search" placeholder="Search by name, city or category..." onkeyup="filterAddModal()">
-        <div class="modal-list" id="add-modal-list">
-            <!-- Liste injectée -->
-        </div>
+        <div class="modal-list" id="add-modal-list"></div>
     </div>
 </div>
 
-<!-- Modal CREATE NEW TRIP (Refondu : Style Google Flights + Filtres) -->
+<!-- Modal CREATE NEW TRIP (Filtres Dynamiques + Style Google Flights) -->
 <div class="modal-overlay hidden" id="add-trip-modal">
     <div class="modal-box" style="width: 600px;">
         <div class="modal-header">
@@ -304,7 +296,7 @@
         
         <input type="text" id="create-trip-name" class="modal-search" placeholder="Trip Name (e.g. Japan 2027)">
 
-        <!-- Filtres Dynamiques (Group, Member, Country, City) -->
+        <!-- Filtres Dynamiques -->
         <div style="display:flex; gap:10px; margin-bottom: 15px;">
              <select id="create-trip-group" class="modal-search" style="margin-bottom:0; flex:1;" onchange="updateCreateTripOptions()">
                   <option value="">Select Group</option>
@@ -363,7 +355,7 @@
     </div>
 </div>
 
-<!-- Modal Auto-Itinerary (Réparé avec conteneur fermé) -->
+<!-- Modal Auto-Itinerary -->
 <div class="modal-overlay hidden" id="itinerary-modal">
     <div class="modal-box" style="width:650px;">
         <div class="modal-header">
@@ -381,12 +373,12 @@
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
             <!-- La carte est restaurée et ne débordera plus grâce à overflow: hidden -->
-            <div style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 12px; overflow: hidden; position: relative; z-index: 10;">
-                <div id="iti-map-container" style="height: 100%; width: 100%; background: #e2e8f0;"></div>
+            <div style="width: 100%; height: 250px; background: #e2e8f0; border-radius: 12px; margin-bottom: 15px; position: relative; z-index: 10; overflow: hidden;">
+                <div id="iti-map-container" style="height: 100%; width: 100%;"></div>
             </div>
             <div id="iti-days-list" style="max-height:30vh; overflow-y:auto; margin-bottom:15px; padding-right:10px;"></div>
             <div style="display:flex; gap:10px;">
-                <button id="export-pdf-btn" class="gen-btn ghost" onclick="exportItineraryPDF()" style="flex:1; justify-content:center;" id="i18n-itiExport">Export Guide as PDF</button>
+                <button class="gen-btn ghost" onclick="exportItineraryPDF()" style="flex:1; justify-content:center;" id="i18n-itiExport">Export Guide as PDF</button>
                 <button class="gen-btn" onclick="saveItineraryToTrips()" style="flex:1; justify-content:center;" id="i18n-itiSave">Save to My Trips</button>
             </div>
         </div>
