@@ -128,9 +128,6 @@ const filterData = {
     "General": { categories: ["Cafe", "Concerts", "Fashion", "Landmarks", "Museums", "Restaurants", "Pop-up Store"] }
 };
 
-// =========================================================================================
-// /!\ ATTENTION : C'EST ICI QUE TU DOIS COLLER TES 1700 LIGNES DE LIEUX (celebLocations) /!\ 
-// =========================================================================================
 let celebLocations = [
     { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` }, tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." }, directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." } },
     { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600", fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` }, tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." }, directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." } },
@@ -152,15 +149,13 @@ let celebLocations = [
     { id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y", address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg" },
     { id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0", address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg" }
 ];
-// =========================================================================================
-
 
 // ==========================================
 // 3. LOGIQUE UI ET TRADUCTIONS
 // ==========================================
 const translations = {
     en: { 
-        btnGenerateIti: "Auto-Itinerary", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
+        btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
         locationsCount: "LOCATIONS", statsCountries: "COUNTRIES", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", 
         cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
         exploreDestOption: "Explore Destinations", exploreArtistsOption: "Explore Artists", accountOption: "Your Account",
@@ -172,7 +167,7 @@ const translations = {
         itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips"
     },
     fr: { 
-        btnGenerateIti: "Générer Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
+        btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
         locationsCount: "LIEUX", statsCountries: "PAYS", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", 
         cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
         exploreDestOption: "Explorer les Destinations", exploreArtistsOption: "Explorer les Artistes", accountOption: "Mon Compte",
@@ -267,7 +262,7 @@ window.openItineraryModal = function() {
     window.initItineraryGenerator();
 }
 
-// Le bouton "Regenerate" a maintenant cette fonction
+// Bouton "Regenerate itinerary"
 window.initItineraryGenerator = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
@@ -457,24 +452,24 @@ window.loadItineraryTabOptions = function() {
     if(!select) return;
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    select.innerHTML = '';
+    select.innerHTML = `<option value="">👉 ${currentLang === 'fr' ? 'Sélectionner un voyage' : 'Select a trip to view'}</option>`;
     
-    if(trips.length === 0) {
-        select.innerHTML = `<option value="">${currentLang === 'fr' ? 'Aucun voyage créé' : 'No trips created yet'}</option>`;
-        document.getElementById('itinerary-content-container').classList.add('hidden');
-    } else {
+    if(trips.length > 0) {
         trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
-        let activeId = localStorage.getItem('activeTripId');
-        if(activeId && trips.some(t => t.id === activeId)) select.value = activeId;
-        else select.value = trips[0].id;
-        
-        loadItineraryView();
     }
+    
+    select.value = "";
+    document.getElementById('itinerary-content-container').classList.add('hidden');
+    clearTripFromMainMap();
 }
 
 window.loadItineraryView = function() {
     const select = document.getElementById('itinerary-trip-select');
-    if(!select || !select.value) return;
+    if(!select || !select.value) {
+        document.getElementById('itinerary-content-container').classList.add('hidden');
+        clearTripFromMainMap();
+        return;
+    }
 
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     const trip = trips.find(t => t.id === select.value);
@@ -846,7 +841,10 @@ window.openDetailsPanel = function(id) {
         }
     }
 
-    // Gestion propre de l'ouverture du panneau : masquer le panneau principal, afficher le panneau détails
+    // MASQUER LES ONGLETS EXPLORE/ITINERARY
+    const topTabs = document.querySelector('.sidebar-top-tabs');
+    if(topTabs) topTabs.style.display = 'none';
+
     const mainSidebar = document.getElementById('sidebar-main');
     if(mainSidebar) mainSidebar.style.display = 'none';
     
@@ -955,6 +953,11 @@ window.closeDetailsPanel = function() {
     }
     const dMain = document.getElementById('sidebar-main');
     if(dMain) dMain.style.display = 'flex'; // Restaure l'affichage normal
+    
+    // REAFFICHER LES ONGLETS
+    const topTabs = document.querySelector('.sidebar-top-tabs');
+    if(topTabs) topTabs.style.display = 'flex';
+
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) sidebar.classList.remove('expanded'); 
     
@@ -1324,7 +1327,6 @@ if(btnReject) btnReject.addEventListener('click', closeCookies);
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
-
 window.initTrips = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     
@@ -1551,7 +1553,12 @@ window.renderTrip = function() {
         return true;
     });
 
-    let unassignedLocs = filteredLocs.filter(loc => !allAssignedIds.includes(loc.id));
+    // Ne garder dans unassignedLocs QUE les lieux qui sont explicitement dans wishlistLocs pour ce voyage ET qui ne sont pas déjà assignés.
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let unassignedLocs = wList
+        .filter(w => w.tripId === currentTrip.id && !allAssignedIds.includes(Number(w.id)))
+        .map(w => celebLocations.find(l => l.id === Number(w.id)))
+        .filter(Boolean);
 
     const locList = document.getElementById('loc-list');
     locList.innerHTML = '';
@@ -1602,7 +1609,8 @@ window.renderTrip = function() {
     
     if(tripCountries.length > 0) {
         celebLocations.forEach(loc => {
-            if (tripCountries.includes(loc.country) && !allAssignedIds.includes(loc.id)) {
+            // Recommandation si: même pays + PAS assigné à un jour + PAS déjà dans unassignedLocs
+            if (tripCountries.includes(loc.country) && !allAssignedIds.includes(loc.id) && !unassignedLocs.some(u=>u.id===loc.id)) {
                 if (recoCount < 4) {
                     recoList.innerHTML += `
                         <div class="loc-row">
@@ -1809,14 +1817,18 @@ window.removeFromTrip = function(btn, locId) {
 window.confirmRemoveLoc = function() {
     if(!locToRemoveData) return;
     
-    if(locToRemoveData.btn) {
-        const locList = document.getElementById('loc-list');
-        locList.appendChild(locToRemoveData.btn.closest('.day-loc'));
-    }
+    // Supprimer totalement de wishlistLocs
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    wList = wList.filter(w => !(Number(w.id) === locToRemoveData.id && w.tripId === currentTrip.id));
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     
+    // Supprimer des jours si c'était dans un jour
+    currentTrip.days = currentTrip.days.map(day => day.filter(id => Number(id) !== locToRemoveData.id));
+
     window.saveTrip(); 
     closeModal('remove-loc-modal');
     locToRemoveData = null;
+    window.renderTrip(); // Force le rafraichissement visuel total
 }
 
 window.quickAddLoc = function(locId) {
