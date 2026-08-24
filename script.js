@@ -100,16 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const btnShowLocs = document.getElementById('btn-show-locations');
-    if (btnShowLocs) btnShowLocs.addEventListener('click', () => { openFilteredListModal('locations'); });
-    const btnShowCountries = document.getElementById('btn-show-countries');
-    if (btnShowCountries) btnShowCountries.addEventListener('click', () => { openFilteredListModal('countries'); });
-
     updateUI();
 });
 
 // ==========================================
-// 2. DONNÉES (ICONES, FILTRES ET LIEUX)
+// 2. DONNÉES (ICONES ET FILTRES)
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5h18"/><path d="M4 8.5 5.5 4h3L7 8.5"/><path d="M9.3 8.5 10.8 4h3l-1.5 4.5"/><path d="M14.7 8.5 16.2 4h3l-1.5 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.5"/></svg>`,
@@ -133,7 +128,9 @@ const filterData = {
     "General": { categories: ["Cafe", "Concerts", "Fashion", "Landmarks", "Museums", "Restaurants", "Pop-up Store"] }
 };
 
-// 🛑 C'EST CE TABLEAU "celebLocations" QUE TU DEVRAS REMPLACER PAR LE TIEN (1700 LIGNES)
+// =========================================================================================
+// /!\ ATTENTION : C'EST ICI QUE TU DOIS COLLER TES 1700 LIGNES DE LIEUX (celebLocations) /!\ 
+// =========================================================================================
 let celebLocations = [
     { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` }, tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." }, directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." } },
     { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600", fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` }, tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." }, directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." } },
@@ -155,14 +152,15 @@ let celebLocations = [
     { id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y", address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg" },
     { id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0", address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg" }
 ];
-// 🛑 FIN DE LA ZONE DE REMPLACEMENT 🛑
+// =========================================================================================
+
 
 // ==========================================
 // 3. LOGIQUE UI ET TRADUCTIONS
 // ==========================================
 const translations = {
     en: { 
-        btnGenerateIti: "Auto-Itinerary Generator", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
+        btnGenerateIti: "Auto-Itinerary", filterGroup: "GROUP", filterMember: "MEMBER", filterArea: "AREA", filterYear: "YEAR", filterCategories: "CATEGORIES", 
         locationsCount: "LOCATIONS", statsCountries: "COUNTRIES", cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", 
         cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
         exploreDestOption: "Explore Destinations", exploreArtistsOption: "Explore Artists", accountOption: "Your Account",
@@ -174,7 +172,7 @@ const translations = {
         itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips"
     },
     fr: { 
-        btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
+        btnGenerateIti: "Générer Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
         locationsCount: "LIEUX", statsCountries: "PAYS", cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", 
         cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
         exploreDestOption: "Explorer les Destinations", exploreArtistsOption: "Explorer les Artistes", accountOption: "Mon Compte",
@@ -269,11 +267,7 @@ window.openItineraryModal = function() {
     window.initItineraryGenerator();
 }
 
-const btnOpenIti = document.getElementById('open-itinerary-btn');
-if(btnOpenIti) {
-    btnOpenIti.addEventListener('click', window.openItineraryModal);
-}
-
+// Le bouton "Regenerate" a maintenant cette fonction
 window.initItineraryGenerator = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
@@ -439,16 +433,21 @@ function renderLocations() {
 // ==========================================
 window.switchMainTab = function(tabName) {
     document.querySelectorAll('.top-tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.sidebar-main-panel').forEach(panel => panel.classList.add('hidden'));
+    document.querySelectorAll('.sidebar-main-panel').forEach(panel => {
+        panel.classList.add('hidden');
+        panel.classList.remove('active');
+    });
     
     if (tabName === 'explore') {
         document.getElementById('tab-explore-btn').classList.add('active');
-        document.getElementById('sidebar-explore').classList.remove('hidden');
+        const p = document.getElementById('sidebar-explore');
+        if(p) { p.classList.remove('hidden'); p.classList.add('active'); }
         clearTripFromMainMap();
         renderLocations();
     } else if (tabName === 'itinerary') {
         document.getElementById('tab-itinerary-btn').classList.add('active');
-        document.getElementById('sidebar-itinerary').classList.remove('hidden');
+        const p = document.getElementById('sidebar-itinerary');
+        if(p) { p.classList.remove('hidden'); p.classList.add('active'); }
         loadItineraryTabOptions();
     }
 }
@@ -516,7 +515,7 @@ window.loadItineraryView = function() {
         `;
         
         if (dayIds.length === 0) {
-            timelineHtml += `<div class="timeline-loc-city" style="font-style:italic;">No locations planned</div>`;
+            timelineHtml += `<div class="timeline-loc-city" style="font-style:italic; text-align:left;">No locations planned</div>`;
         } else {
             dayIds.forEach(id => {
                 const loc = celebLocations.find(l => Number(l.id) === Number(id));
@@ -847,11 +846,15 @@ window.openDetailsPanel = function(id) {
         }
     }
 
+    // Gestion propre de l'ouverture du panneau : masquer le panneau principal, afficher le panneau détails
     const mainSidebar = document.getElementById('sidebar-main');
-    if(mainSidebar) mainSidebar.classList.add('hidden');
+    if(mainSidebar) mainSidebar.style.display = 'none';
     
     const detailsSidebar = document.getElementById('sidebar-details');
-    if(detailsSidebar) detailsSidebar.classList.remove('hidden');
+    if(detailsSidebar) {
+        detailsSidebar.classList.remove('hidden');
+        detailsSidebar.style.display = 'flex';
+    }
     
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) { sidebar.classList.add('open'); sidebar.classList.add('expanded'); }
@@ -946,9 +949,12 @@ if(editMemoryBtn) {
 
 window.closeDetailsPanel = function() {
     const dDetails = document.getElementById('sidebar-details');
-    if(dDetails) dDetails.classList.add('hidden');
+    if(dDetails) {
+        dDetails.classList.add('hidden');
+        dDetails.style.display = 'none';
+    }
     const dMain = document.getElementById('sidebar-main');
-    if(dMain) dMain.classList.remove('hidden');
+    if(dMain) dMain.style.display = 'flex'; // Restaure l'affichage normal
     const sidebar = document.getElementById('app-sidebar');
     if(sidebar) sidebar.classList.remove('expanded'); 
     
@@ -1318,6 +1324,7 @@ if(btnReject) btnReject.addEventListener('click', closeCookies);
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
+
 window.initTrips = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     
@@ -2047,7 +2054,7 @@ window.createNewTripAdvanced = function() {
     nameInput.value = '';
     
     if(typeof window.initTrips === 'function') window.initTrips();
-    else if(document.getElementById('tab-itinerary-btn')) switchMainTab('itinerary');
+    else if(document.getElementById('tab-itinerary-btn')) loadItineraryTabOptions();
 }
 
 window.openDeleteModal = function(id = null, event = null) {
