@@ -14,6 +14,23 @@ let draggedEl = null;
 let tripIdToDelete = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- GESTION DE L'AVATAR (ICÔNE DE COMPTE) ---
+    const userAvatarEls = document.querySelectorAll('.user-avatar-btn');
+    if (userAvatarEls.length > 0) {
+        const savedPhoto = localStorage.getItem('userPhoto');
+        const userName = localStorage.getItem('userName') || 'U';
+        
+        userAvatarEls.forEach(avatarEl => {
+            if (savedPhoto && savedPhoto.trim() !== '') {
+                avatarEl.innerHTML = `<img src="${savedPhoto}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;border:none;">`;
+                avatarEl.style.color = 'transparent'; 
+            } else {
+                avatarEl.innerHTML = '';
+                avatarEl.textContent = userName.substring(0, 2).toUpperCase();
+            }
+        });
+    }
+
     // Si la page contient une carte Leaflet principale (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
@@ -43,13 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Boutons communs (Langue, Profil)
+    // Boutons communs (Langue, Profil Dropdown)
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
             const menuId = id.replace('-btn', '-menu');
             document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
-            document.getElementById(menuId).classList.toggle('hidden');
+            const targetMenu = document.getElementById(menuId);
+            if(targetMenu) targetMenu.classList.toggle('hidden');
             e.stopPropagation();
         });
     });
@@ -57,12 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', () => { 
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
     });
-
-    const profileBtn = document.getElementById('profile-btn');
-    if (profileBtn) {
-        const savedName = localStorage.getItem('userName') || 'U';
-        profileBtn.textContent = savedName.charAt(0).toUpperCase();
-    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -834,7 +846,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR (RÉPARÉ DÉFINITIVEMENT)
+// 8. AUTO-ITINERARY GENERATOR
 // ==========================================
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
@@ -931,7 +943,7 @@ window.generateItinerary = function() {
 
     if(document.getElementById('iti-map-container')) {
         setTimeout(() => {
-            if(itiLeafletMap) {
+            if(typeof itiLeafletMap !== 'undefined' && itiLeafletMap) {
                 itiLeafletMap.remove();
                 itiLeafletMap = null;
             }
