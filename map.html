@@ -20,12 +20,6 @@
   .memory-date { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; background: #e2e8f0; padding: 4px 10px; border-radius: 100px; }
   .memory-notes { font-size: 13.5px; color: #334155; line-height: 1.6; font-style: italic; border-left: 3px solid #D42759; padding-left: 12px; }
 
-  .photo-upload-grid { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
-  .photo-upload-btn { width:56px; height:56px; border:1.5px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink: 0; background: #fff; transition: 0.2s;}
-  .photo-upload-btn:hover { border-color: #D42759; background: #FCE7F0; }
-  .uploaded-thumb { width:56px; height:56px; border-radius:10px; background-size: cover; background-position: center; border: 1px solid #e2e8f0; flex-shrink: 0; position: relative; }
-  .uploaded-thumb .del-photo { position: absolute; top:-4px; right:-4px; background:#D42759; color:#fff; font-size:9px; font-weight:bold; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-
   .trip-box { width:100%; margin-top:14px; background:#faf9fc; border-radius:12px; padding:16px; display:none; animation: slideDown 0.3s ease; }
   .trip-box.open { display:block; }
   .trip-select { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; color:#334155; font-family:'Poppins',sans-serif; margin-bottom:10px; background:#fff; cursor:pointer; outline:none; }
@@ -36,36 +30,27 @@
   .new-trip-field input[type="text"] { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:9px 12px; font-size:12px; color:#334155; font-family:'Poppins',sans-serif; margin-bottom:12px; outline:none; }
   .new-trip-field input:focus { border-color:#D42759; box-shadow:0 0 0 3px #FCE7F0; }
   
-  .date-range { display:flex; gap:8px; margin-bottom:14px; }
-  .date-field { flex:1; display:flex; align-items:center; gap:6px; background:#fff; border:1px solid #cbd5e1; border-radius:8px; padding:9px 10px; }
-  .date-field:focus-within { border-color:#D42759; box-shadow:0 0 0 3px #FCE7F0; }
-  .date-field input { border:none; font-size:11.5px; color:#334155; font-family:'Poppins',sans-serif; outline:none; background:none; width:100%; }
-  
-  .new-trip-actions { display:flex; gap:8px; }
-  .btn-primary-sm { background:#D42759; color:#fff; border:none; border-radius:7px; padding:9px 16px; font-size:11.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; }
-  .btn-primary-sm:disabled { background:#e2e8f0; color:#94a3b8; cursor:not-allowed; }
-  .btn-ghost-sm { background:none; color:#64748b; border:none; font-size:11.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer; padding:9px 6px; }
-
   .user-avatar-btn { width: 40px !important; height: 40px !important; border-radius: 50%; background-color: #ffffff !important; color: #000000 !important; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; border: 1px solid #cbd5e1 !important; overflow: hidden; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: 0.2s ease; padding: 0 !important; }
   .user-avatar-btn:hover { border-color: #D42759 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
 
-  /* NOUVEAUX ONGLETS ET TIMELINE */
-  .sidebar-top-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin: 0 2px 20px 2px; }
+  /* ONGLETS ET TIMELINE */
+  .sidebar-top-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin: 0 20px 20px 20px; }
   .top-tab-btn { flex: 1; background: none; border: none; padding: 10px 0; font-size: 13px; font-weight: 600; color: #94a3b8; cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: 0.2s; outline: none;}
   .top-tab-btn:hover { color: #D42759; }
   .top-tab-btn.active { color: #D42759; font-weight: 700; border-bottom-color: #D42759; }
 
-  .sidebar-main-panel { display: none; flex-direction: column; height: 100%; flex: 1; overflow-y: auto; padding: 0 5px; -ms-overflow-style: none; scrollbar-width: none;}
+  .sidebar-main-panel { display: none; flex-direction: column; height: 100%; flex: 1; overflow-y: auto; padding: 0 20px; -ms-overflow-style: none; scrollbar-width: none;}
   .sidebar-main-panel::-webkit-scrollbar { display: none; }
   .sidebar-main-panel.active { display: flex; }
 
-  /* Design de la timeline (comme la capture) */
-  .timeline-day { display: flex; flex-direction: column; }
-  .timeline-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #212832; margin-bottom: 6px; }
+  /* TIMELINE EXACTE (Capture d'écran) */
+  .timeline-day { margin-bottom: 20px; }
+  .timeline-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #212832; margin-bottom: 8px; }
   .timeline-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .timeline-body { border-left: 2px dashed #cbd5e1; margin-left: 4px; padding-left: 18px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 20px;}
-  .timeline-loc { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 4px 0;}
-  .timeline-loc-name { font-size: 12.5px; font-weight: 700; color: #334155; }
+  .timeline-body { border-left: 1px solid #e2e8f0; margin-left: 4.5px; padding-left: 18px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 10px;}
+  .timeline-loc { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 4px 0; cursor: pointer; transition: 0.2s;}
+  .timeline-loc:hover .timeline-loc-name { color: #D42759; }
+  .timeline-loc-name { font-size: 13px; font-weight: 600; color: #334155; transition: 0.2s;}
   .timeline-loc-city { font-size: 11px; color: #94a3b8; text-align: right; flex-shrink: 0;}
 </style>
 </head>
@@ -74,13 +59,13 @@
 <div class="app-container">
     
     <!-- Sidebar Gauche -->
-    <aside class="sidebar" id="app-sidebar">
+    <aside class="sidebar" id="app-sidebar" style="padding: 20px 0;">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
 
         <div class="sidebar-content" style="height: 100%;">
             
-            <a href="#" onclick="if(document.getElementById('sidebar-details') && !document.getElementById('sidebar-details').classList.contains('hidden')) { closeDetailsPanel(); } else { window.location.href='map.html'; }; return false;" class="brand-row" style="padding-top: 10px; padding-left: 5px; text-decoration: none; display: flex; cursor: pointer;">
+            <a href="#" onclick="if(document.getElementById('sidebar-details') && !document.getElementById('sidebar-details').classList.contains('hidden')) { closeDetailsPanel(); } else { window.location.href='map.html'; }; return false;" class="brand-row" style="padding-top: 5px; padding-left: 20px; text-decoration: none; display: flex; cursor: pointer;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -91,26 +76,24 @@
                 </div>
             </a>
 
-            <!-- ============================================== -->
-            <!-- CONTENEUR PRINCIPAL (GÈRE LES ONGLETS ET PANELS) -->
-            <!-- ============================================== -->
+            <!-- Les 2 Onglets (Explore / My Itinerary) -->
+            <div class="sidebar-top-tabs" style="margin-top: 15px;">
+                <button id="tab-explore-btn" class="top-tab-btn active" onclick="switchMainTab('explore')">Explore</button>
+                <button id="tab-itinerary-btn" class="top-tab-btn" onclick="switchMainTab('itinerary')">My Itinerary</button>
+            </div>
+
             <div id="sidebar-main" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
                 
-                <!-- Les 2 Onglets -->
-                <div class="sidebar-top-tabs">
-                    <button id="tab-explore-btn" class="top-tab-btn active" onclick="switchMainTab('explore')">Explore</button>
-                    <button id="tab-itinerary-btn" class="top-tab-btn" onclick="switchMainTab('itinerary')">My Itinerary</button>
-                </div>
-
-                <!-- ONGLET 1 : EXPLORE (Actif par défaut) -->
-                <div id="sidebar-explore" class="sidebar-main-panel active">
-                    <div class="card-box">
-                        <div style="position:relative;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:14px; top:12px;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            <input type="text" id="search-input" class="input-field" style="padding-left:36px;" placeholder="Search a location...">
-                        </div>
+                <!-- ONGLET 1 : EXPLORE -->
+                <div id="sidebar-explore" class="sidebar-main-panel active" style="gap: 20px;">
+                    
+                    <!-- Search input transparent -->
+                    <div style="position:relative;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; left:14px; top:12px;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="search-input" class="input-field" style="padding-left:36px; background: transparent; border: 1.5px solid #cbd5e1; box-shadow: none;" placeholder="Search a location...">
                     </div>
 
+                    <!-- Filtres -->
                     <div class="card-box">
                         <div class="filters-grid">
                             <div>
@@ -157,12 +140,10 @@
                     </div>
                 </div>
 
-                <!-- ONGLET 2 : MY ITINERARY (Nouveau Design) -->
+                <!-- ONGLET 2 : MY ITINERARY -->
                 <div id="sidebar-itinerary" class="sidebar-main-panel hidden">
-                    <div class="card-box" style="margin-bottom: 15px;">
-                        <div class="filter-item-label" style="margin-bottom: 4px;">SELECT A TRIP</div>
-                        <select id="itinerary-trip-select" class="filter-select" onchange="loadItineraryView()"></select>
-                    </div>
+                    
+                    <select id="itinerary-trip-select" class="filter-select" onchange="loadItineraryView()" style="margin-bottom: 25px; background: transparent; border: 1.5px solid #cbd5e1; font-weight: 600;"></select>
 
                     <div id="itinerary-content-container" class="hidden" style="flex:1; display:flex; flex-direction:column;">
                         <!-- En-tête du Trip -->
@@ -173,21 +154,19 @@
                         <div id="iti-view-meta" style="font-size:11px; color:#94a3b8; margin-bottom: 15px;">3 countries · 19 total locations saved</div>
 
                         <!-- Bouton Regenerate -->
-                        <button class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:24px; padding:14px;">
+                        <button class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:24px; padding:12px;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/><path d="M19 19l2 2"/><path d="M5 19l-2 2"/></svg>
                             Regenerate itinerary
                         </button>
 
-                        <!-- Timeline -->
-                        <div id="iti-view-timeline" style="display:flex; flex-direction:column; padding-bottom:30px;">
-                            <!-- Le contenu de la timeline s'affichera ici -->
-                        </div>
+                        <!-- Timeline (injectée via JS) -->
+                        <div id="iti-view-timeline" style="display:flex; flex-direction:column; padding-bottom:30px;"></div>
                     </div>
                 </div>
             </div>
 
             <!-- PANNEAU DE DÉTAILS D'UN LIEU -->
-            <div id="sidebar-details" class="hidden">
+            <div id="sidebar-details" class="hidden" style="padding: 0;">
                 <div class="detail-hero" id="detail-hero-bg">
                     <a class="detail-back-link" onclick="closeDetailsPanel()" data-i18n="backToList">← Back to list</a>
                     <div class="detail-hero-bottom">
@@ -206,7 +185,6 @@
                         <label class="check-item"><input type="checkbox" id="details-wishlist" class="custom-checkbox" onchange="toggleWishlist()"> <span data-i18n="checkWishlist">Add to Wishlist</span></label>
                     </div>
 
-                    <!-- LE TIROIR WISHLIST / TRIP -->
                     <div class="trip-box" id="trip-box">
                         <span class="sub-label" data-i18n="tripWhich">Which trip is this for?</span>
                         <select id="trip-select" class="trip-select" onchange="handleTripSelect()"></select>
@@ -220,14 +198,12 @@
                                 <div style="flex:1;">
                                     <span style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:4px;display:block;" data-i18n="tripFrom">From</span>
                                     <div class="date-field">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                                         <input type="date" id="new-trip-start">
                                     </div>
                                 </div>
                                 <div style="flex:1;">
                                     <span style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:4px;display:block;" data-i18n="tripTo">To</span>
                                     <div class="date-field">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                                         <input type="date" id="new-trip-end">
                                     </div>
                                 </div>
@@ -239,98 +215,29 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- LE TIROIR SOUVENIR (VISITED) AVEC PHOTOS -->
-                    <div id="memory-dropdown" class="memory-dropdown">
-                        <span class="sub-label">Your rating</span>
-                        <div class="stars" id="memory-stars">
-                            <svg class="star active" data-val="1" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            <svg class="star active" data-val="2" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            <svg class="star active" data-val="3" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            <svg class="star active" data-val="4" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            <svg class="star" data-val="5" viewBox="0 0 24 24" fill="#e2e8f0" stroke="#e2e8f0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        </div>
-                        <input type="hidden" id="memory-rating-val" value="4">
-                        
-                        <span class="sub-label" style="margin-top:14px;">When did you visit?</span>
-                        <input type="date" id="memory-date" style="display:block; width:100%; background:#fff; border:1px solid #cbd5e1; border-radius:8px; padding:9px 12px; font-size:12px; color:#334155; margin-bottom:14px; outline:none; font-family:'Poppins', sans-serif;">
-                        
-                        <span class="sub-label">Your notes (optional)</span>
-                        <textarea id="memory-notes" placeholder="What do you remember about this place?" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; font-family:'Poppins',sans-serif; height:60px; resize:none; margin-bottom:14px; outline:none;"></textarea>
-                        
-                        <span class="sub-label">Add photos</span>
-                        <div class="photo-upload-grid" id="memory-photos-container">
-                            <div class="photo-upload-btn" onclick="alert('Upload module preview.')">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            </div>
-                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=200');"><div class="del-photo" onclick="this.parentElement.style.display='none'">✕</div></div>
-                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200');"><div class="del-photo" onclick="this.parentElement.style.display='none'">✕</div></div>
-                        </div>
-
-                        <button id="save-memory-btn" style="width:100%; margin-top:10px; background:#D42759; color:#fff; border:none; border-radius:9px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;">Save memory</button>
-                    </div>
                 </div>
 
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="info" data-i18n="tabInfo">Info</button>
                     <button class="tab-btn" data-tab="story" data-i18n="tabStory">Story</button>
-                    <button class="tab-btn hidden" id="tab-btn-visit" data-tab="visit">My Visit</button>
                 </div>
 
-                <!-- TAB INFO -->
                 <div class="tab-panel active" id="tab-info">
                     <div class="meta-box">
                         <b data-i18n="lGroup">Group:</b> <span id="details-group"></span><br>
-                        <b data-i18n="lMembers">Members:</b> <span id="details-member"></span><br>
                         <b data-i18n="lCountry">Country:</b> <span id="details-country"></span><br>
                         <b data-i18n="lCity">City:</b> <span id="details-city"></span><br>
                         <b data-i18n="lAddress">Address:</b> <span id="details-full-address"></span><br>
-                        <b data-i18n="lDate">Date:</b> <span id="details-date"></span><br>
-                        <span id="details-episode-container"><b data-i18n="lEpisode">Episode:</b> <span id="details-episode"></span></span>
-                        <span id="details-link-container"><br><b data-i18n="lWatch">Watch:</b> <a id="details-episode-link" href="#" target="_blank" data-i18n="lOfficialLink">Official Link</a></span>
                     </div>
-
-                    <div id="details-video-section" class="media-section hidden">
-                        <span class="sub-label" data-i18n="lWatchEpi">Watch the Episode</span>
-                        <div class="video-wrapper" id="details-video-container"></div>
-                    </div>
-
-                    <div id="details-tip-section" class="tip-box hidden">
-                        <div class="tip-title">💡 <span data-i18n="lTipTitle">The "Screen to Street" Tip</span></div>
-                        <p id="details-tip"></p>
-                    </div>
-
-                    <span class="sub-label" data-i18n="lHowToGetThere">How to get there</span>
-                    <p class="directions-text" id="details-directions"></p>
                     <a class="gmaps-btn" id="details-map-link" href="#" target="_blank">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                         <span data-i18n="lOpenMap">Open in Google Maps</span>
                     </a>
                 </div>
 
-                <!-- TAB STORY -->
                 <div class="tab-panel" id="tab-story">
                     <div class="story" id="details-desc"></div>
                 </div>
-
-                <!-- TAB MY VISIT -->
-                <div class="tab-panel" id="tab-visit">
-                    <div class="memory-card">
-                        <div class="memory-card-header">
-                            <div class="stars" id="display-memory-stars" style="pointer-events: none;"></div>
-                            <div class="memory-date" id="display-memory-date"></div>
-                        </div>
-                        
-                        <div class="photo-upload-grid" style="margin-bottom: 15px;">
-                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=200'); border:none;"></div>
-                            <div class="uploaded-thumb" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200'); border:none;"></div>
-                        </div>
-
-                        <div class="memory-notes" id="display-memory-notes"></div>
-                        <button id="edit-memory-btn" style="background:transparent; border:1.5px solid #cbd5e1; color:#64748b; font-size:11px; font-weight:700; padding:6px 12px; border-radius:100px; margin-top:20px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit memory</button>
-                    </div>
-                </div>
-
             </div>
         </div>
     </aside>
@@ -338,10 +245,19 @@
     <!-- Zone Carte à Droite -->
     <main class="map-container">
         
-        <!-- BANNIERE VIEW MY TRIP -->
-        <div id="active-trip-banner" class="hidden" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); background:#2E3644; color:#fff; padding:10px 20px; border-radius:100px; z-index:2000; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:600; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
-            Viewing Trip: <span id="active-trip-name-display" style="color:#FCE7F0;"></span>
-            <button onclick="clearTripFromMainMap()" style="background:#D42759; color:#fff; border:none; padding:4px 10px; border-radius:100px; cursor:pointer; font-weight:bold; font-size:11px; margin-left:10px;">✕ Close</button>
+        <!-- BANNIERE DE MAP STATS (En haut à gauche) -->
+        <div style="position: absolute; top: 20px; left: 20px; z-index: 2000; display: flex; gap: 15px;">
+            <div style="background: #fff; border-radius: 100px; padding: 10px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 13px; font-weight: 700;">
+                <span style="color: #D42759;" id="stat-locations">0</span> <span style="color: #212832;">LOCATIONS</span>
+                <span style="color: #cbd5e1;">|</span>
+                <span style="color: #212832;"><span id="stat-countries">0</span> COUNTRIES</span>
+            </div>
+            
+            <!-- BANNIERE VIEWING TRIP -->
+            <div id="active-trip-banner" class="hidden" style="background: #2E3644; color: #fff; border-radius: 100px; padding: 8px 12px 8px 20px; display: flex; align-items: center; gap: 15px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <span>Viewing Trip: <span id="active-trip-name-display" style="color: #fff; font-weight: 700;"></span></span>
+                <button onclick="clearTripFromMainMap()" style="background: #D42759; color: #fff; border: none; border-radius: 100px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s;">✕ Close</button>
+            </div>
         </div>
 
         <div class="top-nav">
@@ -378,28 +294,9 @@
                 </div>
             </div>
         </div>
-
-        <div class="stat-pill" style="padding: 6px 14px;">
-            <div id="btn-show-locations" class="stat-pill-btn">
-                <span class="n1" id="stat-locations">0</span> <span data-i18n="locationsCount" style="font-size: 11px;">LOCATIONS</span>
-            </div>
-            <span class="sep">|</span> 
-            <div id="btn-show-countries" class="stat-pill-btn">
-                <span class="n1" id="stat-countries" style="color:var(--primary-magenta);">0</span> <span data-i18n="statsCountries" style="font-size: 11px;">COUNTRIES</span>
-            </div>
-        </div>
         
         <div id="map"></div>
     </main>
-</div>
-
-<!-- Modal Liste (Locations / Countries filtrées) -->
-<div id="list-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 500px; padding: 25px;">
-        <span class="close-btn" onclick="closeModal('list-modal')">&times;</span>
-        <h2 id="list-modal-title" style="color: var(--primary-magenta); font-size:1.4rem; margin-bottom: 15px;">List</h2>
-        <div id="list-modal-content" style="display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
-    </div>
 </div>
 
 <!-- Modal Itinéraire -->
@@ -422,40 +319,6 @@
             </div>
             <div id="iti-days-list" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px; padding-right: 10px;"></div>
             <div id="iti-actions-container" style="display:flex; gap:10px;"></div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Panier -->
-<div id="cart-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 500px;">
-        <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 style="color: #1e293b; margin-bottom: 5px;" data-i18n="cartTitle">Unlock New Passes</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
-        
-        <form id="cart-form">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
-                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
-                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
-            </div>
-            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
-        </form>
-    </div>
-</div>
-
-<div id="cookie-banner" class="cookie-banner hidden">
-    <div class="cookie-content">
-        <p><span data-i18n="cookieText">We use cookies to enhance your experience.</span> <a href="legal.html#confidentialite" data-i18n="cookiePolicy">Cookie Policy</a>.</p>
-        <div class="cookie-actions">
-            <button id="cookie-manage" class="cat-card" style="border:1px solid var(--primary-magenta); color:var(--primary-magenta);" data-i18n="cookieManage">Manage</button>
-            <button id="cookie-reject" class="cat-card" data-i18n="cookieReject">Reject</button>
-            <button id="cookie-accept" class="gen-btn" style="width:auto;" data-i18n="cookieAccept">Accept</button>
         </div>
     </div>
 </div>
