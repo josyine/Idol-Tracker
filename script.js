@@ -8,13 +8,16 @@ let currentLocationIdForMemory = null;
 let currentGeneratedItinerary = [];
 let currentLang = localStorage.getItem('lang') || 'en';
 
-// Variables globales pour trips.html
+// Variables globales
 let currentTrip = null;
 let draggedEl = null;
 let dragType = null; // 'loc' ou 'day'
 let tripIdToDelete = null;
 let locToRemoveData = null; 
 let dayToRemoveBtn = null; 
+let tripPageMap = null;
+let tripPageLayer = null;
+let tripMainLayerGroup = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- GESTION DE L'AVATAR (ICÔNE DE COMPTE) ---
@@ -63,10 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Boutons communs (Langue, Profil Dropdown)
-    ['lang-btn', 'profile-btn'].forEach(id => {
+    ['lang-btn', 'profile-btn', 'cart-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
+            if(id === 'cart-btn') return; // Géré séparément
             const menuId = id.replace('-btn', '-menu');
             document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
             const targetMenu = document.getElementById(menuId);
@@ -109,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 2. DONNÉES
+// 2. DONNÉES (ICONES, FILTRES ET LIEUX)
 // ==========================================
 const iconsSVG = {
     "Run BTS": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5h18"/><path d="M4 8.5 5.5 4h3L7 8.5"/><path d="M9.3 8.5 10.8 4h3l-1.5 4.5"/><path d="M14.7 8.5 16.2 4h3l-1.5 4.5"/><rect x="3" y="8.5" width="18" height="11.5" rx="1.5"/></svg>`,
@@ -133,9 +136,7 @@ const filterData = {
     "General": { categories: ["Cafe", "Concerts", "Fashion", "Landmarks", "Museums", "Restaurants", "Pop-up Store"] }
 };
 
-// =========================================================================================
-// /!\ ATTENTION : C'EST ICI QUE TU DOIS COLLER TES 1700 LIGNES DE LIEUX (celebLocations) /!\ 
-// =========================================================================================
+// 🛑 C'EST CE TABLEAU "celebLocations" QUE TU DEVRAS REMPLACER PAR LE TIEN (1700 LIGNES)
 let celebLocations = [
     { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` }, tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." }, directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." } },
     { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600", fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` }, tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." }, directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." } },
@@ -157,10 +158,10 @@ let celebLocations = [
     { id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y", address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg" },
     { id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0", address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg" }
 ];
-// =========================================================================================
+// 🛑 FIN DE LA ZONE DE REMPLACEMENT 🛑
 
 // ==========================================
-// 3. LOGIQUE UI ET LANGUES
+// 3. LOGIQUE UI ET TRADUCTIONS
 // ==========================================
 const translations = {
     en: { 
@@ -218,20 +219,7 @@ function updateUI() {
         const key = el.getAttribute('data-i18n');
         if(translations[currentLang] && translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
     });
-    
-    const yearSelect = document.getElementById('year-select');
-    if(yearSelect) {
-        const yearOpt = yearSelect.querySelector('option[value="All"]');
-        if(yearOpt) yearOpt.textContent = t('allYears');
-    }
 
-    // MAP.HTML logic
-    if(document.getElementById('group-select')) {
-        initializeFilters();
-        renderLocations();
-    }
-    
-    // TRIPS.HTML logic
     if(document.getElementById('edit-trip-name')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
@@ -264,13 +252,68 @@ function updateUI() {
         if(typeof window.initTrips === 'function') window.initTrips();
     }
 
+    const yearSelect = document.getElementById('year-select');
+    if(yearSelect) {
+        const yearOpt = yearSelect.querySelector('option[value="All"]');
+        if(yearOpt) yearOpt.textContent = t('allYears');
+    }
+
+    if(document.getElementById('group-select')) {
+        initializeFilters();
+        renderLocations();
+    }
+    
     window.initItineraryGenerator();
 }
 
+window.openItineraryModal = function() {
+    document.getElementById('iti-result').classList.add('hidden');
+    document.getElementById('itinerary-modal').classList.remove('hidden');
+    window.initItineraryGenerator();
+}
+
+const btnOpenIti = document.getElementById('open-itinerary-btn');
+if(btnOpenIti) {
+    btnOpenIti.addEventListener('click', window.openItineraryModal);
+}
+
+window.initItineraryGenerator = function() {
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
+    if(unlockedGroups.length === 0) availableLocs = celebLocations;
+    
+    const gSelectIti = document.getElementById('iti-group');
+    const cSelectIti = document.getElementById('iti-country');
+    const citySelectIti = document.getElementById('iti-city');
+    
+    if(gSelectIti && gSelectIti.options.length === 0) {
+        const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
+        availableGroups.forEach(g => gSelectIti.innerHTML += `<option value="${g}">${g}</option>`);
+        [...new Set(availableLocs.map(l => l.country))].sort().forEach(c => cSelectIti.innerHTML += `<option value="${c}">${c}</option>`);
+        if(citySelectIti) window.updateItiCity();
+    }
+};
+
+window.updateItiCity = function() {
+    const country = document.getElementById('iti-country').value;
+    const citySel = document.getElementById('iti-city');
+    if(!citySel) return;
+    
+    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
+    if(unlockedGroups.length === 0) availableLocs = celebLocations;
+
+    let locs = availableLocs;
+    if(country) locs = locs.filter(l => l.country === country);
+
+    citySel.innerHTML = `<option value="">${currentLang === 'fr' ? 'Toutes les villes (Optionnel)' : 'All Cities (Optional)'}</option>`;
+    const cities = [...new Set(locs.map(l => l.city))].filter(Boolean).sort();
+    cities.forEach(c => citySel.innerHTML += `<option value="${c}">${c}</option>`);
+}
+
 // ==========================================
-// 4. FILTRES DE LA CARTE
+// 4. AFFICHAGE DES LIEUX ET FILTRES (MAP.HTML)
 // ==========================================
-let activeCategory = "All"; 
 function initializeFilters() {
     const groupSelect = document.getElementById('group-select');
     const memberSelect = document.getElementById('member-select');
@@ -323,54 +366,6 @@ function initializeFilters() {
     }
 }
 
-window.openItineraryModal = function() {
-    document.getElementById('iti-result').classList.add('hidden');
-    document.getElementById('itinerary-modal').classList.remove('hidden');
-    window.initItineraryGenerator();
-}
-
-const btnOpenIti = document.getElementById('open-itinerary-btn');
-if(btnOpenIti) {
-    btnOpenIti.addEventListener('click', window.openItineraryModal);
-}
-
-window.initItineraryGenerator = function() {
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
-    if(unlockedGroups.length === 0) availableLocs = celebLocations;
-    
-    const gSelectIti = document.getElementById('iti-group');
-    const cSelectIti = document.getElementById('iti-country');
-    const citySelectIti = document.getElementById('iti-city');
-    
-    if(gSelectIti && gSelectIti.options.length === 0) {
-        const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
-        availableGroups.forEach(g => gSelectIti.innerHTML += `<option value="${g}">${g}</option>`);
-        [...new Set(availableLocs.map(l => l.country))].sort().forEach(c => cSelectIti.innerHTML += `<option value="${c}">${c}</option>`);
-        if(citySelectIti) window.updateItiCity();
-    }
-};
-
-window.updateItiCity = function() {
-    const country = document.getElementById('iti-country').value;
-    const citySel = document.getElementById('iti-city');
-    if(!citySel) return;
-    
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
-    if(unlockedGroups.length === 0) availableLocs = celebLocations;
-
-    let locs = availableLocs;
-    if(country) locs = locs.filter(l => l.country === country);
-
-    citySel.innerHTML = `<option value="">${currentLang === 'fr' ? 'Toutes les villes (Optionnel)' : 'All Cities (Optional)'}</option>`;
-    const cities = [...new Set(locs.map(l => l.city))].filter(Boolean).sort();
-    cities.forEach(c => citySel.innerHTML += `<option value="${c}">${c}</option>`);
-}
-
-// ==========================================
-// 5. AFFICHAGE DES LIEUX (CARTE PRINCIPALE)
-// ==========================================
 function renderLocations() {
     const groupSelect = document.getElementById('group-select');
     const memberSelect = document.getElementById('member-select');
@@ -443,7 +438,168 @@ function renderLocations() {
 }
 
 // ==========================================
-// 6. GESTION DES TRIPS / WISHLIST DANS LA CARTE
+// 5. ONGLETS EXPLORE / MY ITINERARY (MAP.HTML)
+// ==========================================
+window.switchMainTab = function(tabName) {
+    document.querySelectorAll('.top-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.sidebar-main-panel').forEach(panel => panel.classList.add('hidden'));
+    
+    if (tabName === 'explore') {
+        document.getElementById('tab-explore-btn').classList.add('active');
+        document.getElementById('sidebar-explore').classList.remove('hidden');
+        clearTripFromMainMap();
+        renderLocations();
+    } else if (tabName === 'itinerary') {
+        document.getElementById('tab-itinerary-btn').classList.add('active');
+        document.getElementById('sidebar-itinerary').classList.remove('hidden');
+        loadItineraryTabOptions();
+    }
+}
+
+window.loadItineraryTabOptions = function() {
+    const select = document.getElementById('itinerary-trip-select');
+    if(!select) return;
+    
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    select.innerHTML = '';
+    
+    if(trips.length === 0) {
+        select.innerHTML = `<option value="">${currentLang === 'fr' ? 'Aucun voyage créé' : 'No trips created yet'}</option>`;
+        document.getElementById('itinerary-content-container').classList.add('hidden');
+    } else {
+        trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
+        let activeId = localStorage.getItem('activeTripId');
+        if(activeId && trips.some(t => t.id === activeId)) select.value = activeId;
+        else select.value = trips[0].id;
+        
+        loadItineraryView();
+    }
+}
+
+window.loadItineraryView = function() {
+    const select = document.getElementById('itinerary-trip-select');
+    if(!select || !select.value) return;
+
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const trip = trips.find(t => t.id === select.value);
+    if(!trip) return;
+
+    localStorage.setItem('activeTripId', trip.id);
+    document.getElementById('itinerary-content-container').classList.remove('hidden');
+
+    document.getElementById('iti-view-name').textContent = trip.name;
+    
+    let allAssignedIds = (trip.days || []).flat().map(Number);
+    document.getElementById('iti-view-loc-count').textContent = `${allAssignedIds.length} location${allAssignedIds.length > 1 ? 's' : ''}`;
+
+    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let totalSaved = wList.filter(w => w.tripId === trip.id).length;
+    
+    let countries = [...new Set(allAssignedIds.map(id => {
+        let loc = celebLocations.find(l => Number(l.id) === id);
+        return loc ? loc.country : null;
+    }).filter(Boolean))];
+    
+    document.getElementById('iti-view-meta').textContent = `${countries.length} countr${countries.length > 1 ? 'ies' : 'y'} · ${totalSaved} total locations saved`;
+
+    const timelineContainer = document.getElementById('iti-view-timeline');
+    let timelineHtml = '';
+    const dayColors = ['#D42759', '#8b5cf6', '#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#14b8a6', '#f43f5e', '#6366f1', '#84cc16'];
+
+    (trip.days || []).forEach((dayIds, idx) => {
+        const color = dayColors[idx % dayColors.length];
+        
+        timelineHtml += `
+            <div class="timeline-day">
+                <div class="timeline-header">
+                    <div class="timeline-dot" style="background:${color};"></div>
+                    <span style="color:#212832;">Day ${idx + 1}</span>
+                </div>
+                <div class="timeline-body" style="border-left: 2px dashed ${color};">
+        `;
+        
+        if (dayIds.length === 0) {
+            timelineHtml += `<div class="timeline-loc-city" style="font-style:italic;">No locations planned</div>`;
+        } else {
+            dayIds.forEach(id => {
+                const loc = celebLocations.find(l => Number(l.id) === Number(id));
+                if(loc) {
+                    timelineHtml += `
+                        <div class="timeline-loc" onclick="map.flyTo([${loc.lat}, ${loc.lng}], 16); window.openDetailsPanel(${loc.id});" style="cursor:pointer;">
+                            <span class="timeline-loc-name">${loc.name}</span>
+                            <span class="timeline-loc-city">${loc.city || ''}</span>
+                        </div>
+                    `;
+                }
+            });
+        }
+        timelineHtml += `</div></div>`;
+    });
+
+    timelineContainer.innerHTML = timelineHtml;
+
+    if(markerGroup) markerGroup.clearLayers();
+    if(!tripMainLayerGroup) tripMainLayerGroup = L.featureGroup().addTo(map);
+    else tripMainLayerGroup.clearLayers();
+
+    drawTripOnMap(trip, map, tripMainLayerGroup);
+    
+    const banner = document.getElementById('active-trip-banner');
+    const nameDisplay = document.getElementById('active-trip-name-display');
+    if(banner && nameDisplay) {
+        nameDisplay.textContent = trip.name;
+        banner.classList.remove('hidden');
+    }
+}
+
+window.clearTripFromMainMap = function() {
+    if(tripMainLayerGroup) {
+        tripMainLayerGroup.clearLayers();
+    }
+    const banner = document.getElementById('active-trip-banner');
+    if(banner) banner.classList.add('hidden');
+    
+    if(document.getElementById('tab-explore-btn')) {
+        renderLocations();
+    }
+}
+
+function drawTripOnMap(trip, targetMap, targetLayerGroup) {
+    if(!targetLayerGroup) return;
+    targetLayerGroup.clearLayers();
+    if(!trip || !trip.days || trip.days.length === 0) return;
+    
+    const dayColors = ['#D42759', '#8b5cf6', '#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#14b8a6', '#f43f5e', '#6366f1', '#84cc16'];
+    let allPoints = [];
+    
+    trip.days.forEach((dayIds, idx) => {
+        const color = dayColors[idx % dayColors.length];
+        let coords = [];
+        dayIds.forEach((id, locIdx) => {
+            const loc = celebLocations.find(l => Number(l.id) === Number(id));
+            if(loc) {
+                coords.push([loc.lat, loc.lng]);
+                allPoints.push([loc.lat, loc.lng]);
+                
+                const markerHtml = `<div style="background:${color}; width:28px; height:28px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:bold; box-shadow:0 3px 6px rgba(0,0,0,0.3);">${idx+1}.${locIdx + 1}</div>`;
+                const icon = L.divIcon({ className: '', html: markerHtml, iconSize: [28,28], iconAnchor: [14,14] });
+                const m = L.marker([loc.lat, loc.lng], {icon: icon}).addTo(targetLayerGroup);
+                
+                m.on('click', () => { if(window.openDetailsPanel) window.openDetailsPanel(loc.id); });
+            }
+        });
+        if(coords.length > 1) {
+            L.polyline(coords, { color: color, weight: 4, opacity: 0.8, dashArray: '8, 6' }).addTo(targetLayerGroup);
+        }
+    });
+    
+    if(allPoints.length > 0 && targetMap) {
+        targetMap.fitBounds(L.polyline(allPoints).getBounds(), { padding: [40, 40], maxZoom: 16 });
+    }
+}
+
+// ==========================================
+// 6. DETAILS PANEL, WISHLIST, ETC.
 // ==========================================
 function loadTripOptions() {
     const select = document.getElementById('trip-select');
@@ -542,9 +698,6 @@ window.cancelNewTrip = function() {
     }
 };
 
-// ==========================================
-// 7. PANNEAU DE DÉTAILS ET VISITED
-// ==========================================
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
@@ -813,7 +966,7 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR
+// 8. AUTO-ITINERARY GENERATOR LOGIC
 // ==========================================
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
@@ -1167,43 +1320,6 @@ if(btnReject) btnReject.addEventListener('click', closeCookies);
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
-let tripPageMap = null;
-let tripPageLayer = null;
-
-function drawTripOnMap(trip, targetMap, targetLayerGroup) {
-    if(!targetLayerGroup) return;
-    targetLayerGroup.clearLayers();
-    if(!trip || !trip.days || trip.days.length === 0) return;
-    
-    const dayColors = ['#D42759', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#14b8a6', '#f43f5e', '#6366f1', '#84cc16'];
-    let allPoints = [];
-    
-    trip.days.forEach((dayIds, idx) => {
-        const color = dayColors[idx % dayColors.length];
-        let coords = [];
-        dayIds.forEach((id, locIdx) => {
-            const loc = celebLocations.find(l => Number(l.id) === Number(id));
-            if(loc) {
-                coords.push([loc.lat, loc.lng]);
-                allPoints.push([loc.lat, loc.lng]);
-                
-                const markerHtml = `<div style="background:${color}; width:28px; height:28px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:bold; box-shadow:0 3px 6px rgba(0,0,0,0.3);">${idx+1}.${locIdx + 1}</div>`;
-                const icon = L.divIcon({ className: '', html: markerHtml, iconSize: [28,28], iconAnchor: [14,14] });
-                const m = L.marker([loc.lat, loc.lng], {icon: icon}).addTo(targetLayerGroup);
-                
-                m.on('click', () => { if(window.openDetailsPanel) window.openDetailsPanel(loc.id); });
-            }
-        });
-        if(coords.length > 1) {
-            L.polyline(coords, { color: color, weight: 4, opacity: 0.8, dashArray: '8, 6' }).addTo(targetLayerGroup);
-        }
-    });
-    
-    if(allPoints.length > 0 && targetMap) {
-        targetMap.fitBounds(L.polyline(allPoints).getBounds(), { padding: [40, 40], maxZoom: 16 });
-    }
-}
-
 window.initTrips = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     
@@ -1229,12 +1345,6 @@ window.initTrips = function() {
         currentTrip = trips[trips.length - 1];
     }
     if (!currentTrip.days) currentTrip.days = [];
-
-    if(document.getElementById('trip-map-container') && !tripPageMap) {
-        tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(tripPageMap);
-        tripPageLayer = L.featureGroup().addTo(tripPageMap);
-    }
 
     window.renderTripsSidebar();
     window.renderTrip();
@@ -1497,18 +1607,14 @@ window.renderTrip = function() {
     }
     document.getElementById('reco-section').style.display = recoCount > 0 ? 'block' : 'none';
     document.querySelectorAll('.day-loc').forEach(el => el.setAttribute('draggable', 'true'));
-    
-    if(tripPageMap) {
-        setTimeout(() => { tripPageMap.invalidateSize(); drawTripOnMap(currentTrip, tripPageMap, tripPageLayer); }, 200);
-    }
 }
 
 window.switchEditDateTab = function(tab) {
     if(tab === 'specific') {
         document.getElementById('edit-date-specific-panel').classList.remove('hidden');
         document.getElementById('edit-date-flexible-panel').classList.add('hidden');
-        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.add('active');
-        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.remove('active');
+        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.remove('active');
+        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.add('active');
     } else {
         document.getElementById('edit-date-specific-panel').classList.add('hidden');
         document.getElementById('edit-date-flexible-panel').classList.remove('hidden');
@@ -1742,10 +1848,6 @@ window.saveTrip = function() {
     localStorage.setItem('myTrips', JSON.stringify(trips));
     
     window.renderTripsSidebar();
-    
-    if(tripPageMap) {
-        drawTripOnMap(currentTrip, tripPageMap, tripPageLayer);
-    }
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
@@ -1932,7 +2034,8 @@ window.createNewTripAdvanced = function() {
     document.getElementById('add-trip-modal').classList.add('hidden');
     nameInput.value = '';
     
-    window.initTrips(); 
+    if(typeof window.initTrips === 'function') window.initTrips();
+    else if(document.getElementById('tab-itinerary-btn')) switchMainTab('itinerary');
 }
 
 window.openDeleteModal = function(id = null, event = null) {
@@ -1959,69 +2062,7 @@ window.confirmDeleteTrip = function() {
     
     tripIdToDelete = null;
     document.getElementById('delete-trip-modal').classList.add('hidden');
-    window.initTrips();
-}
-
-// ==========================================
-// 13. VIEW MY TRIP SUR LA CARTE PRINCIPALE
-// ==========================================
-let tripMainLayerGroup = null;
-
-window.openViewTripModal = function() {
-    const modal = document.getElementById('view-trip-modal');
-    const select = document.getElementById('main-map-trip-select');
-    if(!modal || !select) return;
-
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    select.innerHTML = '';
     
-    if(trips.length === 0) {
-        select.innerHTML = `<option value="">${currentLang === 'fr' ? 'Aucun voyage créé' : 'No trips created yet'}</option>`;
-    } else {
-        trips.forEach(t => {
-            select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
-        });
-    }
-
-    modal.classList.remove('hidden');
-}
-
-window.displayTripOnMainMap = function() {
-    const select = document.getElementById('main-map-trip-select');
-    if(!select || !select.value) return;
-
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    const selectedTrip = trips.find(t => t.id === select.value);
-    if(!selectedTrip) return;
-
-    closeModal('view-trip-modal');
-
-    if(markerGroup) {
-        markerGroup.clearLayers();
-    }
-
-    if(!tripMainLayerGroup) {
-        tripMainLayerGroup = L.featureGroup().addTo(map);
-    } else {
-        tripMainLayerGroup.clearLayers();
-    }
-
-    drawTripOnMap(selectedTrip, map, tripMainLayerGroup);
-
-    const banner = document.getElementById('active-trip-banner');
-    const nameDisplay = document.getElementById('active-trip-name-display');
-    if(banner && nameDisplay) {
-        nameDisplay.textContent = selectedTrip.name;
-        banner.classList.remove('hidden');
-    }
-}
-
-window.clearTripFromMainMap = function() {
-    if(tripMainLayerGroup) {
-        tripMainLayerGroup.clearLayers();
-    }
-    const banner = document.getElementById('active-trip-banner');
-    if(banner) banner.classList.add('hidden');
-    
-    renderLocations();
+    if(typeof window.initTrips === 'function') window.initTrips();
+    else if(document.getElementById('tab-itinerary-btn')) loadItineraryTabOptions();
 }
