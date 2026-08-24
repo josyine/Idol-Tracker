@@ -105,9 +105,12 @@
   }
   .add-day-btn:hover { border-color: #D42759; color: #D42759; }
 
+  .save-row {display:flex;gap:12px;margin-top:24px;}
+  .save-row .gen-btn {flex:1;justify-content:center; padding: 14px;}
+
   /* MODALS */
   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-  .modal-box { background: #fff; width: 550px; max-width: 90%; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 85vh; display: flex; flex-direction: column;}
+  .modal-box { background: #fff; width: 550px; max-width: 90%; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 80vh; display: flex; flex-direction: column;}
   .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
   .modal-title { font-size: 20px; font-weight: 700; color: #212832; }
   .modal-close { cursor: pointer; font-size: 24px; color: #64748b; }
@@ -125,7 +128,7 @@
     <!-- COLONNE DE GAUCHE -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <a href="#" onclick="window.location.href='map.html'; return false;" class="brand-row" style="padding-top: 10px; margin-bottom: 10px;">
+            <a href="map.html" class="brand-row" style="padding-top: 10px; margin-bottom: 10px;">
                 <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
                     <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
                     <circle cx="200" cy="150" r="26" fill="#D42759"/>
@@ -151,10 +154,10 @@
     <!-- ZONE CENTRALE -->
     <main class="map-container">
         
-        <!-- Top Nav (Strictement identique à Map.html pour l'alignement) -->
+        <!-- Top Nav (Strictement identique à Map.html) -->
         <div class="top-nav" style="width: 100%; position: sticky; top:0; z-index:90;">
-            <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            <button id="mobile-menu-btn" class="nav-btn hamburger-btn" onclick="toggleMobileMenu()" style="visibility:hidden;">
+                <!-- Gardé invisible pour l'alignement flexbox -->
             </button>
             <div style="flex:1;"></div>
             <div class="dropdown-container">
@@ -173,7 +176,7 @@
             </div>
             <div class="dropdown-container">
                 <!-- Icon Profil transparent, lettre noire -->
-                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: 1px solid #cbd5e1;" onclick="document.getElementById('profile-menu').classList.toggle('hidden')">U</button>
+                <button id="profile-btn" class="nav-btn" style="background-position: center; background-size: cover; border: 1px solid #cbd5e1; background-color: transparent; color: #212832; font-weight: bold;" onclick="document.getElementById('profile-menu').classList.toggle('hidden')">U</button>
                 <div id="profile-menu" class="dropdown-menu hidden">
                     <a href="map-destinations.html" class="dropdown-option" id="i18n-dest">Explore Destinations</a>
                     <a href="map-artists.html" class="dropdown-option" id="i18n-art">Explore Artists</a>
@@ -208,7 +211,7 @@
                 </div>
 
                 <!-- BANDEAU D'EDITION (Dates & Calendrier Google Flights) -->
-                <div class="edit-banner" id="edit-banner">
+                <div class="edit-banner open" id="edit-banner">
                     <div class="section-label" style="margin-top:0;" id="i18n-trip-duration">Trip Duration & Dates</div>
                     
                     <div class="date-tabs">
@@ -241,20 +244,24 @@
 
                 <div class="section-label" id="i18n-your-iti">YOUR ITINERARY</div>
                 <div class="itinerary-box" id="itinerary-box">
+                    <!-- Les jours apparaîtront ici -->
                     <button class="add-day-btn" onclick="addDay()">
                         <span id="i18n-add-day">+ Add an empty day</span>
                     </button>
                 </div>
 
                 <div class="section-label" id="saved-locs-label" style="margin-top: 40px;">UNASSIGNED LOCATIONS (0)</div>
-                <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent; background: #fff; border-radius: 12px;"></div>
+                <div id="loc-list" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)" style="min-height: 50px; padding: 10px; border: 1px dashed transparent; background: #fff; border-radius: 12px;">
+                    <!-- Lieux non assignés -->
+                </div>
                 
                 <button class="gen-btn ghost" style="margin-top:15px;" onclick="openAddModal()">
                     <span id="i18n-add-more">+ Add more locations</span>
                 </button>
 
+                <!-- Recommandations Intelligentes -->
                 <div id="reco-section" style="display: none; margin-top: 30px;">
-                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP</div>
+                    <div class="section-label" style="color:#D42759;" id="i18n-reco">RECOMMENDED FOR THIS TRIP (SAME COUNTRY)</div>
                     <div id="reco-list"></div>
                 </div>
 
@@ -265,7 +272,7 @@
                 <!-- Bouton pour le Générateur d'itinéraire -->
                 <div style="text-align:center; margin-top: 60px;">
                     <p style="font-size:12px; color:#64748b; margin-bottom:10px;" id="i18n-need-magic">Need some magic?</p>
-                    <button class="gen-btn ghost" onclick="openItineraryModal()" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
+                    <button class="gen-btn ghost" onclick="document.getElementById('itinerary-modal').classList.remove('hidden')" id="i18n-open-iti">Open Auto-Itinerary Generator</button>
                 </div>
 
             </div>
@@ -281,7 +288,9 @@
             <div class="modal-close" onclick="closeAddModal()">&times;</div>
         </div>
         <input type="text" id="add-search" class="modal-search" placeholder="Search by name, city or category..." onkeyup="filterAddModal()">
-        <div class="modal-list" id="add-modal-list"></div>
+        <div class="modal-list" id="add-modal-list">
+            <!-- Liste injectée -->
+        </div>
     </div>
 </div>
 
@@ -354,7 +363,7 @@
     </div>
 </div>
 
-<!-- Modal Auto-Itinerary -->
+<!-- Modal Auto-Itinerary (Réparé avec conteneur fermé) -->
 <div class="modal-overlay hidden" id="itinerary-modal">
     <div class="modal-box" style="width:650px;">
         <div class="modal-header">
@@ -371,12 +380,13 @@
         </div>
 
         <div id="iti-result" class="hidden" style="border-top: 1px solid #cbd5e1; padding-top: 20px;">
-            <div style="width: 100%; height: 200px; margin-bottom: 15px;">
-                <div id="iti-map-container" style="height: 100%; width: 100%; background: #e2e8f0; border-radius: 12px; position: relative; z-index: 10; overflow: hidden;"></div>
+            <!-- La carte est restaurée et ne débordera plus grâce à overflow: hidden -->
+            <div style="width: 100%; height: 250px; margin-bottom: 15px; border-radius: 12px; overflow: hidden; position: relative; z-index: 10;">
+                <div id="iti-map-container" style="height: 100%; width: 100%; background: #e2e8f0;"></div>
             </div>
             <div id="iti-days-list" style="max-height:30vh; overflow-y:auto; margin-bottom:15px; padding-right:10px;"></div>
             <div style="display:flex; gap:10px;">
-                <button class="gen-btn ghost" onclick="exportItineraryPDF()" style="flex:1; justify-content:center;" id="i18n-itiExport">Export Guide as PDF</button>
+                <button id="export-pdf-btn" class="gen-btn ghost" onclick="exportItineraryPDF()" style="flex:1; justify-content:center;" id="i18n-itiExport">Export Guide as PDF</button>
                 <button class="gen-btn" onclick="saveItineraryToTrips()" style="flex:1; justify-content:center;" id="i18n-itiSave">Save to My Trips</button>
             </div>
         </div>
