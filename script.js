@@ -14,6 +14,7 @@ let draggedEl = null;
 let tripIdToDelete = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Si la page contient une carte Leaflet principale (map.html), on l'initialise
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -42,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Boutons communs
+    // Boutons communs (Langue, Profil)
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -57,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); 
     });
 
-    // Profil blanc avec initiale noire
     const profileBtn = document.getElementById('profile-btn');
     if (profileBtn) {
         const savedName = localStorage.getItem('userName') || 'U';
@@ -277,7 +277,7 @@ function updateUI() {
     }
     
     // TRIPS.HTML logic
-    if(document.getElementById('trip-name-display')) {
+    if(document.getElementById('edit-trip-name')) {
         const isFr = currentLang === 'fr';
         const eSub = document.getElementById('i18n-sub'); if(eSub) eSub.textContent = isFr ? "Sur les traces de vos artistes préférés" : "Following the footsteps of your favorite artists";
         const eAuto = document.getElementById('i18n-auto-btn'); if(eAuto) eAuto.textContent = isFr ? "Générateur Itinéraire" : "Auto-Itinerary Generator";
@@ -476,7 +476,9 @@ function loadTripOptions() {
     const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
     
     select.innerHTML = `<option value="none">${noTripTxt}</option>`;
-    trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
+    trips.forEach(t => {
+        select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+    });
     select.innerHTML += `<option value="new">${newTripTxt}</option>`;
 }
 
@@ -540,14 +542,8 @@ window.createTrip = function() {
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
 
-    const select = document.getElementById('trip-select');
-    if(select) {
-        let opt = document.createElement('option');
-        opt.value = newTripId; opt.textContent = label;
-        select.insertBefore(opt, select.lastElementChild);
-        select.value = newTripId;
-    }
-    
+    loadTripOptions(); 
+    document.getElementById('trip-select').value = newTripId;
     window.handleTripSelect(); 
     window.cancelNewTrip();
 };
@@ -838,11 +834,8 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
-// 8. AUTO-ITINERARY GENERATOR (RESTAURÉ COMME A L'ORIGINE SANS EMOJI)
+// 8. AUTO-ITINERARY GENERATOR (RÉPARÉ DÉFINITIVEMENT)
 // ==========================================
-let itiLeafletMap = null;
-let itiLayerGroup = null;
-
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
     const country = document.getElementById('iti-country').value;
@@ -871,14 +864,13 @@ window.generateItinerary = function() {
     
     resultDiv.innerHTML = "";
     
-    // Rétabli comme à l'origine
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     currentGeneratedItinerary = [];
     
     const txt = {
-        en: { day: "Day", transit: "Transit to next location (~30 mins)", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
-        fr: { day: "Jour", transit: "Trajet vers le prochain lieu (~30 mins)", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
+        en: { day: "Day", transit: "Transit to next location", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site" },
+        fr: { day: "Jour", transit: "Trajet vers le prochain lieu", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu" }
     }[currentLang];
 
     for(let i = 0; i < days; i++) {
@@ -915,23 +907,13 @@ window.generateItinerary = function() {
                     <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
                     <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${startTime} - ${endTime}</div>
                     <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
-                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)} &middot; ${txt.free}</div>
+                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)}</div>
             `;
-            
-            if(currentTime.getHours() >= 12 && currentTime.getHours() < 14 && idx < dayLocs.length - 1) {
-                html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:10px; font-size:11.5px; color:#334155; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
-                    <b style="color:#2E3644;">${txt.lunch} ${l.name}</b><br>
-                    <span style="color:#64748b;">Explore local eateries before your next stop.</span>
-                </div>`;
-                currentTime.setHours(currentTime.getHours() + 1);
-            }
             html += `</div>`;
 
             if (idx < dayLocs.length - 1) {
                 html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
                 currentTime.setMinutes(currentTime.getMinutes() + 30);
-            } else {
-                html += `<div style="padding-left:18px; margin-top:5px; margin-bottom:15px;"><span style="background:#FCE7F0; color:#D42759; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:700;">${txt.coffee}</span></div>`;
             }
         });
         
@@ -1231,7 +1213,7 @@ window.dropTrip = function(e, targetId) {
 window.renderTrip = function() {
     if (!currentTrip) return;
 
-    // Edition permanente : On met à jour les champs directement
+    // Edition permanente
     document.getElementById('edit-trip-name').value = currentTrip.name;
     
     if(currentTrip.dateType === 'duration') {
