@@ -172,14 +172,14 @@
                 <!-- ONGLET 2 : MY ITINERARY -->
                 <div id="sidebar-itinerary" class="sidebar-main-panel hidden">
                     
-                    <!-- NOUVEAU MENU DÉROULANT CUSTOM STYLE BARRE DE RECHERCHE -->
-                    <div class="custom-trip-select" style="position: relative; z-index: 50; margin-bottom: 15px;">
-                        <div class="trip-select-header input-field" onclick="toggleTripDropdown(event)" style="cursor: pointer; justify-content: space-between;">
-                            <span id="trip-select-label" style="color: #64748b; font-weight: 500;">Select a trip...</span>
+                    <!-- MENU DÉROULANT CUSTOM STYLE BARRE DE RECHERCHE -->
+                    <div class="custom-trip-select">
+                        <div class="trip-select-header input-field" onclick="toggleTripDropdown(event)">
+                            <span id="trip-select-label" style="color: #64748b; font-weight: 500;">Select a trip to view</span>
                             <svg id="trip-select-chevron" class="trip-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
-                        <div class="trip-select-dropdown hidden" id="trip-dropdown-list" style="position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; z-index: 100;">
-                            <!-- Les voyages seront injectés ici par le JavaScript -->
+                        <div class="trip-select-dropdown hidden" id="trip-dropdown-list">
+                            <!-- Injecté par JS de façon robuste -->
                         </div>
                     </div>
 
@@ -192,9 +192,9 @@
                     <div id="itinerary-content-container" class="hidden" style="flex:1; display:flex; flex-direction:column;">
                         <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 5px;">
                             <div id="iti-view-name" style="font-size:16px; font-weight:700; color:#212832;">Trip Name</div>
-                            <div id="iti-view-loc-count" style="font-size:11px; font-weight:700; color:#D42759;">4 locations</div>
+                            <div id="iti-view-loc-count" style="font-size:11px; font-weight:700; color:#D42759;">0 locations</div>
                         </div>
-                        <div id="iti-view-meta" style="font-size:11px; color:#94a3b8; margin-bottom: 20px;">3 countries · 19 total locations saved</div>
+                        <div id="iti-view-meta" style="font-size:11px; color:#94a3b8; margin-bottom: 20px;">0 countries · 0 total locations saved</div>
 
                         <div id="iti-view-timeline" style="display:flex; flex-direction:column; padding-bottom:30px;"></div>
                     </div>
