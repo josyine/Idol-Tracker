@@ -125,7 +125,7 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .stat-pill .n1 { color: var(--primary-magenta); }
 .stat-pill .sep { color: #e7dcf0; font-weight: 400; }
 .stat-pill-btn { display:flex; gap:6px; align-items:center; cursor:pointer; padding: 6px; border-radius: 8px; transition: 0.2s; }
-.stat-pill-btn:hover span { color: var(--primary-magenta); }
+.stat-pill-btn:hover span { color: var(--primary-magenta) !important; }
 
 .custom-category-marker div { 
     border-radius: 50%; width: var(--marker-size); height: var(--marker-size); 
