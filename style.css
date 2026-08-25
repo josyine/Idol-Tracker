@@ -125,7 +125,7 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .stat-pill .n1 { color: var(--primary-magenta); }
 .stat-pill .sep { color: #e7dcf0; font-weight: 400; }
 .stat-pill-btn { display:flex; gap:6px; align-items:center; cursor:pointer; padding: 6px; border-radius: 8px; transition: 0.2s; }
-.stat-pill-btn:hover { background: #FCE7F0; color: var(--primary-magenta); }
+.stat-pill-btn:hover span { color: var(--primary-magenta); }
 
 .custom-category-marker div { 
     border-radius: 50%; width: var(--marker-size); height: var(--marker-size); 
@@ -154,3 +154,14 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
     .hamburger-btn { display: flex !important; }
 }
 .hamburger-btn { display: none; }
+
+/* CUSTOM TRIP SELECTOR (MAP) */
+.custom-trip-select { position: relative; width: 100%; margin-bottom: 20px; }
+.trip-select-header { background: #fff; border: 1px solid #d1d5db; border-radius: 8px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+.trip-select-header:hover { border-color: #94a3b8; }
+.trip-select-chevron { transition: transform 0.3s ease; stroke: #94a3b8; }
+.trip-select-dropdown { background: #FCFAFF; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 15px rgba(80,60,120,.03); margin-top: 10px; }
+.trip-option { padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.trip-option:hover { background: #fff; box-shadow: 0 4px 12px rgba(80,60,120,.04); }
+.trip-opt-name { font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
+.trip-opt-meta { font-size: 11.5px; color: #94a3b8; }
