@@ -164,7 +164,8 @@ const translations = {
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allYears: "All Years", allCategories: "All Categories",
         checkVisited: "I visited this place", checkWishlist: "Add to Wishlist", tripWhich: "Which trip is this for?",
         tripName: "Trip name", tripWhen: "When are you planning to go?", tripFrom: "From", tripTo: "To", tripCreate: "Create trip", tripCancel: "Cancel",
-        itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips"
+        itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips",
+        noTripsFound: "No trips found.", selectTripToView: "Select a trip to view", locationsWord: "location", locationsWordPlural: "locations"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -176,7 +177,8 @@ const translations = {
         allGroups: "Tous les groupes", allMembers: "Tous les membres", allAreas: "Toutes les régions", allYears: "Toutes les années", allCategories: "Toutes les catégories",
         checkVisited: "J'ai visité ce lieu", checkWishlist: "Ajouter à ma Wishlist", tripWhich: "Pour quel voyage ?",
         tripName: "Nom du voyage", tripWhen: "Quand prévoyez-vous d'y aller ?", tripFrom: "De", tripTo: "À", tripCreate: "Créer", tripCancel: "Annuler",
-        itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips"
+        itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips",
+        noTripsFound: "Aucun voyage trouvé.", selectTripToView: "Sélectionner un voyage", locationsWord: "lieu", locationsWordPlural: "lieux"
     }
 };
 
@@ -254,6 +256,12 @@ function updateUI() {
     }
     
     window.initItineraryGenerator();
+
+    // Rafraîchit le libellé du sélecteur de voyage (My Itinerary) si aucun voyage n'est sélectionné
+    const tripLabel = document.getElementById('trip-select-label');
+    if(tripLabel && !localStorage.getItem('activeTripId')) {
+        tripLabel.textContent = t('selectTripToView');
+    }
 }
 
 window.openItineraryModal = function() {
@@ -451,14 +459,17 @@ window.toggleTripDropdown = function(e) {
     if(e) e.stopPropagation();
     const dropdown = document.getElementById('trip-dropdown-list');
     const chevron = document.getElementById('trip-select-chevron');
+    const header = document.getElementById('trip-select-header-box');
     if(!dropdown || !chevron) return;
     
     if(dropdown.classList.contains('hidden')) {
         dropdown.classList.remove('hidden');
         chevron.style.transform = 'rotate(180deg)';
+        if(header) header.classList.add('open');
     } else {
         dropdown.classList.add('hidden');
         chevron.style.transform = 'rotate(0deg)';
+        if(header) header.classList.remove('open');
     }
 };
 
@@ -466,9 +477,11 @@ document.addEventListener('click', (e) => {
     const wrapper = document.querySelector('.custom-trip-select');
     const dropdown = document.getElementById('trip-dropdown-list');
     const chevron = document.getElementById('trip-select-chevron');
+    const header = document.getElementById('trip-select-header-box');
     if(wrapper && !wrapper.contains(e.target) && dropdown && !dropdown.classList.contains('hidden')) {
         dropdown.classList.add('hidden');
         chevron.style.transform = 'rotate(0deg)';
+        if(header) header.classList.remove('open');
     }
 });
 
@@ -477,33 +490,54 @@ window.loadItineraryTabOptions = function() {
     if(!dropdownList) return;
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const activeId = localStorage.getItem('activeTripId');
     dropdownList.innerHTML = '';
     
     if(trips.length > 0) {
         trips.forEach(t => {
             let allAssignedIds = (t.days || []).flat().map(Number);
-            let durationTxt = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.days ? t.days.length : 0} Days`;
-            let locsTxt = `${allAssignedIds.length} location${allAssignedIds.length > 1 ? 's' : ''}`;
-            
+            let durationTxt = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.days ? t.days.length : 0} ${currentLang === 'fr' ? 'jours' : 'Days'}`;
+            let locWord = allAssignedIds.length > 1 ? t('locationsWordPlural') : t('locationsWord');
+            let locsTxt = `${allAssignedIds.length} ${locWord}`;
+            const isActive = t.id === activeId;
+
             // Création d'élément dynamique pour éviter tout bug lié aux apostrophes/guillemets dans le nom du trip
             let opt = document.createElement('div');
-            opt.className = 'trip-option';
+            opt.className = 'trip-option' + (isActive ? ' selected' : '');
             opt.onclick = () => selectCustomTrip(t.id, t.name);
-            
+
+            let icon = document.createElement('div');
+            icon.className = 'trip-option-icon';
+            icon.textContent = (t.name || '?').trim().slice(0, 2).toUpperCase();
+
+            let body = document.createElement('div');
+            body.className = 'trip-opt-body';
+
             let nameDiv = document.createElement('div');
             nameDiv.className = 'trip-opt-name';
             nameDiv.textContent = t.name;
-            
+
             let metaDiv = document.createElement('div');
             metaDiv.className = 'trip-opt-meta';
-            metaDiv.innerHTML = `${durationTxt} &middot; ${locsTxt}`;
-            
-            opt.appendChild(nameDiv);
-            opt.appendChild(metaDiv);
+            metaDiv.innerHTML = `<span>${durationTxt}</span><span>&middot;</span><span>${locsTxt}</span>`;
+
+            body.appendChild(nameDiv);
+            body.appendChild(metaDiv);
+
+            opt.appendChild(icon);
+            opt.appendChild(body);
+
+            if(isActive) {
+                let check = document.createElement('div');
+                check.className = 'trip-opt-check';
+                check.innerHTML = '✓';
+                opt.appendChild(check);
+            }
+
             dropdownList.appendChild(opt);
         });
     } else {
-        dropdownList.innerHTML = `<div style="padding: 12px; font-size:13px; color:#94a3b8; text-align:center;">${currentLang === 'fr' ? 'Aucun voyage trouvé.' : 'No trips found.'}</div>`;
+        dropdownList.innerHTML = `<div class="trip-select-empty">${t('noTripsFound')}</div>`;
     }
     
     document.getElementById('itinerary-content-container').classList.add('hidden');
@@ -604,13 +638,15 @@ window.clearTripFromMainMap = function() {
     
     const label = document.getElementById('trip-select-label');
     if(label) {
-        label.textContent = currentLang === 'fr' ? 'Sélectionner un voyage' : 'Select a trip to view';
+        label.textContent = t('selectTripToView');
         label.style.color = '#64748b';
     }
     const dropdown = document.getElementById('trip-dropdown-list');
     if(dropdown) dropdown.classList.add('hidden');
     const chevron = document.getElementById('trip-select-chevron');
     if(chevron) chevron.style.transform = 'rotate(0deg)';
+    const header = document.getElementById('trip-select-header-box');
+    if(header) header.classList.remove('open');
 
     const cont = document.getElementById('itinerary-content-container');
     if(cont) cont.classList.add('hidden');
@@ -1037,6 +1073,80 @@ window.closeDetailsPanel = function() {
 }
 
 // ==========================================
+// 7. POPUP LIEU PARTAGEE POUR visited.html ET wishlist.html
+//    (reprend la charte graphique de map.html : marqueur coloré par
+//    catégorie/groupe + carte CartoDB "light_all" + fiche d'infos complète)
+// ==========================================
+let popupMap = null;
+let popupMarker = null;
+
+window.openLocModal = function(id) {
+    const loc = celebLocations.find(l => l.id == id);
+    if(!loc) return;
+
+    const modalTitle = document.getElementById('modal-title');
+    const modalMeta = document.getElementById('modal-meta');
+    const modalHero = document.getElementById('modal-hero');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalMapLink = document.getElementById('modal-map-link');
+    const modalMetaBox = document.getElementById('modal-meta-box');
+
+    if(modalTitle) modalTitle.textContent = loc.name;
+    if(modalMeta) modalMeta.textContent = `${loc.city}, ${loc.country} • ${getCatName(loc.category)}`;
+    if(modalHero) modalHero.style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('${loc.img || ('https://img.youtube.com/vi/' + loc.ytId + '/hqdefault.jpg')}')`;
+
+    if(modalDesc) {
+        const desc = getLocText(loc.fullDescription) || "No description available.";
+        modalDesc.innerHTML = desc;
+    }
+
+    // Fiche d'informations, identique à celle de map.html (Group / Members / Country / City / Address / Date)
+    if(modalMetaBox) {
+        modalMetaBox.innerHTML = `
+            <b>${currentLang === 'fr' ? 'Groupe' : 'Group'}:</b> ${loc.group}<br>
+            <b>${currentLang === 'fr' ? 'Membre(s)' : 'Members'}:</b> ${loc.member === "All" ? "All" : loc.member}<br>
+            <b>${currentLang === 'fr' ? 'Pays' : 'Country'}:</b> ${loc.country}<br>
+            <b>${currentLang === 'fr' ? 'Ville' : 'City'}:</b> ${loc.city}<br>
+            <b>${currentLang === 'fr' ? 'Adresse' : 'Address'}:</b> ${loc.address || '—'}<br>
+            <b>${currentLang === 'fr' ? 'Date' : 'Date'}:</b> ${loc.year || '—'}
+        `;
+    }
+
+    if(modalMapLink) modalMapLink.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+
+    const modalOverlay = document.getElementById('loc-modal');
+    if(modalOverlay) modalOverlay.classList.remove('hidden');
+
+    setTimeout(() => {
+        const mapEl = document.getElementById('modal-map');
+        if(!mapEl || typeof L === 'undefined') return;
+
+        const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
+        const baseColor = groupColors[loc.group] || '#D42759';
+        const markerHtml = `<div class="popup-marker-icon" style="background:${baseColor}; color:#fff;">${catIconSvg}</div>`;
+        const customIcon = L.divIcon({ className: '', html: markerHtml, iconSize: [34,34], iconAnchor: [17,17] });
+
+        if(!popupMap) {
+            popupMap = L.map('modal-map', { zoomControl: false, attributionControl: false }).setView([loc.lat, loc.lng], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd', maxZoom: 19
+            }).addTo(popupMap);
+            popupMarker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(popupMap);
+        } else {
+            popupMap.setView([loc.lat, loc.lng], 15);
+            popupMarker.setLatLng([loc.lat, loc.lng]);
+            popupMarker.setIcon(customIcon);
+            popupMap.invalidateSize();
+        }
+    }, 150);
+};
+
+window.closeLocModal = function() {
+    const modalOverlay = document.getElementById('loc-modal');
+    if(modalOverlay) modalOverlay.classList.add('hidden');
+};
+
+// ==========================================
 // 8. AUTO-ITINERARY GENERATOR LOGIC
 // ==========================================
 window.generateItinerary = function() {
@@ -1208,7 +1318,7 @@ window.addSelectedDaysToTrip = function() {
             dayLocs.forEach(loc => {
                 dayIds.push(loc.id);
                 if (!wList.some(w => Number(w.id) === Number(loc.id) && w.tripId === currentTrip.id)) {
-                    wList.push({ id: Number(loc.id), dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
+                    wList.push({ id: loc.id, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
                 }
             });
             currentTrip.days.push(dayIds);
