@@ -146,7 +146,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 <div class="universal-icons">
     <div class="dropdown-container">
         <button id="lang-btn" class="header-icon-btn" onclick="toggleMenu('lang-menu', event)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </button>
         <div id="lang-menu" class="dropdown-menu hidden">
             <a href="#" class="dropdown-option" onclick="setLang('en'); return false;">English</a>
@@ -154,7 +154,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         </div>
     </div>
     <div class="dropdown-container">
-        <button class="header-icon-btn" onclick="window.location.href='map.html';"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>
+        <button class="header-icon-btn" id="cart-btn" onclick="openCartModal()" title="Unlock Passes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>
     </div>
     <div class="dropdown-container">
         <button id="profile-btn" class="header-icon-btn user-avatar-btn" onclick="toggleMenu('profile-menu', event)">U</button>
@@ -264,6 +264,29 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
 <div class="overlay" id="overlay" onclick="if(event.target===this) closeDetail()">
   <div class="detail-window" id="detail-window"></div>
+</div>
+
+<!-- Modal Panier (Cart) — identique à celui de map.html -->
+<div id="cart-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <span class="close-btn" onclick="closeCartModal()">&times;</span>
+        <h2 style="color: #1e293b; margin-bottom: 5px;">Unlock New Passes</h2>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select the groups you want to unlock. (14.99€ per group)</p>
+
+        <form id="cart-form">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
+                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
+                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
+            </div>
+            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;">Select a group</button>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -376,6 +399,50 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
       document.getElementById('overlay').classList.add('open');
     }
     function closeDetail() { document.getElementById('overlay').classList.remove('open'); lastOpenedCountry = null; }
+
+    // --- GESTION DU PANIER "UNLOCK PASSES" (identique visuellement et fonctionnellement à map.html) ---
+    function openCartModal() {
+        const modal = document.getElementById('cart-modal');
+        modal.classList.remove('hidden');
+        const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        document.querySelectorAll('.cart-checkbox').forEach(cb => {
+            cb.checked = false;
+            const span = cb.nextElementSibling;
+            if (unlockedGroups.includes(cb.value)) { cb.disabled = true; span.style.background = "#f1f5f9"; span.style.color = "#94a3b8"; span.textContent = `${cb.value} (Purchased)`; }
+            else { cb.disabled = false; span.style.background = "white"; span.style.color = "#64748b"; span.textContent = cb.value; }
+        });
+        updateCartPrice();
+    }
+    function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+    function updateCartPrice() {
+        const selected = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
+        const priceDisplay = document.getElementById('cart-price');
+        if (priceDisplay) priceDisplay.textContent = `${(selected * 14.99).toFixed(2)} €`;
+        const btn = document.getElementById('cart-pay-btn');
+        if (btn) {
+            if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; }
+            else { btn.disabled = true; btn.textContent = 'Select a group'; }
+        }
+    }
+    document.querySelectorAll('.cart-checkbox').forEach(cb => {
+        cb.addEventListener('change', function () {
+            this.nextElementSibling.style.borderColor = this.checked ? "#D42759" : "#cbd5e1";
+            this.nextElementSibling.style.color = this.checked ? "#D42759" : "#64748b";
+            this.nextElementSibling.style.background = this.checked ? "#FCE7F0" : "white";
+            updateCartPrice();
+        });
+    });
+    const cartForm = document.getElementById('cart-form');
+    if (cartForm) {
+        cartForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+            document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if (!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
+            localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+            setTimeout(() => window.location.reload(), 1000);
+        });
+    }
+    window.addEventListener('click', function (e) { if (e.target.id === 'cart-modal') closeCartModal(); });
 </script>
 
 </body>
