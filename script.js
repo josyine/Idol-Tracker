@@ -262,7 +262,6 @@ window.openItineraryModal = function() {
     window.initItineraryGenerator();
 }
 
-// Bouton "Regenerate itinerary"
 window.initItineraryGenerator = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
@@ -507,7 +506,8 @@ window.selectCustomTrip = function(tripId, tripName) {
     const label = document.getElementById('trip-select-label');
     if(label) {
         label.textContent = tripName;
-        label.style.color = '#212832';
+        label.style.color = '#1e293b';
+        label.style.fontWeight = '600';
     }
     
     window.toggleTripDropdown();
@@ -588,26 +588,18 @@ window.loadItineraryView = function(tripId) {
     else tripMainLayerGroup.clearLayers();
 
     drawTripOnMap(trip, map, tripMainLayerGroup);
-    
-    const banner = document.getElementById('active-trip-banner');
-    const nameDisplay = document.getElementById('active-trip-name-display');
-    if(banner && nameDisplay) {
-        nameDisplay.textContent = trip.name;
-        banner.classList.remove('hidden');
-    }
 }
 
 window.clearTripFromMainMap = function() {
     if(tripMainLayerGroup) {
         tripMainLayerGroup.clearLayers();
     }
-    const banner = document.getElementById('active-trip-banner');
-    if(banner) banner.classList.add('hidden');
     
     const label = document.getElementById('trip-select-label');
     if(label) {
-        label.textContent = currentLang === 'fr' ? 'Sélectionner un voyage' : 'Select a trip to view';
-        label.style.color = '#8d9bb0';
+        label.textContent = currentLang === 'fr' ? 'Sélectionner un voyage...' : 'Select a trip...';
+        label.style.color = '#64748b';
+        label.style.fontWeight = '500';
     }
     const dropdown = document.getElementById('trip-dropdown-list');
     if(dropdown) dropdown.classList.add('hidden');
@@ -1619,7 +1611,6 @@ window.renderTrip = function() {
         return true;
     });
 
-    // Ne garder dans unassignedLocs QUE les lieux qui sont explicitement dans wishlistLocs pour ce voyage ET qui ne sont pas déjà assignés.
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     let unassignedLocs = wList
         .filter(w => w.tripId === currentTrip.id && !allAssignedIds.includes(Number(w.id)))
@@ -1675,7 +1666,6 @@ window.renderTrip = function() {
     
     if(tripCountries.length > 0) {
         celebLocations.forEach(loc => {
-            // Recommandation si: même pays + PAS assigné à un jour + PAS déjà dans unassignedLocs
             if (tripCountries.includes(loc.country) && !allAssignedIds.includes(loc.id) && !unassignedLocs.some(u=>u.id===loc.id)) {
                 if (recoCount < 4) {
                     recoList.innerHTML += `
@@ -1702,8 +1692,8 @@ window.switchEditDateTab = function(tab) {
     if(tab === 'specific') {
         document.getElementById('edit-date-specific-panel').classList.remove('hidden');
         document.getElementById('edit-date-flexible-panel').classList.add('hidden');
-        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.remove('active');
-        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.add('active');
+        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.add('active');
+        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.remove('active');
     } else {
         document.getElementById('edit-date-specific-panel').classList.add('hidden');
         document.getElementById('edit-date-flexible-panel').classList.remove('hidden');
