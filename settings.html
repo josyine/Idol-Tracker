@@ -36,9 +36,9 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL */
+/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL — agrandi et harmonisé avec les autres pages */
 .page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; pointer-events: none; }
-.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
+.card { background: #fff; border-radius: 20px; padding: 50px 60px; width: 100%; max-width: 960px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
 
 .back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
 .back-link:hover { text-decoration: underline; }
@@ -66,6 +66,24 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
 .modal-close { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s;}
 .edit-btn { width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer; transition:0.2s; }
 .edit-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+/* ==========================================
+   RESPONSIVE MOBILE (n'affecte pas le desktop)
+   ========================================== */
+@media (max-width: 760px) {
+  .universal-logo { top: 14px; left: 14px; gap: 8px; }
+  .universal-logo svg { width: 32px; height: 32px; }
+  .universal-logo .tagline { display: none; }
+  .universal-logo .brand-text { font-size: 15px; }
+  .universal-icons { top: 14px; right: 14px; gap: 6px; }
+  .header-icon-btn { width: 36px; height: 36px; }
+
+  .page { padding: 92px 12px 50px 12px; }
+  .card { padding: 26px 18px; border-radius: 16px; }
+  h1.pg-title { font-size: 22px; margin-bottom: 20px; }
+  .box-container { padding: 6px 14px; }
+  .row { flex-wrap: wrap; gap: 8px; }
+}
 </style>
 <script>
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
