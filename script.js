@@ -101,6 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateUI();
+
+    // Si on arrive sur map.html avec ?loc=ID (depuis le bouton "More details" de
+    // visited.html / wishlist.html), on ouvre directement la fiche du lieu concerné.
+    if(document.getElementById('map')) {
+        const params = new URLSearchParams(window.location.search);
+        const locParam = params.get('loc');
+        if(locParam) {
+            setTimeout(() => {
+                if(typeof window.switchMainTab === 'function') window.switchMainTab('explore');
+                window.openDetailsPanel(Number(locParam));
+            }, 700);
+        }
+    }
 });
 
 // ==========================================
@@ -129,25 +142,120 @@ const filterData = {
 };
 
 let celebLocations = [
-    { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg", fullDescription: { en: `<p>Located in the trendy Apgujeong district, Cafe Camptong served as the sprawling backdrop for one of the most chaotic scavenger hunts in Run BTS history.</p>`, fr: `<p>Situé dans le quartier branché d'Apgujeong, le Cafe Camptong a servi de décor gigantesque pour l'une des chasses au trésor les plus chaotiques de Run BTS.</p>` }, tip: { en: "The building facade remains a historical landmark for fans.", fr: "La façade du bâtiment reste un repère historique pour les fans." }, directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station.", fr: "Prenez la ligne Suin-Bundang jusqu'à Apgujeong Rodeo." } },
-    { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600", fullDescription: { en: `<p>Nestled near Seokchon Lake, Ossu Seiromushi represents Jin's successful venture into culinary business.</p>`, fr: `<p>Niché près du lac Seokchon, Ossu Seiromushi illustre le succès de Jin dans la restauration.</p>` }, tip: { en: "Arrive early to secure a spot on the waiting list.", fr: "Arrivez tôt pour être sur la liste d'attente." }, directions: { en: "Take Line 8 to Songpanaru Station.", fr: "Prenez la ligne 8 jusqu'à Songpanaru." } },
-    { id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", ytId: "d--MDCCJ3jg", address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg" },
-    { id: 4, name: "Ahwon Museum & Hotel", group: "BTS", member: "All", country: "South Korea", city: "Wanju", category: "Museums", year: "2019", ytId: "h1jUtpEzxxA", address: "516-7 Songgwangsuman-ro", lat: 35.8455, lng: 127.1895, img: "https://img.youtube.com/vi/h1jUtpEzxxA/hqdefault.jpg" },
-    { id: 5, name: "Cafe Kitsuné Seoul", group: "Blackpink", member: "Jennie", country: "South Korea", city: "Seoul", category: "Cafe", year: "2021", ytId: "Kitsune1", address: "23 Dosan-daero 13-gil", lat: 37.5197, lng: 127.0229, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600" },
-    { id: 6, name: "Pozzetto", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Cafe", year: "2019", ytId: "Pozzetto1", address: "39 Rue du Roi de Sicile, Paris", lat: 48.8569, lng: 2.3572, img: "https://images.unsplash.com/photo-1557142046-c704a3adf365?w=600" },
-    { id: 7, name: "Musée Nissim de Camondo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Fashion", year: "2026", ytId: "1TdxCtgX53w", address: "63 Rue de Monceau, Paris", lat: 48.8795, lng: 2.3117, img: "https://img.youtube.com/vi/1TdxCtgX53w/hqdefault.jpg" },
-    { id: 8, name: "Montmartre Stairs", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "Montmartre1", address: "Rue Foyatier, Paris", lat: 48.8856, lng: 2.3432, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600" },
-    { id: 9, name: "Wall of Love", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "WallOfLove1", address: "Square Jehan Rictus, Paris", lat: 48.8848, lng: 2.3386, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600" },
-    { id: 10, name: "Palais de Tokyo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Museums", year: "2023", ytId: "PalaisTokyo1", address: "13 Av. du Président Wilson, Paris", lat: 48.8643, lng: 2.2965, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600" },
-    { id: 11, name: "Cheonggu Building", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2017", ytId: "vJwHIpEogEY", address: "16 Hakdong-ro 30-gil", lat: 37.5144, lng: 127.0315, img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg" },
-    { id: 12, name: "The First BTS Dorm", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2015", ytId: "RhJqNFQCU_Q", address: "29 Nonhyeon-ro 119-gil", lat: 37.5133, lng: 127.0321, img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg" },
-    { id: 13, name: "Hyangho Beach Bus Stop", group: "BTS", member: "All", country: "South Korea", city: "Gangneung", category: "Landmarks", year: "2017", ytId: "46qWWmnK4F0", address: "8-55 Hyangho-ri", lat: 37.9048, lng: 128.8266, img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg" },
-    { id: 14, name: "Iryeong Station", group: "BTS", member: "All", country: "South Korea", city: "Yangju", category: "MV Location", year: "2017", ytId: "xEeFrLSkMm8", address: "327 Samsang-ri", lat: 37.7135, lng: 126.9329, img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg" },
-    { id: 15, name: "Quinta da Francelha de Cima", group: "BTS", member: "All", country: "Portugal", city: "Prior Velho", category: "MV Location", year: "2026", ytId: "GEk4jHwfFTA", address: "R. da Francelha de Cima", lat: 38.7844, lng: -9.1238, img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg" },
-    { id: 16, name: "Sunhyewon", group: "BTS", member: "All", country: "South Korea", city: "Seoul Area", category: "MV Location", year: "2026", ytId: "Hb06Iem3FWg", address: "Sunhyewon Estate", lat: 37.5826, lng: 126.9856, img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg" },
-    { id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "MV Location", year: "2026", ytId: "b4iVv91Z6lY", address: "Praça do Império, Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg" },
-    { id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", ytId: "6qB8Nb_WO_Y", address: "Chuncheon, Gangwon-do", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg" },
-    { id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0", address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg" }
+    { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg",
+      fullDescription: { en: `<p>Tucked away in the trendy Apgujeong district of Gangnam, Cafe Camptong is a sprawling, multi-level indoor camping-themed café — complete with faux tents, string lights and a woodsy interior — that became the stage for one of the most chaotic scavenger hunts in Run BTS history.</p><p>The seven members were split into teams and sent racing through the venue's maze-like floors searching for hidden clues, and the footage remains a fan favourite for the sheer amount of screaming, tripping over tent poles and last-minute betrayals it produced.</p>`,
+        fr: `<p>Niché dans le quartier branché d'Apgujeong à Gangnam, le Cafe Camptong est un immense café à thème "camping intérieur" sur plusieurs étages — tentes factices, guirlandes lumineuses et décor boisé inclus — qui est devenu le théâtre de l'une des chasses au trésor les plus chaotiques de l'histoire de Run BTS.</p><p>Les sept membres, répartis en équipes, ont dû courir à travers les étages labyrinthiques du lieu à la recherche d'indices cachés, et cet épisode reste un favori des fans pour la quantité impressionnante de cris, de chutes sur les piquets de tente et de trahisons de dernière minute qu'il a provoquées.</p>` },
+      tip: { en: "Order at the counter before picking a table — the camping 'pods' upstairs fill up fast on weekends.", fr: "Commandez au comptoir avant de choisir une table — les « alcôves » de camping à l'étage se remplissent vite le week-end." },
+      directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station (Exit 5), then walk roughly 8 minutes north through the Rodeo shopping streets.", fr: "Prenez la ligne Suin-Bundang jusqu'à la station Apgujeong Rodeo (sortie 5), puis marchez environ 8 minutes vers le nord à travers les rues commerçantes de Rodeo." } },
+
+    { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+      fullDescription: { en: `<p>Set on a quiet street a short walk from Seokchon Lake, Ossu Seiromushi is a steamed-dish specialty restaurant known for its clean, minimalist dining room and its signature bamboo steamer baskets piled high with pork, vegetables and rice cake.</p><p>The restaurant is closely associated with Jin, who has spoken publicly about his appreciation for its cooking style, and it has since become something of a pilgrimage stop for fans exploring the Songpa-gu area near Lotte World.</p>`,
+        fr: `<p>Installé dans une rue tranquille à quelques minutes à pied du lac Seokchon, Ossu Seiromushi est un restaurant spécialisé dans les plats vapeur, reconnaissable à sa salle épurée et minimaliste et à ses célèbres paniers en bambou débordant de porc, de légumes et de gâteau de riz.</p><p>Ce restaurant est étroitement associé à Jin, qui a publiquement exprimé son appréciation pour ce style de cuisine, et il est depuis devenu une étape incontournable pour les fans qui explorent le quartier de Songpa-gu, non loin de Lotte World.</p>` },
+      tip: { en: "Reservations aren't accepted — arrive right at opening time on weekdays to avoid the longest waits.", fr: "Les réservations ne sont pas acceptées — arrivez pile à l'ouverture en semaine pour éviter les plus longues attentes." },
+      directions: { en: "Take Line 8 or the Bundang Line to Songpanaru Station (Exit 2) and walk about 10 minutes east.", fr: "Prenez la ligne 8 ou la ligne Bundang jusqu'à la station Songpanaru (sortie 2) et marchez environ 10 minutes vers l'est." } },
+
+    { id: 3, name: "Lotte World Adventure", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2018", episode: "Episode 51", ytId: "d--MDCCJ3jg", address: "240 Olympic-ro, Songpa-gu", lat: 37.5113, lng: 127.0980, img: "https://img.youtube.com/vi/d--MDCCJ3jg/hqdefault.jpg",
+      fullDescription: { en: `<p>One of the largest indoor theme parks in the world, Lotte World Adventure combines a fully enclosed amusement park with an artificial lake, an ice rink and a folk museum all under one roof in the heart of Jamsil.</p><p>BTS took over the park for a full day of rides, games and costumed challenges, and the giant indoor atrium — with its glass dome ceiling and parade route — instantly became recognisable to fans worldwide as the backdrop for some of Run BTS's most joyfully unhinged moments.</p>`,
+        fr: `<p>L'un des plus grands parcs à thème intérieurs au monde, Lotte World Adventure réunit sous un même toit, en plein cœur de Jamsil, un parc d'attractions entièrement couvert, un lac artificiel, une patinoire et un musée du folklore.</p><p>BTS a investi le parc le temps d'une journée entière de manèges, de jeux et de défis costumés, et le gigantesque atrium intérieur — avec son toit en verre en forme de dôme et son parcours de parade — est instantanément devenu reconnaissable par les fans du monde entier comme le décor de certains des moments les plus joyeusement chaotiques de Run BTS.</p>` },
+      tip: { en: "Head straight for the French Revolution rollercoaster area first — it's exactly where the members raced during the episode.", fr: "Foncez directement vers la zone du grand huit French Revolution — c'est précisément là que les membres ont couru durant l'épisode." },
+      directions: { en: "Take Line 2 or 8 to Jamsil Station and use Exit 3 or 4, which lead directly into the Lotte World complex.", fr: "Prenez la ligne 2 ou 8 jusqu'à la station Jamsil et empruntez la sortie 3 ou 4, qui mènent directement au complexe Lotte World." } },
+
+    { id: 4, name: "Ahwon Museum & Hotel", group: "BTS", member: "All", country: "South Korea", city: "Wanju", category: "Museums", year: "2019", ytId: "h1jUtpEzxxA", address: "516-7 Songgwangsuman-ro", lat: 35.8455, lng: 127.1895, img: "https://img.youtube.com/vi/h1jUtpEzxxA/hqdefault.jpg",
+      fullDescription: { en: `<p>Hidden in the forested hills of Wanju in North Jeolla Province, Ahwon Museum & Hotel is a boutique art museum and stay built around an extensive private collection of contemporary Korean sculpture and installation art, spread across quiet outdoor gardens and minimalist gallery halls.</p><p>Its remote, tranquil setting made it a natural choice for a slower, more introspective filming segment, letting the members wander the grounds and galleries far from the usual city noise.</p>`,
+        fr: `<p>Caché dans les collines boisées de Wanju, dans la province du Jeolla du Nord, Ahwon Museum & Hotel est un musée d'art-boutique bâti autour d'une vaste collection privée de sculptures et d'installations d'art contemporain coréen, répartie entre jardins extérieurs paisibles et salles d'exposition minimalistes.</p><p>Son cadre isolé et tranquille en a fait un choix naturel pour un tournage plus lent et introspectif, laissant les membres flâner dans les jardins et les galeries loin du bruit habituel de la ville.</p>` },
+      tip: { en: "Book the gallery tour slot in advance — access to certain wings is limited to a handful of visitors per day.", fr: "Réservez le créneau de visite guidée à l'avance — l'accès à certaines ailes est limité à une poignée de visiteurs par jour." },
+      directions: { en: "The museum is best reached by car from Jeonju (around 40 minutes); public transit options in the area are limited.", fr: "Le musée se rejoint le plus facilement en voiture depuis Jeonju (environ 40 minutes) ; les options de transport en commun sont limitées dans ce secteur." } },
+
+    { id: 5, name: "Cafe Kitsuné Seoul", group: "Blackpink", member: "Jennie", country: "South Korea", city: "Seoul", category: "Cafe", year: "2021", ytId: "Kitsune1", address: "23 Dosan-daero 13-gil", lat: 37.5197, lng: 127.0229, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600",
+      fullDescription: { en: `<p>The Seoul outpost of the French fashion-and-coffee brand Maison Kitsuné sits on a stylish backstreet of Apgujeong Rodeo, blending its signature fox-logo streetwear boutique with a sleek, sun-lit café counter.</p><p>Jennie has been photographed here on several occasions, and the location quickly became a favourite stop for fans chasing both a good flat white and a slice of Blackpink-adjacent Seoul fashion culture.</p>`,
+        fr: `<p>L'antenne séoulite de la marque française de mode et de café Maison Kitsuné occupe une rue élégante d'Apgujeong Rodeo, mêlant sa boutique de streetwear au logo renard emblématique à un comptoir de café épuré et baigné de lumière.</p><p>Jennie y a été photographiée à plusieurs reprises, et le lieu est rapidement devenu un arrêt incontournable pour les fans en quête à la fois d'un bon flat white et d'un aperçu de la culture mode séoulite proche de Blackpink.</p>` },
+      tip: { en: "The boutique and café share the same entrance — browse the clothing rack first, the coffee counter is tucked in the back.", fr: "La boutique et le café partagent la même entrée — parcourez d'abord le portant de vêtements, le comptoir à café est niché au fond." },
+      directions: { en: "From Apgujeong Rodeo Station (Suin-Bundang Line), walk about 10 minutes through the Dosan-daero side streets.", fr: "Depuis la station Apgujeong Rodeo (ligne Suin-Bundang), marchez environ 10 minutes à travers les rues secondaires de Dosan-daero." } },
+
+    { id: 6, name: "Pozzetto", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Cafe", year: "2019", ytId: "Pozzetto1", address: "39 Rue du Roi de Sicile, Paris", lat: 48.8569, lng: 2.3572, img: "https://images.unsplash.com/photo-1557142046-c704a3adf365?w=600",
+      fullDescription: { en: `<p>A small, unassuming gelateria in the heart of Le Marais, Pozzetto is beloved by Parisians for its authentically Italian, slow-churned gelato served in the traditional "pozzetto" wells rather than piled-high mounds.</p><p>Jimin was spotted stopping by during a visit to Paris, and the narrow cobblestone street outside — lined with old stone façades — has since become a quiet but well-loved detour for fans wandering the Marais.</p>`,
+        fr: `<p>Petite gelateria discrète au cœur du Marais, Pozzetto est appréciée des Parisiens pour ses glaces italiennes authentiques, turbinées lentement et servies dans les traditionnels "pozzetti" plutôt qu'en boules empilées.</p><p>Jimin y a été aperçu lors d'un passage à Paris, et la ruelle pavée à l'extérieur — bordée de vieilles façades en pierre — est depuis devenue un détour discret mais très apprécié pour les fans qui flânent dans le Marais.</p>` },
+      tip: { en: "Try the pistachio or the tiramisu flavour — both are the shop's most requested and tend to sell out on warm afternoons.", fr: "Essayez le parfum pistache ou tiramisu — ce sont les plus demandés de la boutique et ils partent vite les après-midis ensoleillés." },
+      directions: { en: "Take Metro Line 1 to Saint-Paul or Line 11 to Hôtel de Ville, then walk 5–7 minutes into the Marais.", fr: "Prenez la ligne 1 du métro jusqu'à Saint-Paul ou la ligne 11 jusqu'à Hôtel de Ville, puis marchez 5 à 7 minutes dans le Marais." } },
+
+    { id: 7, name: "Musée Nissim de Camondo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Fashion", year: "2026", ytId: "1TdxCtgX53w", address: "63 Rue de Monceau, Paris", lat: 48.8795, lng: 2.3117, img: "https://img.youtube.com/vi/1TdxCtgX53w/hqdefault.jpg",
+      fullDescription: { en: `<p>Overlooking Parc Monceau, this preserved early-20th-century private mansion houses an extraordinary collection of 18th-century French decorative arts, its rooms kept exactly as they were when the Camondo family lived there.</p><p>The museum's opulent, perfectly preserved interiors made it a striking setting for a high-fashion appearance tied to Jimin, and the location has since drawn fans interested in both music and fine French heritage architecture.</p>`,
+        fr: `<p>Donnant sur le Parc Monceau, cet hôtel particulier du début du XXe siècle parfaitement préservé abrite une collection exceptionnelle d'arts décoratifs français du XVIIIe siècle, ses pièces étant conservées telles qu'elles étaient du vivant de la famille Camondo.</p><p>Les intérieurs somptueux et intacts du musée en ont fait un décor saisissant pour une apparition mode haut de gamme liée à Jimin, et le lieu attire depuis des fans intéressés à la fois par la musique et par le patrimoine architectural français.</p>` },
+      tip: { en: "The museum limits daily visitor numbers to protect the period rooms — buying a timed ticket online in advance is strongly recommended.", fr: "Le musée limite le nombre de visiteurs quotidiens pour protéger ses pièces d'époque — il est vivement recommandé d'acheter un billet horodaté en ligne à l'avance." },
+      directions: { en: "Take Metro Line 2 or 3 to Villiers or Monceau, then walk 3–5 minutes to the park entrance on Rue de Monceau.", fr: "Prenez la ligne 2 ou 3 du métro jusqu'à Villiers ou Monceau, puis marchez 3 à 5 minutes jusqu'à l'entrée du parc, Rue de Monceau." } },
+
+    { id: 8, name: "Montmartre Stairs", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "Montmartre1", address: "Rue Foyatier, Paris", lat: 48.8856, lng: 2.3432, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
+      fullDescription: { en: `<p>The steep, iconic staircase of Rue Foyatier climbs the Montmartre hill toward the Sacré-Cœur basilica, its central funicular track flanked by nearly 300 steps that have appeared in countless films and photographs.</p><p>Jimin was photographed here during a quiet stroll through the neighbourhood, adding one more layer to the staircase's already legendary status among visitors chasing the perfect Parisian panorama.</p>`,
+        fr: `<p>L'escalier abrupt et emblématique de la rue Foyatier grimpe la butte Montmartre en direction de la basilique du Sacré-Cœur, sa voie centrale de funiculaire encadrée par près de 300 marches qui ont figuré dans d'innombrables films et photographies.</p><p>Jimin y a été photographié lors d'une promenade tranquille dans le quartier, ajoutant une couche supplémentaire au statut déjà légendaire de cet escalier auprès des visiteurs en quête du panorama parisien parfait.</p>` },
+      tip: { en: "Climb up early in the morning for soft light and far fewer tourists on the steps.", fr: "Montez tôt le matin pour profiter d'une lumière douce et de bien moins de touristes sur les marches." },
+      directions: { en: "Take Metro Line 12 to Abbesses and follow signs for the funicular; the staircase runs directly alongside it.", fr: "Prenez la ligne 12 du métro jusqu'à Abbesses et suivez les panneaux vers le funiculaire ; l'escalier longe directement celui-ci." } },
+
+    { id: 9, name: "Wall of Love", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Landmarks", year: "2019", ytId: "WallOfLove1", address: "Square Jehan Rictus, Paris", lat: 48.8848, lng: 2.3386, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
+      fullDescription: { en: `<p>Tucked inside a small park at the foot of Montmartre, the Wall of Love ("Le Mur des Je t'aime") is a striking 40-square-metre mural where the phrase "I love you" is painted in over 250 languages and dialects across deep blue enamel tiles.</p><p>Jimin's visit to this quiet, romantic corner of Paris turned it into an unofficial pilgrimage spot for fans, many of whom now search the tiles for their own native language before taking a photo.</p>`,
+        fr: `<p>Niché dans un petit parc au pied de Montmartre, le Mur des Je t'aime est une saisissante fresque de 40 mètres carrés où la phrase "je t'aime" est peinte en plus de 250 langues et dialectes sur des carreaux d'émail bleu profond.</p><p>La visite de Jimin dans ce coin romantique et paisible de Paris en a fait un lieu de pèlerinage officieux pour les fans, dont beaucoup cherchent désormais leur propre langue maternelle sur les carreaux avant de prendre une photo.</p>` },
+      tip: { en: "Look for 'Je t'aime' in Korean near the lower-left section of the wall — it's the tile most fans photograph first.", fr: "Cherchez « je t'aime » en coréen près de la partie inférieure gauche du mur — c'est le carreau que la plupart des fans photographient en premier." },
+      directions: { en: "Take Metro Line 12 to Abbesses; the square is a 2-minute walk from the station, right next to the metro entrance.", fr: "Prenez la ligne 12 du métro jusqu'à Abbesses ; le square se trouve à 2 minutes à pied de la station, juste à côté de l'entrée du métro." } },
+
+    { id: 10, name: "Palais de Tokyo", group: "BTS", member: "Jimin", country: "France", city: "Paris", category: "Museums", year: "2023", ytId: "PalaisTokyo1", address: "13 Av. du Président Wilson, Paris", lat: 48.8643, lng: 2.2965, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600",
+      fullDescription: { en: `<p>One of Europe's largest spaces dedicated to contemporary art, Palais de Tokyo occupies a monumental 1937 Art Deco building facing the Seine, known for its raw concrete interiors and constantly rotating, boundary-pushing exhibitions.</p><p>Jimin's appearance here tied into a fashion and art moment that fit the venue's avant-garde identity perfectly, and its industrial-chic architecture has since become a favourite backdrop for fans' own photos.</p>`,
+        fr: `<p>L'un des plus grands espaces d'Europe dédiés à l'art contemporain, le Palais de Tokyo occupe un bâtiment monumental de style Art déco datant de 1937, face à la Seine, reconnu pour ses intérieurs en béton brut et ses expositions sans cesse renouvelées et avant-gardistes.</p><p>L'apparition de Jimin ici s'inscrivait dans un moment mode et art parfaitement en phase avec l'identité avant-gardiste du lieu, et son architecture industrielle-chic est depuis devenue un décor de prédilection pour les photos des fans.</p>` },
+      tip: { en: "The building stays open late most evenings — an evening visit avoids the daytime museum crowds entirely.", fr: "Le bâtiment reste ouvert tard la plupart des soirs — une visite en soirée permet d'éviter complètement l'affluence diurne du musée." },
+      directions: { en: "Take Metro Line 9 to Alma-Marceau or Iéna, both a 5-minute walk from the entrance on Avenue du Président Wilson.", fr: "Prenez la ligne 9 du métro jusqu'à Alma-Marceau ou Iéna, toutes deux à 5 minutes à pied de l'entrée, avenue du Président Wilson." } },
+
+    { id: 11, name: "Cheonggu Building", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2017", ytId: "vJwHIpEogEY", address: "16 Hakdong-ro 30-gil", lat: 37.5144, lng: 127.0315, img: "https://img.youtube.com/vi/vJwHIpEogEY/hqdefault.jpg",
+      fullDescription: { en: `<p>A modest, unassuming office building in Cheongdam-dong, this address served as Big Hit Entertainment's original headquarters during BTS's earliest, scrappiest years, well before the company grew into the global powerhouse HYBE.</p><p>It's here that early practice sessions, meetings and countless behind-the-scenes moments took place, making the building a quietly significant landmark for long-time fans tracing the group's origin story.</p>`,
+        fr: `<p>Immeuble de bureaux modeste et discret situé à Cheongdam-dong, cette adresse a hébergé le tout premier siège de Big Hit Entertainment durant les années les plus modestes et les plus intenses des débuts de BTS, bien avant que l'entreprise ne devienne le géant mondial HYBE.</p><p>C'est ici qu'ont eu lieu les premières sessions de répétition, les réunions et d'innombrables moments en coulisses, faisant de ce bâtiment un lieu discrètement significatif pour les fans de longue date retraçant les origines du groupe.</p>` },
+      tip: { en: "The building is a private office space today — admire the exterior from the street rather than trying to enter.", fr: "Le bâtiment est aujourd'hui un espace de bureaux privé — admirez l'extérieur depuis la rue plutôt que de tenter d'y entrer." },
+      directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station and walk about 12 minutes southeast into Cheongdam-dong.", fr: "Prenez la ligne Suin-Bundang jusqu'à la station Apgujeong Rodeo et marchez environ 12 minutes vers le sud-est jusqu'à Cheongdam-dong." } },
+
+    { id: 12, name: "The First BTS Dorm", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013 - 2015", ytId: "RhJqNFQCU_Q", address: "29 Nonhyeon-ro 119-gil", lat: 37.5133, lng: 127.0321, img: "https://img.youtube.com/vi/RhJqNFQCU_Q/hqdefault.jpg",
+      fullDescription: { en: `<p>Long before their sprawling, more comfortable later dorms, all seven members of BTS lived together in a compact, two-room apartment on this residential street — a living arrangement famously chronicled in early vlogs and reality segments for its cramped bunk beds and shared everything.</p><p>The building itself is unremarkable from the outside, but its role in shaping the group's early bond and work ethic has made it one of the most sentimental stops on any BTS-focused itinerary.</p>`,
+        fr: `<p>Bien avant leurs dortoirs plus vastes et confortables des années suivantes, les sept membres de BTS ont vécu ensemble dans un appartement compact de deux pièces sur cette rue résidentielle — un cadre de vie rendu célèbre par les premiers vlogs et segments de télé-réalité pour ses lits superposés exigus et tout ce qui s'y partageait.</p><p>Le bâtiment lui-même n'a rien de remarquable vu de l'extérieur, mais son rôle dans la formation des liens et de l'éthique de travail du groupe à ses débuts en fait l'une des étapes les plus chargées d'émotion de tout itinéraire consacré à BTS.</p>` },
+      tip: { en: "This is a private residential building — please stay on the public street and keep noise to a minimum out of respect for current residents.", fr: "Il s'agit d'un immeuble résidentiel privé — merci de rester sur la voie publique et de limiter le bruit par respect pour les résidents actuels." },
+      directions: { en: "Take the Suin-Bundang Line to Apgujeong Rodeo Station and walk roughly 10 minutes south through the Nonhyeon-dong side streets.", fr: "Prenez la ligne Suin-Bundang jusqu'à la station Apgujeong Rodeo et marchez environ 10 minutes vers le sud à travers les rues de Nonhyeon-dong." } },
+
+    { id: 13, name: "Hyangho Beach Bus Stop", group: "BTS", member: "All", country: "South Korea", city: "Gangneung", category: "Landmarks", year: "2017", ytId: "46qWWmnK4F0", address: "8-55 Hyangho-ri", lat: 37.9048, lng: 128.8266, img: "https://img.youtube.com/vi/46qWWmnK4F0/hqdefault.jpg",
+      fullDescription: { en: `<p>A modest little bus shelter facing the sea along the East Coast, this stop near Hyangho Beach became instantly iconic after appearing as a key emotional backdrop in one of BTS's most beloved music videos.</p><p>With the wide, quiet beach stretching out just beyond the road and the pale blue shelter almost unchanged since filming, fans regularly make the trip out from Gangneung just to sit on the same bench and watch the same waves.</p>`,
+        fr: `<p>Modeste petit abribus face à la mer, sur la côte est du pays, cet arrêt près de la plage de Hyangho est devenu instantanément culte après avoir servi de décor émotionnel clé dans l'un des clips les plus aimés de BTS.</p><p>Avec la plage large et paisible qui s'étend juste après la route et l'abri bleu pâle resté quasiment identique depuis le tournage, les fans font régulièrement le déplacement depuis Gangneung pour s'asseoir sur le même banc et regarder les mêmes vagues.</p>` },
+      tip: { en: "Sunrise here is spectacular and the beach is almost empty that early — worth setting an alarm for.", fr: "Le lever de soleil y est spectaculaire et la plage est quasiment vide à cette heure — cela vaut le coup de régler un réveil." },
+      directions: { en: "From Gangneung Station, a taxi takes about 20 minutes; there is also a local bus that stops within walking distance.", fr: "Depuis la gare de Gangneung, comptez environ 20 minutes en taxi ; un bus local dessert également un arrêt à quelques minutes à pied." } },
+
+    { id: 14, name: "Iryeong Station", group: "BTS", member: "All", country: "South Korea", city: "Yangju", category: "MV Location", year: "2017", ytId: "xEeFrLSkMm8", address: "327 Samsang-ri", lat: 37.7135, lng: 126.9329, img: "https://img.youtube.com/vi/xEeFrLSkMm8/hqdefault.jpg",
+      fullDescription: { en: `<p>A small, largely disused regional train station north of Seoul, Iryeong Station's weathered platform and rusting rail cars gave it exactly the melancholic, nostalgic atmosphere needed for a pivotal scene in one of BTS's most narratively rich music videos.</p><p>Because the station sees very little regular traffic, its quiet platforms have remained remarkably close to how they appeared on screen, letting visiting fans recreate shots almost frame for frame.</p>`,
+        fr: `<p>Petite gare régionale largement désaffectée au nord de Séoul, le quai usé et les wagons rouillés d'Iryeong offraient exactement l'atmosphère mélancolique et nostalgique nécessaire à une scène charnière de l'un des clips les plus riches narrativement de BTS.</p><p>La gare étant très peu fréquentée au quotidien, ses quais silencieux sont restés remarquablement fidèles à leur apparition à l'écran, permettant aux fans en visite de recréer les plans presque à l'identique.</p>` },
+      tip: { en: "Trains still run infrequently through the station — always check the platform edge and stay well behind the yellow line.", fr: "Des trains circulent encore occasionnellement dans la gare — vérifiez toujours le bord du quai et restez bien derrière la ligne jaune." },
+      directions: { en: "Best reached by car or taxi from central Seoul (around 1 hour); regional trains to Iryeong are infrequent.", fr: "Se rejoint le plus facilement en voiture ou en taxi depuis le centre de Séoul (environ 1 heure) ; les trains régionaux vers Iryeong sont peu fréquents." } },
+
+    { id: 15, name: "Quinta da Francelha de Cima", group: "BTS", member: "All", country: "Portugal", city: "Prior Velho", category: "MV Location", year: "2026", ytId: "GEk4jHwfFTA", address: "R. da Francelha de Cima", lat: 38.7844, lng: -9.1238, img: "https://img.youtube.com/vi/GEk4jHwfFTA/hqdefault.jpg",
+      fullDescription: { en: `<p>A rustic countryside estate just outside Lisbon, Quinta da Francelha de Cima blends traditional Portuguese stonework with sprawling gardens, olive trees and weathered farm buildings that lend it a timeless, cinematic quality.</p><p>Its earthy, sun-bleached aesthetic made it a striking choice of filming location, offering a very different visual mood from BTS's usual urban settings.</p>`,
+        fr: `<p>Domaine rural rustique situé juste aux portes de Lisbonne, la Quinta da Francelha de Cima marie une architecture en pierre traditionnelle portugaise à de vastes jardins, des oliviers et des bâtiments agricoles patinés par le temps, lui conférant une qualité cinématographique intemporelle.</p><p>Son esthétique brute et délavée par le soleil en a fait un choix de tournage saisissant, offrant une ambiance visuelle très différente des décors urbains habituels de BTS.</p>` },
+      tip: { en: "The estate is largely private property — respectful viewing from the road is recommended unless a public event is scheduled.", fr: "Le domaine est en grande partie une propriété privée — il est recommandé de l'observer respectueusement depuis la route, sauf événement public programmé." },
+      directions: { en: "Best reached by car from central Lisbon (around 20–25 minutes); limited public transit serves this rural area.", fr: "Se rejoint le plus facilement en voiture depuis le centre de Lisbonne (environ 20 à 25 minutes) ; les transports en commun sont limités dans cette zone rurale." } },
+
+    { id: 16, name: "Sunhyewon", group: "BTS", member: "All", country: "South Korea", city: "Seoul Area", category: "MV Location", year: "2026", ytId: "Hb06Iem3FWg", address: "Sunhyewon Estate", lat: 37.5826, lng: 126.9856, img: "https://img.youtube.com/vi/Hb06Iem3FWg/hqdefault.jpg",
+      fullDescription: { en: `<p>Sunhyewon is a beautifully landscaped traditional-style estate on the outskirts of Seoul, blending hanok-inspired architecture with manicured gardens, ponds and stone pathways that evoke a sense of classical Korean elegance.</p><p>Its serene, meticulously maintained grounds provided a striking visual contrast for filming, standing apart from the group's more commonly seen city locations.</p>`,
+        fr: `<p>Sunhyewon est un domaine de style traditionnel magnifiquement paysager, en périphérie de Séoul, alliant une architecture inspirée des hanoks à des jardins soignés, des bassins et des allées de pierre qui évoquent une élégance coréenne classique.</p><p>Son terrain serein et méticuleusement entretenu a offert un contraste visuel saisissant pour le tournage, se démarquant nettement des décors urbains plus habituels du groupe.</p>` },
+      tip: { en: "Certain garden areas open to visitors only on specific days — check ahead before planning a visit around them.", fr: "Certaines zones du jardin ne sont ouvertes aux visiteurs que certains jours précis — vérifiez au préalable avant d'organiser votre visite autour d'elles." },
+      directions: { en: "Best reached by car or taxi from central Seoul; the estate sits roughly 45 minutes from downtown depending on traffic.", fr: "Se rejoint le plus facilement en voiture ou en taxi depuis le centre de Séoul ; le domaine se trouve à environ 45 minutes du centre-ville selon la circulation." } },
+
+    { id: 17, name: "Museu de Marinha", group: "BTS", member: "All", country: "Portugal", city: "Lisbon", category: "MV Location", year: "2026", ytId: "b4iVv91Z6lY", address: "Praça do Império, Lisboa", lat: 38.6976, lng: -9.2082, img: "https://img.youtube.com/vi/b4iVv91Z6lY/hqdefault.jpg",
+      fullDescription: { en: `<p>Housed in a wing of the monumental Jerónimos Monastery complex in Belém, the Museu de Marinha traces Portugal's rich maritime and naval history through ship models, royal barges and navigational instruments spanning centuries of exploration.</p><p>Its grand, echoing halls and nautical exhibits gave a distinctly regal, historic texture to the footage filmed here, tying BTS's Portugal chapter to the country's Age of Discovery heritage.</p>`,
+        fr: `<p>Installé dans une aile du monumental complexe du monastère des Jerónimos, à Belém, le Museu de Marinha retrace la riche histoire maritime et navale du Portugal à travers des maquettes de navires, des barques royales et des instruments de navigation couvrant plusieurs siècles d'exploration.</p><p>Ses grandes salles résonnantes et ses collections nautiques ont conféré une texture nettement royale et historique aux images tournées ici, rattachant le chapitre portugais de BTS à l'héritage des Grandes Découvertes du pays.</p>` },
+      tip: { en: "Combine your visit with the neighbouring Jerónimos Monastery and Belém Tower — all three sit within a short walk of each other.", fr: "Combinez votre visite avec le monastère des Jerónimos et la tour de Belém, juste à côté — les trois sites se trouvent à quelques minutes de marche les uns des autres." },
+      directions: { en: "Take Tram 15E or bus 728/729 from central Lisbon to Belém, then walk about 5 minutes to Praça do Império.", fr: "Prenez le tram 15E ou le bus 728/729 depuis le centre de Lisbonne jusqu'à Belém, puis marchez environ 5 minutes jusqu'à la Praça do Império." } },
+
+    { id: 18, name: "In the SOOP Estate", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2021", episode: "In the SOOP BTS ver. Season 2", ytId: "6qB8Nb_WO_Y", address: "Domaine privé en montagne, Chuncheon (Accès restreint via le Phoenix Pyeongchang Resort)", lat: 37.8813, lng: 127.7298, img: "https://img.youtube.com/vi/6qB8Nb_WO_Y/hqdefault.jpg",
+      fullDescription: { en: `<p>Nestled deep in the lush mountains and dense forests of Chuncheon, this sprawling estate is far more than a simple vacation rental. HYBE acquired, redesigned and fully renovated the vast property specifically to create the perfect setting for the show.</p><p>The location seamlessly blends untouched wilderness with ultra-modern architecture: a sumptuous main house, private guest villas, an outdoor pool, a tennis court, and even a dedicated RV area. It's a true sanctuary of tranquility, custom-built to offer quiet luxury and a total disconnect from the outside world.</p><p><b>Following in BTS's Footsteps (In the SOOP Season 2)</b><br>It was in this idyllic setting that the members of BTS settled in 2021 for a well-deserved break. Walking the grounds today, the immersion is total: the sets remain faithful to the show. You can walk exactly where RM once read peacefully, see the RV where SUGA retreated to play guitar, and visit the kitchen that was the backdrop for Jin and Jung Kook's late-night meals. The outdoor sports field still seems to echo with their laughter from legendary games of foot-volley in the rain. Visiting this place means feeling the magic and serenity of the simple moments the group shared together.</p>`,
+        fr: `<p>Niché au cœur des montagnes luxuriantes et des forêts denses de Chuncheon, ce vaste domaine n'est pas une simple location de vacances. L'agence HYBE a acquis, repensé et entièrement rénové cette immense propriété spécifiquement pour créer le cadre parfait de l'émission.</p><p>Le lieu allie harmonieusement nature sauvage et architecture ultra-moderne : il comprend une somptueuse maison principale, des villas d'invités privées, une piscine extérieure, un court de tennis, et même une zone dédiée aux camping-cars. C'est un véritable sanctuaire de tranquillité, conçu sur mesure pour offrir un luxe discret et une déconnexion totale du monde extérieur.</p><p><b>Following in BTS's Footsteps (In the SOOP Season 2)</b><br>C'est dans cet environnement idyllique que les membres de BTS ont posé leurs valises en 2021 pour s'accorder une pause bien méritée. En visitant le domaine, l'immersion est totale : les décors sont restés fidèles à l'émission. Vous pourrez marcher exactement là où RM lisait paisiblement, voir le camping-car où SUGA s'isolait pour jouer de la guitare, et visiter la cuisine qui a été le théâtre des repas nocturnes de Jin et Jung Kook. Le terrain de sport extérieur résonne encore de leurs rires lors de leurs mythiques parties de foot-volley sous la pluie. Visiter ce lieu, c'est ressentir la magie et la sérénité des moments simples partagés par le groupe.</p>` },
+      tip: { en: "Wear comfortable shoes to explore the whole property. Don't miss the hidden gift shop on-site, which sells exclusive merchandise you won't find anywhere else!", fr: "Prévoyez des chaussures confortables pour explorer l'ensemble de la propriété. Ne manquez surtout pas la boutique de souvenirs cachée sur le site, qui vend des produits dérivés exclusifs que vous ne trouverez nulle part ailleurs !" },
+      directions: { en: "Access to this estate is strictly regulated to preserve the grounds. You cannot arrive by personal vehicle or taxi. Entry requires booking the official 'In the SOOP Stay' package in partnership with the Phoenix Pyeongchang Resort. The recommended route is to take the KTX high-speed train from Seoul Station to Pyeongchang Station, then board the resort's private shuttle, which takes you directly to the estate.",
+        fr: "L'accès à ce domaine est strictement réglementé pour préserver les lieux. Vous ne pouvez pas vous y rendre avec un véhicule personnel ou un taxi. Pour y accéder, vous devez obligatoirement réserver le package officiel « In the SOOP Stay » en partenariat avec le Phoenix Pyeongchang Resort. Le trajet recommandé est de prendre le train à grande vitesse (KTX) depuis la gare de Séoul jusqu'à la gare de Pyeongchang, puis de monter à bord de la navette privée du complexe hôtelier qui vous conduira directement au domaine." } },
+
+    { id: 19, name: "Happy Meadow Ranch", group: "BTS", member: "All", country: "South Korea", city: "Chuncheon", category: "Bon Voyage", year: "2020", ytId: "F14vk9qPRM0", address: "330-48 Chunhwa-ro", lat: 37.9547, lng: 127.6975, img: "https://img.youtube.com/vi/F14vk9qPRM0/hqdefault.jpg",
+      fullDescription: { en: `<p>A working horse ranch set against the rolling green hills of Chuncheon, Happy Meadow Ranch offers wide-open pastures, stables and riding trails that feel a world away from Seoul, just an hour or so outside the capital.</p><p>The members visited during a Bon Voyage travel segment to try horseback riding for the first time, and the ranch's laid-back, countryside charm made for one of the show's most relaxed and good-humoured episodes.</p>`,
+        fr: `<p>Ranch équestre en activité niché au milieu des collines verdoyantes de Chuncheon, Happy Meadow Ranch offre de vastes pâturages, des écuries et des sentiers de randonnée à cheval qui semblent à des lieues de Séoul, à seulement une heure environ de la capitale.</p><p>Les membres l'ont visité lors d'un segment de voyage de Bon Voyage pour s'essayer à l'équitation pour la première fois, et le charme décontracté et champêtre du ranch a donné lieu à l'un des épisodes les plus détendus et les plus drôles de l'émission.</p>` },
+      tip: { en: "Riding lessons for beginners are available on-site and can be booked the same day if it isn't too busy.", fr: "Des cours d'équitation pour débutants sont proposés sur place et peuvent être réservés le jour même si l'affluence le permet." },
+      directions: { en: "Best reached by car from Chuncheon city center (around 20 minutes); a taxi is the easiest option for visitors without a vehicle.", fr: "Se rejoint le plus facilement en voiture depuis le centre-ville de Chuncheon (environ 20 minutes) ; le taxi reste l'option la plus simple pour les visiteurs sans véhicule." } }
 ];
 
 // ==========================================
@@ -165,7 +273,20 @@ const translations = {
         checkVisited: "I visited this place", checkWishlist: "Add to Wishlist", tripWhich: "Which trip is this for?",
         tripName: "Trip name", tripWhen: "When are you planning to go?", tripFrom: "From", tripTo: "To", tripCreate: "Create trip", tripCancel: "Cancel",
         itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips",
-        noTripsFound: "No trips found.", selectTripToView: "Select a trip to view", locationsWord: "location", locationsWordPlural: "locations"
+        noTripsFound: "No trips found.", selectTripToView: "Select a trip to view", locationsWord: "location", locationsWordPlural: "locations",
+        backToMap: "← Back to Map", moreDetails: "More details", openInMaps: "Open in Google Maps", detailsLabel: "Details", aboutPlaceLabel: "About this place",
+        accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accNameLabel: "Name", accEmailLabel: "Email address",
+        accActivityTitle: "Your activity", accTrips: "Trips", accVisited: "Visited", accWishlist: "Wishlist", accPasses: "Passes & billing",
+        accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes",
+        setTitle: "Settings", setSecurity: "Account & Security", setPassword: "Password", setPasswordSub: "Last changed 3 months ago", setChange: "Change",
+        setSignedWith: "Signed in with", setPreferences: "Preferences", setLanguage: "Language", setCurrency: "Currency", setUnits: "Distance units",
+        setEmailNotif: "Email notifications", setPushNotif: "Push notifications", setPrivacy: "Privacy", setCookiePrefs: "Cookie Preferences",
+        setResetBanners: "Reset Banners", setDownloadData: "Download my data", setExportSub: "Export everything in JSON", setExport: "Export",
+        setDanger: "Danger zone", setDeleteAccTitle: "Delete account", setDeleteAccSub: "This permanently deletes your trips, wishlist and unlocked passes.", setDeleteAccBtn: "Delete Account",
+        wishTitle: "My Wishlist", wishEmpty: "You haven't saved any places yet. Explore the map and click \"Add to Wishlist\"!", wishSomeday: "Someday / No trip yet",
+        visitTitle: "My Visited Places", visitEmpty: "You haven't marked any place as visited yet. Explore the map and check \"I visited this place\"!",
+        destTitle: "Explore Destinations", destSub: "Browse every country and city featured on Screen To Street", destCountries: "Countries", destCities: "Cities", destLocations: "Locations", destViewMap: "View on Map →",
+        artTitle: "Explore Artists", artSub: "Discover every group featured on Screen To Street", artGroups: "Groups", artFeatured: "Featured group"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -178,7 +299,20 @@ const translations = {
         checkVisited: "J'ai visité ce lieu", checkWishlist: "Ajouter à ma Wishlist", tripWhich: "Pour quel voyage ?",
         tripName: "Nom du voyage", tripWhen: "Quand prévoyez-vous d'y aller ?", tripFrom: "De", tripTo: "À", tripCreate: "Créer", tripCancel: "Annuler",
         itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips",
-        noTripsFound: "Aucun voyage trouvé.", selectTripToView: "Sélectionner un voyage", locationsWord: "lieu", locationsWordPlural: "lieux"
+        noTripsFound: "Aucun voyage trouvé.", selectTripToView: "Sélectionner un voyage", locationsWord: "lieu", locationsWordPlural: "lieux",
+        backToMap: "← Retour à la carte", moreDetails: "Plus de détails", openInMaps: "Ouvrir dans Google Maps", detailsLabel: "Détails", aboutPlaceLabel: "À propos de ce lieu",
+        accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accNameLabel: "Nom", accEmailLabel: "Adresse e-mail",
+        accActivityTitle: "Votre activité", accTrips: "Voyages", accVisited: "Visités", accWishlist: "Wishlist", accPasses: "Pass et facturation",
+        accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif",
+        setTitle: "Paramètres", setSecurity: "Compte et sécurité", setPassword: "Mot de passe", setPasswordSub: "Dernière modification il y a 3 mois", setChange: "Modifier",
+        setSignedWith: "Connecté avec", setPreferences: "Préférences", setLanguage: "Langue", setCurrency: "Devise", setUnits: "Unités de distance",
+        setEmailNotif: "Notifications par e-mail", setPushNotif: "Notifications push", setPrivacy: "Confidentialité", setCookiePrefs: "Préférences de cookies",
+        setResetBanners: "Réinitialiser la bannière", setDownloadData: "Télécharger mes données", setExportSub: "Exporter toutes les données en JSON", setExport: "Exporter",
+        setDanger: "Zone de danger", setDeleteAccTitle: "Supprimer le compte", setDeleteAccSub: "Ceci supprime définitivement vos voyages, votre wishlist et vos pass débloqués.", setDeleteAccBtn: "Supprimer le compte",
+        wishTitle: "Ma Wishlist", wishEmpty: "Vous n'avez encore enregistré aucun lieu. Explorez la carte et cliquez sur « Ajouter à ma Wishlist » !", wishSomeday: "Un jour / Pas de voyage prévu",
+        visitTitle: "Mes lieux visités", visitEmpty: "Vous n'avez marqué aucun lieu comme visité. Explorez la carte et cochez « J'ai visité ce lieu » !",
+        destTitle: "Explorer les destinations", destSub: "Parcourez tous les pays et villes présents sur Screen To Street", destCountries: "Pays", destCities: "Villes", destLocations: "Lieux", destViewMap: "Voir sur la carte →",
+        artTitle: "Explorer les artistes", artSub: "Découvrez tous les groupes présents sur Screen To Street", artGroups: "Groupes", artFeatured: "Groupe à la une"
     }
 };
 
@@ -494,28 +628,24 @@ window.loadItineraryTabOptions = function() {
     dropdownList.innerHTML = '';
     
     if(trips.length > 0) {
-        trips.forEach(t => {
-            let allAssignedIds = (t.days || []).flat().map(Number);
-            let durationTxt = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.days ? t.days.length : 0} ${currentLang === 'fr' ? 'jours' : 'Days'}`;
+        trips.forEach(tr => {
+            let allAssignedIds = (tr.days || []).flat().map(Number);
+            let durationTxt = tr.dateType === 'duration' ? (tr.duration || 'Flexible') : `${tr.days ? tr.days.length : 0} ${currentLang === 'fr' ? 'jours' : 'Days'}`;
             let locWord = allAssignedIds.length > 1 ? t('locationsWordPlural') : t('locationsWord');
             let locsTxt = `${allAssignedIds.length} ${locWord}`;
-            const isActive = t.id === activeId;
+            const isActive = tr.id === activeId;
 
             // Création d'élément dynamique pour éviter tout bug lié aux apostrophes/guillemets dans le nom du trip
             let opt = document.createElement('div');
             opt.className = 'trip-option' + (isActive ? ' selected' : '');
-            opt.onclick = () => selectCustomTrip(t.id, t.name);
-
-            let icon = document.createElement('div');
-            icon.className = 'trip-option-icon';
-            icon.textContent = (t.name || '?').trim().slice(0, 2).toUpperCase();
+            opt.onclick = () => selectCustomTrip(tr.id, tr.name);
 
             let body = document.createElement('div');
             body.className = 'trip-opt-body';
 
             let nameDiv = document.createElement('div');
             nameDiv.className = 'trip-opt-name';
-            nameDiv.textContent = t.name;
+            nameDiv.textContent = tr.name;
 
             let metaDiv = document.createElement('div');
             metaDiv.className = 'trip-opt-meta';
@@ -523,8 +653,6 @@ window.loadItineraryTabOptions = function() {
 
             body.appendChild(nameDiv);
             body.appendChild(metaDiv);
-
-            opt.appendChild(icon);
             opt.appendChild(body);
 
             if(isActive) {
@@ -539,9 +667,15 @@ window.loadItineraryTabOptions = function() {
     } else {
         dropdownList.innerHTML = `<div class="trip-select-empty">${t('noTripsFound')}</div>`;
     }
-    
-    document.getElementById('itinerary-content-container').classList.add('hidden');
-    window.clearTripFromMainMap();
+
+    // NE PAS masquer/réinitialiser le voyage actif quand on rouvre l'onglet :
+    // si un voyage était déjà sélectionné, on ré-affiche directement son itinéraire.
+    if(activeId && trips.some(tr => tr.id === activeId)) {
+        window.loadItineraryView(activeId);
+    } else {
+        document.getElementById('itinerary-content-container').classList.add('hidden');
+        window.clearTripFromMainMap();
+    }
 };
 
 window.selectCustomTrip = function(tripId, tripName) {
@@ -572,6 +706,9 @@ window.loadItineraryView = function(tripId) {
 
     localStorage.setItem('activeTripId', trip.id);
     document.getElementById('itinerary-content-container').classList.remove('hidden');
+
+    const tripLabelEl = document.getElementById('trip-select-label');
+    if(tripLabelEl) { tripLabelEl.textContent = trip.name; tripLabelEl.style.color = '#1e293b'; }
 
     document.getElementById('iti-view-name').textContent = trip.name;
     
@@ -1113,6 +1250,21 @@ window.openLocModal = function(id) {
     }
 
     if(modalMapLink) modalMapLink.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+
+    // Bouton "Plus de détails" -> renvoie vers la fiche complète du lieu sur map.html
+    const modalMoreDetails = document.getElementById('modal-more-details');
+    if(modalMoreDetails) {
+        modalMoreDetails.href = `map.html?loc=${loc.id}`;
+        modalMoreDetails.textContent = t('moreDetails');
+    }
+
+    // Traduction des petits libellés statiques de la modale (si présents sur la page)
+    const modalDetailsLabel = document.getElementById('modal-details-label');
+    if(modalDetailsLabel) modalDetailsLabel.textContent = t('detailsLabel');
+    const modalAboutLabel = document.getElementById('modal-about-label');
+    if(modalAboutLabel) modalAboutLabel.textContent = t('aboutPlaceLabel');
+    const modalMapLinkText = document.getElementById('modal-map-link-text');
+    if(modalMapLinkText) modalMapLinkText.textContent = t('openInMaps');
 
     const modalOverlay = document.getElementById('loc-modal');
     if(modalOverlay) modalOverlay.classList.remove('hidden');
