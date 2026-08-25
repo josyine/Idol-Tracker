@@ -2,16 +2,18 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Screen To Street — Explore Artists</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore Artists - Screen To Street</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
-a{text-decoration:none;}
+a{text-decoration:none; cursor:pointer;}
 body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:auto;}
 .hidden { display: none !important; }
 
+/* FOND ANIMÉ */
 .hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; }
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: float 12s infinite ease-in-out alternate; }
@@ -19,6 +21,7 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
 .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
 
+/* HEADER SEPARÉ POUR LE Z-INDEX (Logo en dessous, Icones au dessus) */
 .universal-logo { position: fixed; top: 25px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
 .brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
 .tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
@@ -34,61 +37,70 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
+/* CENTRAGE DU BLOC PRINCIPAL (Passe au dessus du logo, sous les icones) */
 .page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; pointer-events: none; }
-.card { background: #fff; border-radius: 20px; padding: 50px 60px; width: 100%; max-width: 960px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
+.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
 
 .back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
 .back-link:hover { text-decoration: underline; }
-h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 8px 0; }
-.pg-sub { text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 30px; }
+h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 30px 0; }
 
-.stats-bar { display: flex; gap: 14px; margin-bottom: 30px; }
-.stats-bar .stat-box { flex: 1; text-align: center; background: #faf9fc; border-radius: 12px; padding: 16px 10px; border: 1px solid #e2e8f0; }
+/* CSS SPÉCIFIQUE ARTISTS */
+.stats-bar { display: flex; margin-bottom: 30px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px 0; box-shadow: 0 4px 15px rgba(80,60,120,.02); }
+.stat { flex: 1; text-align: center; border-right: 1px solid #cbd5e1; }
+.stat:last-child { border-right: none; }
 .stat-num { font-size: 22px; font-weight: 800; color: #D42759; }
-.stat-lab { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-top: 3px; }
+.stat-label { font-size: 10.5px; font-weight: 700; color: #5B6472; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
 
-/* Bloc BTS mis en avant */
-.featured { position: relative; border-radius: 18px; overflow: hidden; min-height: 220px; margin-bottom: 30px; cursor: pointer; display: flex; align-items: flex-end; background-size: cover; background-position: center; }
-.featured::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,16,30,.85), rgba(20,16,30,.1)); }
-.featured-content { position: relative; z-index: 2; padding: 24px; color: #fff; }
-.featured-badge { display: inline-block; background: rgba(255,255,255,.2); backdrop-filter: blur(6px); font-size: 10.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; margin-bottom: 10px; }
-.featured-title { font-size: 26px; font-weight: 700; margin-bottom: 6px; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
-.featured-sub { font-size: 13px; color: #e6dff2; }
+.featured { border-radius: 16px; padding: 34px 36px; margin-bottom: 30px; position: relative; overflow: hidden; background: linear-gradient(135deg,#8B5CF6 0%,#5B4A8A 45%,#2E3644 100%); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15); }
+.featured-blob { position: absolute; border-radius: 50%; filter: blur(30px); pointer-events: none; }
+.fb1 { top: -60px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle,rgba(255,255,255,.2),transparent 70%); }
+.fb2 { bottom: -70px; left: 20%; width: 180px; height: 180px; background: radial-gradient(circle,rgba(212,39,89,.35),transparent 70%); }
+.featured-tag { position: relative; font-size: 10.5px; font-weight: 700; color: #e9e2fb; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 10px; }
+.featured-name { position: relative; font-size: 30px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.featured-blurb { position: relative; font-size: 13px; color: #ede7fb; max-width: 520px; line-height: 1.65; margin-bottom: 18px; }
+.featured-meta { position: relative; display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+.fm-item { font-size: 12px; color: #fff; font-weight: 600; }
+.fm-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.5); }
+.explore-btn { position: relative; display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #5B4A8A; font-size: 13px; font-weight: 700; padding: 11px 20px; border-radius: 100px; cursor: pointer; transition: 0.2s;}
+.explore-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 
-.member-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-.member-chip { background: rgba(255,255,255,.15); backdrop-filter: blur(4px); font-size: 10.5px; font-weight: 600; padding: 4px 10px; border-radius: 100px; color: #fff; }
+.list-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 14px; }
+.row { display: flex; align-items: center; gap: 16px; padding: 16px 18px; background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(80,60,120,.02); transition: 0.2s;}
+.row:hover { background: #fff; box-shadow: 0 8px 25px rgba(80,60,120,.08); border-color: #cbd5e1; }
+.row-dot { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 11px; }
+.row-name { font-size: 14px; font-weight: 700; color: #212832; }
+.row-meta { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+.row-cats { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.cat-chip { font-size: 9.5px; font-weight: 700; color: #4A5262; background: #f1f5f9; border-radius: 100px; padding: 3px 9px; }
+.row-explore { font-size: 12px; font-weight: 700; color: #2E3644; border: 1.5px solid #2E3644; padding: 8px 16px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; cursor: pointer; transition: 0.2s;}
+.row-explore:hover { background: #2E3644; color: #fff; }
 
-.row { display: flex; gap: 16px; align-items: center; background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; cursor: pointer; transition: 0.2s; }
-.row:hover { border-color: #D42759; box-shadow: 0 8px 20px rgba(80,60,120,.08); }
-.row-thumb { width: 56px; height: 56px; border-radius: 14px; background-size: cover; background-position: center; flex-shrink: 0; }
-.row-title { font-size: 16px; font-weight: 700; color: #212832; margin-bottom: 4px; }
-.row-desc { font-size: 11.5px; color: #94a3b8; }
-.row-count { margin-left: auto; font-size: 11.5px; font-weight: 700; color: #D42759; flex-shrink: 0; }
+/* OVERLAY DÉTAIL ARTISTE */
+.overlay { position: fixed; inset: 0; background: rgba(20,16,30,.55); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 30px; }
+.overlay.open { display: flex; }
+.detail-window { width: 100%; max-width: 580px; max-height: 88vh; overflow-y: auto; background: #fff; border-radius: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.35); position: relative; }
+.detail-window::-webkit-scrollbar { width: 6px; }
+.detail-window::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-.overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-.detail-window { background: #fff; width: 90%; max-width: 640px; max-height: 85vh; overflow-y: auto; border-radius: 18px; padding: 32px; position: relative; }
-.detail-window .close-btn { position: absolute; top: 18px; right: 22px; font-size: 1.8rem; color: #94a3b8; cursor: pointer; }
-.detail-loc-row { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
-.detail-loc-thumb { width: 48px; height: 48px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
+.detail-hero { padding: 34px 36px 26px 36px; position: relative; overflow: hidden; height: 180px; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end;}
+.detail-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg,rgba(20,16,30,.1) 10%,rgba(20,16,30,.8)); z-index: 1;}
+.detail-close { position: absolute; top: 16px; right: 18px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; z-index: 3; transition: 0.2s;}
+.detail-close:hover { background: rgba(255,255,255,.5); }
+.detail-tag { position: relative; font-size: 10.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .7px; opacity: .85; margin-bottom: 4px; z-index: 2;}
+.detail-name { position: relative; font-size: 26px; font-weight: 700; color: #fff; z-index: 2;}
 
-@media (max-width: 760px) {
-  .universal-logo { top: 14px; left: 14px; gap: 8px; }
-  .universal-logo svg { width: 32px; height: 32px; }
-  .universal-logo .tagline { display: none; }
-  .universal-logo .brand-text { font-size: 15px; }
-  .universal-icons { top: 14px; right: 14px; gap: 6px; }
-  .header-icon-btn { width: 36px; height: 36px; }
-
-  .page { padding: 92px 12px 50px 12px; }
-  .card { padding: 26px 18px; border-radius: 16px; }
-  h1.pg-title { font-size: 22px; }
-  .stats-bar { flex-wrap: wrap; }
-  .featured { min-height: 180px; }
-  .featured-title { font-size: 21px; }
-  .row { flex-wrap: wrap; }
-  .row-count { margin-left: 0; }
-  .detail-window { padding: 20px; }
-}
+.detail-body { padding: 28px 36px 34px 36px; }
+.detail-section-label { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.detail-blurb { font-size: 13px; color: #334155; line-height: 1.7; margin-bottom: 22px; }
+.members-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.member-chip { display: flex; align-items: center; gap: 7px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 100px; padding: 6px 12px 6px 6px; }
+.member-avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 9px; font-weight: 700; }
+.member-name { font-size: 11.5px; font-weight: 600; color: #334155; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+.stat-card { background: #faf9fc; border-radius: 12px; padding: 14px 16px; border: 1px solid #e2e8f0;}
+.stat-card .num { font-size: 20px; font-weight: 800; color: #212832; }
+.stat-card .lab { font-size: 10.5px; color: #94a3b8; font-weight: 600; margin-top: 2px; }
 </style>
 <script>
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
@@ -123,9 +135,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         </div>
     </div>
     <div class="dropdown-container">
-        <button id="cart-btn" class="header-icon-btn" onclick="openCartModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-        </button>
+        <button class="header-icon-btn" onclick="window.location.href='map.html';"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>
     </div>
     <div class="dropdown-container">
         <button id="profile-btn" class="header-icon-btn user-avatar-btn" onclick="toggleMenu('profile-menu')">U</button>
@@ -146,44 +156,69 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
 <div class="page">
     <div class="card">
-      <a href="map.html" class="back-link">← Back to Map</a>
-      <h1 class="pg-title">Explore Artists</h1>
-      <div class="pg-sub">Discover every group featured on Screen To Street</div>
+        <a href="map.html" class="back-link">← Back to Map</a>
+        <h1 class="pg-title" data-i18n="title">Explore Artists</h1>
+        
+        <div class="stats-bar">
+            <div class="stat"><div class="stat-num">6</div><div class="stat-label" data-i18n="statsGroups">Groups</div></div>
+            <div class="stat"><div class="stat-num">44</div><div class="stat-label" data-i18n="statsMembers">Members</div></div>
+            <div class="stat"><div class="stat-num">13</div><div class="stat-label" data-i18n="statsLocs">Locations mapped</div></div>
+        </div>
 
-      <div class="stats-bar">
-        <div class="stat-box"><div class="stat-num" id="stat-groups">0</div><div class="stat-lab">Groups</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-locations">0</div><div class="stat-lab">Locations</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-countries">0</div><div class="stat-lab">Countries</div></div>
-      </div>
+        <!-- ===== BTS FEATURED ===== -->
+        <div class="featured">
+            <div class="featured-blob fb1"></div><div class="featured-blob fb2"></div>
+            <div class="featured-tag" data-i18n="mostMapped">Most mapped group</div>
+            <div class="featured-name">BTS</div>
+            <p class="featured-blurb" data-i18n="btsBlurb">From a cramped Gangnam practice room to a custom-built mountain retreat in Chuncheon — BTS is the most extensively mapped group on Screen To Street, spanning three countries and nine years of history.</p>
+            <div class="featured-meta">
+                <div class="fm-item" data-i18n="btsMembers">7 members</div><div class="fm-sep"></div>
+                <div class="fm-item" data-i18n="btsLocs">12 locations</div><div class="fm-sep"></div>
+                <div class="fm-item" data-i18n="btsCountries">South Korea, France, Portugal</div>
+            </div>
+            <a class="explore-btn" onclick="openDetail('bts')" data-i18n="exploreBts">Explore BTS →</a>
+        </div>
 
-      <div id="featured-group"></div>
-      <div id="group-list"></div>
+        <div class="list-label" data-i18n="otherGroups">Other groups</div>
+
+        <div class="row">
+            <div class="row-dot" style="background:#D42759;">BP</div>
+            <div style="flex:1;">
+                <div class="row-name">Blackpink</div>
+                <div class="row-meta" data-i18n="bpMeta">4 members · 1 location mapped</div>
+                <div class="row-cats"><span class="cat-chip" data-i18n="catCafe">Cafe</span><span class="cat-chip" data-i18n="catRest">Restaurants</span><span class="cat-chip" data-i18n="catFash">Fashion</span></div>
+            </div>
+            <a class="row-explore" onclick="openDetail('blackpink')" data-i18n="explore">Explore</a>
+        </div>
+        <div class="row">
+            <div class="row-dot" style="background:#2E3644;">TW</div>
+            <div style="flex:1;"><div class="row-name">Twice</div><div class="row-meta" data-i18n="twMeta">9 members · 0 locations mapped yet</div></div>
+            <a class="row-explore" onclick="openDetail('twice')" data-i18n="explore">Explore</a>
+        </div>
+        <div class="row">
+            <div class="row-dot" style="background:#C97A9A;">SV</div>
+            <div style="flex:1;"><div class="row-name">Seventeen</div><div class="row-meta" data-i18n="svMeta">13 members · 0 locations mapped yet</div></div>
+            <a class="row-explore" onclick="openDetail('seventeen')" data-i18n="explore">Explore</a>
+        </div>
+        <div class="row">
+            <div class="row-dot" style="background:#5B6472;">KE</div>
+            <div style="flex:1;"><div class="row-name">Katseye</div><div class="row-meta" data-i18n="keMeta">6 members · 0 locations mapped yet</div></div>
+            <a class="row-explore" onclick="openDetail('katseye')" data-i18n="explore">Explore</a>
+        </div>
+        <div class="row">
+            <div class="row-dot" style="background:#A78BFA;">TX</div>
+            <div style="flex:1;"><div class="row-name">TXT</div><div class="row-meta" data-i18n="txMeta">5 members · 0 locations mapped yet</div></div>
+            <a class="row-explore" onclick="openDetail('txt')" data-i18n="explore">Explore</a>
+        </div>
     </div>
 </div>
 
-<!-- Overlay de détail groupe -->
-<div id="detail-overlay" class="overlay hidden">
-    <div class="detail-window">
-        <span class="close-btn" onclick="document.getElementById('detail-overlay').classList.add('hidden')">&times;</span>
-        <h2 id="detail-title" style="color:#D42759; font-size:22px; margin-bottom:16px;"></h2>
-        <div id="detail-loc-list"></div>
-        <a id="detail-view-map" href="map.html" class="header-icon-btn" style="width:auto; height:auto; border-radius:100px; padding:12px 22px; font-size:13px; margin-top:20px; display:inline-flex;">View on Map →</a>
-    </div>
+<div class="overlay" id="overlay" onclick="if(event.target===this) closeDetail()">
+  <div class="detail-window" id="detail-window"></div>
 </div>
 
-<!-- Modal Panier (Cart) -->
-<div id="cart-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center;">
-    <div style="background: white; width: 90%; max-width: 500px; border-radius: 16px; padding: 30px; position: relative;">
-        <div style="position:absolute; top:15px; right:15px; width:32px; height:32px; background:#f1f5f9; color:#212832; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:20px; cursor:pointer;" onclick="document.getElementById('cart-modal').classList.add('hidden')">&times;</div>
-        <h2 style="color: #D42759; margin-bottom: 20px; font-size:20px;">Unlock Passes</h2>
-        <div id="cart-options"></div>
-        <div style="font-weight: bold; margin: 20px 0; font-size: 16px; color:#212832;">Total: <span id="cart-price" style="color:#D42759;">0.00 €</span></div>
-        <button style="width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer;" id="cart-pay-btn" onclick="payCart()" disabled>Select a group</button>
-    </div>
-</div>
-
-<script src="script.js"></script>
 <script>
+    // --- GESTION DES ICÔNES HEADER ---
     function toggleMenu(menuId) {
         document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
         document.getElementById(menuId).classList.toggle('hidden');
@@ -191,6 +226,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     }
     document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
 
+    // Initialisation Avatar
     const savedName = localStorage.getItem('userName') || 'User';
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
@@ -198,107 +234,95 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         else { btn.textContent = savedName.charAt(0).toUpperCase(); }
     });
 
-    function openCartModal() {
-        document.getElementById('cart-modal').classList.remove('hidden');
-        const optionsDiv = document.getElementById('cart-options');
-        const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        const groups = ['BTS', 'Blackpink', 'Twice', 'Seventeen'];
-        optionsDiv.innerHTML = '';
-        groups.forEach(g => {
-            const isUnlocked = unlockedGroups.includes(g);
-            optionsDiv.innerHTML += `
-                <div style="margin-bottom:12px;">
-                    <label style="display:flex; align-items:center; gap:10px; padding:12px 16px; border:1px solid ${isUnlocked?'#e2e8f0':'#cbd5e1'}; border-radius:10px; cursor:${isUnlocked?'default':'pointer'}; background:${isUnlocked?'#f8fafc':'#fff'}; color:${isUnlocked?'#94a3b8':'#212832'};">
-                        <input type="checkbox" class="cart-checkbox" value="${g}" ${isUnlocked?'disabled checked':''} onchange="updateCartPrice()" style="accent-color:#D42759; width:16px; height:16px;">
-                        <span style="font-weight:600;">${g} Pass</span>
-                        <span style="margin-left:auto; font-size:13px;">${isUnlocked?'Purchased':'14.99 €'}</span>
-                    </label>
-                </div>
-            `;
+    // --- LOGIQUE ARTISTES ---
+    let currentLang = localStorage.getItem('lang') || 'en';
+    const t_artists = {
+      en: {
+        title: "Explore Artists", statsGroups: "Groups", statsMembers: "Members", statsLocs: "Locations mapped",
+        mostMapped: "Most mapped group", 
+        btsBlurb: "From a cramped Gangnam practice room to a custom-built mountain retreat in Chuncheon — BTS is the most extensively mapped group on Screen To Street, spanning three countries and nine years of history.",
+        btsMembers: "7 members", btsLocs: "12 locations", btsCountries: "South Korea, France, Portugal",
+        exploreBts: "Explore BTS →", otherGroups: "Other groups", explore: "Explore",
+        bpMeta: "4 members · 1 location mapped", twMeta: "9 members · 0 locations mapped yet",
+        svMeta: "13 members · 0 locations mapped yet", keMeta: "6 members · 0 locations mapped yet", txMeta: "5 members · 0 locations mapped yet",
+        catCafe: "Cafe", catRest: "Restaurants", catFash: "Fashion",
+        since: "Since", detailMembers: "Members", detailGlance: "At a glance",
+        statLocs: "Locations mapped", statCountries: "Countries covered", detailCats: "Content categories"
+      },
+      fr: {
+        title: "Explorer les Artistes", statsGroups: "Groupes", statsMembers: "Membres", statsLocs: "Lieux cartographiés",
+        mostMapped: "Groupe le plus cartographié", 
+        btsBlurb: "D'une salle de pratique exiguë à Gangnam à un refuge sur mesure dans les montagnes de Chuncheon — BTS est le groupe le plus cartographié sur Screen To Street, couvrant trois pays et neuf ans d'histoire.",
+        btsMembers: "7 membres", btsLocs: "12 lieux", btsCountries: "Corée du Sud, France, Portugal",
+        exploreBts: "Explorer BTS →", otherGroups: "Autres groupes", explore: "Explorer",
+        bpMeta: "4 membres · 1 lieu cartographié", twMeta: "9 membres · aucun lieu pour le moment",
+        svMeta: "13 membres · aucun lieu pour le moment", keMeta: "6 membres · aucun lieu pour le moment", txMeta: "5 membres · aucun lieu pour le moment",
+        catCafe: "Café", catRest: "Restaurants", catFash: "Mode",
+        since: "Depuis", detailMembers: "Membres", detailGlance: "En un coup d'œil",
+        statLocs: "Lieux cartographiés", statCountries: "Pays couverts", detailCats: "Catégories de contenu"
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if(t_artists[currentLang] && t_artists[currentLang][key]) el.innerHTML = t_artists[currentLang][key];
         });
-        updateCartPrice();
+    });
+
+    const GROUPS = {
+      en: {
+          bts: { name: "BTS", photo: "https://images.unsplash.com/photo-1621252179027-94459d278660?w=800", blurb: "From a cramped Gangnam practice room to a custom-built mountain retreat in Chuncheon, BTS's map spans nine years and three countries — the most complete journey on Screen To Street.", members: [["RM","#8B5CF6"],["Jin","#7C4FE0"],["Suga","#8B5CF6"],["J-Hope","#7C4FE0"],["Jimin","#8B5CF6"],["V","#7C4FE0"],["Jungkook","#8B5CF6"]], locations: 12, countries: 3, categories: "Run BTS, Bon Voyage, MV Location, Museums, Restaurants, Cafe, Concerts, Fashion, Landmarks", since: "2013" },
+          blackpink: { name: "Blackpink", photo: "https://images.unsplash.com/photo-1493225457124-a1a2a5f0fa47?w=800", blurb: "Just getting started — the first stop on Blackpink's map is a chic Gangnam cafe spotted on Jennie's Instagram. More locations are added as they're confirmed.", members: [["Jisoo","#D42759"],["Jennie","#B23554"],["Rosé","#D42759"],["Lisa","#B23554"]], locations: 1, countries: 1, categories: "Cafe, Restaurants, MV Location, Pop-up Store, Concerts, Fashion", since: "2016" },
+          twice: { name: "Twice", photo: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800", blurb: "Nine members, no shortage of stories — Twice's map is next in line to be built. Their filming locations and favorite spots are being researched.", members: [["Nayeon","#2E3644"],["Jeongyeon","#5B6472"],["Momo","#2E3644"],["Sana","#5B6472"],["Jihyo","#2E3644"],["Mina","#5B6472"],["Dahyun","#2E3644"],["Chaeyoung","#5B6472"],["Tzuyu","#2E3644"]], locations: 0, countries: 0, categories: "Cafe, Concerts, Fashion", since: "2015" },
+          seventeen: { name: "Seventeen", photo: "https://images.unsplash.com/photo-1540039155732-6134b281165e?w=800", blurb: "Thirteen members and a world tour's worth of stages — Seventeen's footprint on Screen To Street is on the way.", members: [["S.Coups","#C97A9A"],["Jeonghan","#D9A5BE"],["Joshua","#C97A9A"],["Jun","#D9A5BE"],["Hoshi","#C97A9A"],["Wonwoo","#D9A5BE"],["Woozi","#C97A9A"],["DK","#D9A5BE"],["Mingyu","#C97A9A"],["The8","#D9A5BE"],["Seungkwan","#C97A9A"],["Vernon","#D9A5BE"],["Dino","#C97A9A"]], locations: 0, countries: 0, categories: "Concerts, Landmarks", since: "2015" },
+          katseye: { name: "Katseye", photo: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800", blurb: "The newest addition to the roster — pop-up stores and fashion moments are next on the map as Katseye's presence grows.", members: [["Sophia","#5B6472"],["Lara","#8996A3"],["Manon","#5B6472"],["Daniela","#8996A3"],["Yoonchae","#5B6472"],["Megan","#8996A3"]], locations: 0, countries: 0, categories: "Pop-up Store, Fashion", since: "2024" },
+          txt: { name: "TXT", photo: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=800", blurb: "Five members, one story about to begin — TXT's first mapped location is in the works.", members: [["Soobin","#A78BFA"],["Yeonjun","#C4B5FD"],["Beomgyu","#A78BFA"],["Taehyun","#C4B5FD"],["Huening Kai","#A78BFA"]], locations: 0, countries: 0, categories: "MV Location, Concerts", since: "2019" }
+      },
+      fr: {
+          bts: { name: "BTS", photo: "https://images.unsplash.com/photo-1621252179027-94459d278660?w=800", blurb: "D'une petite salle d'entraînement à Gangnam à un refuge majestueux dans les montagnes de Chuncheon, la carte de BTS couvre neuf ans et trois pays — le voyage le plus complet sur Screen To Street.", members: [["RM","#8B5CF6"],["Jin","#7C4FE0"],["Suga","#8B5CF6"],["J-Hope","#7C4FE0"],["Jimin","#8B5CF6"],["V","#7C4FE0"],["Jungkook","#8B5CF6"]], locations: 12, countries: 3, categories: "Run BTS, Bon Voyage, MV Location, Musées, Restaurants, Café, Concerts, Mode, Lieux mythiques", since: "2013" },
+          blackpink: { name: "Blackpink", photo: "https://images.unsplash.com/photo-1493225457124-a1a2a5f0fa47?w=800", blurb: "Un début prometteur — le premier lieu de Blackpink est un café chic de Gangnam repéré sur l'Instagram de Jennie. D'autres lieux seront ajoutés prochainement.", members: [["Jisoo","#D42759"],["Jennie","#B23554"],["Rosé","#D42759"],["Lisa","#B23554"]], locations: 1, countries: 1, categories: "Café, Restaurants, MV Location, Pop-up Store, Concerts, Mode", since: "2016" },
+          twice: { name: "Twice", photo: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800", blurb: "Neuf membres, des histoires à revendre — la carte de Twice est la prochaine sur la liste. Leurs lieux de tournage et endroits favoris sont en cours d'analyse.", members: [["Nayeon","#2E3644"],["Jeongyeon","#5B6472"],["Momo","#2E3644"],["Sana","#5B6472"],["Jihyo","#2E3644"],["Mina","#5B6472"],["Dahyun","#2E3644"],["Chaeyoung","#5B6472"],["Tzuyu","#2E3644"]], locations: 0, countries: 0, categories: "Café, Concerts, Mode", since: "2015" },
+          seventeen: { name: "Seventeen", photo: "https://images.unsplash.com/photo-1540039155732-6134b281165e?w=800", blurb: "Treize membres et l'équivalent d'une tournée mondiale — l'empreinte de Seventeen sur Screen To Street est en route.", members: [["S.Coups","#C97A9A"],["Jeonghan","#D9A5BE"],["Joshua","#C97A9A"],["Jun","#D9A5BE"],["Hoshi","#C97A9A"],["Wonwoo","#D9A5BE"],["Woozi","#C97A9A"],["DK","#D9A5BE"],["Mingyu","#C97A9A"],["The8","#D9A5BE"],["Seungkwan","#C97A9A"],["Vernon","#D9A5BE"],["Dino","#C97A9A"]], locations: 0, countries: 0, categories: "Concerts, Lieux mythiques", since: "2015" },
+          katseye: { name: "Katseye", photo: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800", blurb: "La petite dernière de la sélection — les pop-up stores et moments de mode seront les prochains sur la carte de Katseye.", members: [["Sophia","#5B6472"],["Lara","#8996A3"],["Manon","#5B6472"],["Daniela","#8996A3"],["Yoonchae","#5B6472"],["Megan","#8996A3"]], locations: 0, countries: 0, categories: "Pop-up Store, Mode", since: "2024" },
+          txt: { name: "TXT", photo: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=800", blurb: "Cinq membres, une histoire qui ne fait que commencer — le premier lieu de TXT est en cours d'ajout.", members: [["Soobin","#A78BFA"],["Yeonjun","#C4B5FD"],["Beomgyu","#A78BFA"],["Taehyun","#C4B5FD"],["Huening Kai","#A78BFA"]], locations: 0, countries: 0, categories: "MV Location, Concerts", since: "2019" }
+      }
+    };
+
+    function openDetail(key) {
+      const g = GROUPS[currentLang][key];
+      const t = t_artists[currentLang];
+      
+      const membersHtml = g.members.map(([name,color]) =>
+        `<div class="member-chip"><div class="member-avatar" style="background:${color};">${name.slice(0,2).toUpperCase()}</div><span class="member-name">${name}</span></div>`
+      ).join('');
+
+      document.getElementById('detail-window').innerHTML = `
+        <div class="detail-hero" style="background-image: url('${g.photo}');">
+          <div class="detail-hero-overlay"></div>
+          <div class="detail-close" onclick="closeDetail()">✕</div>
+          <div class="detail-tag">${t.since} ${g.since}</div>
+          <div class="detail-name">${g.name}</div>
+        </div>
+        <div class="detail-body">
+          <p class="detail-blurb">${g.blurb}</p>
+
+          <div class="detail-section-label">${t.detailMembers} (${g.members.length})</div>
+          <div class="members-grid">${membersHtml}</div>
+
+          <div class="detail-section-label">${t.detailGlance}</div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="num">${g.locations}</div><div class="lab">${t.statLocs}</div></div>
+            <div class="stat-card"><div class="num">${g.countries}</div><div class="lab">${t.statCountries}</div></div>
+          </div>
+
+          ${g.locations > 0 ? `<div class="detail-section-label">${t.detailCats}</div><p class="detail-blurb">${g.categories}</p>` : ''}
+        </div>
+      `;
+      document.getElementById('overlay').classList.add('open');
     }
-    function updateCartPrice() {
-        const checkboxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
-        const price = checkboxes.length * 14.99;
-        document.getElementById('cart-price').textContent = price.toFixed(2) + ' €';
-        const btn = document.getElementById('cart-pay-btn');
-        btn.disabled = checkboxes.length === 0;
-        btn.textContent = checkboxes.length > 0 ? `Pay ${price.toFixed(2)} €` : 'Select a group';
-    }
-    function payCart() {
-        let existing = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => {
-            if(!existing.includes(cb.value)) existing.push(cb.value);
-        });
-        localStorage.setItem('unlockedGroups', JSON.stringify(existing));
-        window.location.reload();
-    }
-
-    // --- LISTE DES GROUPES (BTS mis en avant, puis les autres) ---
-    function renderGroups() {
-        const allGroups = [...new Set(celebLocations.map(l => l.group))];
-        document.getElementById('stat-groups').textContent = allGroups.length;
-        document.getElementById('stat-locations').textContent = celebLocations.length;
-        document.getElementById('stat-countries').textContent = new Set(celebLocations.map(l => l.country)).size;
-
-        const btsLocs = celebLocations.filter(l => l.group === 'BTS');
-        const btsThumb = btsLocs[0] ? (btsLocs[0].img || ('https://img.youtube.com/vi/' + btsLocs[0].ytId + '/hqdefault.jpg')) : '';
-        const btsMembers = filterData['BTS'] ? filterData['BTS'].members : [];
-
-        document.getElementById('featured-group').innerHTML = `
-            <div class="featured" style="background-image:url('${btsThumb}');" onclick="openGroupDetail('BTS')">
-                <div class="featured-content">
-                    <span class="featured-badge">Featured group</span>
-                    <div class="featured-title">BTS</div>
-                    <div class="featured-sub">${btsLocs.length} filming locations across ${[...new Set(btsLocs.map(l=>l.country))].length} countries</div>
-                    <div class="member-chips">${btsMembers.map(m => `<span class="member-chip">${m}</span>`).join('')}</div>
-                </div>
-            </div>
-        `;
-
-        const otherGroups = allGroups.filter(g => g !== 'BTS');
-        const listEl = document.getElementById('group-list');
-        listEl.innerHTML = '';
-        otherGroups.forEach(g => {
-            const locs = celebLocations.filter(l => l.group === g);
-            const thumb = locs[0].img || ('https://img.youtube.com/vi/' + locs[0].ytId + '/hqdefault.jpg');
-            const members = filterData[g] ? filterData[g].members.join(', ') : '';
-            const row = document.createElement('div');
-            row.className = 'row';
-            row.onclick = () => openGroupDetail(g);
-            row.innerHTML = `
-                <div class="row-thumb" style="background-image:url('${thumb}');"></div>
-                <div>
-                    <div class="row-title">${g}</div>
-                    <div class="row-desc">${members}</div>
-                </div>
-                <div class="row-count">${locs.length} location${locs.length > 1 ? 's' : ''}</div>
-            `;
-            listEl.appendChild(row);
-        });
-    }
-
-    function openGroupDetail(group) {
-        const locs = celebLocations.filter(l => l.group === group);
-        document.getElementById('detail-title').textContent = group;
-        const listEl = document.getElementById('detail-loc-list');
-        listEl.innerHTML = '';
-        locs.forEach(loc => {
-            listEl.innerHTML += `
-                <div class="detail-loc-row">
-                    <div class="detail-loc-thumb" style="background-image:url('${loc.img || ('https://img.youtube.com/vi/' + loc.ytId + '/hqdefault.jpg')}');"></div>
-                    <div>
-                        <div style="font-size:13.5px; font-weight:700; color:#212832;">${loc.name}</div>
-                        <div style="font-size:11px; color:#94a3b8;">${loc.city}, ${loc.country} &middot; ${getCatName(loc.category)}</div>
-                    </div>
-                </div>
-            `;
-        });
-        document.getElementById('detail-overlay').classList.remove('hidden');
-    }
-
-    renderGroups();
+    function closeDetail() { document.getElementById('overlay').classList.remove('open'); }
 </script>
+
 </body>
 </html>
