@@ -2,10 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>My Visited Places - Screen To Street</title>
+<title>Screen To Street — My Visited Places</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
 a{text-decoration:none;}
@@ -20,7 +21,7 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
 .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
 
-/* HEADER : LOGO EN ARRIÈRE PLAN (z-index 1000) ET ICÔNES AU PREMIER PLAN (z-index 3000) */
+/* HEADER SEPARÉ POUR LE Z-INDEX */
 .universal-logo { position: fixed; top: 25px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
 .brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
 .tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
@@ -36,43 +37,72 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-/* LE BLOC CENTRAL : z-index 2000 (Passe au dessus du logo, mais sous les icônes) */
+/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL — agrandi et harmonisé avec les autres pages */
 .page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; pointer-events: none; }
-.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
+.card { background: #fff; border-radius: 20px; padding: 50px 60px; width: 100%; max-width: 960px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
 
 .back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
 .back-link:hover { text-decoration: underline; }
-h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 30px 0; }
+h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 8px 0; }
+.pg-sub { text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 26px; }
 
-.progress-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
-.progress-item { margin-bottom: 14px; }
-.progress-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #212832; }
-.progress-bar-bg { width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
-.progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+/* Barre de progression par groupe */
+#visited-progress-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+.progress-row { background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; }
+.progress-row-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.progress-group-name { font-size: 13px; font-weight: 700; color: #212832; }
+.progress-count { font-size: 11.5px; font-weight: 700; color: #D42759; }
+.progress-bar-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 100px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 100px; transition: width 0.4s ease; }
 
-.loc-card { display: flex; gap: 16px; background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 14px; align-items: center; cursor: pointer; transition: 0.2s;}
-.loc-card:hover { border-color: #D42759; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,39,89,0.1); }
-.loc-card-thumb { width: 64px; height: 64px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
-.loc-card-info { flex: 1; }
-.loc-card-title { font-size: 15px; font-weight: 700; color: #212832; margin-bottom: 4px; }
-.loc-card-meta { font-size: 12px; color: #64748b; font-weight: 500; }
-.loc-card-date { font-size: 11px; font-weight: 700; color: #10b981; background: #d1fae5; padding: 4px 8px; border-radius: 6px; margin-top: 6px; display: inline-block;}
+.visit-list { display: flex; flex-direction: column; gap: 10px; }
+.visit-row { display: flex; gap: 14px; align-items: center; background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 16px; cursor: pointer; transition: 0.2s; }
+.visit-row:hover { border-color: #D42759; background: #fff; box-shadow: 0 6px 16px rgba(80,60,120,.06); }
+.visit-thumb { width: 56px; height: 56px; border-radius: 12px; background-size: cover; background-position: center; flex-shrink: 0; }
+.visit-name { font-size: 14.5px; font-weight: 700; color: #212832; }
+.visit-meta { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+.visit-stars { margin-left: auto; display: flex; gap: 2px; flex-shrink: 0; }
+.empty-visit { text-align: center; color: #94a3b8; font-size: 13.5px; padding: 60px 0; }
 
-/* CSS DU POPUP DES LIEUX ET CART */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; pointer-events: auto; }
-.modal-box { background: white; width: 90%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto;}
-.modal-hero { height: 200px; background-size: cover; background-position: center; position: relative; }
-.modal-close { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s;}
-.modal-close:hover { background: #D42759; }
-.modal-hero-content { position: absolute; bottom: 20px; left: 20px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-.modal-hero-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.modal-hero-meta { font-size: 12px; font-weight: 600; opacity: 0.9; }
-.modal-body { padding: 25px; }
-.btn-outline-modal { display: block; text-align: center; border: 1.5px solid #cbd5e1; color: #334155; font-size: 13px; font-weight: 700; padding: 12px; border-radius: 100px; transition: 0.2s; text-decoration: none;}
-.btn-outline-modal:hover { border-color: #D42759; color: #D42759; }
-.edit-btn { width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer; transition:0.2s; }
-.edit-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+/* MODAL LIEU (identique à la charte de map.html) */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: white; width: 90%; max-width: 560px; max-height: 90vh; border-radius: 16px; overflow-y: auto; position: relative; }
+.close-btn { position: absolute; top: 12px; right: 18px; font-size: 2rem; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.4); cursor: pointer; z-index: 10; }
+#modal-hero { height: 220px; background-size: cover; background-position: center; border-radius: 16px 16px 0 0; display: flex; align-items: flex-end; padding: 20px; }
+#modal-title { color: #fff; font-size: 22px; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.modal-body { padding: 22px 26px 28px 26px; }
+#modal-meta { font-size: 12.5px; color: #D42759; font-weight: 700; margin-bottom: 16px; }
+.modal-sub-label { font-size: 10px; font-weight: 700; letter-spacing: .8px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; display: block; }
+#modal-meta-box { background: #f8fafc; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 12.5px; line-height: 2; color: #334155; }
+#modal-desc { font-size: 13px; line-height: 1.8; color: #3f495c; margin-bottom: 18px; }
+#modal-map { width: 100%; height: 200px; border-radius: 12px; margin-bottom: 16px; }
+.modal-map-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #2E3644; font-size: 12.5px; font-weight: 600; transition: .2s; }
+.modal-map-link:hover { border-color: #D42759; color: #D42759; }
+
+/* ==========================================
+   RESPONSIVE MOBILE (n'affecte pas le desktop)
+   ========================================== */
+@media (max-width: 760px) {
+  .universal-logo { top: 14px; left: 14px; gap: 8px; }
+  .universal-logo svg { width: 32px; height: 32px; }
+  .universal-logo .tagline { display: none; }
+  .universal-logo .brand-text { font-size: 15px; }
+  .universal-icons { top: 14px; right: 14px; gap: 6px; }
+  .header-icon-btn { width: 36px; height: 36px; }
+
+  .page { padding: 92px 12px 50px 12px; }
+  .card { padding: 26px 18px; border-radius: 16px; }
+  h1.pg-title { font-size: 22px; }
+  .visit-thumb { width: 46px; height: 46px; }
+  .visit-stars svg { width: 12px; height: 12px; }
+  .modal-body { padding: 18px 18px 22px 18px; }
+  #modal-hero { height: 170px; }
+}
 </style>
+<script>
+    if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
+    document.documentElement.style.setProperty('--sync-t', ((Date.now() - parseInt(sessionStorage.getItem('bgSyncTime'))) / 1000) + 's');
+</script>
 </head>
 <body>
 
@@ -80,7 +110,6 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
     <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
 </div>
 
-<!-- LE LOGO PASSE DESSOUS AU SCROLL -->
 <a href="map.html" class="universal-logo">
     <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
         <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
@@ -92,7 +121,6 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
     </div>
 </a>
 
-<!-- LES ICONES RESTENT TOUJOURS AU DESSUS -->
 <div class="universal-icons">
     <div class="dropdown-container">
         <button id="lang-btn" class="header-icon-btn" onclick="toggleMenu('lang-menu')">
@@ -129,45 +157,49 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
     <div class="card">
       <a href="map.html" class="back-link">← Back to Map</a>
       <h1 class="pg-title">My Visited Places</h1>
-      
-      <div id="visited-progress-container" class="progress-section"></div>
-      <div id="visited-list-container"></div>
+      <div class="pg-sub" id="visit-count-sub">0 places visited</div>
+
+      <div id="visited-progress-container"></div>
+
+      <div class="visit-list" id="visit-container"></div>
+      <div class="empty-visit hidden" id="empty-visit">You haven't marked any place as visited yet. Explore the map and check "I visited this place"!</div>
     </div>
 </div>
 
-<!-- Modal Pop-up pour le détail des lieux -->
-<div id="loc-modal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div id="modal-hero" class="modal-hero">
-            <div class="modal-close" onclick="closeLocModal()">&times;</div>
-            <div class="modal-hero-content">
-                <div id="modal-title" class="modal-hero-title">Location Name</div>
-                <div id="modal-meta" class="modal-hero-meta">City, Country</div>
-            </div>
-        </div>
+<!-- MODAL LIEU (rempli par window.openLocModal / closeLocModal du script.js partagé) -->
+<div id="loc-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeLocModal()">&times;</span>
+        <div id="modal-hero"><div id="modal-title"></div></div>
         <div class="modal-body">
-            <p id="modal-desc" style="font-size: 13px; color: #3f495c; line-height: 1.7; margin-bottom: 20px;"></p>
-            <div id="modal-map" style="width:100%; height:200px; border-radius:12px; margin-bottom:15px; background:#e2e8f0; z-index:1;"></div>
-            <a id="modal-map-link" href="#" target="_blank" class="btn-outline-modal">Open in Google Maps</a>
+            <div id="modal-meta"></div>
+            <span class="modal-sub-label">Details</span>
+            <div id="modal-meta-box"></div>
+            <span class="modal-sub-label">About this place</span>
+            <div id="modal-desc"></div>
+            <div id="modal-map"></div>
+            <a id="modal-map-link" href="#" target="_blank" class="modal-map-link">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                Open in Google Maps
+            </a>
         </div>
     </div>
 </div>
 
 <!-- Modal Panier (Cart) -->
-<div id="cart-modal" class="modal-overlay hidden">
-    <div class="modal-box" style="padding: 30px;">
-        <div class="modal-close" style="background:#f1f5f9; color:#212832;" onclick="document.getElementById('cart-modal').classList.add('hidden')">&times;</div>
+<div id="cart-modal-overlay" class="modal hidden">
+    <div class="modal-content" style="max-width:500px; padding:30px;">
+        <span class="close-btn" style="color:#212832; text-shadow:none; top:15px;" onclick="document.getElementById('cart-modal-overlay').classList.add('hidden')">&times;</span>
         <h2 style="color: #D42759; margin-bottom: 20px; font-size:20px;">Unlock Passes</h2>
         <div id="cart-options"></div>
         <div style="font-weight: bold; margin: 20px 0; font-size: 16px; color:#212832;">Total: <span id="cart-price" style="color:#D42759;">0.00 €</span></div>
-        <button class="edit-btn" id="cart-pay-btn" onclick="payCart()" disabled>Select a group</button>
+        <button style="width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer;" id="cart-pay-btn" onclick="payCart()" disabled>Select a group</button>
     </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
 <script>
-    // --- GESTION DES ICÔNES HEADER ---
     function toggleMenu(menuId) {
         document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
         document.getElementById(menuId).classList.toggle('hidden');
@@ -175,7 +207,6 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
     }
     document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
 
-    // Initialisation Avatar
     const savedName = localStorage.getItem('userName') || 'User';
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
@@ -185,11 +216,10 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
 
     // --- GESTION DU PANIER ---
     function openCartModal() {
-        document.getElementById('cart-modal').classList.remove('hidden');
+        document.getElementById('cart-modal-overlay').classList.remove('hidden');
         const optionsDiv = document.getElementById('cart-options');
         const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
         const groups = ['BTS', 'Blackpink', 'Twice', 'Seventeen'];
-        
         optionsDiv.innerHTML = '';
         groups.forEach(g => {
             const isUnlocked = unlockedGroups.includes(g);
@@ -222,95 +252,79 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
         window.location.reload();
     }
 
-    // --- LOGIQUE VISITED ---
-    window.addEventListener('load', () => {
-        const visitedList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-        const progressContainer = document.getElementById('visited-progress-container');
-        const listContainer = document.getElementById('visited-list-container');
-        
-        if (visitedList.length === 0) {
-            progressContainer.innerHTML = '';
-            listContainer.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:30px 0;">You haven\'t visited any places yet.</p>';
+    const starFullSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const starEmptySvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="#e2e8f0" stroke="#e2e8f0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+    function renderProgressBars(visitedIds) {
+        const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        let baseLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
+        if (unlockedGroups.length === 0) baseLocs = celebLocations;
+
+        const groups = [...new Set(baseLocs.map(l => l.group))];
+        const container = document.getElementById('visited-progress-container');
+        container.innerHTML = '';
+
+        groups.forEach(g => {
+            const groupLocs = baseLocs.filter(l => l.group === g);
+            const visitedCount = groupLocs.filter(l => visitedIds.includes(l.id)).length;
+            const pct = groupLocs.length > 0 ? Math.round((visitedCount / groupLocs.length) * 100) : 0;
+            const color = groupColors[g] || '#D42759';
+
+            container.innerHTML += `
+                <div class="progress-row">
+                    <div class="progress-row-top">
+                        <span class="progress-group-name">${g}</span>
+                        <span class="progress-count">${visitedCount} / ${groupLocs.length}</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%; background:${color};"></div></div>
+                </div>
+            `;
+        });
+    }
+
+    function renderVisited() {
+        const vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        const normalized = vList.map(v => (typeof v === 'object' ? v : { id: v }));
+        const visitedIds = normalized.map(v => Number(v.id));
+
+        renderProgressBars(visitedIds);
+
+        const container = document.getElementById('visit-container');
+        const emptyEl = document.getElementById('empty-visit');
+        container.innerHTML = '';
+
+        document.getElementById('visit-count-sub').textContent = `${normalized.length} place${normalized.length > 1 ? 's' : ''} visited`;
+
+        if (normalized.length === 0) {
+            emptyEl.classList.remove('hidden');
             return;
         }
+        emptyEl.classList.add('hidden');
 
-        const groupStats = {};
-        celebLocations.forEach(loc => {
-            if(!groupStats[loc.group]) groupStats[loc.group] = { total: 0, visited: 0, color: groupColors[loc.group] || '#D42759' };
-            groupStats[loc.group].total++;
+        normalized.forEach(v => {
+            const loc = celebLocations.find(l => l.id === Number(v.id));
+            if (!loc) return;
+
+            let starsHtml = '';
+            const rating = v.rating || 0;
+            for (let i = 0; i < 5; i++) { starsHtml += i < rating ? starFullSvg : starEmptySvg; }
+
+            const row = document.createElement('div');
+            row.className = 'visit-row';
+            row.onclick = () => openLocModal(loc.id);
+            row.innerHTML = `
+                <div class="visit-thumb" style="background-image:url('${loc.img || ('https://img.youtube.com/vi/' + loc.ytId + '/hqdefault.jpg')}');"></div>
+                <div>
+                    <div class="visit-name">${loc.name}</div>
+                    <div class="visit-meta">${loc.city}, ${loc.country} &middot; ${v.date || ''}</div>
+                </div>
+                <div class="visit-stars">${starsHtml}</div>
+            `;
+            container.appendChild(row);
         });
-
-        visitedList.forEach(v => {
-            const id = typeof v === 'object' ? v.id : v;
-            const loc = celebLocations.find(l => l.id == id);
-            if(loc && groupStats[loc.group]) groupStats[loc.group].visited++;
-        });
-
-        let progressHtml = '<div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:12px;">Group Progress</div>';
-        for (let group in groupStats) {
-            if (groupStats[group].visited > 0) {
-                const perc = Math.round((groupStats[group].visited / groupStats[group].total) * 100);
-                progressHtml += `
-                    <div class="progress-item">
-                        <div class="progress-header"><span>${group}</span> <span>${groupStats[group].visited}/${groupStats[group].total} (${perc}%)</span></div>
-                        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${perc}%; background: ${groupStats[group].color};"></div></div>
-                    </div>
-                `;
-            }
-        }
-        progressContainer.innerHTML = progressHtml;
-
-        let listHtml = '';
-        visitedList.forEach(v => {
-            const id = typeof v === 'object' ? v.id : v;
-            const dateStr = typeof v === 'object' && v.date ? v.date : "Date unknown";
-            const loc = celebLocations.find(l => l.id == id);
-            if(loc) {
-                listHtml += `
-                    <div class="loc-card" onclick="openLocModal(${loc.id})">
-                        <div class="loc-card-thumb" style="background-image:url('${loc.img}');"></div>
-                        <div class="loc-card-info">
-                            <div class="loc-card-title">${loc.name}</div>
-                            <div class="loc-card-meta">${loc.group} · ${loc.city}, ${loc.country}</div>
-                            <div class="loc-card-date">Visited on: ${dateStr}</div>
-                        </div>
-                    </div>
-                `;
-            }
-        });
-        listContainer.innerHTML = listHtml;
-    });
-
-    // --- POP UP AVEC LEAFLET MAP ---
-    let popupMap = null;
-    let popupMarker = null;
-
-    function openLocModal(id) {
-        const loc = celebLocations.find(l => l.id == id);
-        if(!loc) return;
-        document.getElementById('modal-title').textContent = loc.name;
-        document.getElementById('modal-meta').textContent = `${loc.city}, ${loc.country} • ${loc.category}`;
-        document.getElementById('modal-hero').style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('${loc.img}')`;
-        
-        const desc = loc.fullDescription ? (loc.fullDescription.en || loc.fullDescription) : "No description available.";
-        document.getElementById('modal-desc').innerHTML = desc;
-        document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
-        
-        document.getElementById('loc-modal').classList.remove('hidden');
-
-        setTimeout(() => {
-            if(!popupMap) {
-                popupMap = L.map('modal-map', {zoomControl: false, attributionControl: false}).setView([loc.lat, loc.lng], 15);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(popupMap);
-                popupMarker = L.marker([loc.lat, loc.lng]).addTo(popupMap);
-            } else {
-                popupMap.setView([loc.lat, loc.lng], 15);
-                popupMarker.setLatLng([loc.lat, loc.lng]);
-                popupMap.invalidateSize();
-            }
-        }, 150);
     }
-    function closeLocModal() { document.getElementById('loc-modal').classList.add('hidden'); }
+
+    renderVisited();
 </script>
 </body>
 </html>
