@@ -116,12 +116,12 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
 <div class="universal-icons">
     <div class="dropdown-container">
-        <button id="lang-btn" class="header-icon-btn" onclick="toggleMenu('lang-menu')">
+        <button id="lang-btn" class="header-icon-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </button>
         <div id="lang-menu" class="dropdown-menu hidden">
-            <a href="#" class="dropdown-option">English</a>
-            <a href="#" class="dropdown-option">Français</a>
+            <a href="#" class="dropdown-option" onclick="changeLang('en'); return false;">English</a>
+            <a href="#" class="dropdown-option" onclick="changeLang('fr'); return false;">Français</a>
         </div>
     </div>
     <div class="dropdown-container">
@@ -130,30 +130,30 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         </button>
     </div>
     <div class="dropdown-container">
-        <button id="profile-btn" class="header-icon-btn user-avatar-btn" onclick="toggleMenu('profile-menu')">U</button>
+        <button id="profile-btn" class="header-icon-btn user-avatar-btn">U</button>
         <div id="profile-menu" class="dropdown-menu hidden">
-            <a href="map-destinations.html" class="dropdown-option">Explore Destinations</a>
-            <a href="map-artists.html" class="dropdown-option">Explore Artists</a>
+            <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
+            <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
             <div class="dropdown-divider"></div>
-            <a href="account.html" class="dropdown-option">Your Account</a>
-            <a href="visited.html" class="dropdown-option">My Visited Places</a>
-            <a href="wishlist.html" class="dropdown-option" style="color: #D42759; font-weight: bold;">My Wishlist</a>
-            <a href="trips.html" class="dropdown-option">My Trips</a>
-            <a href="settings.html" class="dropdown-option">Settings</a>
+            <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
+            <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
+            <a href="wishlist.html" class="dropdown-option" style="color: #D42759; font-weight: bold;" data-i18n="wishlistOption">My Wishlist</a>
+            <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
+            <a href="settings.html" class="dropdown-option" data-i18n="settingsOption">Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="index.html" class="dropdown-option" style="color:#D42759; font-weight:bold;">Logout</a>
+            <a href="index.html" class="dropdown-option" id="logout-btn" style="color:#D42759; font-weight:bold;" data-i18n="logoutOption">Logout</a>
         </div>
     </div>
 </div>
 
 <div class="page">
     <div class="card">
-      <a href="map.html" class="back-link">← Back to Map</a>
-      <h1 class="pg-title">My Wishlist</h1>
+      <a href="map.html" class="back-link" data-i18n="backToMap">← Back to Map</a>
+      <h1 class="pg-title" data-i18n="wishTitle">My Wishlist</h1>
       <div class="pg-sub" id="wish-count-sub">0 places saved</div>
 
       <div id="wish-container"></div>
-      <div class="empty-wish hidden" id="empty-wish">You haven't saved any places yet. Explore the map and click "Add to Wishlist"!</div>
+      <div class="empty-wish hidden" id="empty-wish" data-i18n="wishEmpty">You haven't saved any places yet. Explore the map and click "Add to Wishlist"!</div>
     </div>
 </div>
 
@@ -164,15 +164,21 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         <div id="modal-hero"><div id="modal-title"></div></div>
         <div class="modal-body">
             <div id="modal-meta"></div>
-            <span class="modal-sub-label">Details</span>
+            <span class="modal-sub-label" id="modal-details-label">Details</span>
             <div id="modal-meta-box"></div>
-            <span class="modal-sub-label">About this place</span>
+            <span class="modal-sub-label" id="modal-about-label">About this place</span>
             <div id="modal-desc"></div>
             <div id="modal-map"></div>
-            <a id="modal-map-link" href="#" target="_blank" class="modal-map-link">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                Open in Google Maps
-            </a>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a id="modal-map-link" href="#" target="_blank" class="modal-map-link">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span id="modal-map-link-text">Open in Google Maps</span>
+                </a>
+                <a id="modal-more-details" href="map.html" class="modal-map-link" style="border-color:#D42759; color:#D42759;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    More details
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -191,13 +197,6 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
 <script>
-    function toggleMenu(menuId) {
-        document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
-        document.getElementById(menuId).classList.toggle('hidden');
-        event.stopPropagation();
-    }
-    document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
-
     const savedName = localStorage.getItem('userName') || 'User';
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
@@ -251,7 +250,9 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         const emptyEl = document.getElementById('empty-wish');
         container.innerHTML = '';
 
-        document.getElementById('wish-count-sub').textContent = `${wList.length} place${wList.length > 1 ? 's' : ''} saved`;
+        document.getElementById('wish-count-sub').textContent = currentLang === 'fr'
+            ? `${wList.length} lieu${wList.length > 1 ? 'x' : ''} enregistré${wList.length > 1 ? 's' : ''}`
+            : `${wList.length} place${wList.length > 1 ? 's' : ''} saved`;
 
         if (wList.length === 0) {
             emptyEl.classList.remove('hidden');
@@ -271,7 +272,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
         orderedKeys.forEach(key => {
             const trip = trips.find(t => t.id === key);
-            const label = trip ? trip.name : 'Someday / No trip yet';
+            const label = trip ? trip.name : t('wishSomeday');
 
             const titleEl = document.createElement('div');
             titleEl.className = 'wish-group-title';
@@ -309,6 +310,13 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     }
 
     renderWishlist();
+
+    // Recharge la liste (traduction des catégories, du compteur, du libellé "Someday"...) au changement de langue
+    const _wishOriginalChangeLang = window.changeLang;
+    window.changeLang = function(lang) {
+        _wishOriginalChangeLang(lang);
+        renderWishlist();
+    };
 </script>
 </body>
 </html>
