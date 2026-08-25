@@ -109,12 +109,12 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
 
 <div class="universal-icons">
     <div class="dropdown-container">
-        <button id="lang-btn" class="header-icon-btn" onclick="toggleMenu('lang-menu')">
+        <button id="lang-btn" class="header-icon-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </button>
         <div id="lang-menu" class="dropdown-menu hidden">
-            <a href="#" class="dropdown-option">English</a>
-            <a href="#" class="dropdown-option">Français</a>
+            <a href="#" class="dropdown-option" onclick="changeLang('en'); return false;">English</a>
+            <a href="#" class="dropdown-option" onclick="changeLang('fr'); return false;">Français</a>
         </div>
     </div>
     <div class="dropdown-container">
@@ -123,58 +123,58 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
         </button>
     </div>
     <div class="dropdown-container">
-        <button id="profile-btn" class="header-icon-btn user-avatar-btn" onclick="toggleMenu('profile-menu')">U</button>
+        <button id="profile-btn" class="header-icon-btn user-avatar-btn">U</button>
         <div id="profile-menu" class="dropdown-menu hidden">
-            <a href="map-destinations.html" class="dropdown-option">Explore Destinations</a>
-            <a href="map-artists.html" class="dropdown-option">Explore Artists</a>
+            <a href="map-destinations.html" class="dropdown-option" data-i18n="exploreDestOption">Explore Destinations</a>
+            <a href="map-artists.html" class="dropdown-option" data-i18n="exploreArtistsOption">Explore Artists</a>
             <div class="dropdown-divider"></div>
-            <a href="account.html" class="dropdown-option">Your Account</a>
-            <a href="visited.html" class="dropdown-option">My Visited Places</a>
-            <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
-            <a href="trips.html" class="dropdown-option">My Trips</a>
-            <a href="settings.html" class="dropdown-option" style="color: #D42759; font-weight: bold;">Settings</a>
+            <a href="account.html" class="dropdown-option" data-i18n="accountOption">Your Account</a>
+            <a href="visited.html" class="dropdown-option" data-i18n="visitedOption">My Visited Places</a>
+            <a href="wishlist.html" class="dropdown-option" data-i18n="wishlistOption">My Wishlist</a>
+            <a href="trips.html" class="dropdown-option" data-i18n="tripsOption">My Trips</a>
+            <a href="settings.html" class="dropdown-option" style="color: #D42759; font-weight: bold;" data-i18n="settingsOption">Settings</a>
             <div class="dropdown-divider"></div>
-            <a href="index.html" class="dropdown-option" style="color:#D42759; font-weight:bold;">Logout</a>
+            <a href="index.html" class="dropdown-option" id="logout-btn" style="color:#D42759; font-weight:bold;" data-i18n="logoutOption">Logout</a>
         </div>
     </div>
 </div>
 
 <div class="page">
     <div class="card">
-      <a href="map.html" class="back-link">← Back to Map</a>
-      <h1 class="pg-title">Settings</h1>
+      <a href="map.html" class="back-link" data-i18n="backToMap">← Back to Map</a>
+      <h1 class="pg-title" data-i18n="setTitle">Settings</h1>
 
-      <div class="section-title">Account &amp; Security</div>
+      <div class="section-title" data-i18n="setSecurity">Account &amp; Security</div>
       <div class="box-container">
-        <div class="row"><div><div class="row-label">Password</div><div class="row-sub">Last changed 3 months ago</div></div><button class="btn-outline">Change</button></div>
-        <div class="row" style="border-bottom:none;"><div class="row-label">Signed in with</div><div class="provider-badge">Google</div></div>
+        <div class="row"><div><div class="row-label" data-i18n="setPassword">Password</div><div class="row-sub" data-i18n="setPasswordSub">Last changed 3 months ago</div></div><button class="btn-outline" data-i18n="setChange">Change</button></div>
+        <div class="row" style="border-bottom:none;"><div class="row-label" data-i18n="setSignedWith">Signed in with</div><div class="provider-badge">Google</div></div>
       </div>
 
-      <div class="section-title">Preferences</div>
+      <div class="section-title" data-i18n="setPreferences">Preferences</div>
       <div class="box-container">
-        <div class="row"><div class="row-label">Language</div>
+        <div class="row"><div class="row-label" data-i18n="setLanguage">Language</div>
             <select id="lang-select" onchange="changeLanguage(this.value)">
                 <option value="en">English</option>
                 <option value="fr">Français</option>
             </select>
         </div>
-        <div class="row"><div class="row-label">Currency</div><select><option>EUR (€)</option></select></div>
-        <div class="row"><div class="row-label">Distance units</div><select><option>Kilometers</option></select></div>
-        <div class="row"><div class="row-label">Email notifications</div><div class="toggle on" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
-        <div class="row" style="border-bottom:none;"><div class="row-label">Push notifications</div><div class="toggle off" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
+        <div class="row"><div class="row-label" data-i18n="setCurrency">Currency</div><select><option>EUR (€)</option></select></div>
+        <div class="row"><div class="row-label" data-i18n="setUnits">Distance units</div><select><option>Kilometers</option></select></div>
+        <div class="row"><div class="row-label" data-i18n="setEmailNotif">Email notifications</div><div class="toggle on" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
+        <div class="row" style="border-bottom:none;"><div class="row-label" data-i18n="setPushNotif">Push notifications</div><div class="toggle off" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
       </div>
 
-      <div class="section-title">Privacy</div>
+      <div class="section-title" data-i18n="setPrivacy">Privacy</div>
       <div class="box-container">
-        <div class="row"><div class="row-label">Cookie Preferences</div><button class="btn-outline" onclick="resetCookies()">Reset Banners</button></div>
-        <div class="row" style="border-bottom:none;"><div><div class="row-label">Download my data</div><div class="row-sub">Export everything in JSON</div></div><button class="btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</button></div>
+        <div class="row"><div class="row-label" data-i18n="setCookiePrefs">Cookie Preferences</div><button class="btn-outline" onclick="resetCookies()" data-i18n="setResetBanners">Reset Banners</button></div>
+        <div class="row" style="border-bottom:none;"><div><div class="row-label" data-i18n="setDownloadData">Download my data</div><div class="row-sub" data-i18n="setExportSub">Export everything in JSON</div></div><button class="btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span data-i18n="setExport">Export</span></button></div>
       </div>
 
-      <div class="section-title">Danger zone</div>
+      <div class="section-title" data-i18n="setDanger">Danger zone</div>
       <div style="border:1.5px solid #FBD5DC;background:#FFF7F8;border-radius:16px;padding:22px 24px;">
-        <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span style="font-size:13px;font-weight:700;color:#D42759;">Delete account</span></div>
-        <p style="font-size:11.5px;color:#94a3b8;margin-bottom:14px;">This permanently deletes your trips, wishlist and unlocked passes.</p>
-        <button style="width:100%;background:#ef4444;color:#fff;border:none;border-radius:100px;padding:13px;font-size:13.5px;font-weight:700;font-family:'Poppins',sans-serif; cursor:pointer;box-shadow:0 6px 15px rgba(239,68,68,0.2);">Delete Account</button>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span style="font-size:13px;font-weight:700;color:#D42759;" data-i18n="setDeleteAccTitle">Delete account</span></div>
+        <p style="font-size:11.5px;color:#94a3b8;margin-bottom:14px;" data-i18n="setDeleteAccSub">This permanently deletes your trips, wishlist and unlocked passes.</p>
+        <button style="width:100%;background:#ef4444;color:#fff;border:none;border-radius:100px;padding:13px;font-size:13.5px;font-weight:700;font-family:'Poppins',sans-serif; cursor:pointer;box-shadow:0 6px 15px rgba(239,68,68,0.2);" data-i18n="setDeleteAccBtn">Delete Account</button>
       </div>
     </div>
 </div>
@@ -192,13 +192,6 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
 
 <script src="script.js"></script>
 <script>
-    function toggleMenu(menuId) {
-        document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
-        document.getElementById(menuId).classList.toggle('hidden');
-        event.stopPropagation();
-    }
-    document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
-
     const savedName = localStorage.getItem('userName') || 'User';
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
@@ -254,8 +247,16 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
     }
     function resetCookies() {
         localStorage.removeItem('cookiesAccepted');
-        alert('Cookie banner has been reset. It will appear next time you open the site.');
+        alert(currentLang === 'fr' ? 'La bannière de cookies a été réinitialisée. Elle réapparaîtra à la prochaine ouverture du site.' : 'Cookie banner has been reset. It will appear next time you open the site.');
     }
+
+    // Garde le sélecteur "Language" des Préférences synchronisé avec le bouton de langue du header
+    const _setOriginalChangeLang = window.changeLang;
+    window.changeLang = function(lang) {
+        _setOriginalChangeLang(lang);
+        const selEl = document.getElementById('lang-select');
+        if(selEl) selEl.value = lang;
+    };
 </script>
 </body>
 </html>
