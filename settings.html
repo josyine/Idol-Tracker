@@ -5,57 +5,59 @@
 <title>Screen To Street — Settings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
 a{text-decoration:none;}
-body{background:#E7E9EC;padding:0; height:100vh; overflow-y:auto;}
+body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:auto;}
+.hidden { display: none !important; }
 
-.hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; }
+/* FOND ANIMÉ */
+.hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; }
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: float 12s infinite ease-in-out alternate; }
 .blob-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: #e3d5f8; }
 .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
 .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
 
-.top-nav-standalone { position: fixed; top: 0; left: 0; width: 100%; height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px 0 20px; z-index: 2000; background: transparent; }
-.header-left { width: 360px; display: flex; align-items: center; padding-top: 5px; }
-.brand-row { text-decoration: none; display: flex; align-items: center; cursor: pointer; gap: 12px; }
+/* HEADER (FIXE ET ALIGNÉ COMME MAP.HTML) */
+.universal-logo { position: fixed; top: 25px; left: 20px; z-index: 2000; display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
 .tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
-.header-right { display: flex; align-items: center; gap: 14px; }
-.dropdown-container { position: relative; display: inline-block; z-index: 3000; }
-.header-icon-btn { width: 42px; height: 42px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #2E3644; border: 1px solid #cbd5e1; cursor: pointer; transition: 0.2s; font-size: 16px; font-weight: bold; box-shadow: 0 4px 14px rgba(80,60,120,.05); }
-.header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: #D42759; transform: translateY(-2px);}
-.user-avatar-btn { color: #000000 !important; overflow: hidden; padding: 0;}
 
-.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 4000; }
+.universal-icons { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; gap: 9px; align-items: center; }
+.dropdown-container { position: relative; display: inline-block; }
+.header-icon-btn { width: 40px; height: 40px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #2E3644; border: none; cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: bold; box-shadow: 0 4px 14px rgba(80,60,120,.1); }
+.header-icon-btn:hover { background: #f1f5f9; color: #D42759; }
+.user-avatar-btn { color: #000 !important; overflow: hidden; padding: 0; border: 1px solid #cbd5e1; }
+
+.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 3000; }
 .dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: #1e293b; transition: 0.2s; border-radius: 8px; display: block; text-align: left; text-decoration: none;}
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-.page { padding: 120px 20px 80px 20px; position: relative; z-index: 10; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); }
+/* CENTRAGE ET AGRANDISSEMENT */
+.page { position: relative; z-index: 10; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; }
+.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 800px; box-shadow: 0 15px 40px rgba(80,60,120,.08); margin: 0 auto; }
 
-.back-link { color: #D42759; font-weight: 700; font-size: 13.5px; }
+.back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
 .back-link:hover { text-decoration: underline; }
-h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: center; margin: 16px 0 30px 0; }
+h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 30px 0; }
 
 .row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #f1f5f9;}
-.row-label{font-size:14px;font-weight:700;color:#212832;}
-.row-sub{font-size:11px;color:#94a3b8;margin-top:2px;}
-select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 14px;font-size:12.5px;color:#334155;font-family:'Poppins',sans-serif;outline:none;background:#f8fafc;cursor:pointer;}
-.toggle{width:42px;height:24px;border-radius:100px;position:relative;cursor:pointer;flex-shrink:0;transition:0.3s;}
+.row-label{font-size:14.5px;font-weight:700;color:#212832;}
+.row-sub{font-size:11.5px;color:#94a3b8;margin-top:2px;}
+select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13px;color:#334155;font-family:'Poppins',sans-serif;outline:none;background:#f8fafc;cursor:pointer;}
+.toggle{width:46px;height:26px;border-radius:100px;position:relative;cursor:pointer;flex-shrink:0;transition:0.3s;}
 .toggle.on{background:#D42759;}
 .toggle.off{background:#e2e8f0;}
-.toggle::after{content:'';position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:0.3s;}
+.toggle::after{content:'';position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:0.3s;}
 .toggle.on::after{right:3px;}
 .toggle.off::after{left:3px;}
-.btn-outline{border:1.5px solid #cbd5e1;color:#334155;font-size:12px;font-weight:700;padding:9px 16px;border-radius:100px;background:#fff;cursor:pointer;transition:0.2s;}
+.btn-outline{border:1.5px solid #cbd5e1;color:#334155;font-size:12.5px;font-weight:700;padding:10px 18px;border-radius:100px;background:#fff;cursor:pointer;transition:0.2s;}
 .btn-outline:hover { border-color:#D42759; color:#D42759;}
-.section-title{font-size:11px;font-weight:700;letter-spacing:.6px;color:#94a3b8;text-transform:uppercase;margin-bottom:12px;}
-.provider-badge{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#334155;background:#f8fafc;padding:6px 14px;border-radius:100px;border:1px solid #e2e8f0;}
-.box-container { border: 1px solid #ECE7F3; border-radius: 16px; padding: 6px 24px; margin-bottom: 22px; background: #fff; }
+.section-title{font-size:11.5px;font-weight:700;letter-spacing:.6px;color:#94a3b8;text-transform:uppercase;margin-bottom:12px;}
+.provider-badge{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#334155;background:#f8fafc;padding:8px 16px;border-radius:100px;border:1px solid #e2e8f0;}
+.box-container { border: 1px solid #ECE7F3; border-radius: 16px; padding: 10px 26px; margin-bottom: 24px; background: #fff; }
 </style>
 <script>
     if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
@@ -68,44 +70,41 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 14px;font-size:12.
     <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
 </div>
 
-<div class="top-nav-standalone">
-    <div class="header-left">
-        <a href="map.html" class="brand-row">
-            <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
-                <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
-                <circle cx="200" cy="150" r="26" fill="#D42759"/>
-            </svg>
-            <div>
-                <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
-                <div class="tagline">Following the footsteps of your favorite artists</div>
-            </div>
-        </a>
+<a href="map.html" class="universal-logo">
+    <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
+        <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+        <circle cx="200" cy="150" r="26" fill="#D42759"/>
+    </svg>
+    <div>
+        <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
+        <div class="tagline">Following the footsteps of your favorite artists</div>
     </div>
-    <div class="header-right">
-        <div class="dropdown-container">
-            <button id="lang-btn" class="header-icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></button>
-            <div id="lang-menu" class="dropdown-menu hidden">
-                <a href="#" class="dropdown-option">English</a>
-                <a href="#" class="dropdown-option">Français</a>
-            </div>
+</a>
+
+<div class="universal-icons">
+    <div class="dropdown-container">
+        <button id="lang-btn" class="header-icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></button>
+        <div id="lang-menu" class="dropdown-menu hidden">
+            <a href="#" class="dropdown-option">English</a>
+            <a href="#" class="dropdown-option">Français</a>
         </div>
-        <div class="dropdown-container">
-            <button class="header-icon-btn" onclick="window.location.href='map.html';"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>
-        </div>
-        <div class="dropdown-container">
-            <button id="profile-btn" class="header-icon-btn user-avatar-btn">U</button>
-            <div id="profile-menu" class="dropdown-menu hidden">
-                <a href="map-destinations.html" class="dropdown-option">Explore Destinations</a>
-                <a href="map-artists.html" class="dropdown-option">Explore Artists</a>
-                <div class="dropdown-divider"></div>
-                <a href="account.html" class="dropdown-option">Your Account</a>
-                <a href="visited.html" class="dropdown-option">My Visited Places</a>
-                <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
-                <a href="trips.html" class="dropdown-option">My Trips</a>
-                <a href="settings.html" class="dropdown-option" style="color: #D42759; font-weight: bold;">Settings</a>
-                <div class="dropdown-divider"></div>
-                <a href="index.html" class="dropdown-option" style="color:#D42759; font-weight:bold;">Logout</a>
-            </div>
+    </div>
+    <div class="dropdown-container">
+        <button class="header-icon-btn" onclick="window.location.href='map.html';"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>
+    </div>
+    <div class="dropdown-container">
+        <button id="profile-btn" class="header-icon-btn user-avatar-btn">U</button>
+        <div id="profile-menu" class="dropdown-menu hidden">
+            <a href="map-destinations.html" class="dropdown-option">Explore Destinations</a>
+            <a href="map-artists.html" class="dropdown-option">Explore Artists</a>
+            <div class="dropdown-divider"></div>
+            <a href="account.html" class="dropdown-option">Your Account</a>
+            <a href="visited.html" class="dropdown-option">My Visited Places</a>
+            <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
+            <a href="trips.html" class="dropdown-option">My Trips</a>
+            <a href="settings.html" class="dropdown-option" style="color: #D42759; font-weight: bold;">Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="index.html" class="dropdown-option" style="color:#D42759; font-weight:bold;">Logout</a>
         </div>
     </div>
 </div>
@@ -123,7 +122,12 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 14px;font-size:12.
 
       <div class="section-title">Preferences</div>
       <div class="box-container">
-        <div class="row"><div class="row-label">Language</div><select><option>English</option></select></div>
+        <div class="row"><div class="row-label">Language</div>
+            <select id="lang-select" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
         <div class="row"><div class="row-label">Currency</div><select><option>EUR (€)</option></select></div>
         <div class="row"><div class="row-label">Distance units</div><select><option>Kilometers</option></select></div>
         <div class="row"><div class="row-label">Email notifications</div><div class="toggle on" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
@@ -132,7 +136,7 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 14px;font-size:12.
 
       <div class="section-title">Privacy</div>
       <div class="box-container">
-        <div class="row"><div class="row-label">Cookie Preferences</div><button class="btn-outline">Reset Banners</button></div>
+        <div class="row"><div class="row-label">Cookie Preferences</div><button class="btn-outline" onclick="resetCookies()">Reset Banners</button></div>
         <div class="row" style="border-bottom:none;"><div><div class="row-label">Download my data</div><div class="row-sub">Export everything in JSON</div></div><button class="btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</button></div>
       </div>
 
@@ -140,12 +144,23 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 14px;font-size:12.
       <div style="border:1.5px solid #FBD5DC;background:#FFF7F8;border-radius:16px;padding:22px 24px;">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span style="font-size:13px;font-weight:700;color:#D42759;">Delete account</span></div>
         <p style="font-size:11.5px;color:#94a3b8;margin-bottom:14px;">This permanently deletes your trips, wishlist and unlocked passes.</p>
-        <button style="width:100%;background:#D42759;color:#fff;border:none;border-radius:100px;padding:13px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif; cursor:pointer;">Delete Account</button>
+        <button style="width:100%;background:#ef4444;color:#fff;border:none;border-radius:100px;padding:13px;font-size:13.5px;font-weight:700;font-family:'Poppins',sans-serif; cursor:pointer;box-shadow:0 6px 15px rgba(239,68,68,0.2);">Delete Account</button>
       </div>
-    </div></div>
+    </div>
+</div>
 
-<script src="script.js"></script>
 <script>
+    // Initialisation des icônes
+    const savedName = localStorage.getItem('userName') || 'User';
+    const savedPic = localStorage.getItem('userPhoto');
+    document.querySelectorAll('.user-avatar-btn').forEach(btn => {
+        if(savedPic) {
+            btn.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+            btn.textContent = savedName.charAt(0).toUpperCase();
+        }
+    });
+
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -157,6 +172,20 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:9px 14px;font-size:12.
         });
     });
     document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
+
+    // Logique Settings
+    const savedLang = localStorage.getItem('lang') || 'en';
+    const sel = document.getElementById('lang-select');
+    if(sel) sel.value = savedLang;
+
+    function changeLanguage(val) {
+        localStorage.setItem('lang', val);
+        window.location.reload();
+    }
+    function resetCookies() {
+        localStorage.removeItem('cookiesAccepted');
+        alert('Cookie banner has been reset. It will appear next time you open the site.');
+    }
 </script>
 </body>
 </html>
