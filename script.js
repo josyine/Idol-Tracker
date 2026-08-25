@@ -446,7 +446,7 @@ window.switchMainTab = function(tabName) {
     }
 }
 
-// NOUVELLE FONCTION POUR LE MENU DÉROULANT CUSTOM
+// DROPDOWN CUSTOM POUR LA SELECTION DE VOYAGE (SANS INJECTION HTML DANGEREUSE)
 window.toggleTripDropdown = function(e) {
     if(e) e.stopPropagation();
     const dropdown = document.getElementById('trip-dropdown-list');
@@ -485,14 +485,22 @@ window.loadItineraryTabOptions = function() {
             let durationTxt = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.days ? t.days.length : 0} Days`;
             let locsTxt = `${allAssignedIds.length} location${allAssignedIds.length > 1 ? 's' : ''}`;
             
-            let safeName = t.name.replace(/'/g, "\\'");
+            // Création d'élément dynamique pour éviter tout bug lié aux apostrophes/guillemets dans le nom du trip
+            let opt = document.createElement('div');
+            opt.className = 'trip-option';
+            opt.onclick = () => selectCustomTrip(t.id, t.name);
             
-            dropdownList.innerHTML += `
-                <div class="trip-option" onclick="selectCustomTrip('${t.id}', '${safeName}')">
-                    <div class="trip-opt-name">${t.name}</div>
-                    <div class="trip-opt-meta">${durationTxt} · ${locsTxt}</div>
-                </div>
-            `;
+            let nameDiv = document.createElement('div');
+            nameDiv.className = 'trip-opt-name';
+            nameDiv.textContent = t.name;
+            
+            let metaDiv = document.createElement('div');
+            metaDiv.className = 'trip-opt-meta';
+            metaDiv.innerHTML = `${durationTxt} &middot; ${locsTxt}`;
+            
+            opt.appendChild(nameDiv);
+            opt.appendChild(metaDiv);
+            dropdownList.appendChild(opt);
         });
     } else {
         dropdownList.innerHTML = `<div style="padding: 12px; font-size:13px; color:#94a3b8; text-align:center;">${currentLang === 'fr' ? 'Aucun voyage trouvé.' : 'No trips found.'}</div>`;
@@ -507,7 +515,6 @@ window.selectCustomTrip = function(tripId, tripName) {
     if(label) {
         label.textContent = tripName;
         label.style.color = '#1e293b';
-        label.style.fontWeight = '600';
     }
     
     window.toggleTripDropdown();
@@ -597,9 +604,8 @@ window.clearTripFromMainMap = function() {
     
     const label = document.getElementById('trip-select-label');
     if(label) {
-        label.textContent = currentLang === 'fr' ? 'Sélectionner un voyage...' : 'Select a trip...';
+        label.textContent = currentLang === 'fr' ? 'Sélectionner un voyage' : 'Select a trip to view';
         label.style.color = '#64748b';
-        label.style.fontWeight = '500';
     }
     const dropdown = document.getElementById('trip-dropdown-list');
     if(dropdown) dropdown.classList.add('hidden');
@@ -1611,6 +1617,7 @@ window.renderTrip = function() {
         return true;
     });
 
+    // Ne garder dans unassignedLocs QUE les lieux qui sont explicitement dans wishlistLocs pour ce voyage ET qui ne sont pas déjà assignés.
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     let unassignedLocs = wList
         .filter(w => w.tripId === currentTrip.id && !allAssignedIds.includes(Number(w.id)))
@@ -1666,6 +1673,7 @@ window.renderTrip = function() {
     
     if(tripCountries.length > 0) {
         celebLocations.forEach(loc => {
+            // Recommandation si: même pays + PAS assigné à un jour + PAS déjà dans unassignedLocs
             if (tripCountries.includes(loc.country) && !allAssignedIds.includes(loc.id) && !unassignedLocs.some(u=>u.id===loc.id)) {
                 if (recoCount < 4) {
                     recoList.innerHTML += `
@@ -1692,8 +1700,8 @@ window.switchEditDateTab = function(tab) {
     if(tab === 'specific') {
         document.getElementById('edit-date-specific-panel').classList.remove('hidden');
         document.getElementById('edit-date-flexible-panel').classList.add('hidden');
-        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.add('active');
-        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.remove('active');
+        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.remove('active');
+        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.add('active');
     } else {
         document.getElementById('edit-date-specific-panel').classList.add('hidden');
         document.getElementById('edit-date-flexible-panel').classList.remove('hidden');
