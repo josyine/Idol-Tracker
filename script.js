@@ -2149,10 +2149,19 @@ window.confirmRemoveLoc = function() {
     
     currentTrip.days = currentTrip.days.map(day => day.filter(id => Number(id) !== locToRemoveData.id));
 
-    window.saveTrip(); 
+    // Important : on persiste directement le voyage mis à jour AVANT de ré-appeler renderTrip().
+    // On n'utilise pas saveTrip() ici, car elle reconstruit currentTrip.days en relisant le DOM
+    // (qui contient encore l'ancien lieu tant que renderTrip() n'a pas tourné), ce qui annulait
+    // silencieusement la suppression qu'on vient de faire.
+    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
+    if(tripIndex !== -1) trips[tripIndex] = currentTrip;
+    localStorage.setItem('myTrips', JSON.stringify(trips));
+
     closeModal('remove-loc-modal');
     locToRemoveData = null;
-    window.renderTrip(); 
+    window.renderTrip();
+    window.renderTripsSidebar();
 }
 
 window.quickAddLoc = function(locId) {
