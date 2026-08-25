@@ -2,11 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Wishlist - Screen To Street</title>
+<title>Screen To Street — My Wishlist</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
 a{text-decoration:none;}
@@ -32,44 +32,70 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: #D42759; transform: translateY(-2px);}
 .user-avatar-btn { color: #000000 !important; overflow: hidden; padding: 0;}
 
-.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 3000; }
+.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
 .dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: #1e293b; transition: 0.2s; border-radius: 8px; display: block; text-align: left; text-decoration: none;}
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL */
+/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL — agrandi et harmonisé avec les autres pages */
 .page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; pointer-events: none; }
-.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
+.card { background: #fff; border-radius: 20px; padding: 50px 60px; width: 100%; max-width: 960px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
 
 .back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
 .back-link:hover { text-decoration: underline; }
-h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 30px 0; }
+h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 8px 0; }
+.pg-sub { text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 30px; }
 
-.loc-card { display: flex; gap: 16px; background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 14px; align-items: center; cursor: pointer; transition: 0.2s;}
-.loc-card:hover { border-color: #D42759; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,39,89,0.1); }
-.loc-card-thumb { width: 64px; height: 64px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
-.loc-card-info { flex: 1; }
-.loc-card-title { font-size: 15px; font-weight: 700; color: #212832; margin-bottom: 4px; }
-.loc-card-meta { font-size: 12px; color: #64748b; font-weight: 500; }
-.loc-trip-badge { font-size: 10.5px; font-weight: 700; background: #FCE7F0; color: #D42759; padding: 3px 8px; border-radius: 6px; margin-top: 6px; display: inline-block; border: 1px solid #fbcfe8;}
-.remove-btn { background: #fee2e2; color: #ef4444; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;}
-.remove-btn:hover { background: #ef4444; color: white; }
+.wish-group-title { font-size: 12px; font-weight: 700; letter-spacing: .6px; color: #94a3b8; text-transform: uppercase; margin: 26px 0 12px 0; }
+.wish-group-title:first-of-type { margin-top: 0; }
+.wish-list { display: flex; flex-direction: column; gap: 10px; }
+.wish-row { display: flex; gap: 14px; align-items: center; background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 16px; cursor: pointer; transition: 0.2s; }
+.wish-row:hover { border-color: #D42759; background: #fff; box-shadow: 0 6px 16px rgba(80,60,120,.06); }
+.wish-thumb { width: 56px; height: 56px; border-radius: 12px; background-size: cover; background-position: center; flex-shrink: 0; }
+.wish-name { font-size: 14.5px; font-weight: 700; color: #212832; }
+.wish-meta { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+.wish-remove { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #94a3b8; transition: 0.2s; flex-shrink: 0; }
+.wish-remove:hover { background: #fef2f2; color: #ef4444; }
+.empty-wish { text-align: center; color: #94a3b8; font-size: 13.5px; padding: 60px 0; }
 
-/* CSS DU POPUP DES LIEUX ET CART */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; pointer-events: auto; }
-.modal-box { background: white; width: 90%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto;}
-.modal-hero { height: 200px; background-size: cover; background-position: center; position: relative; }
-.modal-close { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s;}
-.modal-close:hover { background: #D42759; }
-.modal-hero-content { position: absolute; bottom: 20px; left: 20px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-.modal-hero-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.modal-hero-meta { font-size: 12px; font-weight: 600; opacity: 0.9; }
-.modal-body { padding: 25px; }
-.btn-outline-modal { display: block; text-align: center; border: 1.5px solid #cbd5e1; color: #334155; font-size: 13px; font-weight: 700; padding: 12px; border-radius: 100px; transition: 0.2s; text-decoration: none;}
-.btn-outline-modal:hover { border-color: #D42759; color: #D42759; }
-.edit-btn { width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer; transition:0.2s; }
-.edit-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+/* MODAL LIEU (identique à la charte de map.html) */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: white; width: 90%; max-width: 560px; max-height: 90vh; border-radius: 16px; overflow-y: auto; position: relative; }
+.close-btn { position: absolute; top: 12px; right: 18px; font-size: 2rem; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.4); cursor: pointer; z-index: 10; }
+#modal-hero { height: 220px; background-size: cover; background-position: center; border-radius: 16px 16px 0 0; display: flex; align-items: flex-end; padding: 20px; }
+#modal-title { color: #fff; font-size: 22px; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.modal-body { padding: 22px 26px 28px 26px; }
+#modal-meta { font-size: 12.5px; color: #D42759; font-weight: 700; margin-bottom: 16px; }
+.modal-sub-label { font-size: 10px; font-weight: 700; letter-spacing: .8px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; display: block; }
+#modal-meta-box { background: #f8fafc; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 12.5px; line-height: 2; color: #334155; }
+#modal-desc { font-size: 13px; line-height: 1.8; color: #3f495c; margin-bottom: 18px; }
+#modal-map { width: 100%; height: 200px; border-radius: 12px; margin-bottom: 16px; }
+.modal-map-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #2E3644; font-size: 12.5px; font-weight: 600; transition: .2s; }
+.modal-map-link:hover { border-color: #D42759; color: #D42759; }
+
+/* ==========================================
+   RESPONSIVE MOBILE (n'affecte pas le desktop)
+   ========================================== */
+@media (max-width: 760px) {
+  .universal-logo { top: 14px; left: 14px; gap: 8px; }
+  .universal-logo svg { width: 32px; height: 32px; }
+  .universal-logo .tagline { display: none; }
+  .universal-logo .brand-text { font-size: 15px; }
+  .universal-icons { top: 14px; right: 14px; gap: 6px; }
+  .header-icon-btn { width: 36px; height: 36px; }
+
+  .page { padding: 92px 12px 50px 12px; }
+  .card { padding: 26px 18px; border-radius: 16px; }
+  h1.pg-title { font-size: 22px; }
+  .wish-thumb { width: 46px; height: 46px; }
+  .modal-body { padding: 18px 18px 22px 18px; }
+  #modal-hero { height: 170px; }
+}
 </style>
+<script>
+    if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
+    document.documentElement.style.setProperty('--sync-t', ((Date.now() - parseInt(sessionStorage.getItem('bgSyncTime'))) / 1000) + 's');
+</script>
 </head>
 <body>
 
@@ -124,36 +150,41 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     <div class="card">
       <a href="map.html" class="back-link">← Back to Map</a>
       <h1 class="pg-title">My Wishlist</h1>
-      <div id="wishlist-container"></div>
+      <div class="pg-sub" id="wish-count-sub">0 places saved</div>
+
+      <div id="wish-container"></div>
+      <div class="empty-wish hidden" id="empty-wish">You haven't saved any places yet. Explore the map and click "Add to Wishlist"!</div>
     </div>
 </div>
 
-<!-- Modal Pop-up pour le détail des lieux -->
-<div id="loc-modal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div id="modal-hero" class="modal-hero">
-            <div class="modal-close" onclick="closeLocModal()">&times;</div>
-            <div class="modal-hero-content">
-                <div id="modal-title" class="modal-hero-title">Location Name</div>
-                <div id="modal-meta" class="modal-hero-meta">City, Country</div>
-            </div>
-        </div>
+<!-- MODAL LIEU (rempli par window.openLocModal / closeLocModal du script.js partagé) -->
+<div id="loc-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeLocModal()">&times;</span>
+        <div id="modal-hero"><div id="modal-title"></div></div>
         <div class="modal-body">
-            <p id="modal-desc" style="font-size: 13px; color: #3f495c; line-height: 1.7; margin-bottom: 20px;"></p>
-            <div id="modal-map" style="width:100%; height:200px; border-radius:12px; margin-bottom:15px; background:#e2e8f0; z-index:1;"></div>
-            <a id="modal-map-link" href="#" target="_blank" class="btn-outline-modal">Open in Google Maps</a>
+            <div id="modal-meta"></div>
+            <span class="modal-sub-label">Details</span>
+            <div id="modal-meta-box"></div>
+            <span class="modal-sub-label">About this place</span>
+            <div id="modal-desc"></div>
+            <div id="modal-map"></div>
+            <a id="modal-map-link" href="#" target="_blank" class="modal-map-link">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                Open in Google Maps
+            </a>
         </div>
     </div>
 </div>
 
 <!-- Modal Panier (Cart) -->
-<div id="cart-modal" class="modal-overlay hidden">
-    <div class="modal-box" style="padding: 30px;">
-        <div class="modal-close" style="background:#f1f5f9; color:#212832;" onclick="document.getElementById('cart-modal').classList.add('hidden')">&times;</div>
+<div id="cart-modal-overlay" class="modal hidden">
+    <div class="modal-content" style="max-width:500px; padding:30px;">
+        <span class="close-btn" style="color:#212832; text-shadow:none; top:15px;" onclick="document.getElementById('cart-modal-overlay').classList.add('hidden')">&times;</span>
         <h2 style="color: #D42759; margin-bottom: 20px; font-size:20px;">Unlock Passes</h2>
         <div id="cart-options"></div>
         <div style="font-weight: bold; margin: 20px 0; font-size: 16px; color:#212832;">Total: <span id="cart-price" style="color:#D42759;">0.00 €</span></div>
-        <button class="edit-btn" id="cart-pay-btn" onclick="payCart()" disabled>Select a group</button>
+        <button style="width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer;" id="cart-pay-btn" onclick="payCart()" disabled>Select a group</button>
     </div>
 </div>
 
@@ -176,7 +207,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
     // --- GESTION DU PANIER ---
     function openCartModal() {
-        document.getElementById('cart-modal').classList.remove('hidden');
+        document.getElementById('cart-modal-overlay').classList.remove('hidden');
         const optionsDiv = document.getElementById('cart-options');
         const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
         const groups = ['BTS', 'Blackpink', 'Twice', 'Seventeen'];
@@ -212,85 +243,72 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         window.location.reload();
     }
 
-    // --- LOGIQUE WISHLIST ---
-    window.addEventListener('load', () => { renderWishlist(); });
-
+    // --- LISTE DE LA WISHLIST (groupée par voyage) ---
     function renderWishlist() {
         const wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-        const myTrips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-        const container = document.getElementById('wishlist-container');
-        
+        const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+        const container = document.getElementById('wish-container');
+        const emptyEl = document.getElementById('empty-wish');
+        container.innerHTML = '';
+
+        document.getElementById('wish-count-sub').textContent = `${wList.length} place${wList.length > 1 ? 's' : ''} saved`;
+
         if (wList.length === 0) {
-            container.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:30px 0;">Your wishlist is empty.</p>';
+            emptyEl.classList.remove('hidden');
             return;
         }
+        emptyEl.classList.add('hidden');
 
-        let html = '';
+        // Groupement par tripId ("none" = "Someday")
+        const groups = {};
         wList.forEach(w => {
-            const loc = celebLocations.find(l => l.id == w.id);
-            if(loc) {
-                let tripBadge = '';
-                if(w.tripId && w.tripId !== 'none') {
-                    const trip = myTrips.find(t => t.id === w.tripId);
-                    if(trip) tripBadge = `<div class="loc-trip-badge">Prévu pour : ${trip.name}</div>`;
-                } else {
-                    tripBadge = `<div class="loc-trip-badge" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">Aucun voyage prévu</div>`;
-                }
-
-                html += `
-                    <div class="loc-card" onclick="openLocModal(${loc.id})">
-                        <div class="loc-card-thumb" style="background-image:url('${loc.img}');"></div>
-                        <div class="loc-card-info">
-                            <div class="loc-card-title">${loc.name}</div>
-                            <div class="loc-card-meta">${loc.group} · ${loc.city}, ${loc.country}</div>
-                            ${tripBadge}
-                        </div>
-                        <button class="remove-btn" onclick="removeWishlist(event, ${loc.id})">Remove</button>
-                    </div>
-                `;
-            }
+            const key = w.tripId && w.tripId !== 'none' ? w.tripId : 'none';
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(w);
         });
-        container.innerHTML = html;
+
+        const orderedKeys = Object.keys(groups).sort((a, b) => (a === 'none' ? 1 : b === 'none' ? -1 : 0));
+
+        orderedKeys.forEach(key => {
+            const trip = trips.find(t => t.id === key);
+            const label = trip ? trip.name : 'Someday / No trip yet';
+
+            const titleEl = document.createElement('div');
+            titleEl.className = 'wish-group-title';
+            titleEl.textContent = label;
+            container.appendChild(titleEl);
+
+            const listEl = document.createElement('div');
+            listEl.className = 'wish-list';
+
+            groups[key].forEach(w => {
+                const loc = celebLocations.find(l => l.id === Number(w.id));
+                if (!loc) return;
+                const row = document.createElement('div');
+                row.className = 'wish-row';
+                row.onclick = () => openLocModal(loc.id);
+                row.innerHTML = `
+                    <div class="wish-thumb" style="background-image:url('${loc.img || ('https://img.youtube.com/vi/' + loc.ytId + '/hqdefault.jpg')}');"></div>
+                    <div>
+                        <div class="wish-name">${loc.name}</div>
+                        <div class="wish-meta">${loc.city}, ${loc.country} &middot; ${getCatName(loc.category)}</div>
+                    </div>
+                    <div class="wish-remove" onclick="event.stopPropagation(); removeFromWishlist(${loc.id}, '${key}');">✕</div>
+                `;
+                listEl.appendChild(row);
+            });
+            container.appendChild(listEl);
+        });
     }
 
-    function removeWishlist(event, id) {
-        event.stopPropagation();
+    function removeFromWishlist(id, tripId) {
         let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
-        wList = wList.filter(w => w.id != id);
+        wList = wList.filter(w => !(Number(w.id) === Number(id) && ((w.tripId && w.tripId !== 'none' ? w.tripId : 'none') === tripId)));
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
         renderWishlist();
     }
 
-    // --- POP UP AVEC LEAFLET MAP ---
-    let popupMap = null;
-    let popupMarker = null;
-
-    function openLocModal(id) {
-        const loc = celebLocations.find(l => l.id == id);
-        if(!loc) return;
-        document.getElementById('modal-title').textContent = loc.name;
-        document.getElementById('modal-meta').textContent = `${loc.city}, ${loc.country} • ${loc.category}`;
-        document.getElementById('modal-hero').style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('${loc.img}')`;
-        
-        const desc = loc.fullDescription ? (loc.fullDescription.en || loc.fullDescription) : "No description available.";
-        document.getElementById('modal-desc').innerHTML = desc;
-        document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
-        
-        document.getElementById('loc-modal').classList.remove('hidden');
-
-        setTimeout(() => {
-            if(!popupMap) {
-                popupMap = L.map('modal-map', {zoomControl: false, attributionControl: false}).setView([loc.lat, loc.lng], 15);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(popupMap);
-                popupMarker = L.marker([loc.lat, loc.lng]).addTo(popupMap);
-            } else {
-                popupMap.setView([loc.lat, loc.lng], 15);
-                popupMarker.setLatLng([loc.lat, loc.lng]);
-                popupMap.invalidateSize();
-            }
-        }, 150);
-    }
-    function closeLocModal() { document.getElementById('loc-modal').classList.add('hidden'); }
+    renderWishlist();
 </script>
 </body>
 </html>
