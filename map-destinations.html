@@ -1,271 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Screen To Street — Destinations (Map View)</title>
+<title>Explore Destinations - Screen To Street</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
-  a{text-decoration:none; cursor:pointer;}
-  
-  body{background:#E7E9EC;padding:50px 0 100px 0; min-height: 100vh;}
-  .hidden { display: none !important; }
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+a{text-decoration:none;}
+body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:auto;}
+.hidden { display: none !important; }
 
-  /* Le cadre façon "fenêtre sur la carte" */
-  .frame{width:900px;max-width:96vw;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(80,60,120,.08); background:linear-gradient(150deg,#FAF8FE 0%,#F1EBFA 50%,#E9DFF6 100%); padding:44px 46px 50px 46px;}
-  .back-link{color:#D42759;font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;gap:6px; cursor:pointer; margin-bottom: 20px;}
-  .back-link:hover{text-decoration:underline;}
-  h1.pg-title{font-size:28px;font-weight:700;color:#D42759;text-align:center;}
-  .underline{width:46px;height:3px;background:#D42759;border-radius:3px;margin:14px auto 30px auto;}
+/* FOND ANIMÉ */
+.hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; }
+@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: float 12s infinite ease-in-out alternate; }
+.blob-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: #e3d5f8; }
+.blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
+.blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
 
-  .stats-bar { display: flex; margin-bottom: 34px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); border-radius: 16px; padding: 18px 0; box-shadow: 0 4px 15px rgba(80,60,120,.03); }
-  .stat { flex: 1; text-align: center; border-right: 1px solid rgba(148, 163, 184, 0.3); }
-  .stat:last-child { border-right: none; }
-  .stat-num { font-size: 22px; font-weight: 800; color: #D42759; }
-  .stat-label { font-size: 10.5px; font-weight: 700; color: #5B6472; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+/* HEADER SEPARÉ POUR LE Z-INDEX */
+.universal-logo { position: fixed; top: 25px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
+.brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
+.tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
 
-  .row { display: flex; align-items: stretch; gap: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; margin-bottom: 22px; overflow: hidden; cursor: pointer; transition: box-shadow .2s, transform .2s; }
-  .row:hover { box-shadow: 0 16px 40px rgba(80,60,120,.12); transform: translateY(-2px); }
-  .row-photo { width: 38%; min-height: 260px; background-size: cover; background-position: center; flex-shrink: 0; position: relative; }
-  .row-photo-badge { position: absolute; top: 16px; left: 16px; background: #fff; border-radius: 100px; padding: 7px 14px; font-size: 12px; font-weight: 700; color: #D42759; box-shadow: 0 4px 12px rgba(0,0,0,.12); }
-  .row-content { flex: 1; padding: 28px 32px; display: flex; flex-direction: column; }
-  .row-name { font-size: 22px; font-weight: 700; color: #212832; margin-bottom: 10px; }
-  .row-blurb { font-size: 13px; color: #5B6472; line-height: 1.7; margin-bottom: 20px; max-width: 560px; }
+.universal-icons { position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; gap: 9px; align-items: center; }
+.dropdown-container { position: relative; display: inline-block; }
+.header-icon-btn { width: 42px; height: 42px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #2E3644; border: 1px solid #cbd5e1; cursor: pointer; transition: 0.2s; font-size: 16px; font-weight: bold; box-shadow: 0 4px 14px rgba(80,60,120,.05); }
+.header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: #D42759; transform: translateY(-2px);}
+.user-avatar-btn { color: #000000 !important; overflow: hidden; padding: 0;}
 
-  .row-stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-  .row-stat { background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; }
-  .row-stat .n { font-size: 16px; font-weight: 800; color: #D42759; }
-  .row-stat .l { font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .4px; margin-top: 1px; }
+.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+.dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: #1e293b; transition: 0.2s; border-radius: 8px; display: block; text-align: left; text-decoration: none;}
+.dropdown-option:hover { background: #f1f5f9; color: #D42759; }
+.dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-  .row-cities-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-  .city-pill { display: flex; align-items: center; gap: 7px; background: #f1f5f9; border-radius: 100px; padding: 7px 14px; font-size: 12px; }
-  .city-pill b { color: #334155; font-weight: 700; }
-  .city-pill span { color: #94a3b8; font-weight: 600; }
+/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL */
+.page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; pointer-events: none; }
+.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 800px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
 
-  .row-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
-  .row-explore { display: inline-flex; align-items: center; gap: 8px; background: #D42759; color: #fff; font-size: 13px; font-weight: 700; padding: 12px 22px; border-radius: 100px; box-shadow: 0 10px 22px rgba(212,39,89,.25); transition: 0.2s;}
-  .row-explore:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(212,39,89,.35); }
-  .row-since { font-size: 11px; color: #94a3b8; font-weight: 600; }
+.back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
+.back-link:hover { text-decoration: underline; }
+h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: center; margin: 0 0 30px 0; }
+.pg-subtitle { text-align: center; font-size: 14px; color: #64748b; margin-bottom: 40px; }
 
-  /* Overlay Détail Destination */
-  .overlay { position: fixed; inset: 0; background: rgba(20,16,30,.55); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 30px; }
-  .overlay.open { display: flex; }
-  .detail-window { width: 100%; max-width: 660px; max-height: 88vh; overflow-y: auto; background: #fff; border-radius: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.35); position: relative; }
-  .detail-window::-webkit-scrollbar { width: 6px; }
-  .detail-window::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-  
-  .detail-hero { height: 200px; position: relative; background-size: cover; background-position: center; }
-  .detail-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg,rgba(20,16,30,.1) 30%,rgba(20,16,30,.8)); }
-  .detail-close { position: absolute; top: 16px; right: 18px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; z-index: 2; transition: 0.2s; }
-  .detail-close:hover { background: rgba(255,255,255,.5); }
-  .detail-hero-bottom { position: absolute; bottom: 20px; left: 28px; right: 28px; z-index: 1; }
-  .detail-name { font-size: 26px; font-weight: 700; color: #fff; }
-  .detail-sub { font-size: 12px; color: #e6dff2; margin-top: 4px; }
-
-  .detail-body { padding: 28px 32px 34px 32px; }
-  .detail-section-label { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
-  .detail-blurb { font-size: 13px; color: #334155; line-height: 1.7; margin-bottom: 22px; }
-
-  .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 22px; }
-  .stat-card { background: #faf9fc; border-radius: 12px; padding: 14px 12px; text-align: center; border: 1px solid #e2e8f0; }
-  .stat-card .num { font-size: 19px; font-weight: 800; color: #D42759; }
-  .stat-card .lab { font-size: 9.5px; color: #94a3b8; font-weight: 600; margin-top: 3px; line-height: 1.3; }
-
-  .city-list { margin-bottom: 22px; }
-  .city-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f6f4fb; font-size: 12.5px; }
-  .city-row:last-child { border-bottom: none; }
-  .city-row span:first-child { color: #334155; font-weight: 600; }
-  .city-row span:last-child { color: #94a3b8; }
-
-  .example-note { font-size: 10px; color: #b0a8c4; font-style: italic; margin-bottom: 22px; }
+/* GRILLES DE DESTINATIONS */
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+.dest-card { position: relative; border-radius: 16px; overflow: hidden; height: 180px; cursor: pointer; box-shadow: 0 6px 15px rgba(0,0,0,0.06); transition: 0.3s; text-decoration: none; display: block;}
+.dest-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(212,39,89,0.15); }
+.dest-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: 0.3s; }
+.dest-card:hover .dest-bg { transform: scale(1.05); }
+.dest-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%); }
+.dest-content { position: absolute; bottom: 15px; left: 15px; right: 15px; color: white; }
+.dest-title { font-size: 18px; font-weight: 700; margin-bottom: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
+.dest-meta { font-size: 11px; font-weight: 600; color: #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px;}
 </style>
 </head>
 <body>
 
-<div class="frame">
-    <a href="map.html" class="back-link">← Back to Map</a>
-    <h1 class="pg-title" data-i18n="title">Destinations</h1>
-    <div class="underline"></div>
-
-    <div class="stats-bar">
-    <div class="stat"><div class="stat-num">3</div><div class="stat-label" data-i18n="statsCountries">Countries</div></div>
-    <div class="stat"><div class="stat-num">8</div><div class="stat-label" data-i18n="statsCities">Cities</div></div>
-    <div class="stat"><div class="stat-num">19</div><div class="stat-label" data-i18n="statsLocs">Locations</div></div>
-    </div>
-
-    <div class="row" onclick="openDetail('southkorea')">
-    <div class="row-photo" style="background-image:url('https://images.unsplash.com/photo-1538485399081-7191377e8241?w=700');">
-        <div class="row-photo-badge"><span data-i18n="badgeKr">12 locations</span></div>
-    </div>
-    <div class="row-content">
-        <div class="row-name" data-i18n="nameKr">South Korea</div>
-        <p class="row-blurb" data-i18n="krBlurb">From dance-practice basements in Gangnam to a custom-built mountain retreat in Chuncheon — the birthplace of it all, and by far the most mapped destination on Screen To Street.</p>
-        <div class="row-stats">
-        <div class="row-stat"><div class="n">12</div><div class="l" data-i18n="lLocs">Locations</div></div>
-        <div class="row-stat"><div class="n">4</div><div class="l" data-i18n="lCities">Cities</div></div>
-        <div class="row-stat"><div class="n">2</div><div class="l" data-i18n="lGroups">Groups mapped</div></div>
-        </div>
-        <div class="row-cities-grid">
-        <div class="city-pill"><b data-i18n="seoul">Seoul</b><span>8</span></div>
-        <div class="city-pill"><b data-i18n="chuncheon">Chuncheon</b><span>2</span></div>
-        <div class="city-pill"><b data-i18n="gangneung">Gangneung</b><span>1</span></div>
-        <div class="city-pill"><b data-i18n="yangju">Yangju</b><span>1</span></div>
-        </div>
-        <div class="row-footer">
-        <a class="row-explore" onclick="event.stopPropagation(); openDetail('southkorea')"><span data-i18n="exploreKr">Explore South Korea</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-        </a>
-        <span class="row-since" data-i18n="since13">Mapped since 2013</span>
-        </div>
-    </div>
-    </div>
-
-    <div class="row" onclick="openDetail('france')">
-    <div class="row-photo" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=700');">
-        <div class="row-photo-badge"><span data-i18n="badgeFr">5 locations</span></div>
-    </div>
-    <div class="row-content">
-        <div class="row-name" data-i18n="nameFr">France</div>
-        <p class="row-blurb" data-i18n="frBlurb">Fashion Week runways, artisanal gelato and the cobbled streets of Montmartre — Paris seen through the eyes of a member on tour, almost entirely built around a single city.</p>
-        <div class="row-stats">
-        <div class="row-stat"><div class="n">5</div><div class="l" data-i18n="lLocs">Locations</div></div>
-        <div class="row-stat"><div class="n">1</div><div class="l" data-i18n="lCities">City</div></div>
-        <div class="row-stat"><div class="n">1</div><div class="l" data-i18n="lGroups">Group mapped</div></div>
-        </div>
-        <div class="row-cities-grid">
-        <div class="city-pill"><b data-i18n="paris">Paris</b><span>5</span></div>
-        </div>
-        <div class="row-footer">
-        <a class="row-explore" onclick="event.stopPropagation(); openDetail('france')"><span data-i18n="exploreFr">Explore France</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-        </a>
-        <span class="row-since" data-i18n="since19">Mapped since 2019</span>
-        </div>
-    </div>
-    </div>
-
-    <div class="row" onclick="openDetail('portugal')">
-    <div class="row-photo" style="background-image:url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=700');">
-        <div class="row-photo-badge"><span data-i18n="badgePt">2 locations</span></div>
-    </div>
-    <div class="row-content">
-        <div class="row-name" data-i18n="namePt">Portugal</div>
-        <p class="row-blurb" data-i18n="ptBlurb">A cinematic estate near Lisbon Airport and a historic naval museum in Belém — two very different sides of a single music video shoot, and the newest country on the map.</p>
-        <div class="row-stats">
-        <div class="row-stat"><div class="n">2</div><div class="l" data-i18n="lLocs">Locations</div></div>
-        <div class="row-stat"><div class="n">2</div><div class="l" data-i18n="lCities">Cities</div></div>
-        <div class="row-stat"><div class="n">1</div><div class="l" data-i18n="lGroups">Group mapped</div></div>
-        </div>
-        <div class="row-cities-grid">
-        <div class="city-pill"><b data-i18n="lisbon">Lisbon</b><span>1</span></div>
-        <div class="city-pill"><b data-i18n="prior">Prior Velho</b><span>1</span></div>
-        </div>
-        <div class="row-footer">
-        <a class="row-explore" onclick="event.stopPropagation(); openDetail('portugal')"><span data-i18n="explorePt">Explore Portugal</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
-        </a>
-        <span class="row-since" data-i18n="since26">Mapped since 2026</span>
-        </div>
-    </div>
-    </div>
-
+<div class="hero-background">
+    <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
 </div>
 
-<div class="overlay" id="overlay" onclick="if(event.target===this) closeDetail()">
-  <div class="detail-window" id="detail-window"></div>
+<a href="map.html" class="universal-logo">
+    <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
+        <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+        <circle cx="200" cy="150" r="26" fill="#D42759"/>
+    </svg>
+    <div>
+        <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
+        <div class="tagline">Following the footsteps of your favorite artists</div>
+    </div>
+</a>
+
+<div class="universal-icons">
+    <div class="dropdown-container">
+        <button id="lang-btn" class="header-icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></button>
+        <div id="lang-menu" class="dropdown-menu hidden">
+            <a href="#" class="dropdown-option">English</a>
+            <a href="#" class="dropdown-option">Français</a>
+        </div>
+    </div>
+    <div class="dropdown-container">
+        <button class="header-icon-btn" onclick="window.location.href='map.html';"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>
+    </div>
+    <div class="dropdown-container">
+        <button id="profile-btn" class="header-icon-btn user-avatar-btn">U</button>
+        <div id="profile-menu" class="dropdown-menu hidden">
+            <a href="map-destinations.html" class="dropdown-option" style="color: #D42759; font-weight: bold;">Explore Destinations</a>
+            <a href="map-artists.html" class="dropdown-option">Explore Artists</a>
+            <div class="dropdown-divider"></div>
+            <a href="account.html" class="dropdown-option">Your Account</a>
+            <a href="visited.html" class="dropdown-option">My Visited Places</a>
+            <a href="wishlist.html" class="dropdown-option">My Wishlist</a>
+            <a href="trips.html" class="dropdown-option">My Trips</a>
+            <a href="settings.html" class="dropdown-option">Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="index.html" class="dropdown-option" style="color:#D42759; font-weight:bold;">Logout</a>
+        </div>
+    </div>
+</div>
+
+<div class="page">
+    <div class="card">
+        <a href="map.html" class="back-link">← Back to Map</a>
+        <h1 class="pg-title">Explore Destinations</h1>
+        <p class="pg-subtitle">Discover where your favorite artists have been filming, eating, and performing around the world.</p>
+        
+        <div class="grid-container">
+            <!-- Corée du Sud -->
+            <a href="map.html" class="dest-card">
+                <div class="dest-bg" style="background-image: url('https://images.unsplash.com/photo-1538485399081-7191377e8241?w=600');"></div>
+                <div class="dest-overlay"></div>
+                <div class="dest-content">
+                    <div class="dest-title">Seoul</div>
+                    <div class="dest-meta">South Korea • 14 locations</div>
+                </div>
+            </a>
+            <!-- France -->
+            <a href="map.html" class="dest-card">
+                <div class="dest-bg" style="background-image: url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600');"></div>
+                <div class="dest-overlay"></div>
+                <div class="dest-content">
+                    <div class="dest-title">Paris</div>
+                    <div class="dest-meta">France • 5 locations</div>
+                </div>
+            </a>
+            <!-- Portugal -->
+            <a href="map.html" class="dest-card">
+                <div class="dest-bg" style="background-image: url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=600');"></div>
+                <div class="dest-overlay"></div>
+                <div class="dest-content">
+                    <div class="dest-title">Lisbon</div>
+                    <div class="dest-meta">Portugal • 2 locations</div>
+                </div>
+            </a>
+            <!-- Jeju -->
+            <a href="map.html" class="dest-card">
+                <div class="dest-bg" style="background-image: url('https://images.unsplash.com/photo-1588414734732-660b07304ddb?w=600');"></div>
+                <div class="dest-overlay"></div>
+                <div class="dest-content">
+                    <div class="dest-title">Jeju Island</div>
+                    <div class="dest-meta">South Korea • 8 locations</div>
+                </div>
+            </a>
+            <!-- LA -->
+            <a href="map.html" class="dest-card">
+                <div class="dest-bg" style="background-image: url('https://images.unsplash.com/photo-1580659324482-95cd28312066?w=600');"></div>
+                <div class="dest-overlay"></div>
+                <div class="dest-content">
+                    <div class="dest-title">Los Angeles</div>
+                    <div class="dest-meta">USA • 11 locations</div>
+                </div>
+            </a>
+            <!-- London -->
+            <a href="map.html" class="dest-card">
+                <div class="dest-bg" style="background-image: url('https://images.unsplash.com/photo-1513635269975-59693e0cd25d?w=600');"></div>
+                <div class="dest-overlay"></div>
+                <div class="dest-content">
+                    <div class="dest-title">London</div>
+                    <div class="dest-meta">UK • 4 locations</div>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
 
 <script>
-let currentLang = localStorage.getItem('lang') || 'en';
-const t_dest = {
-  en: {
-    title: "Destinations", statsCountries: "Countries", statsCities: "Cities", statsLocs: "Locations",
-    badgeKr: "12 locations", badgeFr: "5 locations", badgePt: "2 locations",
-    nameKr: "South Korea", nameFr: "France", namePt: "Portugal",
-    seoul: "Seoul", chuncheon: "Chuncheon", gangneung: "Gangneung", yangju: "Yangju",
-    paris: "Paris", lisbon: "Lisbon", prior: "Prior Velho",
-    krBlurb: "From dance-practice basements in Gangnam to a custom-built mountain retreat in Chuncheon — the birthplace of it all, and by far the most mapped destination on Screen To Street.",
-    frBlurb: "Fashion Week runways, artisanal gelato and the cobbled streets of Montmartre — Paris seen through the eyes of a member on tour, almost entirely built around a single city.",
-    ptBlurb: "A cinematic estate near Lisbon Airport and a historic naval museum in Belém — two very different sides of a single music video shoot, and the newest country on the map.",
-    lLocs: "Locations", lCities: "Cities", lGroups: "Groups mapped",
-    exploreKr: "Explore South Korea", exploreFr: "Explore France", explorePt: "Explore Portugal",
-    since13: "Mapped since 2013", since19: "Mapped since 2019", since26: "Mapped since 2026",
-    historyTitle: "History & context", statsTitle: "User stats",
-    citiesTitle: "Cities covered", exampleNote: "Example data shown for preview — connect real analytics to populate these figures."
-  },
-  fr: {
-    title: "Destinations", statsCountries: "Pays", statsCities: "Villes", statsLocs: "Lieux",
-    badgeKr: "12 lieux", badgeFr: "5 lieux", badgePt: "2 lieux",
-    nameKr: "Corée du Sud", nameFr: "France", namePt: "Portugal",
-    seoul: "Séoul", chuncheon: "Chuncheon", gangneung: "Gangneung", yangju: "Yangju",
-    paris: "Paris", lisbon: "Lisbonne", prior: "Prior Velho",
-    krBlurb: "Des sous-sols de danse à Gangnam à un refuge majestueux dans les montagnes de Chuncheon — le berceau de tout, et de loin la destination la plus cartographiée sur Screen To Street.",
-    frBlurb: "Défilés de Fashion Week, glaces artisanales et rues pavées de Montmartre — Paris vue à travers les yeux d'un membre en tournée.",
-    ptBlurb: "Un domaine impressionnant près de l'aéroport et un musée naval historique à Belém — deux facettes très différentes d'un seul tournage de clip, et le pays le plus récent sur la carte.",
-    lLocs: "Lieux", lCities: "Villes", lGroups: "Groupes",
-    exploreKr: "Explorer la Corée du Sud", exploreFr: "Explorer la France", explorePt: "Explorer le Portugal",
-    since13: "Sur la carte depuis 2013", since19: "Sur la carte depuis 2019", since26: "Sur la carte depuis 2026",
-    historyTitle: "Histoire et contexte", statsTitle: "Statistiques d'utilisateurs",
-    citiesTitle: "Villes couvertes", exampleNote: "Données à titre d'exemple — connectez des données réelles pour alimenter ces chiffres."
-  }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if(t_dest[currentLang] && t_dest[currentLang][key]) el.innerHTML = t_dest[currentLang][key];
+    // Activation des menus déroulants
+    ['lang-btn', 'profile-btn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if(btn) btn.addEventListener('click', (e) => {
+            const menuId = id.replace('-btn', '-menu');
+            document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
+            const targetMenu = document.getElementById(menuId);
+            if(targetMenu) targetMenu.classList.toggle('hidden');
+            e.stopPropagation();
+        });
     });
-});
+    document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
 
-const COUNTRIES = {
-  en: {
-      southkorea: { name: "South Korea", photo: "https://images.unsplash.com/photo-1538485399081-7191377e8241?w=900", locations: 12, history: "Long before it became a global pop-culture capital, Seoul was already a city of contrasts — centuries-old palaces sitting a few blocks from neon-lit shopping districts. That same contrast is what makes it the backbone of the K-pop map: rookie-era practice rooms in Gangnam sit alongside purpose-built retreats deep in the mountains of Gangwon-do, each telling a different chapter of an artist's story.", cities: [["Seoul",8],["Chuncheon",2],["Gangneung",1],["Yangju",1]], stats: [["68%","of users' itineraries include South Korea"],["4.2","average days planned for a Korea trip"],["3","most-visited cities: Seoul, Chuncheon, Gangneung"]] },
-      france: { name: "France", photo: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900", locations: 5, history: "Paris has long been a stage for K-pop's biggest fashion moments — Fashion Week runways, flagship store openings, and quiet afternoons in Montmartre captured between official schedules. It's the second most-mapped destination on Screen To Street, almost entirely built around Paris itself.", cities: [["Paris",5]], stats: [["31%","of users' itineraries include France"],["2.5","average days planned for a Paris trip"],["1","city covered so far: Paris"]] },
-      portugal: { name: "Portugal", photo: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=900", locations: 2, history: "Portugal's spot on the map exists almost by accident of production choices — a historic estate near Lisbon Airport and the Navy Museum in Belém were both chosen as filming backdrops for a single music video shoot, putting the country on ARMY's radar for the first time.", cities: [["Lisbon",1],["Prior Velho",1]], stats: [["9%","of users' itineraries include Portugal"],["1.5","average days planned for a Portugal trip"],["2","cities covered: Lisbon, Prior Velho"]] }
-  },
-  fr: {
-      southkorea: { name: "Corée du Sud", photo: "https://images.unsplash.com/photo-1538485399081-7191377e8241?w=900", locations: 12, history: "Longtemps avant de devenir une capitale mondiale de la pop culture, Séoul était déjà une ville de contrastes — des palais centenaires situés à quelques rues de quartiers commerçants aux néons clignotants. Ce même contraste fait d'elle la colonne vertébrale de la carte K-pop : des salles d'entraînement de Gangnam aux refuges sur mesure dans les montagnes de Gangwon-do.", cities: [["Séoul",8],["Chuncheon",2],["Gangneung",1],["Yangju",1]], stats: [["68%","des itinéraires incluent la Corée du Sud"],["4.2","jours prévus en moyenne pour un voyage en Corée"],["3","villes les plus visitées : Séoul, Chuncheon, Gangneung"]] },
-      france: { name: "France", photo: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900", locations: 5, history: "Paris a longtemps été le théâtre des plus grands moments de mode de la K-pop — des défilés de la Fashion Week, des glaces artisanales et des après-midi tranquilles à Montmartre capturés entre deux événements officiels. C'est la deuxième destination la plus cartographiée.", cities: [["Paris",5]], stats: [["31%","des itinéraires incluent la France"],["2.5","jours prévus en moyenne pour un voyage à Paris"],["1","ville couverte pour le moment : Paris"]] },
-      portugal: { name: "Portugal", photo: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=900", locations: 2, history: "La place du Portugal sur la carte existe presque par accident de production — un domaine impressionnant près de l'aéroport de Lisbonne et le musée de la marine à Belém ont tous deux été choisis comme décors pour un même tournage de clip.", cities: [["Lisbonne",1],["Prior Velho",1]], stats: [["9%","des itinéraires incluent le Portugal"],["1.5","jours prévus en moyenne pour un voyage au Portugal"],["2","villes couvertes : Lisbonne, Prior Velho"]] }
-  }
-};
-
-function openDetail(key) {
-  const c = COUNTRIES[currentLang][key];
-  const t = t_dest[currentLang];
-  
-  const cityRows = c.cities.map(([name,n]) => `<div class="city-row"><span>${name}</span><span>${n} ${n>1 ? 'lieux' : 'lieu'}</span></div>`).join('');
-  const statCards = c.stats.map(([num,lab]) => `<div class="stat-card"><div class="num">${num}</div><div class="lab">${lab}</div></div>`).join('');
-
-  document.getElementById('detail-window').innerHTML = `
-    <div class="detail-hero" style="background-image:url('${c.photo}');">
-      <div class="detail-hero-overlay"></div>
-      <div class="detail-close" onclick="closeDetail()">✕</div>
-      <div class="detail-hero-bottom">
-        <div class="detail-name">${c.name}</div>
-        <div class="detail-sub">${c.locations} ${t.lLocs.toLowerCase()}</div>
-      </div>
-    </div>
-    <div class="detail-body">
-      <div class="detail-section-label">${t.historyTitle}</div>
-      <p class="detail-blurb">${c.history}</p>
-
-      <div class="detail-section-label">${t.statsTitle}</div>
-      <div class="stat-grid">${statCards}</div>
-      <div class="example-note">${t.exampleNote}</div>
-
-      <div class="detail-section-label">${t.citiesTitle}</div>
-      <div class="city-list">${cityRows}</div>
-    </div>
-  `;
-  document.getElementById('overlay').classList.add('open');
-}
-function closeDetail() {
-  document.getElementById('overlay').classList.remove('open');
-}
+    // Initialisation Avatar
+    const savedName = localStorage.getItem('userName') || 'User';
+    const savedPic = localStorage.getItem('userPhoto');
+    document.querySelectorAll('.user-avatar-btn').forEach(btn => {
+        if(savedPic) { btn.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; } 
+        else { btn.textContent = savedName.charAt(0).toUpperCase(); }
+    });
 </script>
-
 </body>
 </html>
