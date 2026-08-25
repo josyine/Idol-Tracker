@@ -121,10 +121,8 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .map-container { flex: 1; position: relative; background: #E7E9EC; overflow: hidden; z-index: 1; height: 100%; }
 #map { width: 100%; height: 100%; background: transparent; z-index: 1; }
 
+/* REVISION KPI COUNTRIES (0 en rose, hover rose que sur le texte) */
 .stat-pill { position: absolute; top: 20px; left: 20px; background: #fff; border-radius: 100px; padding: 6px 14px; font-size: 12.5px; font-weight: 700; color: #2E3644; box-shadow: 0 6px 18px rgba(80,60,120,.1); display: flex; gap: 10px; align-items: center; z-index: 1000; }
-.stat-pill .n1 { color: var(--primary-magenta); }
-.stat-pill .sep { color: #e7dcf0; font-weight: 400; }
-
 .stat-pill-btn { display:flex; gap:6px; align-items:center; cursor:pointer; transition: 0.2s; }
 .stat-pill-num { color: var(--primary-magenta); font-weight: 800; }
 .stat-pill-text { color: #212832; transition: 0.2s; }
@@ -157,3 +155,15 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
     .hamburger-btn { display: flex !important; }
 }
 .hamburger-btn { display: none; }
+
+/* CUSTOM TRIP SELECTOR (MAP) */
+.custom-trip-select { position: relative; width: 100%; margin-bottom: 20px; }
+.trip-select-header { background: #fff; border: 1px solid #cbd5e1; border-radius: 100px; padding: 11px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; font-size: 12.5px; }
+.trip-select-header:hover { border-color: var(--primary-magenta); }
+.trip-select-chevron { transition: transform 0.3s ease; stroke: #94a3b8; }
+.trip-select-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(80,60,120,0.1); max-height: 250px; overflow-y: auto; z-index: 9999; }
+.trip-option { padding: 12px 14px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #f1f5f9; }
+.trip-option:last-child { border-bottom: none; }
+.trip-option:hover { background: #faf9fc; }
+.trip-opt-name { font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
+.trip-opt-meta { font-size: 11.5px; color: #94a3b8; }
