@@ -10,9 +10,21 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 /* Top Nav (pour Map et Trips) */
 .top-nav { position: absolute; top: 20px; right: 20px; z-index: 2000; display: flex; gap: 9px; pointer-events: auto; }
 .dropdown-container { position: relative; display: inline-block; }
-.nav-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 4px 14px rgba(80,60,120,.1); display: flex; align-items: center; justify-content: center; color: #2E3644; border: none; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px;}
-.nav-btn:hover { background: #f1f5f9; color: var(--primary-magenta); }
-.user-avatar-btn { color: #000; overflow: hidden; padding: 0; border: 1px solid #cbd5e1;}
+
+/* Boutons d'icônes du header : alignés à 100% sur le style utilisé par map.html
+   (mêmes dimensions, même ombre, même bordure) pour que le header soit identique
+   entre map.html, trips.html et toutes les pages "card". */
+.nav-btn,
+.header-icon-btn {
+    width: 42px; height: 42px; border-radius: 50%; background: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    color: #2E3644; border: 1px solid #cbd5e1; cursor: pointer;
+    transition: 0.2s; font-size: 16px; font-weight: bold;
+    box-shadow: 0 4px 14px rgba(80,60,120,.05);
+}
+.nav-btn:hover,
+.header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: var(--primary-magenta); transform: translateY(-2px); }
+.user-avatar-btn { color: #000 !important; overflow: hidden; padding: 0; border: 1px solid #cbd5e1;}
 
 .dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 3000; }
 .dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); transition: 0.2s; border-radius: 8px; display: block; text-align: left; }
@@ -137,6 +149,11 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .custom-category-marker div svg { width: var(--icon-size); height: var(--icon-size); transition: all 0.2s ease;}
 .custom-category-marker:hover div { transform: scale(1.15) translateY(-2px); background-color: var(--marker-color) !important; color: white !important; }
 
+/* Marqueur utilisé dans les pop-ups de visited.html / wishlist.html
+   (même charte graphique que la carte de map.html) */
+.popup-marker-icon { border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,.3); border: 2px solid #fff; }
+.popup-marker-icon svg { width: 16px; height: 16px; }
+
 /* Modals */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
 .modal-content { background: white; width: 90%; max-width: 600px; max-height: 90vh; border-radius: 16px; padding: 30px; overflow-y: auto; position: relative; }
@@ -148,22 +165,76 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .cookie-content a { color: var(--primary-magenta); font-weight: bold; }
 .cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-@media (max-width: 800px) {
-    .app-container { flex-direction: column; width: 100%; height: 100vh; border-radius: 0; }
-    .sidebar { width: 100%; position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; transition: 0.3s; }
-    .sidebar.open { left: 0; }
-    .hamburger-btn { display: flex !important; }
-}
 .hamburger-btn { display: none; }
 
-/* CUSTOM TRIP SELECTOR (MAP) */
+/* ==========================================
+   CUSTOM TRIP SELECTOR (MAP) — VERSION REDESIGNEE
+   ========================================== */
 .custom-trip-select { position: relative; width: 100%; margin-bottom: 20px; }
-.trip-select-header { background: #fff; border: 1px solid #cbd5e1; border-radius: 100px; padding: 11px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; font-size: 12.5px; }
-.trip-select-header:hover { border-color: var(--primary-magenta); }
-.trip-select-chevron { transition: transform 0.3s ease; stroke: #94a3b8; }
-.trip-select-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(80,60,120,0.1); max-height: 250px; overflow-y: auto; z-index: 9999; }
-.trip-option { padding: 12px 14px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #f1f5f9; }
-.trip-option:last-child { border-bottom: none; }
-.trip-option:hover { background: #faf9fc; }
-.trip-opt-name { font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
-.trip-opt-meta { font-size: 11.5px; color: #94a3b8; }
+.trip-select-header {
+    background: #fff; border: 1.5px solid #e2e8f0; border-radius: 16px;
+    padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; transition: 0.2s; font-size: 13px;
+    box-shadow: 0 4px 14px rgba(80,60,120,.05);
+}
+.trip-select-header:hover { border-color: var(--primary-magenta); box-shadow: 0 6px 18px rgba(212,39,89,.12); }
+.trip-select-header.open { border-color: var(--primary-magenta); border-radius: 16px 16px 0 0; box-shadow: 0 6px 18px rgba(212,39,89,.12); }
+.trip-select-icon { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-pink); color: var(--primary-magenta); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 10px; }
+.trip-select-header-text { display: flex; align-items: center; flex: 1; overflow: hidden; }
+.trip-select-label-main { font-weight: 700; color: #1e293b; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trip-select-chevron { transition: transform 0.3s ease; stroke: #94a3b8; flex-shrink: 0; }
+
+.trip-select-dropdown {
+    position: absolute; top: calc(100% - 1px); left: 0; width: 100%; background: #fff;
+    border: 1.5px solid var(--primary-magenta); border-top: none; border-radius: 0 0 16px 16px;
+    box-shadow: 0 16px 34px rgba(80,60,120,0.16);
+    max-height: 280px; overflow-y: auto; z-index: 9999;
+    padding: 6px;
+}
+.trip-select-dropdown::-webkit-scrollbar { width: 5px; }
+.trip-select-dropdown::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 10px; }
+
+.trip-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; cursor: pointer; transition: 0.15s; border-radius: 12px; margin-bottom: 2px;
+}
+.trip-option:last-child { margin-bottom: 0; }
+.trip-option:hover { background: #faf5fb; }
+.trip-option.selected { background: var(--accent-pink); }
+.trip-option-icon {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg,#D42759,#8B5CF6); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;
+}
+.trip-opt-body { flex: 1; min-width: 0; }
+.trip-opt-name { font-size: 13.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trip-opt-meta { font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+.trip-opt-check { width: 18px; height: 18px; border-radius: 50%; background: var(--primary-magenta); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; }
+.trip-select-empty { padding: 18px 12px; font-size: 13px; color: #94a3b8; text-align: center; }
+
+/* ==========================================
+   MOBILE : SIDEBAR EN TIROIR + HAMBURGER (map.html & trips.html)
+   ========================================== */
+@media (max-width: 800px) {
+    .app-container { flex-direction: column; width: 100%; height: 100vh; border-radius: 0; }
+    .sidebar { width: 85%; max-width: 340px; position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.15); }
+    .sidebar.open { left: 0; }
+    .hamburger-btn { display: flex !important; }
+
+    .top-nav { top: 14px; right: 14px; gap: 7px; }
+    .nav-btn, .header-icon-btn { width: 38px; height: 38px; }
+
+    .filters-grid { grid-template-columns: 1fr; }
+    .stat-pill { top: 14px; left: 14px; padding: 6px 10px; font-size: 11px; gap: 8px; }
+    .stat-pill-text { display: none; }
+
+    .itinerary-box { padding: 16px; }
+    .day-card { padding: 14px 16px; }
+    .trip-detail-wrapper { padding: 22px 18px; }
+    .trip-hero { flex-direction: column; align-items: stretch; gap: 14px; }
+    .trip-name-input { font-size: 24px; }
+    .edit-banner { padding: 16px; }
+    .trips-main { padding: 90px 16px 40px 16px; }
+
+    .brand-row { padding: 5px 40px 10px 6px; }
+}
