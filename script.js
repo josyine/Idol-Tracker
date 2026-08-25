@@ -447,32 +447,86 @@ window.switchMainTab = function(tabName) {
     }
 }
 
+// NOUVELLE FONCTION POUR LE MENU DÉROULANT CUSTOM
+window.toggleTripDropdown = function(e) {
+    if(e) e.stopPropagation();
+    const dropdown = document.getElementById('trip-dropdown-list');
+    const chevron = document.getElementById('trip-select-chevron');
+    if(!dropdown || !chevron) return;
+    
+    if(dropdown.classList.contains('hidden')) {
+        dropdown.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        dropdown.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+    }
+};
+
+document.addEventListener('click', (e) => {
+    const wrapper = document.querySelector('.custom-trip-select');
+    const dropdown = document.getElementById('trip-dropdown-list');
+    const chevron = document.getElementById('trip-select-chevron');
+    if(wrapper && !wrapper.contains(e.target) && dropdown && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+    }
+});
+
 window.loadItineraryTabOptions = function() {
-    const select = document.getElementById('itinerary-trip-select');
-    if(!select) return;
+    const dropdownList = document.getElementById('trip-dropdown-list');
+    if(!dropdownList) return;
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    select.innerHTML = `<option value="">👉 ${currentLang === 'fr' ? 'Sélectionner un voyage' : 'Select a trip to view'}</option>`;
+    dropdownList.innerHTML = '';
     
     if(trips.length > 0) {
-        trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
+        trips.forEach(t => {
+            let allAssignedIds = (t.days || []).flat().map(Number);
+            let durationTxt = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.days ? t.days.length : 0} Days`;
+            let locsTxt = `${allAssignedIds.length} location${allAssignedIds.length > 1 ? 's' : ''}`;
+            
+            let safeName = t.name.replace(/'/g, "\\'");
+            
+            dropdownList.innerHTML += `
+                <div class="trip-option" onclick="selectCustomTrip('${t.id}', '${safeName}')">
+                    <div class="trip-opt-name">${t.name}</div>
+                    <div class="trip-opt-meta">${durationTxt} · ${locsTxt}</div>
+                </div>
+            `;
+        });
+    } else {
+        dropdownList.innerHTML = `<div style="padding: 12px; font-size:13px; color:#94a3b8; text-align:center;">${currentLang === 'fr' ? 'Aucun voyage trouvé.' : 'No trips found.'}</div>`;
     }
     
-    select.value = "";
     document.getElementById('itinerary-content-container').classList.add('hidden');
-    clearTripFromMainMap();
-}
+    window.clearTripFromMainMap();
+};
 
-window.loadItineraryView = function() {
-    const select = document.getElementById('itinerary-trip-select');
-    if(!select || !select.value) {
+window.selectCustomTrip = function(tripId, tripName) {
+    const label = document.getElementById('trip-select-label');
+    if(label) {
+        label.textContent = tripName;
+        label.style.color = '#212832';
+    }
+    
+    window.toggleTripDropdown();
+    localStorage.setItem('activeTripId', tripId);
+    window.loadItineraryView(tripId);
+};
+
+window.loadItineraryView = function(tripId) {
+    if(!tripId) {
+        tripId = localStorage.getItem('activeTripId');
+    }
+    if(!tripId) {
         document.getElementById('itinerary-content-container').classList.add('hidden');
-        clearTripFromMainMap();
+        window.clearTripFromMainMap();
         return;
     }
 
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    const trip = trips.find(t => t.id === select.value);
+    const trip = trips.find(t => t.id === tripId);
     if(!trip) return;
 
     localStorage.setItem('activeTripId', trip.id);
@@ -550,6 +604,19 @@ window.clearTripFromMainMap = function() {
     const banner = document.getElementById('active-trip-banner');
     if(banner) banner.classList.add('hidden');
     
+    const label = document.getElementById('trip-select-label');
+    if(label) {
+        label.textContent = currentLang === 'fr' ? 'Sélectionner un voyage' : 'Select a trip to view';
+        label.style.color = '#8d9bb0';
+    }
+    const dropdown = document.getElementById('trip-dropdown-list');
+    if(dropdown) dropdown.classList.add('hidden');
+    const chevron = document.getElementById('trip-select-chevron');
+    if(chevron) chevron.style.transform = 'rotate(0deg)';
+
+    const cont = document.getElementById('itinerary-content-container');
+    if(cont) cont.classList.add('hidden');
+
     if(document.getElementById('tab-explore-btn')) {
         renderLocations();
     }
@@ -841,7 +908,7 @@ window.openDetailsPanel = function(id) {
         }
     }
 
-    // MASQUER LES ONGLETS EXPLORE/ITINERARY
+    // MASQUER LES ONGLETS EXPLORE/ITINERARY ET LE BLOC PRINCIPAL
     const topTabs = document.querySelector('.sidebar-top-tabs');
     if(topTabs) topTabs.style.display = 'none';
 
@@ -952,9 +1019,8 @@ window.closeDetailsPanel = function() {
         dDetails.style.display = 'none';
     }
     const dMain = document.getElementById('sidebar-main');
-    if(dMain) dMain.style.display = 'flex'; // Restaure l'affichage normal
+    if(dMain) dMain.style.display = 'flex'; 
     
-    // REAFFICHER LES ONGLETS
     const topTabs = document.querySelector('.sidebar-top-tabs');
     if(topTabs) topTabs.style.display = 'flex';
 
@@ -1817,18 +1883,16 @@ window.removeFromTrip = function(btn, locId) {
 window.confirmRemoveLoc = function() {
     if(!locToRemoveData) return;
     
-    // Supprimer totalement de wishlistLocs
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     wList = wList.filter(w => !(Number(w.id) === locToRemoveData.id && w.tripId === currentTrip.id));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     
-    // Supprimer des jours si c'était dans un jour
     currentTrip.days = currentTrip.days.map(day => day.filter(id => Number(id) !== locToRemoveData.id));
 
     window.saveTrip(); 
     closeModal('remove-loc-modal');
     locToRemoveData = null;
-    window.renderTrip(); // Force le rafraichissement visuel total
+    window.renderTrip(); 
 }
 
 window.quickAddLoc = function(locId) {
