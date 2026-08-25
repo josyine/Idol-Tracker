@@ -172,29 +172,29 @@
                 <!-- ONGLET 2 : MY ITINERARY -->
                 <div id="sidebar-itinerary" class="sidebar-main-panel hidden">
                     
-                    <!-- NOUVEAU MENU DÉROULANT CUSTOM -->
-                    <div class="custom-trip-select">
-                        <div class="trip-select-header" onclick="toggleTripDropdown(event)">
-                            <span id="trip-select-label" style="font-weight: 700; color: #8d9bb0;">Select a trip to view</span>
-                            <svg id="trip-select-chevron" class="trip-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <!-- NOUVEAU MENU DÉROULANT CUSTOM STYLE BARRE DE RECHERCHE -->
+                    <div class="custom-trip-select" style="position: relative; z-index: 50; margin-bottom: 15px;">
+                        <div class="trip-select-header input-field" onclick="toggleTripDropdown(event)" style="cursor: pointer; justify-content: space-between;">
+                            <span id="trip-select-label" style="color: #64748b; font-weight: 500;">Select a trip...</span>
+                            <svg id="trip-select-chevron" class="trip-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
-                        <div class="trip-select-dropdown hidden" id="trip-dropdown-list">
+                        <div class="trip-select-dropdown hidden" id="trip-dropdown-list" style="position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; z-index: 100;">
                             <!-- Les voyages seront injectés ici par le JavaScript -->
                         </div>
                     </div>
 
+                    <!-- BOUTON AUTO-ITINERARY GENERATOR -->
+                    <button class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:25px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 2v6h6"></path></svg>
+                        Auto-Itinerary Generator
+                    </button>
+
                     <div id="itinerary-content-container" class="hidden" style="flex:1; display:flex; flex-direction:column;">
-                        
                         <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 5px;">
                             <div id="iti-view-name" style="font-size:16px; font-weight:700; color:#212832;">Trip Name</div>
                             <div id="iti-view-loc-count" style="font-size:11px; font-weight:700; color:#D42759;">4 locations</div>
                         </div>
-                        <div id="iti-view-meta" style="font-size:11px; color:#94a3b8; margin-bottom: 15px;">3 countries · 19 total locations saved</div>
-
-                        <button class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:24px; padding:12px; border-radius: 8px;">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 2v6h6"></path></svg>
-                            Regenerate itinerary
-                        </button>
+                        <div id="iti-view-meta" style="font-size:11px; color:#94a3b8; margin-bottom: 20px;">3 countries · 19 total locations saved</div>
 
                         <div id="iti-view-timeline" style="display:flex; flex-direction:column; padding-bottom:30px;"></div>
                     </div>
@@ -330,15 +330,15 @@
         <!-- BANNIERE DE MAP STATS (En haut à gauche) -->
         <div style="position: absolute; top: 20px; left: 20px; z-index: 2000; display: flex; gap: 15px;">
             <div style="background: #fff; border-radius: 100px; padding: 10px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 13px; font-weight: 700;">
-                <div id="btn-show-locations" class="stat-pill-btn" onclick="openFilteredListModal('locations')" style="color: #D42759; cursor:pointer;"><span id="stat-locations">0</span> <span style="color: #212832;">LOCATIONS</span></div>
+                <div id="btn-show-locations" class="stat-pill-btn" onclick="openFilteredListModal('locations')">
+                    <span id="stat-locations" class="stat-pill-num">0</span> 
+                    <span class="stat-pill-text">LOCATIONS</span>
+                </div>
                 <span style="color: #cbd5e1;">|</span>
-                <div id="btn-show-countries" class="stat-pill-btn" onclick="openFilteredListModal('countries')" style="color: #212832; cursor:pointer;"><span id="stat-countries">0</span> COUNTRIES</div>
-            </div>
-            
-            <!-- BANNIERE VIEWING TRIP -->
-            <div id="active-trip-banner" class="hidden" style="background: #2E3644; color: #fff; border-radius: 100px; padding: 8px 12px 8px 20px; display: flex; align-items: center; gap: 15px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <span>Viewing Trip: <span id="active-trip-name-display" style="color: #fff; font-weight: 700;"></span></span>
-                <button onclick="clearTripFromMainMap()" style="background: #D42759; color: #fff; border: none; border-radius: 100px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s;">✕ Close</button>
+                <div id="btn-show-countries" class="stat-pill-btn" onclick="openFilteredListModal('countries')">
+                    <span id="stat-countries" class="stat-pill-num">0</span> 
+                    <span class="stat-pill-text">COUNTRIES</span>
+                </div>
             </div>
         </div>
 
