@@ -117,7 +117,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 <div class="universal-icons">
     <div class="dropdown-container">
         <button id="lang-btn" class="header-icon-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         </button>
         <div id="lang-menu" class="dropdown-menu hidden">
             <a href="#" class="dropdown-option" onclick="changeLang('en'); return false;">English</a>
@@ -183,64 +183,41 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     </div>
 </div>
 
-<!-- Modal Panier (Cart) -->
-<div id="cart-modal-overlay" class="modal hidden">
-    <div class="modal-content" style="max-width:500px; padding:30px;">
-        <span class="close-btn" style="color:#212832; text-shadow:none; top:15px;" onclick="document.getElementById('cart-modal-overlay').classList.add('hidden')">&times;</span>
-        <h2 style="color: #D42759; margin-bottom: 20px; font-size:20px;">Unlock Passes</h2>
-        <div id="cart-options"></div>
-        <div style="font-weight: bold; margin: 20px 0; font-size: 16px; color:#212832;">Total: <span id="cart-price" style="color:#D42759;">0.00 €</span></div>
-        <button style="width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer;" id="cart-pay-btn" onclick="payCart()" disabled>Select a group</button>
+<!-- Modal Panier (Cart) — identique à celui de map.html -->
+<div id="cart-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
+        <h2 style="color: #1e293b; margin-bottom: 5px;">Unlock New Passes</h2>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select the groups you want to unlock. (14.99€ per group)</p>
+
+        <form id="cart-form">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
+                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
+                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
+                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
+            </div>
+            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;">Select a group</button>
+        </form>
     </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
 <script>
+    // La fenêtre "Unlock Passes" est entièrement gérée par script.js (openCartModal /
+    // updateCartPrice / soumission de #cart-form), pour être identique à map.html.
+
     const savedName = localStorage.getItem('userName') || 'User';
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
         if(savedPic) { btn.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; } 
         else { btn.textContent = savedName.charAt(0).toUpperCase(); }
     });
-
-    // --- GESTION DU PANIER ---
-    function openCartModal() {
-        document.getElementById('cart-modal-overlay').classList.remove('hidden');
-        const optionsDiv = document.getElementById('cart-options');
-        const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        const groups = ['BTS', 'Blackpink', 'Twice', 'Seventeen'];
-        optionsDiv.innerHTML = '';
-        groups.forEach(g => {
-            const isUnlocked = unlockedGroups.includes(g);
-            optionsDiv.innerHTML += `
-                <div style="margin-bottom:12px;">
-                    <label style="display:flex; align-items:center; gap:10px; padding:12px 16px; border:1px solid ${isUnlocked?'#e2e8f0':'#cbd5e1'}; border-radius:10px; cursor:${isUnlocked?'default':'pointer'}; background:${isUnlocked?'#f8fafc':'#fff'}; color:${isUnlocked?'#94a3b8':'#212832'};">
-                        <input type="checkbox" class="cart-checkbox" value="${g}" ${isUnlocked?'disabled checked':''} onchange="updateCartPrice()" style="accent-color:#D42759; width:16px; height:16px;">
-                        <span style="font-weight:600;">${g} Pass</span>
-                        <span style="margin-left:auto; font-size:13px;">${isUnlocked?'Purchased':'14.99 €'}</span>
-                    </label>
-                </div>
-            `;
-        });
-        updateCartPrice();
-    }
-    function updateCartPrice() {
-        const checkboxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
-        const price = checkboxes.length * 14.99;
-        document.getElementById('cart-price').textContent = price.toFixed(2) + ' €';
-        const btn = document.getElementById('cart-pay-btn');
-        btn.disabled = checkboxes.length === 0;
-        btn.textContent = checkboxes.length > 0 ? `Pay ${price.toFixed(2)} €` : 'Select a group';
-    }
-    function payCart() {
-        let existing = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => {
-            if(!existing.includes(cb.value)) existing.push(cb.value);
-        });
-        localStorage.setItem('unlockedGroups', JSON.stringify(existing));
-        window.location.reload();
-    }
 
     // --- LISTE DE LA WISHLIST (groupée par voyage) ---
     function renderWishlist() {
