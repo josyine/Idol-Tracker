@@ -5,6 +5,7 @@
 <title>Screen To Street — Your Account</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
 a{text-decoration:none;}
@@ -19,25 +20,25 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
 .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
 
-/* HEADER (FIXE ET ALIGNÉ COMME MAP.HTML) */
-.universal-logo { position: fixed; top: 25px; left: 20px; z-index: 2000; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+/* HEADER SEPARÉ POUR LE Z-INDEX */
+.universal-logo { position: fixed; top: 25px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
 .brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
 .tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
 
-.universal-icons { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; gap: 9px; align-items: center; }
+.universal-icons { position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; gap: 9px; align-items: center; }
 .dropdown-container { position: relative; display: inline-block; }
-.header-icon-btn { width: 40px; height: 40px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #2E3644; border: none; cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: bold; box-shadow: 0 4px 14px rgba(80,60,120,.1); }
-.header-icon-btn:hover { background: #f1f5f9; color: #D42759; }
-.user-avatar-btn { color: #000 !important; overflow: hidden; padding: 0; border: 1px solid #cbd5e1; }
+.header-icon-btn { width: 42px; height: 42px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #2E3644; border: 1px solid #cbd5e1; cursor: pointer; transition: 0.2s; font-size: 16px; font-weight: bold; box-shadow: 0 4px 14px rgba(80,60,120,.05); }
+.header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: #D42759; transform: translateY(-2px);}
+.user-avatar-btn { color: #000000 !important; overflow: hidden; padding: 0;}
 
-.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 3000; }
+.dropdown-menu { position: absolute; right: 0; top: 52px; background: white; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 190px; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
 .dropdown-option { padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 500; color: #1e293b; transition: 0.2s; border-radius: 8px; display: block; text-align: left; text-decoration: none;}
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-/* CENTRAGE ET AGRANDISSEMENT */
-.page { position: relative; z-index: 10; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; }
-.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 800px; box-shadow: 0 15px 40px rgba(80,60,120,.08); margin: 0 auto; }
+/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL */
+.page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; pointer-events: none; }
+.card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
 
 .back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
 .back-link:hover { text-decoration: underline; }
@@ -46,7 +47,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 .field-label { font-size: 11px; font-weight: 700; letter-spacing: .6px; color: #94a3b8; text-transform: uppercase; margin-bottom: 7px; display: block; }
 .field-value { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 9px; padding: 12px 15px; font-size: 14px; color: #334155; font-weight: 600; width: 100%; outline: none;}
 .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 100px; }
-.edit-btn { width: 100%; background: #D42759; color: #fff; border: none; border-radius: 100px; padding: 14px; font-size: 14px; font-weight: 700; font-family: 'Poppins', sans-serif; box-shadow: 0 10px 22px rgba(212,39,89,.22); cursor: pointer; transition: 0.2s; }
+.edit-btn { width: 100%; background: #D42759; color: #fff; border: none; border-radius: 100px; padding: 14px; font-size: 14px; font-weight: 700; font-family: 'Poppins', sans-serif; box-shadow: 0 10px 22px rgba(212,39,89,.22); cursor: pointer; transition: 0.2s; margin-top: 10px;}
 .edit-btn:hover { transform: translateY(-2px); }
 .section-title { font-size: 11px; font-weight: 700; letter-spacing: .6px; color: #94a3b8; text-transform: uppercase; margin-bottom: 12px; }
 .stat-box { flex: 1; text-align: center; background: #faf9fc; border-radius: 12px; padding: 16px 10px; border: 1px solid #e2e8f0; }
@@ -56,6 +57,10 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 .receipt-row:last-child { border-bottom: none; }
 .box-container { border: 1px solid #ECE7F3; border-radius: 16px; padding: 24px 26px; margin-bottom: 24px; background: #fff; }
 </style>
+<script>
+    if (!sessionStorage.getItem('bgSyncTime')) { sessionStorage.setItem('bgSyncTime', Date.now()); }
+    document.documentElement.style.setProperty('--sync-t', ((Date.now() - parseInt(sessionStorage.getItem('bgSyncTime'))) / 1000) + 's');
+</script>
 </head>
 <body>
 
@@ -76,7 +81,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
 <div class="universal-icons">
     <div class="dropdown-container">
-        <button id="lang-btn" class="header-icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg></button>
+        <button id="lang-btn" class="header-icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></button>
         <div id="lang-menu" class="dropdown-menu hidden">
             <a href="#" class="dropdown-option">English</a>
             <a href="#" class="dropdown-option">Français</a>
@@ -139,18 +144,9 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     </div>
 </div>
 
+<script src="script.js"></script>
 <script>
-    // Initialisation des icônes
-    const savedName = localStorage.getItem('userName') || 'User';
-    const savedPic = localStorage.getItem('userPhoto');
-    document.querySelectorAll('.user-avatar-btn').forEach(btn => {
-        if(savedPic) {
-            btn.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-        } else {
-            btn.textContent = savedName.charAt(0).toUpperCase();
-        }
-    });
-
+    // Activation des menus déroulants
     ['lang-btn', 'profile-btn'].forEach(id => {
         const btn = document.getElementById(id);
         if(btn) btn.addEventListener('click', (e) => {
@@ -164,15 +160,21 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
 
     // Logique Account
-    document.getElementById('user-name-input').value = savedName;
-    const profilePreview = document.getElementById('profile-preview');
-    if(savedPic) {
-        profilePreview.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;">`;
-    }
-
     document.getElementById('stat-trips').textContent = JSON.parse(localStorage.getItem('myTrips') || '[]').length;
     document.getElementById('stat-visited').textContent = JSON.parse(localStorage.getItem('visitedLocs') || '[]').length;
     document.getElementById('stat-wishlist').textContent = JSON.parse(localStorage.getItem('wishlistLocs') || '[]').length;
+
+    const savedName = localStorage.getItem('userName');
+    if(savedName) document.getElementById('user-name-input').value = savedName;
+
+    const savedPic = localStorage.getItem('userPhoto');
+    const profilePreview = document.getElementById('profile-preview');
+    if(savedPic) {
+        profilePreview.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;">`;
+        document.querySelectorAll('.user-avatar-btn').forEach(btn => {
+            btn.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        });
+    }
 
     const unlocked = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     if(unlocked.length > 0) {
