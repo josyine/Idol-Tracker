@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Screen To Street — My Visited Places</title>
+<title>My Visited Places - Screen To Street</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
 a{text-decoration:none;}
@@ -20,7 +20,7 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
 .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
 
-/* HEADER SEPARÉ POUR LE Z-INDEX (Le bloc passera SUR le logo mais SOUS les icônes) */
+/* HEADER : LOGO EN ARRIÈRE PLAN (z-index 1000) ET ICÔNES AU PREMIER PLAN (z-index 3000) */
 .universal-logo { position: fixed; top: 25px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
 .brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
 .tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
@@ -36,7 +36,7 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .dropdown-option:hover { background: #f1f5f9; color: #D42759; }
 .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 8px; }
 
-/* CENTRAGE ET Z-INDEX DU BLOC PRINCIPAL */
+/* LE BLOC CENTRAL : z-index 2000 (Passe au dessus du logo, mais sous les icônes) */
 .page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 120px 20px 80px 20px; pointer-events: none; }
 .card { background: #fff; border-radius: 20px; padding: 45px 50px; width: 100%; max-width: 680px; box-shadow: 0 15px 40px rgba(80,60,120,.08); pointer-events: auto; }
 
@@ -56,10 +56,11 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
 .loc-card-info { flex: 1; }
 .loc-card-title { font-size: 15px; font-weight: 700; color: #212832; margin-bottom: 4px; }
 .loc-card-meta { font-size: 12px; color: #64748b; font-weight: 500; }
+.loc-card-date { font-size: 11px; font-weight: 700; color: #10b981; background: #d1fae5; padding: 4px 8px; border-radius: 6px; margin-top: 6px; display: inline-block;}
 
-/* CSS DU POPUP DES LIEUX */
+/* CSS DU POPUP DES LIEUX ET CART */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; pointer-events: auto; }
-.modal-box { background: white; width: 90%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative;}
+.modal-box { background: white; width: 90%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto;}
 .modal-hero { height: 200px; background-size: cover; background-position: center; position: relative; }
 .modal-close { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s;}
 .modal-close:hover { background: #D42759; }
@@ -67,8 +68,10 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
 .modal-hero-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 .modal-hero-meta { font-size: 12px; font-weight: 600; opacity: 0.9; }
 .modal-body { padding: 25px; }
-.btn-outline-modal { display: block; text-align: center; border: 1.5px solid #cbd5e1; color: #334155; font-size: 13px; font-weight: 700; padding: 12px; border-radius: 100px; transition: 0.2s; }
+.btn-outline-modal { display: block; text-align: center; border: 1.5px solid #cbd5e1; color: #334155; font-size: 13px; font-weight: 700; padding: 12px; border-radius: 100px; transition: 0.2s; text-decoration: none;}
 .btn-outline-modal:hover { border-color: #D42759; color: #D42759; }
+.edit-btn { width:100%; background:#D42759; color:#fff; border:none; border-radius:100px; padding:13px; font-size:13px; font-weight:700; cursor:pointer; transition:0.2s; }
+.edit-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -77,6 +80,7 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
     <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
 </div>
 
+<!-- LE LOGO PASSE DESSOUS AU SCROLL -->
 <a href="map.html" class="universal-logo">
     <svg width="38" height="38" viewBox="0 0 400 400" style="flex-shrink:0;">
         <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
@@ -88,19 +92,24 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
     </div>
 </a>
 
+<!-- LES ICONES RESTENT TOUJOURS AU DESSUS -->
 <div class="universal-icons">
     <div class="dropdown-container">
-        <button id="lang-btn" class="header-icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg></button>
+        <button id="lang-btn" class="header-icon-btn" onclick="toggleMenu('lang-menu')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        </button>
         <div id="lang-menu" class="dropdown-menu hidden">
             <a href="#" class="dropdown-option">English</a>
             <a href="#" class="dropdown-option">Français</a>
         </div>
     </div>
     <div class="dropdown-container">
-        <button class="header-icon-btn" onclick="window.location.href='map.html';"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>
+        <button id="cart-btn" class="header-icon-btn" onclick="openCartModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        </button>
     </div>
     <div class="dropdown-container">
-        <button id="profile-btn" class="header-icon-btn user-avatar-btn">U</button>
+        <button id="profile-btn" class="header-icon-btn user-avatar-btn" onclick="toggleMenu('profile-menu')">U</button>
         <div id="profile-menu" class="dropdown-menu hidden">
             <a href="map-destinations.html" class="dropdown-option">Explore Destinations</a>
             <a href="map-artists.html" class="dropdown-option">Explore Artists</a>
@@ -138,26 +147,35 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
         </div>
         <div class="modal-body">
             <p id="modal-desc" style="font-size: 13px; color: #3f495c; line-height: 1.7; margin-bottom: 20px;"></p>
+            <div id="modal-map" style="width:100%; height:200px; border-radius:12px; margin-bottom:15px; background:#e2e8f0; z-index:1;"></div>
             <a id="modal-map-link" href="#" target="_blank" class="btn-outline-modal">Open in Google Maps</a>
         </div>
     </div>
 </div>
 
+<!-- Modal Panier (Cart) -->
+<div id="cart-modal" class="modal-overlay hidden">
+    <div class="modal-box" style="padding: 30px;">
+        <div class="modal-close" style="background:#f1f5f9; color:#212832;" onclick="document.getElementById('cart-modal').classList.add('hidden')">&times;</div>
+        <h2 style="color: #D42759; margin-bottom: 20px; font-size:20px;">Unlock Passes</h2>
+        <div id="cart-options"></div>
+        <div style="font-weight: bold; margin: 20px 0; font-size: 16px; color:#212832;">Total: <span id="cart-price" style="color:#D42759;">0.00 €</span></div>
+        <button class="edit-btn" id="cart-pay-btn" onclick="payCart()" disabled>Select a group</button>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
 <script>
-    // Activation des menus déroulants
-    ['lang-btn', 'profile-btn'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) btn.addEventListener('click', (e) => {
-            const menuId = id.replace('-btn', '-menu');
-            document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
-            const targetMenu = document.getElementById(menuId);
-            if(targetMenu) targetMenu.classList.toggle('hidden');
-            e.stopPropagation();
-        });
-    });
+    // --- GESTION DES ICÔNES HEADER ---
+    function toggleMenu(menuId) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => { if(m.id !== menuId) m.classList.add('hidden'); });
+        document.getElementById(menuId).classList.toggle('hidden');
+        event.stopPropagation();
+    }
     document.addEventListener('click', () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); });
 
+    // Initialisation Avatar
     const savedName = localStorage.getItem('userName') || 'User';
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
@@ -165,7 +183,46 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
         else { btn.textContent = savedName.charAt(0).toUpperCase(); }
     });
 
-    // Rendu Visited & Progress Bar
+    // --- GESTION DU PANIER ---
+    function openCartModal() {
+        document.getElementById('cart-modal').classList.remove('hidden');
+        const optionsDiv = document.getElementById('cart-options');
+        const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        const groups = ['BTS', 'Blackpink', 'Twice', 'Seventeen'];
+        
+        optionsDiv.innerHTML = '';
+        groups.forEach(g => {
+            const isUnlocked = unlockedGroups.includes(g);
+            optionsDiv.innerHTML += `
+                <div style="margin-bottom:12px;">
+                    <label style="display:flex; align-items:center; gap:10px; padding:12px 16px; border:1px solid ${isUnlocked?'#e2e8f0':'#cbd5e1'}; border-radius:10px; cursor:${isUnlocked?'default':'pointer'}; background:${isUnlocked?'#f8fafc':'#fff'}; color:${isUnlocked?'#94a3b8':'#212832'};">
+                        <input type="checkbox" class="cart-checkbox" value="${g}" ${isUnlocked?'disabled checked':''} onchange="updateCartPrice()" style="accent-color:#D42759; width:16px; height:16px;">
+                        <span style="font-weight:600;">${g} Pass</span>
+                        <span style="margin-left:auto; font-size:13px;">${isUnlocked?'Purchased':'14.99 €'}</span>
+                    </label>
+                </div>
+            `;
+        });
+        updateCartPrice();
+    }
+    function updateCartPrice() {
+        const checkboxes = document.querySelectorAll('.cart-checkbox:not(:disabled):checked');
+        const price = checkboxes.length * 14.99;
+        document.getElementById('cart-price').textContent = price.toFixed(2) + ' €';
+        const btn = document.getElementById('cart-pay-btn');
+        btn.disabled = checkboxes.length === 0;
+        btn.textContent = checkboxes.length > 0 ? `Pay ${price.toFixed(2)} €` : 'Select a group';
+    }
+    function payCart() {
+        let existing = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => {
+            if(!existing.includes(cb.value)) existing.push(cb.value);
+        });
+        localStorage.setItem('unlockedGroups', JSON.stringify(existing));
+        window.location.reload();
+    }
+
+    // --- LOGIQUE VISITED ---
     window.addEventListener('load', () => {
         const visitedList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
         const progressContainer = document.getElementById('visited-progress-container');
@@ -206,6 +263,7 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
         let listHtml = '';
         visitedList.forEach(v => {
             const id = typeof v === 'object' ? v.id : v;
+            const dateStr = typeof v === 'object' && v.date ? v.date : "Date unknown";
             const loc = celebLocations.find(l => l.id == id);
             if(loc) {
                 listHtml += `
@@ -214,6 +272,7 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
                         <div class="loc-card-info">
                             <div class="loc-card-title">${loc.name}</div>
                             <div class="loc-card-meta">${loc.group} · ${loc.city}, ${loc.country}</div>
+                            <div class="loc-card-date">Visited on: ${dateStr}</div>
                         </div>
                     </div>
                 `;
@@ -222,21 +281,36 @@ h1.pg-title { font-size: 26px; font-weight: 700; color: #D42759; text-align: cen
         listContainer.innerHTML = listHtml;
     });
 
-    // Fonctions Modale
+    // --- POP UP AVEC LEAFLET MAP ---
+    let popupMap = null;
+    let popupMarker = null;
+
     function openLocModal(id) {
         const loc = celebLocations.find(l => l.id == id);
         if(!loc) return;
         document.getElementById('modal-title').textContent = loc.name;
         document.getElementById('modal-meta').textContent = `${loc.city}, ${loc.country} • ${loc.category}`;
         document.getElementById('modal-hero').style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('${loc.img}')`;
-        const desc = loc.fullDescription ? (loc.fullDescription.en || "") : "";
+        
+        const desc = loc.fullDescription ? (loc.fullDescription.en || loc.fullDescription) : "No description available.";
         document.getElementById('modal-desc').innerHTML = desc;
         document.getElementById('modal-map-link').href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
+        
         document.getElementById('loc-modal').classList.remove('hidden');
+
+        setTimeout(() => {
+            if(!popupMap) {
+                popupMap = L.map('modal-map', {zoomControl: false, attributionControl: false}).setView([loc.lat, loc.lng], 15);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(popupMap);
+                popupMarker = L.marker([loc.lat, loc.lng]).addTo(popupMap);
+            } else {
+                popupMap.setView([loc.lat, loc.lng], 15);
+                popupMarker.setLatLng([loc.lat, loc.lng]);
+                popupMap.invalidateSize();
+            }
+        }, 150);
     }
-    function closeLocModal() {
-        document.getElementById('loc-modal').classList.add('hidden');
-    }
+    function closeLocModal() { document.getElementById('loc-modal').classList.add('hidden'); }
 </script>
 </body>
 </html>
