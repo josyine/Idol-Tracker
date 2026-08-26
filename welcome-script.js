@@ -10,6 +10,7 @@ import {
     signInWithPopup,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    sendPasswordResetEmail,
     updateProfile,
     getAdditionalUserInfo,
     onAuthStateChanged
@@ -57,8 +58,13 @@ const dict = {
         authGoogle: "Continue with Google", authEmail: "Continue with email",
         authTerms: "By continuing, you agree to Screen To Street's", linkTerms: "Terms of Use", 
         authPrivacy: "Read our", linkPrivacy: "Privacy Policy",
+        haveAccountYet: "Already have an account?", logInLink: "Log in",
+        noAccountYet: "Don't have an account?", signUpLink: "Sign up",
+
+        loginTitle: "Log in", loginDesc: "Welcome back! Enter your email and password to continue.",
+        forgotPassword: "Forgot password?", loginBtn: "Log in", orDivider: "OR",
         
-        step1Title: "Account", emailCheck: "Enter your email and password to continue.",
+        step1Title: "Account", emailCheck: "Create your account with an email and password.",
         emailLabel: "Email address", password: "Password", btnContinue: "Continue",
         
         step2Title: "Profile", step2Desc: "Tell us a bit about yourself.",
@@ -82,6 +88,10 @@ const dict = {
         errTooManyRequests: "Too many attempts. Try again in a few minutes.",
         errNetwork: "Network connection issue. Check your internet connection.",
         errWrongPassword: "Incorrect password for this email address.",
+        errInvalidLogin: "Incorrect email or password.",
+        errEmailInUse: "An account already exists with this email. Please log in instead.",
+        resetEmailSent: "Password reset email sent — check your inbox.",
+        enterEmailFirst: "Please enter your email address first.",
         errDefault: "Something went wrong. Please try again."
     },
     fr: {
@@ -93,8 +103,13 @@ const dict = {
         authGoogle: "Continuer avec Google", authEmail: "Continuer avec un e-mail",
         authTerms: "En continuant, vous acceptez les", linkTerms: "Conditions d'utilisation", 
         authPrivacy: "Consultez notre", linkPrivacy: "Politique de confidentialité",
+        haveAccountYet: "Vous avez déjà un compte ?", logInLink: "Se connecter",
+        noAccountYet: "Vous n'avez pas de compte ?", signUpLink: "S'inscrire",
+
+        loginTitle: "Se connecter", loginDesc: "Ravis de vous revoir ! Entrez votre e-mail et votre mot de passe.",
+        forgotPassword: "Mot de passe oublié ?", loginBtn: "Se connecter", orDivider: "OU",
         
-        step1Title: "Compte", emailCheck: "Entrez votre e-mail et votre mot de passe pour continuer.",
+        step1Title: "Compte", emailCheck: "Créez votre compte avec un e-mail et un mot de passe.",
         emailLabel: "Adresse e-mail", password: "Mot de passe", btnContinue: "Continuer",
         
         step2Title: "Profil", step2Desc: "Parlez-nous un peu de vous.",
@@ -118,6 +133,10 @@ const dict = {
         errTooManyRequests: "Trop de tentatives. Réessayez dans quelques minutes.",
         errNetwork: "Problème de connexion internet.",
         errWrongPassword: "Mot de passe incorrect pour cette adresse e-mail.",
+        errInvalidLogin: "E-mail ou mot de passe incorrect.",
+        errEmailInUse: "Un compte existe déjà avec cet e-mail. Connectez-vous plutôt.",
+        resetEmailSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.",
+        enterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail.",
         errDefault: "Une erreur est survenue. Réessayez."
     }
 };
@@ -175,16 +194,13 @@ function showStep(step) {
     currentActiveStep = step;
     clearAuthError();
     
-    for(let i=0; i<=4; i++) {
-        let s = document.getElementById('auth-step-' + i);
-        if(s) s.classList.add('hidden');
-    }
-    
+    document.querySelectorAll('.auth-step').forEach(s => s.classList.add('hidden'));
     const targetStep = document.getElementById('auth-step-' + step);
     if(targetStep) targetStep.classList.remove('hidden');
 
     const stepper = document.getElementById('auth-stepper');
-    if(step === 0) {
+    const isNumberedStep = (typeof step === 'number' && step >= 1 && step <= 4);
+    if(!isNumberedStep) {
         if(stepper) stepper.classList.add('hidden');
     } else {
         if(stepper) stepper.classList.remove('hidden');
@@ -213,14 +229,27 @@ function showStep(step) {
 
 document.querySelectorAll('.open-auth-btn').forEach(btn => {
     btn.addEventListener('click', () => { 
-        // Si la personne est déjà connectée, inutile de lui redemander de se connecter.
-        if (firebaseCurrentUser) {
-            window.location.href = 'map.html';
-            return;
-        }
         if(modal) modal.classList.remove('hidden'); 
         showStep(0); 
     });
+});
+
+// Bouton "Log in" du header : ouvre directement le vrai formulaire de connexion,
+// jamais de redirection automatique — la personne doit toujours saisir ses identifiants.
+const headerLoginBtn = document.getElementById('header-login-btn');
+if (headerLoginBtn) {
+    headerLoginBtn.addEventListener('click', () => {
+        if(modal) modal.classList.remove('hidden');
+        showStep('login');
+    });
+}
+
+// Liens croisés "Se connecter" <-> "S'inscrire"
+document.querySelectorAll('.link-to-login').forEach(link => {
+    link.addEventListener('click', (e) => { e.preventDefault(); showStep('login'); });
+});
+document.querySelectorAll('.link-to-signup').forEach(link => {
+    link.addEventListener('click', (e) => { e.preventDefault(); showStep(0); });
 });
 
 const closeAuth = document.getElementById('close-auth');
@@ -262,6 +291,7 @@ async function loadExistingProfileAndRedirect(user) {
         if (snap.exists()) {
             const data = snap.data();
             if (data.username) localStorage.setItem('userName', data.username);
+            if (data.firstName) localStorage.setItem('userFirstName', data.firstName);
             if (Array.isArray(data.unlockedGroups)) localStorage.setItem('unlockedGroups', JSON.stringify(data.unlockedGroups));
         }
     } catch (e) {
@@ -300,13 +330,69 @@ window.openGooglePopup = async function() {
     }
 };
 
+// ==========================================
+// FORMULAIRE "SE CONNECTER" (dédié, séparé de l'inscription)
+// ==========================================
+const btnLoginSubmit = document.getElementById('btn-login-submit');
+if (btnLoginSubmit) {
+    btnLoginSubmit.addEventListener('click', async () => {
+        const emailInput = document.getElementById('login-email');
+        const passInput = document.getElementById('login-password');
+        if(!emailInput.checkValidity()) { emailInput.reportValidity(); return; }
+        if(!passInput.checkValidity()) { passInput.reportValidity(); return; }
+        clearAuthError();
+
+        const emailVal = emailInput.value.trim();
+        const passVal = passInput.value;
+        const originalLabel = btnLoginSubmit.textContent;
+        btnLoginSubmit.disabled = true;
+        btnLoginSubmit.textContent = '...';
+
+        try {
+            const cred = await signInWithEmailAndPassword(auth, emailVal, passVal);
+            await loadExistingProfileAndRedirect(cred.user);
+        } catch (err) {
+            btnLoginSubmit.disabled = false;
+            btnLoginSubmit.textContent = originalLabel;
+            if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+                showAuthError(dict[currentLang].errInvalidLogin);
+            } else {
+                showAuthError(friendlyAuthError(err.code));
+            }
+        }
+    });
+}
+
+// "Mot de passe oublié ?"
+const forgotPasswordLink = document.getElementById('forgot-password-link');
+if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        clearAuthError();
+        const emailInput = document.getElementById('login-email');
+        const emailVal = emailInput.value.trim();
+        if (!emailVal) {
+            showAuthError(dict[currentLang].enterEmailFirst);
+            emailInput.focus();
+            return;
+        }
+        try {
+            await sendPasswordResetEmail(auth, emailVal);
+            showAuthError(dict[currentLang].resetEmailSent);
+        } catch (err) {
+            showAuthError(friendlyAuthError(err.code));
+        }
+    });
+}
+
 // --- NAVIGATION --- //
 
 // Step 0 -> Step 1 (Email)
 const btnToEmail = document.getElementById('btn-to-email');
 if(btnToEmail) btnToEmail.addEventListener('click', () => { showStep(1); });
 
-// Step 1 -> Step 2 (Account -> Profile) : connexion OU création de compte Firebase
+// Step 1 -> Step 2 (Account -> Profile) : création de compte UNIQUEMENT.
+// (La connexion à un compte existant se fait désormais via le formulaire "Se connecter" dédié.)
 const btnToStep2 = document.getElementById('btn-to-step2');
 if(btnToStep2) {
     btnToStep2.addEventListener('click', async () => { 
@@ -323,34 +409,20 @@ if(btnToStep2) {
         btnToStep2.textContent = '...';
 
         try {
-            // 1) On essaie d'abord de connecter un compte existant avec cet e-mail/mot de passe.
-            const cred = await signInWithEmailAndPassword(auth, emailVal, passVal);
-            await loadExistingProfileAndRedirect(cred.user);
-            return; // on quitte la page, pas besoin de réactiver le bouton
-        } catch (signInErr) {
-            if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
-                // 2) Aucun compte ne correspond : soit l'e-mail n'existe pas encore, soit le mot
-                //    de passe est faux pour un compte existant. On tente une création de compte.
-                try {
-                    await createUserWithEmailAndPassword(auth, emailVal, passVal);
-                    localStorage.setItem('userEmail', emailVal);
-                    btnToStep2.disabled = false;
-                    btnToStep2.textContent = originalLabel;
-                    showStep(2);
-                } catch (createErr) {
-                    btnToStep2.disabled = false;
-                    btnToStep2.textContent = originalLabel;
-                    if (createErr.code === 'auth/email-already-in-use') {
-                        // La création échoue car le compte existe déjà : le mot de passe entré était donc faux.
-                        showAuthError(friendlyAuthError('auth/wrong-password'));
-                    } else {
-                        showAuthError(friendlyAuthError(createErr.code));
-                    }
-                }
+            await createUserWithEmailAndPassword(auth, emailVal, passVal);
+            localStorage.setItem('userEmail', emailVal);
+            btnToStep2.disabled = false;
+            btnToStep2.textContent = originalLabel;
+            showStep(2);
+        } catch (createErr) {
+            btnToStep2.disabled = false;
+            btnToStep2.textContent = originalLabel;
+            if (createErr.code === 'auth/email-already-in-use') {
+                showAuthError(dict[currentLang].errEmailInUse);
+                const loginEmailInput = document.getElementById('login-email');
+                if (loginEmailInput) loginEmailInput.value = emailVal;
             } else {
-                btnToStep2.disabled = false;
-                btnToStep2.textContent = originalLabel;
-                showAuthError(friendlyAuthError(signInErr.code));
+                showAuthError(friendlyAuthError(createErr.code));
             }
         }
     });
@@ -370,6 +442,7 @@ if(btnToStep3) {
         const reasonVal = document.getElementById('user-reason').value;
 
         localStorage.setItem('userName', usernameVal);
+        if (fnameVal) localStorage.setItem('userFirstName', fnameVal);
 
         const user = auth.currentUser;
         if (user) {
