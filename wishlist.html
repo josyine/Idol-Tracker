@@ -212,11 +212,14 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     // La fenêtre "Unlock Passes" est entièrement gérée par script.js (openCartModal /
     // updateCartPrice / soumission de #cart-form), pour être identique à map.html.
 
-    const savedName = localStorage.getItem('userName') || 'User';
+    // Initiale de l'avatar : prénom en priorité (comme Google), sinon pseudo.
+    const savedFirstName = (localStorage.getItem('userFirstName') || '').trim();
+    const savedName = (localStorage.getItem('userName') || 'User').trim();
+    const avatarInitial = (savedFirstName || savedName || 'U').charAt(0).toUpperCase();
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
         if(savedPic) { btn.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; } 
-        else { btn.textContent = savedName.charAt(0).toUpperCase(); }
+        else { btn.textContent = avatarInitial; }
     });
 
     // --- LISTE DE LA WISHLIST (groupée par voyage) ---
