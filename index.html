@@ -34,27 +34,6 @@
 </head>
 <body>
 
-<!-- Popup Simulation Google -->
-<div id="google-auth-popup" class="google-popup-overlay hidden">
-    <div class="google-popup-box">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40px" height="40px" style="margin-bottom: 10px;">
-            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-        </svg>
-        <h3 style="color: #34414C; margin-bottom: 5px;">Sign in with Google</h3>
-        <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 20px;">Choose an account to continue</p>
-        <div class="google-account-mock" onclick="completeGoogleLogin()">
-            <div class="google-avatar">JD</div>
-            <div class="google-info">
-                <strong>Jane Doe</strong>
-                <span>jane.doe@gmail.com</span>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- LE DESIGN PLEIN ÉCRAN -->
 <div class="hero">
     <div class="blob blob-1"></div>
@@ -139,12 +118,14 @@
                 <div class="step-container" id="step-btn-4"><div class="step-dot" id="step-dot-4">4</div><span class="step-label" id="step-label-4" data-i18n="step4Title">Payment</span></div>
             </div>
 
+            <!-- Message d'erreur commun (connexion / création de compte) -->
+            <div id="auth-error" class="hidden" style="background:#FFF1F3; border:1px solid #FBD5DC; color:#D42759; font-size:12px; font-weight:600; padding:10px 14px; border-radius:8px; margin-bottom:16px;"></div>
+
             <!-- ETAPE 0 -->
             <div id="auth-step-0" class="auth-step">
                 <h2 data-i18n="authTitle">Log in or sign up</h2>
                 <p data-i18n="authDesc">Use your email or another service to continue with Screen To Street.</p>
                 <div class="social-btn" onclick="openGooglePopup()"><svg class="g-icon" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg><span data-i18n="authGoogle">Continue with Google</span></div>
-                <div class="social-btn" onclick="simulateFacebookLogin()"><svg class="f-icon" viewBox="0 0 48 48"><path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"/><path fill="#fff" d="M26.6 29H31.5L32.3 24H26.6V21.3C26.6 19.2 27.3 17.4 29.2 17.4H32.3V13C31.8 12.9 30.6 12.7 28.4 12.7C23.9 12.7 21.2 15.1 21.2 20.6V24H16.5V29H21.2V42.8C22.1 42.9 23 43 24 43C24.9 43 25.7 42.9 26.6 42.8V29Z"/></svg><span data-i18n="authFacebook">Continue with Facebook</span></div>
                 <div class="social-btn" id="btn-to-email"><svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7L22 6"/></svg><span data-i18n="authEmail">Continue with email</span></div>
                 <p class="terms"><span data-i18n="authTerms">By continuing, you agree to Screen To Street's</span> <a href="legal.html#cgu" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkTerms">Terms of Use</a>. <span data-i18n="authPrivacy">Read our</span> <a href="legal.html#confidentialite" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkPrivacy">Privacy Policy</a>.</p>
             </div>
@@ -154,7 +135,7 @@
                 <h2 data-i18n="step1Title">Account</h2>
                 <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
                 <div class="input-group"><label><span data-i18n="emailLabel">Email address</span> <span style="color:#D42759;">*</span></label><input type="email" id="user-email" class="field-input" placeholder="jane.doe@example.com" required></div>
-                <div class="input-group"><label><span data-i18n="password">Password</span> <span style="color:#D42759;">*</span></label><input type="password" id="user-password" class="field-input" minlength="8" placeholder="••••••••" required></div>
+                <div class="input-group"><label><span data-i18n="password">Password</span> <span style="color:#D42759;">*</span></label><input type="password" id="user-password" class="field-input" minlength="6" placeholder="••••••••" required></div>
                 <button class="pay-btn" id="btn-to-step2" data-i18n="btnContinue">Continue</button>
             </div>
 
@@ -235,6 +216,6 @@
     </div>
 </div>
 
-<script src="welcome-script.js"></script>
+<script type="module" src="welcome-script.js"></script>
 </body>
 </html>
