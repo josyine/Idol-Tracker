@@ -37,7 +37,8 @@
 
   /* HEADER */
   .nav { display: flex; align-items: center; justify-content: space-between; padding: 40px 6%; position: relative; z-index: 10; width: 100%; }
-  
+  .nav-actions { position: relative; }
+
   /* LEGAL CONTENT */
   .legal-container { position: relative; z-index: 10; width: 100%; max-width: 900px; margin: 0 auto; padding: 10px 20px 80px 20px; }
   .legal-card { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(80,60,120,.05); }
@@ -122,13 +123,17 @@
         <span>Screen To <b style="color: #D42759;">Street</b></span>
     </a>
     <div class="nav-right">
-        <a class="nav-link" href="destinations.html">Destinations</a>
-        <a class="nav-link" href="artists.html">Artists</a>
+        <a class="nav-link" href="destinations.html" data-i18n="navDest">Destinations</a>
+        <a class="nav-link" href="artists.html" data-i18n="navArtists">Artists</a>
         <div class="nav-actions">
-            <div class="icon-btn" title="Language / Region">
+            <div class="icon-btn" id="lang-btn" title="Language / Region">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/></svg>
             </div>
-            <a href="index.html" class="login-btn-v5">Log in</a>
+            <div id="lang-menu" class="lang-menu hidden">
+                <div class="lang-option" data-lang="en">English</div>
+                <div class="lang-option" data-lang="fr">Français</div>
+            </div>
+            <a href="index.html?login=1" class="login-btn-v5" data-i18n="navLogin">Log in</a>
         </div>
     </div>
 </div>
@@ -137,126 +142,283 @@
 <div class="legal-container">
     
     <!-- SMART BACK BUTTON -->
-    <a href="#" onclick="smartBack(event)" class="back-btn">← Back</a>
+    <a href="#" onclick="smartBack(event)" class="back-btn" data-i18n="backBtn">← Back</a>
     
     <div class="legal-card">
     
     <!-- Sub-navigation: underlined tabs -->
     <div class="subnav">
         <div class="subnav-tabs">
-            <a href="#mentions" class="active" onclick="setActiveTab(this)">Legal Notice</a>
-            <a href="#apropos" onclick="setActiveTab(this)">About Us</a>
-            <a href="#cgu" onclick="setActiveTab(this)">Terms of Use</a>
-            <a href="#confidentialite" onclick="setActiveTab(this)">Privacy Policy</a>
+            <a href="#mentions" class="active" onclick="setActiveTab(this)" data-i18n="tabMentions">Legal Notice</a>
+            <a href="#apropos" onclick="setActiveTab(this)" data-i18n="tabAbout">About Us</a>
+            <a href="#cgu" onclick="setActiveTab(this)" data-i18n="tabTOU">Terms of Use</a>
+            <a href="#confidentialite" onclick="setActiveTab(this)" data-i18n="tabPrivacy">Privacy Policy</a>
         </div>
-        <button class="subnav-cookies" onclick="alert('To manage your cookies, return to the homepage or open the settings.')">Cookies ⚙</button>
+        <button class="subnav-cookies" id="cookies-settings-btn" data-i18n="tabCookies">Cookies ⚙</button>
     </div>
 
-    <h1 class="legal-title">Legal Information</h1>
-    <p class="legal-sub">Everything you need to know about Screen To Street, how it works, and your data.</p>
+    <h1 class="legal-title" data-i18n="pageTitle">Legal Information</h1>
+    <p class="legal-sub" data-i18n="pageSub">Everything you need to know about Screen To Street, how it works, and your data.</p>
     <div class="underline"></div>
 
     <!-- ================= ABOUT US ================= -->
     <div class="section" id="apropos">
         <div class="sec-title">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
-            About Us
+            <span data-i18n="aboutTitle">About Us</span>
         </div>
-        <p class="sec-body">Screen To Street is an independent guide created to help fans find, in the real world, the places visited, photographed, or filmed by their favorite artists: show sets, restaurants, museums, concert halls, or music video locations.</p>
-        <p class="sec-body">The site lists public places and information already shared publicly (broadcasts, social networks, press), organized in the form of interactive maps by artist, category, and city, with an itinerary generator to prepare a trip following the footsteps of your favorite group.</p>
-        <p class="sec-body"><b>Screen To Street is an independent project and is not affiliated, associated, or endorsed by any agency, record label, artist, or right holder mentioned on the site.</b> All artist names, group names, and trademarks mentioned remain the property of their respective owners.</p>
-        <div class="note">Contact: contact@screentostreet.com</div>
+        <p class="sec-body" data-i18n="aboutBody1">Screen To Street is an independent guide created to help fans find, in the real world, the places visited, photographed, or filmed by their favorite artists: show sets, restaurants, museums, concert halls, or music video locations.</p>
+        <p class="sec-body" data-i18n="aboutBody2">The site lists public places and information already shared publicly (broadcasts, social networks, press), organized in the form of interactive maps by artist, category, and city, with an itinerary generator to prepare a trip following the footsteps of your favorite group.</p>
+        <p class="sec-body" data-i18n="aboutBody3"><b>Screen To Street is an independent project and is not affiliated, associated, or endorsed by any agency, record label, artist, or right holder mentioned on the site.</b> All artist names, group names, and trademarks mentioned remain the property of their respective owners.</p>
+        <div class="note" data-i18n="aboutContact">Contact: contact@screentostreet.com</div>
     </div>
 
     <!-- ================= TERMS OF USE ================= -->
     <div class="section" id="cgu">
         <div class="sec-title">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-            Terms of Use (TOU)
+            <span data-i18n="touTitle">Terms of Use (TOU)</span>
         </div>
 
-        <div class="sub-h">Article 1 — Preamble</div>
-        <p class="sec-body">These TOU apply to the Screen To Street website (the "Site"). They are concluded between the Site publisher and any person accessing it (the "User"). Access to the Site implies full and complete acceptance of these terms. The publisher reserves the right to modify them at any time to adapt them to the evolution of the Site.</p>
+        <div class="sub-h" data-i18n="touArt1Title">Article 1 — Preamble</div>
+        <p class="sec-body" data-i18n="touArt1Body">These TOU apply to the Screen To Street website (the "Site"). They are concluded between the Site publisher and any person accessing it (the "User"). Access to the Site implies full and complete acceptance of these terms. The publisher reserves the right to modify them at any time to adapt them to the evolution of the Site.</p>
 
-        <div class="sub-h">Article 2 — Site Access and Paid Features</div>
-        <p class="sec-body">Access to the Site and the interactive map is free. Detailed access to certain groups or artists may require a paid unlock, in the form of a one-time, non-transferable payment, the price of which is indicated before purchase. The itinerary generator and guide export are provided to help organize a trip, without any guarantee of accuracy or availability of the locations at the time of the visit.</p>
+        <div class="sub-h" data-i18n="touArt2Title">Article 2 — Site Access and Paid Features</div>
+        <p class="sec-body" data-i18n="touArt2Body">Access to the Site and the interactive map is free. Detailed access to certain groups or artists may require a paid unlock, in the form of a one-time, non-transferable payment, the price of which is indicated before purchase. The itinerary generator and guide export are provided to help organize a trip, without any guarantee of accuracy or availability of the locations at the time of the visit.</p>
 
-        <div class="sub-h">Article 3 — Reliability of Information</div>
-        <p class="sec-body">The information on the Site (addresses, hours, status of a place, context of a filming) is provided for informational purposes. Some locations may have closed, changed use, or become private residences since they were mentioned in a show or music video; the User agrees to exercise discretion and respect the peace of residents and owners during any visit.</p>
+        <div class="sub-h" data-i18n="touArt3Title">Article 3 — Reliability of Information</div>
+        <p class="sec-body" data-i18n="touArt3Body">The information on the Site (addresses, hours, status of a place, context of a filming) is provided for informational purposes. Some locations may have closed, changed use, or become private residences since they were mentioned in a show or music video; the User agrees to exercise discretion and respect the peace of residents and owners during any visit.</p>
 
-        <div class="sub-h">Article 4 — Intellectual Property</div>
-        <p class="sec-body">The texts, visuals, logos, and structure of the Site are protected by intellectual property rights. Any total or partial reproduction without authorization is prohibited. Third-party content cited (show excerpts, artist visuals) remains the property of their respective rights holders and is used for informational purposes.</p>
+        <div class="sub-h" data-i18n="touArt4Title">Article 4 — Intellectual Property</div>
+        <p class="sec-body" data-i18n="touArt4Body">The texts, visuals, logos, and structure of the Site are protected by intellectual property rights. Any total or partial reproduction without authorization is prohibited. Third-party content cited (show excerpts, artist visuals) remains the property of their respective rights holders and is used for informational purposes.</p>
 
-        <div class="sub-h">Article 5 — Hyperlinks</div>
-        <p class="sec-body">The Site may contain links to third-party services (Google Maps, video platforms). The publisher has no control over these external sites and cannot be held responsible for their content.</p>
+        <div class="sub-h" data-i18n="touArt5Title">Article 5 — Hyperlinks</div>
+        <p class="sec-body" data-i18n="touArt5Body">The Site may contain links to third-party services (Google Maps, video platforms). The publisher has no control over these external sites and cannot be held responsible for their content.</p>
 
-        <div class="sub-h">Article 6 — Applicable Law</div>
-        <p class="sec-body">These TOU are subject to French law. In the event of a dispute, an amicable solution will be sought before any legal action.</p>
+        <div class="sub-h" data-i18n="touArt6Title">Article 6 — Applicable Law</div>
+        <p class="sec-body" data-i18n="touArt6Body">These TOU are subject to French law. In the event of a dispute, an amicable solution will be sought before any legal action.</p>
     </div>
 
     <!-- ================= PRIVACY POLICY ================= -->
     <div class="section" id="confidentialite">
         <div class="sec-title">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.5 3.4 10 8 11 4.6-1 8-5.5 8-11V5z"/></svg>
-            Privacy Policy
+            <span data-i18n="privacyTitle">Privacy Policy</span>
         </div>
-        <p class="sec-body">Screen To Street, as the data controller, is committed to protecting your personal data in accordance with the General Data Protection Regulation (GDPR) and applicable data protection laws.</p>
+        <p class="sec-body" data-i18n="privacyIntro">Screen To Street, as the data controller, is committed to protecting your personal data in accordance with the General Data Protection Regulation (GDPR) and applicable data protection laws.</p>
 
-        <div class="sub-h">Collected Data</div>
+        <div class="sub-h" data-i18n="privacyDataTitle">Collected Data</div>
         <ul class="plain">
-            <li>Name and email address, when creating an account;</li>
-            <li>Unlocked groups/artists and purchase history;</li>
-            <li>Locations marked as "visited" or added to the wishlist;</li>
-            <li>Browsing data (language, display preferences).</li>
+            <li data-i18n="privacyData1">Name and email address, when creating an account;</li>
+            <li data-i18n="privacyData2">Unlocked groups/artists and purchase history;</li>
+            <li data-i18n="privacyData3">Locations marked as "visited" or added to the wishlist;</li>
+            <li data-i18n="privacyData4">Browsing data (language, display preferences).</li>
         </ul>
-        <p class="sec-body">Payments are processed by a secure third-party provider (e.g., Stripe, PayPal): Screen To Street never stores your bank details.</p>
+        <p class="sec-body" data-i18n="privacyPayments">Payments are processed by a secure third-party provider (e.g., Stripe, PayPal): Screen To Street never stores your bank details.</p>
 
-        <div class="sub-h">Purposes and Legal Basis</div>
-        <p class="sec-body">Your data is used for managing your account, accessing purchased content, and improving the service, based on the performance of the contract concluded with you or your consent.</p>
+        <div class="sub-h" data-i18n="privacyPurposeTitle">Purposes and Legal Basis</div>
+        <p class="sec-body" data-i18n="privacyPurposeBody">Your data is used for managing your account, accessing purchased content, and improving the service, based on the performance of the contract concluded with you or your consent.</p>
 
-        <div class="sub-h">Retention and Recipients</div>
-        <p class="sec-body">Your data is kept for the time necessary for the above purposes. It is never sold to third parties; it may be shared with our technical and payment providers, strictly within the limits of their assignments.</p>
+        <div class="sub-h" data-i18n="privacyRetentionTitle">Retention and Recipients</div>
+        <p class="sec-body" data-i18n="privacyRetentionBody">Your data is kept for the time necessary for the above purposes. It is never sold to third parties; it may be shared with our technical and payment providers, strictly within the limits of their assignments.</p>
 
-        <div class="sub-h">Your Rights</div>
-        <p class="sec-body">You have the right to access, rectify, delete, limit, oppose, and port your data, as well as the right to withdraw your consent at any time. You can exercise these rights at contact@screentostreet.com, or lodge a complaint with the CNIL (cnil.fr/fr/plaintes).</p>
+        <div class="sub-h" data-i18n="privacyRightsTitle">Your Rights</div>
+        <p class="sec-body" data-i18n="privacyRightsBody">You have the right to access, rectify, delete, limit, oppose, and port your data, as well as the right to withdraw your consent at any time. You can exercise these rights at contact@screentostreet.com, or lodge a complaint with the CNIL (cnil.fr/fr/plaintes).</p>
 
-        <div class="sub-h">Minors</div>
-        <p class="sec-body">The Site does not knowingly collect data concerning minors under 15 years of age without the consent of their parents or legal guardians.</p>
+        <div class="sub-h" data-i18n="privacyMinorsTitle">Minors</div>
+        <p class="sec-body" data-i18n="privacyMinorsBody">The Site does not knowingly collect data concerning minors under 15 years of age without the consent of their parents or legal guardians.</p>
 
-        <div class="sub-h">Cookies</div>
-        <p class="sec-body">The Site uses cookies necessary for its operation (language preferences, session) and, where applicable, audience measurement cookies. You can manage your choices at any time via "Cookie Settings".</p>
+        <div class="sub-h" data-i18n="privacyCookiesTitle">Cookies</div>
+        <p class="sec-body" data-i18n="privacyCookiesBody">The Site uses cookies necessary for its operation (language preferences, session) and, where applicable, audience measurement cookies. You can manage your choices at any time via "Cookie Settings".</p>
     </div>
 
     <!-- ================= LEGAL NOTICE ================= -->
     <div class="section" id="mentions">
         <div class="sec-title">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
-            Legal Notice
+            <span data-i18n="mentionsTitle">Legal Notice</span>
         </div>
 
-        <div class="sub-h">Site Publisher</div>
-        <p class="sec-body">
+        <div class="sub-h" data-i18n="mentionsPublisherTitle">Site Publisher</div>
+        <p class="sec-body" data-i18n="mentionsPublisherBody">
             Name / Company name: <span class="placeholder">[to be completed]</span><br>
             Address: <span class="placeholder">[to be completed]</span><br>
             Contact: contact@screentostreet.com<br>
             Director of publication: <span class="placeholder">[to be completed]</span>
         </p>
 
-        <div class="sub-h">Hosting Provider</div>
-        <p class="sec-body">
+        <div class="sub-h" data-i18n="mentionsHostTitle">Hosting Provider</div>
+        <p class="sec-body" data-i18n="mentionsHostBody">
             Company name: <span class="placeholder">[to be completed]</span><br>
             Address: <span class="placeholder">[to be completed]</span>
         </p>
 
-        <div class="sub-h">Intellectual Property</div>
-        <p class="sec-body">All elements of the Site (texts, graphics, logo) are protected by copyright. Any reproduction, even partial, is prohibited without prior written authorization.</p>
+        <div class="sub-h" data-i18n="mentionsIPTitle">Intellectual Property</div>
+        <p class="sec-body" data-i18n="mentionsIPBody">All elements of the Site (texts, graphics, logo) are protected by copyright. Any reproduction, even partial, is prohibited without prior written authorization.</p>
 
-        <div class="sub-h">Disclaimer</div>
-        <p class="sec-body">Screen To Street is an independent project created by fans. It is not affiliated, associated, authorized, or endorsed by HYBE Corporation, YG Entertainment, JYP Entertainment, or any of their subsidiaries or artists. All names, trademarks, and logos mentioned belong to their respective owners.</p>
+        <div class="sub-h" data-i18n="mentionsDisclaimerTitle">Disclaimer</div>
+        <p class="sec-body" data-i18n="mentionsDisclaimerBody">Screen To Street is an independent project created by fans. It is not affiliated, associated, authorized, or endorsed by HYBE Corporation, YG Entertainment, JYP Entertainment, or any of their subsidiaries or artists. All names, trademarks, and logos mentioned belong to their respective owners.</p>
     </div>
 
     </div>
 </div>
+
+<script>
+    let currentLang = localStorage.getItem('lang') || 'en';
+
+    const dict = {
+        en: {
+            navDest: "Destinations", navArtists: "Artists", navLogin: "Log in",
+            backBtn: "← Back",
+            tabMentions: "Legal Notice", tabAbout: "About Us", tabTOU: "Terms of Use", tabPrivacy: "Privacy Policy", tabCookies: "Cookies ⚙",
+            pageTitle: "Legal Information", pageSub: "Everything you need to know about Screen To Street, how it works, and your data.",
+
+            aboutTitle: "About Us",
+            aboutBody1: "Screen To Street is an independent guide created to help fans find, in the real world, the places visited, photographed, or filmed by their favorite artists: show sets, restaurants, museums, concert halls, or music video locations.",
+            aboutBody2: "The site lists public places and information already shared publicly (broadcasts, social networks, press), organized in the form of interactive maps by artist, category, and city, with an itinerary generator to prepare a trip following the footsteps of your favorite group.",
+            aboutBody3: "<b>Screen To Street is an independent project and is not affiliated, associated, or endorsed by any agency, record label, artist, or right holder mentioned on the site.</b> All artist names, group names, and trademarks mentioned remain the property of their respective owners.",
+            aboutContact: "Contact: contact@screentostreet.com",
+
+            touTitle: "Terms of Use (TOU)",
+            touArt1Title: "Article 1 — Preamble",
+            touArt1Body: "These TOU apply to the Screen To Street website (the \"Site\"). They are concluded between the Site publisher and any person accessing it (the \"User\"). Access to the Site implies full and complete acceptance of these terms. The publisher reserves the right to modify them at any time to adapt them to the evolution of the Site.",
+            touArt2Title: "Article 2 — Site Access and Paid Features",
+            touArt2Body: "Access to the Site and the interactive map is free. Detailed access to certain groups or artists may require a paid unlock, in the form of a one-time, non-transferable payment, the price of which is indicated before purchase. The itinerary generator and guide export are provided to help organize a trip, without any guarantee of accuracy or availability of the locations at the time of the visit.",
+            touArt3Title: "Article 3 — Reliability of Information",
+            touArt3Body: "The information on the Site (addresses, hours, status of a place, context of a filming) is provided for informational purposes. Some locations may have closed, changed use, or become private residences since they were mentioned in a show or music video; the User agrees to exercise discretion and respect the peace of residents and owners during any visit.",
+            touArt4Title: "Article 4 — Intellectual Property",
+            touArt4Body: "The texts, visuals, logos, and structure of the Site are protected by intellectual property rights. Any total or partial reproduction without authorization is prohibited. Third-party content cited (show excerpts, artist visuals) remains the property of their respective rights holders and is used for informational purposes.",
+            touArt5Title: "Article 5 — Hyperlinks",
+            touArt5Body: "The Site may contain links to third-party services (Google Maps, video platforms). The publisher has no control over these external sites and cannot be held responsible for their content.",
+            touArt6Title: "Article 6 — Applicable Law",
+            touArt6Body: "These TOU are subject to French law. In the event of a dispute, an amicable solution will be sought before any legal action.",
+
+            privacyTitle: "Privacy Policy",
+            privacyIntro: "Screen To Street, as the data controller, is committed to protecting your personal data in accordance with the General Data Protection Regulation (GDPR) and applicable data protection laws.",
+            privacyDataTitle: "Collected Data",
+            privacyData1: "Name and email address, when creating an account;",
+            privacyData2: "Unlocked groups/artists and purchase history;",
+            privacyData3: "Locations marked as \"visited\" or added to the wishlist;",
+            privacyData4: "Browsing data (language, display preferences).",
+            privacyPayments: "Payments are processed by a secure third-party provider (e.g., Stripe, PayPal): Screen To Street never stores your bank details.",
+            privacyPurposeTitle: "Purposes and Legal Basis",
+            privacyPurposeBody: "Your data is used for managing your account, accessing purchased content, and improving the service, based on the performance of the contract concluded with you or your consent.",
+            privacyRetentionTitle: "Retention and Recipients",
+            privacyRetentionBody: "Your data is kept for the time necessary for the above purposes. It is never sold to third parties; it may be shared with our technical and payment providers, strictly within the limits of their assignments.",
+            privacyRightsTitle: "Your Rights",
+            privacyRightsBody: "You have the right to access, rectify, delete, limit, oppose, and port your data, as well as the right to withdraw your consent at any time. You can exercise these rights at contact@screentostreet.com, or lodge a complaint with the CNIL (cnil.fr/fr/plaintes).",
+            privacyMinorsTitle: "Minors",
+            privacyMinorsBody: "The Site does not knowingly collect data concerning minors under 15 years of age without the consent of their parents or legal guardians.",
+            privacyCookiesTitle: "Cookies",
+            privacyCookiesBody: "The Site uses cookies necessary for its operation (language preferences, session) and, where applicable, audience measurement cookies. You can manage your choices at any time via \"Cookie Settings\".",
+
+            mentionsTitle: "Legal Notice",
+            mentionsPublisherTitle: "Site Publisher",
+            mentionsPublisherBody: "Name / Company name: <span class=\"placeholder\">[to be completed]</span><br>Address: <span class=\"placeholder\">[to be completed]</span><br>Contact: contact@screentostreet.com<br>Director of publication: <span class=\"placeholder\">[to be completed]</span>",
+            mentionsHostTitle: "Hosting Provider",
+            mentionsHostBody: "Company name: <span class=\"placeholder\">[to be completed]</span><br>Address: <span class=\"placeholder\">[to be completed]</span>",
+            mentionsIPTitle: "Intellectual Property",
+            mentionsIPBody: "All elements of the Site (texts, graphics, logo) are protected by copyright. Any reproduction, even partial, is prohibited without prior written authorization.",
+            mentionsDisclaimerTitle: "Disclaimer",
+            mentionsDisclaimerBody: "Screen To Street is an independent project created by fans. It is not affiliated, associated, authorized, or endorsed by HYBE Corporation, YG Entertainment, JYP Entertainment, or any of their subsidiaries or artists. All names, trademarks, and logos mentioned belong to their respective owners.",
+
+            cookiesAlert: "To manage your cookies, return to the homepage or open the settings."
+        },
+        fr: {
+            navDest: "Destinations", navArtists: "Artistes", navLogin: "Se connecter",
+            backBtn: "← Retour",
+            tabMentions: "Mentions légales", tabAbout: "Qui sommes-nous", tabTOU: "CGU", tabPrivacy: "Confidentialité", tabCookies: "Cookies ⚙",
+            pageTitle: "Informations légales", pageSub: "Tout ce qu'il faut savoir sur Screen To Street, son fonctionnement et vos données.",
+
+            aboutTitle: "Qui sommes-nous",
+            aboutBody1: "Screen To Street est un guide indépendant créé pour aider les fans à retrouver, dans le monde réel, les lieux visités, photographiés ou filmés par leurs artistes préférés : décors d'émissions, restaurants, musées, salles de concert ou lieux de tournage de clips.",
+            aboutBody2: "Le site répertorie des lieux publics et des informations déjà partagées publiquement (émissions, réseaux sociaux, presse), organisés sous forme de cartes interactives par artiste, catégorie et ville, avec un générateur d'itinéraire pour préparer un voyage sur les traces de votre groupe préféré.",
+            aboutBody3: "<b>Screen To Street est un projet indépendant et n'est affilié, associé ni approuvé par aucune agence, maison de disques, artiste ou ayant droit mentionné sur le site.</b> Tous les noms d'artistes, de groupes et les marques mentionnés restent la propriété de leurs détenteurs respectifs.",
+            aboutContact: "Contact : contact@screentostreet.com",
+
+            touTitle: "Conditions Générales d'Utilisation (CGU)",
+            touArt1Title: "Article 1 — Préambule",
+            touArt1Body: "Les présentes CGU s'appliquent au site Screen To Street (le « Site »). Elles sont conclues entre l'éditeur du Site et toute personne y accédant (l'« Utilisateur »). L'accès au Site implique l'acceptation pleine et entière des présentes conditions. L'éditeur se réserve le droit de les modifier à tout moment afin de les adapter à l'évolution du Site.",
+            touArt2Title: "Article 2 — Accès au Site et fonctionnalités payantes",
+            touArt2Body: "L'accès au Site et à la carte interactive est gratuit. L'accès détaillé à certains groupes ou artistes peut nécessiter un déblocage payant, sous la forme d'un paiement unique et non transférable, dont le prix est indiqué avant l'achat. Le générateur d'itinéraire et l'export de guide sont fournis pour aider à organiser un voyage, sans garantie d'exactitude ni de disponibilité des lieux au moment de la visite.",
+            touArt3Title: "Article 3 — Fiabilité des informations",
+            touArt3Body: "Les informations présentes sur le Site (adresses, horaires, statut d'un lieu, contexte d'un tournage) sont fournies à titre indicatif. Certains lieux peuvent avoir fermé, changé d'usage ou être devenus des résidences privées depuis leur apparition dans une émission ou un clip ; l'Utilisateur s'engage à faire preuve de discrétion et à respecter la tranquillité des riverains et des propriétaires lors de toute visite.",
+            touArt4Title: "Article 4 — Propriété intellectuelle",
+            touArt4Body: "Les textes, visuels, logos et la structure du Site sont protégés par le droit de la propriété intellectuelle. Toute reproduction totale ou partielle sans autorisation est interdite. Les contenus tiers cités (extraits d'émissions, visuels d'artistes) restent la propriété de leurs ayants droit respectifs et sont utilisés à titre informatif.",
+            touArt5Title: "Article 5 — Liens hypertextes",
+            touArt5Body: "Le Site peut contenir des liens vers des services tiers (Google Maps, plateformes vidéo). L'éditeur n'exerce aucun contrôle sur ces sites externes et ne saurait être tenu responsable de leur contenu.",
+            touArt6Title: "Article 6 — Droit applicable",
+            touArt6Body: "Les présentes CGU sont soumises au droit français. En cas de litige, une solution amiable sera recherchée avant toute action judiciaire.",
+
+            privacyTitle: "Politique de confidentialité",
+            privacyIntro: "Screen To Street, en tant que responsable de traitement, s'engage à protéger vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD) et aux lois applicables en matière de protection des données.",
+            privacyDataTitle: "Données collectées",
+            privacyData1: "Nom et adresse e-mail, lors de la création d'un compte ;",
+            privacyData2: "Groupes/artistes débloqués et historique d'achat ;",
+            privacyData3: "Lieux marqués comme « visités » ou ajoutés à la wishlist ;",
+            privacyData4: "Données de navigation (langue, préférences d'affichage).",
+            privacyPayments: "Les paiements sont traités par un prestataire tiers sécurisé (ex. Stripe, PayPal) : Screen To Street ne stocke jamais vos coordonnées bancaires.",
+            privacyPurposeTitle: "Finalités et base légale",
+            privacyPurposeBody: "Vos données sont utilisées pour la gestion de votre compte, l'accès aux contenus achetés et l'amélioration du service, sur la base de l'exécution du contrat conclu avec vous ou de votre consentement.",
+            privacyRetentionTitle: "Durée de conservation et destinataires",
+            privacyRetentionBody: "Vos données sont conservées le temps nécessaire aux finalités ci-dessus. Elles ne sont jamais vendues à des tiers ; elles peuvent être partagées avec nos prestataires techniques et de paiement, strictement dans la limite de leurs missions.",
+            privacyRightsTitle: "Vos droits",
+            privacyRightsBody: "Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité de vos données, ainsi que du droit de retirer votre consentement à tout moment. Vous pouvez exercer ces droits à contact@screentostreet.com, ou introduire une réclamation auprès de la CNIL (cnil.fr/fr/plaintes).",
+            privacyMinorsTitle: "Mineurs",
+            privacyMinorsBody: "Le Site ne collecte pas sciemment de données concernant des mineurs de moins de 15 ans sans le consentement de leurs parents ou représentants légaux.",
+            privacyCookiesTitle: "Cookies",
+            privacyCookiesBody: "Le Site utilise des cookies nécessaires à son fonctionnement (préférences de langue, session) et, le cas échéant, des cookies de mesure d'audience. Vous pouvez gérer vos choix à tout moment via « Paramètres des cookies ».",
+
+            mentionsTitle: "Mentions légales",
+            mentionsPublisherTitle: "Éditeur du site",
+            mentionsPublisherBody: "Nom / Raison sociale : <span class=\"placeholder\">[à compléter]</span><br>Adresse : <span class=\"placeholder\">[à compléter]</span><br>Contact : contact@screentostreet.com<br>Directeur de la publication : <span class=\"placeholder\">[à compléter]</span>",
+            mentionsHostTitle: "Hébergeur",
+            mentionsHostBody: "Raison sociale : <span class=\"placeholder\">[à compléter]</span><br>Adresse : <span class=\"placeholder\">[à compléter]</span>",
+            mentionsIPTitle: "Propriété intellectuelle",
+            mentionsIPBody: "L'ensemble des éléments du Site (textes, graphismes, logo) sont protégés par le droit d'auteur. Toute reproduction, même partielle, est interdite sans autorisation écrite préalable.",
+            mentionsDisclaimerTitle: "Avertissement",
+            mentionsDisclaimerBody: "Screen To Street est un projet indépendant créé par des fans. Il n'est affilié, associé, autorisé ni approuvé par HYBE Corporation, YG Entertainment, JYP Entertainment, ni aucune de leurs filiales ou artistes. Tous les noms, marques et logos mentionnés appartiennent à leurs détenteurs respectifs.",
+
+            cookiesAlert: "Pour gérer vos cookies, retournez à la page d'accueil ou ouvrez les paramètres."
+        }
+    };
+
+    function applyTranslations() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[currentLang] && dict[currentLang][key] !== undefined) el.innerHTML = dict[currentLang][key];
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        applyTranslations();
+
+        const langBtn = document.getElementById('lang-btn');
+        if (langBtn) langBtn.addEventListener('click', (e) => {
+            const lMenu = document.getElementById('lang-menu');
+            if (lMenu) lMenu.classList.toggle('hidden');
+            e.stopPropagation();
+        });
+
+        document.querySelectorAll('.lang-option').forEach(opt => {
+            opt.addEventListener('click', function () {
+                currentLang = this.getAttribute('data-lang');
+                localStorage.setItem('lang', currentLang);
+                applyTranslations();
+                const lMenu = document.getElementById('lang-menu');
+                if (lMenu) lMenu.classList.add('hidden');
+            });
+        });
+
+        document.addEventListener('click', () => {
+            const lMenu = document.getElementById('lang-menu');
+            if (lMenu) lMenu.classList.add('hidden');
+        });
+
+        const cookiesBtn = document.getElementById('cookies-settings-btn');
+        if (cookiesBtn) cookiesBtn.addEventListener('click', () => alert(dict[currentLang].cookiesAlert));
+    });
+</script>
 
 </body>
 </html>
