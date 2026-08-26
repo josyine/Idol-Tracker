@@ -75,7 +75,7 @@
               <div class="lang-option" data-lang="en">English</div>
               <div class="lang-option" data-lang="fr">Français</div>
           </div>
-          <button class="login-btn-v5 open-auth-btn" data-i18n="navLogin">Log in</button>
+          <button class="login-btn-v5" id="header-login-btn" data-i18n="navLogin">Log in</button>
         </div>
       </div>
     </div>
@@ -118,8 +118,36 @@
                 <div class="step-container" id="step-btn-4"><div class="step-dot" id="step-dot-4">4</div><span class="step-label" id="step-label-4" data-i18n="step4Title">Payment</span></div>
             </div>
 
-            <!-- Message d'erreur commun (connexion / création de compte) -->
+            <!-- Message d'erreur / de confirmation commun (connexion / création de compte) -->
             <div id="auth-error" class="hidden" style="background:#FFF1F3; border:1px solid #FBD5DC; color:#D42759; font-size:12px; font-weight:600; padding:10px 14px; border-radius:8px; margin-bottom:16px;"></div>
+
+            <!-- ETAPE "LOG IN" (dédiée, distincte de l'inscription) -->
+            <div id="auth-step-login" class="auth-step hidden">
+                <h2 data-i18n="loginTitle">Log in</h2>
+                <p data-i18n="loginDesc">Welcome back! Enter your email and password to continue.</p>
+
+                <div class="input-group"><label><span data-i18n="emailLabel">Email address</span> <span style="color:#D42759;">*</span></label><input type="email" id="login-email" class="field-input" placeholder="jane.doe@example.com" required></div>
+                <div class="input-group">
+                    <label><span data-i18n="password">Password</span> <span style="color:#D42759;">*</span></label>
+                    <input type="password" id="login-password" class="field-input" placeholder="••••••••" required>
+                </div>
+                <div style="text-align:right; margin-bottom:16px; margin-top:-6px;">
+                    <a href="#" id="forgot-password-link" style="font-size:11.5px; color:#D42759; font-weight:600;" data-i18n="forgotPassword">Forgot password?</a>
+                </div>
+                <button class="pay-btn" id="btn-login-submit" data-i18n="loginBtn">Log in</button>
+
+                <div style="display:flex; align-items:center; gap:10px; margin:18px 0;">
+                    <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+                    <span style="font-size:11px; color:#94a3b8; font-weight:600;" data-i18n="orDivider">OR</span>
+                    <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+                </div>
+
+                <div class="social-btn" onclick="openGooglePopup()"><svg class="g-icon" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg><span data-i18n="authGoogle">Continue with Google</span></div>
+
+                <p class="terms" style="margin-top:18px;">
+                    <span data-i18n="noAccountYet">Don't have an account?</span> <a href="#" class="link-to-signup" style="color:#D42759;font-weight:600;" data-i18n="signUpLink">Sign up</a>
+                </p>
+            </div>
 
             <!-- ETAPE 0 -->
             <div id="auth-step-0" class="auth-step">
@@ -128,15 +156,21 @@
                 <div class="social-btn" onclick="openGooglePopup()"><svg class="g-icon" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg><span data-i18n="authGoogle">Continue with Google</span></div>
                 <div class="social-btn" id="btn-to-email"><svg class="m-icon" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7L22 6"/></svg><span data-i18n="authEmail">Continue with email</span></div>
                 <p class="terms"><span data-i18n="authTerms">By continuing, you agree to Screen To Street's</span> <a href="legal.html#cgu" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkTerms">Terms of Use</a>. <span data-i18n="authPrivacy">Read our</span> <a href="legal.html#confidentialite" target="_blank" style="color:#D42759;font-weight:600;" data-i18n="linkPrivacy">Privacy Policy</a>.</p>
+                <p class="terms" style="margin-top:14px;">
+                    <span data-i18n="haveAccountYet">Already have an account?</span> <a href="#" class="link-to-login" style="color:#D42759;font-weight:600;" data-i18n="logInLink">Log in</a>
+                </p>
             </div>
 
             <!-- ETAPES 1-4 -->
             <div id="auth-step-1" class="auth-step hidden">
                 <h2 data-i18n="step1Title">Account</h2>
-                <p data-i18n="emailCheck">We will check if you have an account, and if not, we will help you create one.</p>
+                <p data-i18n="emailCheck">Create your account with an email and password.</p>
                 <div class="input-group"><label><span data-i18n="emailLabel">Email address</span> <span style="color:#D42759;">*</span></label><input type="email" id="user-email" class="field-input" placeholder="jane.doe@example.com" required></div>
                 <div class="input-group"><label><span data-i18n="password">Password</span> <span style="color:#D42759;">*</span></label><input type="password" id="user-password" class="field-input" minlength="6" placeholder="••••••••" required></div>
                 <button class="pay-btn" id="btn-to-step2" data-i18n="btnContinue">Continue</button>
+                <p class="terms" style="margin-top:14px;">
+                    <span data-i18n="haveAccountYet">Already have an account?</span> <a href="#" class="link-to-login" style="color:#D42759;font-weight:600;" data-i18n="logInLink">Log in</a>
+                </p>
             </div>
 
             <div id="auth-step-2" class="auth-step hidden">
