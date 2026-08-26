@@ -29,6 +29,41 @@ let tripPageMap = null;
 let tripPageLayer = null;
 let tripMainLayerGroup = null;
 
+// ==========================================
+// 0bis. SYNCHRONISATION CLOUD DE LA WISHLIST (Firestore)
+// ==========================================
+// Petite fonction centrale appelée juste après chaque écriture locale de la
+// wishlist : si un compte est connecté (window.syncUserData vient de
+// firebase-init.js), on répercute aussi le changement dans Firestore. Si
+// firebase-init.js n'est pas chargé sur la page (ex: map-destinations.html) ou si
+// personne n'est connecté, cette fonction ne fait rien de plus — la wishlist reste
+// purement locale, exactement comme avant.
+function syncWishlist(wList) {
+    if (typeof window.syncUserData === 'function') {
+        window.syncUserData({ wishlistLocs: wList });
+    }
+}
+
+// Au chargement de la page, une fois que Firebase a déterminé si quelqu'un est
+// connecté : si oui, on va chercher sa wishlist réelle dans Firestore et on
+// l'utilise pour remplacer celle du navigateur (qui pourrait être vide, ou celle
+// d'un autre compte testé plus tôt sur ce même appareil), puis on rafraîchit
+// l'affichage si la page en a déjà dessiné une partie.
+window.addEventListener('firebase-ready', async (e) => {
+    const user = e.detail && e.detail.user;
+    if (!user) return; // visiteur non connecté : on garde la wishlist locale telle quelle
+
+    const cloudData = await window.loadUserCloudData();
+    if (cloudData && Array.isArray(cloudData.wishlistLocs)) {
+        localStorage.setItem('wishlistLocs', JSON.stringify(cloudData.wishlistLocs));
+
+        // Rafraîchit les affichages déjà construits qui dépendent de la wishlist.
+        if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations();
+        if (document.getElementById('edit-trip-name') && typeof window.renderTrip === 'function' && currentTrip) window.renderTrip();
+        if (typeof window.refreshWishlistFromCloud === 'function') window.refreshWishlistFromCloud();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const userAvatarEls = document.querySelectorAll('.user-avatar-btn');
     if (userAvatarEls.length > 0) {
@@ -1030,6 +1065,7 @@ window.toggleWishlist = function() {
         wList = wList.filter(w => w.id !== currentLocationIdForMemory && w !== currentLocationIdForMemory);
     }
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    syncWishlist(wList);
     if(map) renderLocations();
 };
 
@@ -1046,6 +1082,7 @@ window.handleTripSelect = function() {
         if(idx !== -1) {
             wList[idx].tripId = value;
             localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+            syncWishlist(wList);
         }
     }
 };
@@ -1644,6 +1681,7 @@ window.addSelectedDaysToTrip = function() {
     });
     
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    syncWishlist(wList);
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
@@ -1686,6 +1724,7 @@ window.saveItineraryToTrips = function() {
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    syncWishlist(wList);
     localStorage.setItem('activeTripId', newTripId);
 
     if(document.getElementById('trip-name-display')) {
@@ -2310,6 +2349,7 @@ window.confirmRemoveLoc = function() {
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     wList = wList.filter(w => !(Number(w.id) === locToRemoveData.id && w.tripId === currentTrip.id));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    syncWishlist(wList);
     
     currentTrip.days = currentTrip.days.map(day => day.filter(id => Number(id) !== locToRemoveData.id));
 
@@ -2334,6 +2374,7 @@ window.quickAddLoc = function(locId) {
     if(!wList.some(w => Number(w.id) === locId && w.tripId === currentTrip.id)) {
         wList.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+        syncWishlist(wList);
         window.renderTrip(); 
         
         if(document.getElementById('add-modal') && !document.getElementById('add-modal').classList.contains('hidden')) {
@@ -2578,6 +2619,7 @@ window.confirmDeleteTrip = function() {
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     wList = wList.filter(w => w.tripId !== tripIdToDelete);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    syncWishlist(wList);
     
     if (currentTrip && currentTrip.id === tripIdToDelete) {
         currentTrip = null;
