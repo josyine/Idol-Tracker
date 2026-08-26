@@ -1,4 +1,17 @@
 // ==========================================
+// 0. CONFIGURATION DES FONDS DE CARTE (CARTO)
+// ==========================================
+// CARTO exige désormais une clé API gratuite pour ses fonds de carte (changement
+// effectué courant août 2026, indépendant de toute action sur ce site).
+// 1) Va sur https://carto.com/basemaps/apikey et demande une clé gratuite (gratuite
+//    jusqu'à 5 millions de requêtes/mois, largement suffisant pour ce site).
+// 2) Colle la clé reçue ci-dessous, entre les guillemets.
+// 3) Tant que CARTO_API_KEY est vide, les cartes afficheront le filigrane
+//    "API KEY REQUIRED" — c'est normal, ça disparaît dès que la clé est renseignée.
+const CARTO_API_KEY = ""; // <-- colle ta clé CARTO ici, ex: "abcd1234..."
+const CARTO_TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' + (CARTO_API_KEY ? ('?key=' + CARTO_API_KEY) : '');
+
+// ==========================================
 // 1. INITIALISATION ROBUSTE DE L'APPLICATION
 // ==========================================
 let map = null;
@@ -38,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+        L.tileLayer(CARTO_TILE_URL, { 
             attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 
         }).addTo(map);
         markerGroup = L.layerGroup().addTo(map);
@@ -72,6 +85,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetMenu = document.getElementById(menuId);
             if(targetMenu) targetMenu.classList.toggle('hidden');
             e.stopPropagation();
+        });
+    });
+
+    // Clic sur "English" / "Français" dans le menu de langue (map.html / trips.html) :
+    // ce gestionnaire manquait, ce qui faisait que la traduction ne se déclenchait jamais.
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const lang = opt.getAttribute('data-lang');
+            if(lang) window.changeLang(lang);
+            const menu = opt.closest('.dropdown-menu');
+            if(menu) menu.classList.add('hidden');
         });
     });
 
@@ -1280,7 +1306,7 @@ window.openLocModal = function(id) {
 
         if(!popupMap) {
             popupMap = L.map('modal-map', { zoomControl: false, attributionControl: false }).setView([loc.lat, loc.lng], 15);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            L.tileLayer(CARTO_TILE_URL, {
                 subdomains: 'abcd', maxZoom: 19
             }).addTo(popupMap);
             popupMarker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(popupMap);
@@ -1432,7 +1458,7 @@ window.generateItinerary = function() {
                 itiLeafletMap = null;
             }
             itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(itiLeafletMap);
+            L.tileLayer(CARTO_TILE_URL).addTo(itiLeafletMap);
             itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
 
             coordsForMap.forEach((c, idx) => {
@@ -1681,7 +1707,7 @@ window.initTrips = function() {
 
     if(document.getElementById('trip-map-container') && !tripPageMap) {
         tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(tripPageMap);
+        L.tileLayer(CARTO_TILE_URL).addTo(tripPageMap);
         tripPageLayer = L.featureGroup().addTo(tripPageMap);
     }
 
