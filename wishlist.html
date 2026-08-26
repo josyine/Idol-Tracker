@@ -207,6 +207,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="firebase-init.js"></script>
 <script src="script.js"></script>
 <script>
     // La fenêtre "Unlock Passes" est entièrement gérée par script.js (openCartModal /
@@ -286,8 +287,14 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
         wList = wList.filter(w => !(Number(w.id) === Number(id) && ((w.tripId && w.tripId !== 'none' ? w.tripId : 'none') === tripId)));
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+        if (typeof window.syncUserData === 'function') window.syncUserData({ wishlistLocs: wList });
         renderWishlist();
     }
+
+    // Permet à firebase-init.js / script.js de rafraîchir cette page une fois la
+    // vraie wishlist du compte récupérée depuis Firestore (voir l'écouteur
+    // "firebase-ready" dans script.js).
+    window.refreshWishlistFromCloud = renderWishlist;
 
     renderWishlist();
 
