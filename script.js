@@ -1,15 +1,13 @@
 // ==========================================
-// 0. CONFIGURATION DES FONDS DE CARTE (CARTO)
+// 0. CONFIGURATION DU FOND DE CARTE (OpenStreetMap standard)
 // ==========================================
-// CARTO exige désormais une clé API gratuite pour ses fonds de carte (changement
-// effectué courant août 2026, indépendant de toute action sur ce site).
-// 1) Va sur https://carto.com/basemaps/apikey et demande une clé gratuite (gratuite
-//    jusqu'à 5 millions de requêtes/mois, largement suffisant pour ce site).
-// 2) Colle la clé reçue ci-dessous, entre les guillemets.
-// 3) Tant que CARTO_API_KEY est vide, les cartes afficheront le filigrane
-//    "API KEY REQUIRED" — c'est normal, ça disparaît dès que la clé est renseignée.
-const CARTO_API_KEY = ""; // <-- colle ta clé CARTO ici, ex: "abcd1234..."
-const CARTO_TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' + (CARTO_API_KEY ? ('?key=' + CARTO_API_KEY) : '');
+// On utilise directement les tuiles publiques d'OpenStreetMap : entièrement gratuites,
+// sans inscription et sans clé API — contrairement à CARTO, qui a changé sa politique
+// en août 2026 et impose désormais une clé. OSM ne demandera jamais de clé.
+// (Seule condition d'usage : garder l'attribution "OpenStreetMap contributors" visible,
+// déjà incluse ci-dessous, et rester dans un usage raisonnable — largement le cas ici.)
+const OSM_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 // ==========================================
 // 1. INITIALISATION ROBUSTE DE L'APPLICATION
@@ -54,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
         map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-        L.tileLayer(CARTO_TILE_URL, { 
-            attribution: '&copy; OpenStreetMap contributors', subdomains: 'abcd', maxZoom: 19 
+        L.tileLayer(OSM_TILE_URL, { 
+            attribution: OSM_ATTRIBUTION, subdomains: 'abc', maxZoom: 19 
         }).addTo(map);
         markerGroup = L.layerGroup().addTo(map);
         setTimeout(() => { map.invalidateSize(); }, 200);
@@ -1309,8 +1307,8 @@ window.openLocModal = function(id) {
 
         if(!popupMap) {
             popupMap = L.map('modal-map', { zoomControl: false, attributionControl: false }).setView([loc.lat, loc.lng], 15);
-            L.tileLayer(CARTO_TILE_URL, {
-                subdomains: 'abcd', maxZoom: 19
+            L.tileLayer(OSM_TILE_URL, {
+                subdomains: 'abc', maxZoom: 19
             }).addTo(popupMap);
             popupMarker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(popupMap);
         } else {
@@ -1461,7 +1459,7 @@ window.generateItinerary = function() {
                 itiLeafletMap = null;
             }
             itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
-            L.tileLayer(CARTO_TILE_URL).addTo(itiLeafletMap);
+            L.tileLayer(OSM_TILE_URL).addTo(itiLeafletMap);
             itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
 
             coordsForMap.forEach((c, idx) => {
@@ -1710,7 +1708,7 @@ window.initTrips = function() {
 
     if(document.getElementById('trip-map-container') && !tripPageMap) {
         tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
-        L.tileLayer(CARTO_TILE_URL).addTo(tripPageMap);
+        L.tileLayer(OSM_TILE_URL).addTo(tripPageMap);
         tripPageLayer = L.featureGroup().addTo(tripPageMap);
     }
 
