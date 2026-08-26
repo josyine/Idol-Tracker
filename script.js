@@ -35,7 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const userAvatarEls = document.querySelectorAll('.user-avatar-btn');
     if (userAvatarEls.length > 0) {
         const savedPhoto = localStorage.getItem('userPhoto');
-        const userName = localStorage.getItem('userName') || 'U';
+        // Initiale de l'avatar : prénom en priorité (comme Google), sinon pseudo.
+        const firstName = (localStorage.getItem('userFirstName') || '').trim();
+        const userName = (localStorage.getItem('userName') || 'U').trim();
+        const avatarInitial = (firstName || userName || 'U').charAt(0).toUpperCase();
         
         userAvatarEls.forEach(avatarEl => {
             if (savedPhoto && savedPhoto.trim() !== '') {
@@ -43,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 avatarEl.style.color = 'transparent'; 
             } else {
                 avatarEl.innerHTML = '';
-                avatarEl.textContent = userName.substring(0, 2).toUpperCase();
+                avatarEl.textContent = avatarInitial;
             }
         });
     }
