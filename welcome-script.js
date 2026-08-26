@@ -1,3 +1,49 @@
+// ==========================================
+// FIREBASE : INITIALISATION
+// ==========================================
+// Toute la logique Firebase vit ici (dans ce module), et non plus dans une balise
+// <script> séparée dans index.html, pour que les imports fonctionnent proprement.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    updateProfile,
+    getAdditionalUserInfo,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBa1e1JhWCxYI3fSWtVN6TsFiOnvxH7i5I",
+    authDomain: "screen-to-street-e29ff.firebaseapp.com",
+    projectId: "screen-to-street-e29ff",
+    storageBucket: "screen-to-street-e29ff.firebasestorage.app",
+    messagingSenderId: "48854939735",
+    appId: "1:48854939735:web:4f6264a5589ebbf5a70b12"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
+// On garde une trace de l'état de connexion, utile pour éviter de rouvrir la modale
+// de connexion à quelqu'un qui est déjà connecté.
+let firebaseCurrentUser = null;
+onAuthStateChanged(auth, (user) => { firebaseCurrentUser = user || null; });
+
+// ==========================================
+// TRADUCTIONS ET LOGIQUE DE PAGE (inchangé)
+// ==========================================
 const PRICE_PER_GROUP = 14.99;
 let currentLang = localStorage.getItem('lang') || 'en';
 
@@ -8,7 +54,7 @@ const dict = {
         heroSubtitle: "Create custom routes instantly, with tools designed to follow your favorite artists.", 
         heroCta: "Generate my guide", heroDemo: "See Demo",
         authTitle: "Log in or sign up", authDesc: "Use your email or another service to continue with Screen To Street.",
-        authGoogle: "Continue with Google", authFacebook: "Continue with Facebook", authEmail: "Continue with email",
+        authGoogle: "Continue with Google", authEmail: "Continue with email",
         authTerms: "By continuing, you agree to Screen To Street's", linkTerms: "Terms of Use", 
         authPrivacy: "Read our", linkPrivacy: "Privacy Policy",
         
@@ -29,7 +75,14 @@ const dict = {
         
         processing: "Processing securely...", authRightTitle: "Unlock the world of your idols.",
         cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", 
-        cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept"
+        cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
+
+        errInvalidEmail: "Invalid email address.",
+        errWeakPassword: "Password must be at least 6 characters.",
+        errTooManyRequests: "Too many attempts. Try again in a few minutes.",
+        errNetwork: "Network connection issue. Check your internet connection.",
+        errWrongPassword: "Incorrect password for this email address.",
+        errDefault: "Something went wrong. Please try again."
     },
     fr: {
         navDest: "Destinations", navArtists: "Artistes", navLogin: "Se connecter", 
@@ -37,7 +90,7 @@ const dict = {
         heroSubtitle: "Créez des itinéraires sur mesure instantanément, avec des outils conçus pour suivre vos idoles.", 
         heroCta: "Générer mon guide", heroDemo: "Voir la démo",
         authTitle: "Connectez-vous ou créez un compte", authDesc: "Utilisez votre e-mail ou un autre service pour continuer.",
-        authGoogle: "Continuer avec Google", authFacebook: "Continuer avec Facebook", authEmail: "Continuer avec un e-mail",
+        authGoogle: "Continuer avec Google", authEmail: "Continuer avec un e-mail",
         authTerms: "En continuant, vous acceptez les", linkTerms: "Conditions d'utilisation", 
         authPrivacy: "Consultez notre", linkPrivacy: "Politique de confidentialité",
         
@@ -58,7 +111,14 @@ const dict = {
         
         processing: "Traitement sécurisé...", authRightTitle: "Débloquez le monde de vos idoles.",
         cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", 
-        cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter"
+        cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
+
+        errInvalidEmail: "Adresse e-mail invalide.",
+        errWeakPassword: "Le mot de passe doit contenir au moins 6 caractères.",
+        errTooManyRequests: "Trop de tentatives. Réessayez dans quelques minutes.",
+        errNetwork: "Problème de connexion internet.",
+        errWrongPassword: "Mot de passe incorrect pour cette adresse e-mail.",
+        errDefault: "Une erreur est survenue. Réessayez."
     }
 };
 
@@ -113,6 +173,7 @@ const modal = document.getElementById('auth-modal');
 
 function showStep(step) {
     currentActiveStep = step;
+    clearAuthError();
     
     for(let i=0; i<=4; i++) {
         let s = document.getElementById('auth-step-' + i);
@@ -152,6 +213,11 @@ function showStep(step) {
 
 document.querySelectorAll('.open-auth-btn').forEach(btn => {
     btn.addEventListener('click', () => { 
+        // Si la personne est déjà connectée, inutile de lui redemander de se connecter.
+        if (firebaseCurrentUser) {
+            window.location.href = 'map.html';
+            return;
+        }
         if(modal) modal.classList.remove('hidden'); 
         showStep(0); 
     });
@@ -160,43 +226,175 @@ document.querySelectorAll('.open-auth-btn').forEach(btn => {
 const closeAuth = document.getElementById('close-auth');
 if(closeAuth) closeAuth.addEventListener('click', () => { if(modal) modal.classList.add('hidden'); });
 
+// ==========================================
+// GESTION DES ERREURS D'AUTHENTIFICATION
+// ==========================================
+function showAuthError(message) {
+    const el = document.getElementById('auth-error');
+    if(el) { el.textContent = message; el.classList.remove('hidden'); }
+}
+function clearAuthError() {
+    const el = document.getElementById('auth-error');
+    if(el) { el.classList.add('hidden'); el.textContent = ''; }
+}
+function friendlyAuthError(code) {
+    const t = dict[currentLang];
+    const table = {
+        'auth/invalid-email': t.errInvalidEmail,
+        'auth/weak-password': t.errWeakPassword,
+        'auth/too-many-requests': t.errTooManyRequests,
+        'auth/network-request-failed': t.errNetwork,
+        'auth/wrong-password': t.errWrongPassword
+    };
+    return table[code] || t.errDefault;
+}
+
+// ==========================================
+// CHARGEMENT DU PROFIL D'UN UTILISATEUR EXISTANT
+// ==========================================
+// Appelé quand quelqu'un se reconnecte (email ou Google) à un compte déjà créé :
+// on récupère son profil Firestore, on le recopie dans localStorage pour que le
+// reste du site (encore basé sur localStorage) fonctionne sans changement, puis
+// on l'envoie directement sur la carte.
+async function loadExistingProfileAndRedirect(user) {
+    try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+            const data = snap.data();
+            if (data.username) localStorage.setItem('userName', data.username);
+            if (Array.isArray(data.unlockedGroups)) localStorage.setItem('unlockedGroups', JSON.stringify(data.unlockedGroups));
+        }
+    } catch (e) {
+        // Si la lecture échoue (règles de sécurité en cours d'ajustement, etc.),
+        // on laisse quand même la personne accéder à la carte.
+    }
+    localStorage.setItem('userEmail', user.email || '');
+    window.location.href = 'map.html';
+}
+
+// ==========================================
+// CONNEXION GOOGLE (vrai popup Firebase, plus de simulation)
+// ==========================================
+window.openGooglePopup = async function() {
+    clearAuthError();
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const info = getAdditionalUserInfo(result);
+        const user = result.user;
+
+        if (info && info.isNewUser) {
+            // Première connexion Google : on pré-remplit le pseudo suggéré et on
+            // continue l'inscription (profil, pass, paiement) comme pour un nouvel utilisateur.
+            localStorage.setItem('userEmail', user.email || '');
+            const unameInput = document.getElementById('uname');
+            if (unameInput && user.displayName) unameInput.value = user.displayName.replace(/\s+/g, '');
+            showStep(2);
+        } else {
+            // Compte Google déjà existant : on récupère son profil et on file sur la carte.
+            await loadExistingProfileAndRedirect(user);
+        }
+    } catch (err) {
+        // L'utilisateur a fermé la fenêtre Google lui-même : ce n'est pas une vraie erreur.
+        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+        showAuthError(friendlyAuthError(err.code));
+    }
+};
+
 // --- NAVIGATION --- //
 
 // Step 0 -> Step 1 (Email)
 const btnToEmail = document.getElementById('btn-to-email');
 if(btnToEmail) btnToEmail.addEventListener('click', () => { showStep(1); });
 
-// Step 1 -> Step 2 (Account -> Profile)
+// Step 1 -> Step 2 (Account -> Profile) : connexion OU création de compte Firebase
 const btnToStep2 = document.getElementById('btn-to-step2');
 if(btnToStep2) {
-    btnToStep2.addEventListener('click', () => { 
+    btnToStep2.addEventListener('click', async () => { 
         const emailInput = document.getElementById('user-email');
         const passInput = document.getElementById('user-password');
         if(!emailInput.checkValidity()) { emailInput.reportValidity(); return; }
         if(!passInput.checkValidity()) { passInput.reportValidity(); return; }
-        
-        const emailVal = emailInput.value.trim().toLowerCase();
-        const savedEmail = localStorage.getItem('userEmail');
-        
-        if (savedEmail && emailVal === savedEmail.toLowerCase() && localStorage.getItem('unlockedGroups')) {
-            btnToStep2.textContent = "Logging in...";
-            setTimeout(() => { window.location.href = 'map.html'; }, 800);
-        } else {
-            localStorage.setItem('userEmail', emailVal);
-            showStep(2);
+        clearAuthError();
+
+        const emailVal = emailInput.value.trim();
+        const passVal = passInput.value;
+        const originalLabel = btnToStep2.textContent;
+        btnToStep2.disabled = true;
+        btnToStep2.textContent = '...';
+
+        try {
+            // 1) On essaie d'abord de connecter un compte existant avec cet e-mail/mot de passe.
+            const cred = await signInWithEmailAndPassword(auth, emailVal, passVal);
+            await loadExistingProfileAndRedirect(cred.user);
+            return; // on quitte la page, pas besoin de réactiver le bouton
+        } catch (signInErr) {
+            if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
+                // 2) Aucun compte ne correspond : soit l'e-mail n'existe pas encore, soit le mot
+                //    de passe est faux pour un compte existant. On tente une création de compte.
+                try {
+                    await createUserWithEmailAndPassword(auth, emailVal, passVal);
+                    localStorage.setItem('userEmail', emailVal);
+                    btnToStep2.disabled = false;
+                    btnToStep2.textContent = originalLabel;
+                    showStep(2);
+                } catch (createErr) {
+                    btnToStep2.disabled = false;
+                    btnToStep2.textContent = originalLabel;
+                    if (createErr.code === 'auth/email-already-in-use') {
+                        // La création échoue car le compte existe déjà : le mot de passe entré était donc faux.
+                        showAuthError(friendlyAuthError('auth/wrong-password'));
+                    } else {
+                        showAuthError(friendlyAuthError(createErr.code));
+                    }
+                }
+            } else {
+                btnToStep2.disabled = false;
+                btnToStep2.textContent = originalLabel;
+                showAuthError(friendlyAuthError(signInErr.code));
+            }
         }
     });
 }
 
-// Step 2 -> Step 3 (Profile -> Passes)
+// Step 2 -> Step 3 (Profile -> Passes) : on écrit le profil dans Firestore
 const btnToStep3 = document.getElementById('btn-to-step3');
 if(btnToStep3) {
-    btnToStep3.addEventListener('click', () => {
+    btnToStep3.addEventListener('click', async () => {
         const uname = document.getElementById('uname');
         // SEUL le nom d'utilisateur est obligatoire
         if(!uname.checkValidity()) { uname.reportValidity(); return; }
+
+        const usernameVal = uname.value.trim();
+        const fnameVal = document.getElementById('fname').value.trim();
+        const lnameVal = document.getElementById('lname').value.trim();
+        const reasonVal = document.getElementById('user-reason').value;
+
+        localStorage.setItem('userName', usernameVal);
+
+        const user = auth.currentUser;
+        if (user) {
+            btnToStep3.disabled = true;
+            try {
+                await updateProfile(user, { displayName: usernameVal });
+                await setDoc(doc(db, 'users', user.uid), {
+                    username: usernameVal,
+                    firstName: fnameVal,
+                    lastName: lnameVal,
+                    email: user.email,
+                    reason: reasonVal,
+                    unlockedGroups: [],
+                    wishlistLocs: [],
+                    visitedLocs: [],
+                    myTrips: [],
+                    createdAt: serverTimestamp()
+                }, { merge: true });
+            } catch (e) {
+                // On laisse la personne avancer même si l'écriture échoue pour l'instant ;
+                // les règles de sécurité Firestore seront ajustées dans une étape suivante.
+            }
+            btnToStep3.disabled = false;
+        }
         
-        localStorage.setItem('userName', uname.value.trim());
         showStep(3);
     });
 }
@@ -220,30 +418,6 @@ if(btnToStep4) {
     });
 }
 
-// Popups Google/Facebook
-window.openGooglePopup = function() {
-    const popup = document.getElementById('google-auth-popup');
-    if(popup) popup.classList.remove('hidden');
-};
-
-window.completeGoogleLogin = function() {
-    const popup = document.getElementById('google-auth-popup');
-    if(popup) popup.classList.add('hidden');
-    
-    if(localStorage.getItem('userEmail') === 'jane.doe@gmail.com' && localStorage.getItem('unlockedGroups')) {
-        window.location.href = 'map.html';
-    } else {
-        localStorage.setItem('userEmail', 'jane.doe@gmail.com');
-        document.getElementById('uname').value = "JaneDoe99"; // On pré-remplit pour Google
-        showStep(2);
-    }
-};
-
-window.simulateFacebookLogin = function() {
-    localStorage.setItem('userEmail', 'user.facebook@fb.com');
-    showStep(2);
-};
-
 // --- LOGIQUE PRIX ET PAIEMENT --- //
 const checkboxes = document.querySelectorAll('.group-checkbox');
 const subtotalDisplay = document.getElementById('subtotal-display');
@@ -264,20 +438,31 @@ function updatePrice() {
 }
 checkboxes.forEach(cb => { cb.addEventListener('change', updatePrice); });
 
+// Paiement (toujours simulé pour l'instant — aucun vrai système de paiement n'est branché) :
+// on enregistre les pass choisis dans Firestore et dans localStorage, puis on redirige.
 const checkoutForm = document.getElementById('checkout-form');
 if(checkoutForm) {
-    checkoutForm.addEventListener('submit', function(e) {
+    checkoutForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
         if(checkedBoxes.length === 0) return;
 
-        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        checkedBoxes.forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
-        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+        let selectedGroups = [];
+        checkedBoxes.forEach(cb => selectedGroups.push(cb.value));
+        localStorage.setItem('unlockedGroups', JSON.stringify(selectedGroups));
 
         document.getElementById('btn-submit-payment').style.display = 'none';
         const paymentLoader = document.getElementById('payment-loader');
         if(paymentLoader) paymentLoader.classList.remove('hidden');
+
+        const user = auth.currentUser;
+        if (user) {
+            try {
+                await setDoc(doc(db, 'users', user.uid), { unlockedGroups: selectedGroups }, { merge: true });
+            } catch (e) {
+                // Silencieux : le paiement reste simulé, on ne bloque pas la personne pour ça.
+            }
+        }
         
         setTimeout(() => { window.location.href = 'map.html'; }, 2000);
     });
