@@ -302,6 +302,18 @@ async function loadExistingProfileAndRedirect(user) {
     window.location.href = 'map.html';
 }
 
+// Réinitialise les données locales d'un NOUVEAU compte : un compte qui vient d'être
+// créé ne doit jamais hériter de lieux visités, d'une wishlist ou de voyages
+// laissés par un test précédent dans ce même navigateur. Tout doit venir
+// explicitement de l'utilisateur, une fois son compte créé.
+function resetFreshAccountData() {
+    localStorage.removeItem('wishlistLocs');
+    localStorage.removeItem('visitedLocs');
+    localStorage.removeItem('myTrips');
+    localStorage.removeItem('activeTripId');
+    localStorage.removeItem('unlockedGroups');
+}
+
 // ==========================================
 // CONNEXION GOOGLE (vrai popup Firebase, plus de simulation)
 // ==========================================
@@ -313,8 +325,10 @@ window.openGooglePopup = async function() {
         const user = result.user;
 
         if (info && info.isNewUser) {
-            // Première connexion Google : on pré-remplit le pseudo suggéré et on
-            // continue l'inscription (profil, pass, paiement) comme pour un nouvel utilisateur.
+            // Première connexion Google : on repart d'un compte totalement vierge, on
+            // pré-remplit le pseudo suggéré et on continue l'inscription (profil, pass,
+            // paiement) comme pour un nouvel utilisateur.
+            resetFreshAccountData();
             localStorage.setItem('userEmail', user.email || '');
             const unameInput = document.getElementById('uname');
             if (unameInput && user.displayName) unameInput.value = user.displayName.replace(/\s+/g, '');
@@ -410,6 +424,7 @@ if(btnToStep2) {
 
         try {
             await createUserWithEmailAndPassword(auth, emailVal, passVal);
+            resetFreshAccountData();
             localStorage.setItem('userEmail', emailVal);
             btnToStep2.disabled = false;
             btnToStep2.textContent = originalLabel;
