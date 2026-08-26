@@ -570,3 +570,14 @@ const cookieAccept = document.getElementById('cookie-accept');
 const cookieReject = document.getElementById('cookie-reject');
 if(cookieAccept) cookieAccept.addEventListener('click', closeCookies);
 if(cookieReject) cookieReject.addEventListener('click', closeCookies);
+
+// ==========================================
+// OUVERTURE AUTOMATIQUE DU FORMULAIRE DE CONNEXION
+// ==========================================
+// Permet à d'autres pages (ex: legal.html) de renvoyer vers index.html?login=1
+// pour ouvrir directement le vrai formulaire "Se connecter", au lieu de simplement
+// atterrir sur la page d'accueil.
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+    if (modal) modal.classList.remove('hidden');
+    showStep('login');
+}
