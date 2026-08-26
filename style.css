@@ -136,7 +136,11 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 /* L'océan des tuiles CartoDB est teinté d'un violet doux, cohérent avec la charte
    graphique du site, au lieu du bleu par défaut. Le filtre est appliqué au pane des
    tuiles (pas image par image) pour éviter tout artefact de raccord entre tuiles. */
-#map .leaflet-tile-pane { filter: hue-rotate(75deg) saturate(1.25); }
+/* Les tuiles OpenStreetMap sont par défaut plus colorées que celles utilisées avant ;
+   ce filtre les éclaircit et les teinte d'un violet doux pour rester cohérent avec la
+   charte graphique du site. Appliqué sur l'ensemble des cartes du site (map.html,
+   trips.html, itinéraires, mini-cartes des popups) pour un rendu homogène partout. */
+.leaflet-tile-pane { filter: grayscale(45%) brightness(1.08) contrast(0.92) hue-rotate(220deg) saturate(0.65); }
 
 /* REVISION KPI COUNTRIES (0 en rose, hover rose que sur le texte) */
 .stat-pill { position: absolute; top: 20px; left: 20px; background: #fff; border-radius: 100px; padding: 6px 14px; font-size: 12.5px; font-weight: 700; color: #2E3644; box-shadow: 0 6px 18px rgba(80,60,120,.1); display: flex; gap: 10px; align-items: center; z-index: 1000; }
