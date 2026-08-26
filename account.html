@@ -202,11 +202,14 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     // afin d'avoir EXACTEMENT le même visuel et comportement que sur map.html.
 
     // Initialisation Avatar
-    const savedName = localStorage.getItem('userName') || 'User';
+    // Initiale de l'avatar : prénom en priorité (comme Google), sinon pseudo.
+    const savedFirstName = (localStorage.getItem('userFirstName') || '').trim();
+    const savedName = (localStorage.getItem('userName') || 'User').trim();
+    const avatarInitial = (savedFirstName || savedName || 'U').charAt(0).toUpperCase();
     const savedPic = localStorage.getItem('userPhoto');
     document.querySelectorAll('.user-avatar-btn').forEach(btn => {
         if(savedPic) { btn.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; } 
-        else { btn.textContent = savedName.charAt(0).toUpperCase(); }
+        else { btn.textContent = avatarInitial; }
     });
 
     // --- LOGIQUE ACCOUNT ---
@@ -215,9 +218,13 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     document.getElementById('stat-wishlist').textContent = JSON.parse(localStorage.getItem('wishlistLocs') || '[]').length;
 
     if(savedName) document.getElementById('user-name-input').value = savedName;
+    const savedEmail = localStorage.getItem('userEmail');
+    if(savedEmail) document.getElementById('user-email-input').textContent = savedEmail;
     const profilePreview = document.getElementById('profile-preview');
     if(savedPic) {
         profilePreview.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+        profilePreview.textContent = avatarInitial;
     }
 
     const unlocked = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
