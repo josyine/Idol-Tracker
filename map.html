@@ -82,9 +82,35 @@
   }
   .header-icon-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: #D42759; transform: translateY(-2px);}
   .user-avatar-btn { color: #000000 !important; overflow: hidden; padding: 0;}
+
+  /* ==========================================
+     FENÊTRES DE SÉCURITÉ (accès non autorisé à la carte)
+     ========================================== */
+  body.auth-gate-active .app-container { filter: blur(10px); pointer-events: none; user-select: none; }
+  .auth-gate-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(20,16,30,0.3); padding: 20px; }
+  body.auth-gate-active .auth-gate-overlay { display: flex; }
+  .gate-modal { background: #fff; border-radius: 18px; padding: 38px 34px; max-width: 400px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,.35); text-align: center; }
+  .gate-modal h2 { font-size: 21px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+  .gate-modal p { font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.55; }
+  .gate-modal .input-group { margin-bottom: 14px; text-align: left; }
+  .gate-modal label { font-size: 11.5px; font-weight: 700; color: #334155; margin-bottom: 5px; display: block; }
+  .gate-modal .field-input { width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: 'Poppins', sans-serif; outline: none; }
+  .gate-modal .field-input:focus { border-color: #D42759; box-shadow: 0 0 0 3px #FCE7F0; }
+  .gate-forgot-link { display: block; text-align: right; font-size: 11px; color: #D42759; font-weight: 600; margin: -6px 0 14px 0; cursor: pointer; }
+  .gate-modal .pay-btn { width: 100%; padding: 13px; border-radius: 10px; font-size: 13.5px; font-weight: 700; color: #fff; background: #D42759; border: none; cursor: pointer; font-family: 'Poppins', sans-serif; transition: 0.2s; }
+  .gate-modal .pay-btn:hover { transform: translateY(-1px); }
+  .gate-modal .gate-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+  .gate-modal .gate-divider div { flex: 1; height: 1px; background: #e5e7eb; }
+  .gate-modal .gate-divider span { font-size: 10.5px; color: #94a3b8; font-weight: 700; }
+  .gate-modal .social-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; border: 1.5px solid #e5e7eb; color: #1e293b; transition: 0.2s; }
+  .gate-modal .social-btn:hover { background: #f8fafc; }
+  .gate-modal .social-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .gate-modal .terms { font-size: 11px; text-align: center; color: #94a3b8; margin-top: 18px; }
+  .gate-modal .terms a { color: #D42759; font-weight: 600; }
+  .gate-error { background: #FFF1F3; border: 1px solid #FBD5DC; color: #D42759; font-size: 12px; font-weight: 600; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; text-align: left; }
 </style>
 </head>
-<body>
+<body class="auth-gate-active">
 
 <div class="app-container">
     
@@ -442,9 +468,157 @@
     </div>
 </div>
 
+<!-- ==========================================
+     FENÊTRES DE SÉCURITÉ : bloquent l'accès à la carte tant que la situation
+     n'est pas résolue (pas connecté, ou connecté sans aucun groupe débloqué).
+     ========================================== -->
+<div class="auth-gate-overlay" id="auth-gate-overlay">
+
+    <!-- Cas 1 : personne n'est connectée -->
+    <div class="gate-modal hidden" id="gate-not-logged-in">
+        <h2 data-i18n="gateLoginTitle">Log in to continue</h2>
+        <p data-i18n="gateLoginDesc">You need an account to explore the map.</p>
+
+        <div id="gate-auth-error" class="gate-error hidden"></div>
+
+        <div class="input-group">
+            <label data-i18n="gateEmailLabel">Email address</label>
+            <input type="email" id="gate-login-email" class="field-input" placeholder="jane.doe@example.com">
+        </div>
+        <div class="input-group">
+            <label data-i18n="gatePasswordLabel">Password</label>
+            <input type="password" id="gate-login-password" class="field-input" placeholder="••••••••">
+        </div>
+        <a href="#" id="gate-forgot-password" class="gate-forgot-link" data-i18n="gateForgotPassword">Forgot password?</a>
+
+        <button class="pay-btn" id="gate-login-btn" data-i18n="gateLoginBtn">Log in</button>
+
+        <div class="gate-divider"><div></div><span data-i18n="gateOrDivider">OR</span><div></div></div>
+
+        <div class="social-btn" id="gate-google-btn">
+            <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>
+            <span data-i18n="gateGoogleBtn">Continue with Google</span>
+        </div>
+
+        <p class="terms"><span data-i18n="gateSignupPrompt">Don't have an account?</span> <a href="index.html" data-i18n="gateSignupLink">Sign up</a></p>
+    </div>
+
+    <!-- Cas 2 : connecté, mais aucun groupe débloqué -->
+    <div class="gate-modal hidden" id="gate-no-groups">
+        <h2 data-i18n="gateNoGroupsTitle">Unlock a group to see the map</h2>
+        <p data-i18n="gateNoGroupsDesc">You haven't unlocked any group yet. Click below to choose a pass and start exploring.</p>
+        <button class="pay-btn" onclick="openCartModal()" data-i18n="gateUnlockBtn">Unlock a group</button>
+        <a href="#" id="gate-logout-link" style="display:block; margin-top:16px; font-size:12px; color:#94a3b8; font-weight:600;" data-i18n="gateLogoutLink">Log out</a>
+    </div>
+
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script type="module" src="firebase-init.js"></script>
 <script src="script.js"></script>
+<script>
+    // ==========================================
+    // VÉRIFICATION D'ACCÈS À LA CARTE
+    // ==========================================
+    // Par défaut (voir <body class="auth-gate-active">), la page est floutée et
+    // inerte dès le premier affichage : personne ne voit jamais, même une fraction
+    // de seconde, une carte à laquelle il/elle n'a pas droit. On ne retire ce
+    // verrou qu'une fois la situation confirmée par Firebase.
+    function gateShowError(msg) {
+        const el = document.getElementById('gate-auth-error');
+        if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+    }
+    function gateClearError() {
+        const el = document.getElementById('gate-auth-error');
+        if (el) { el.classList.add('hidden'); el.textContent = ''; }
+    }
+    function gateFriendlyError(code) {
+        if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+            return t('gateErrorInvalid');
+        }
+        return t('gateErrorGeneric');
+    }
+
+    window.addEventListener('firebase-ready', async (e) => {
+        const user = e.detail && e.detail.user;
+
+        if (!user) {
+            document.getElementById('gate-no-groups').classList.add('hidden');
+            document.getElementById('gate-not-logged-in').classList.remove('hidden');
+            document.body.classList.add('auth-gate-active');
+            return;
+        }
+
+        // Connecté : on vérifie les groupes débloqués directement depuis Firestore
+        // (source de vérité), pas depuis le localStorage qui peut être obsolète.
+        const cloudData = await window.loadUserCloudData();
+        let unlocked = [];
+        if (cloudData && Array.isArray(cloudData.unlockedGroups)) {
+            unlocked = cloudData.unlockedGroups;
+            localStorage.setItem('unlockedGroups', JSON.stringify(unlocked));
+        } else {
+            unlocked = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        }
+
+        if (unlocked.length === 0) {
+            document.getElementById('gate-not-logged-in').classList.add('hidden');
+            document.getElementById('gate-no-groups').classList.remove('hidden');
+            document.body.classList.add('auth-gate-active');
+        } else {
+            document.body.classList.remove('auth-gate-active');
+            if (typeof initializeFilters === 'function') initializeFilters();
+            if (typeof renderLocations === 'function') renderLocations();
+        }
+    });
+
+    const gateLoginBtn = document.getElementById('gate-login-btn');
+    if (gateLoginBtn) {
+        gateLoginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('gate-login-email').value.trim();
+            const pass = document.getElementById('gate-login-password').value;
+            if (!email || !pass) return;
+            gateClearError();
+            gateLoginBtn.disabled = true;
+            try {
+                await window.firebaseSignInEmail(email, pass);
+                window.location.reload();
+            } catch (err) {
+                gateLoginBtn.disabled = false;
+                gateShowError(gateFriendlyError(err.code));
+            }
+        });
+    }
+
+    const gateGoogleBtn = document.getElementById('gate-google-btn');
+    if (gateGoogleBtn) {
+        gateGoogleBtn.addEventListener('click', async () => {
+            gateClearError();
+            try {
+                await window.firebaseSignInGoogle();
+                window.location.reload();
+            } catch (err) {
+                if (err.code === 'auth/popup-closed-by-user') return;
+                gateShowError(gateFriendlyError(err.code));
+            }
+        });
+    }
+
+    const gateForgotLink = document.getElementById('gate-forgot-password');
+    if (gateForgotLink) {
+        gateForgotLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('gate-login-email');
+            const email = emailInput.value.trim();
+            if (!email) { gateShowError(t('gateEnterEmailFirst')); emailInput.focus(); return; }
+            try {
+                await window.firebaseSendPasswordReset(email);
+                gateShowError(t('gateResetSent'));
+            } catch (err) {
+                gateShowError(gateFriendlyError(err.code));
+            }
+        });
+    }
+</script>
 </body>
 </html>
