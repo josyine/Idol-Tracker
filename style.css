@@ -234,11 +234,21 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
    ========================================== */
 @media (max-width: 800px) {
     .app-container { flex-direction: column; width: 100%; height: 100vh; border-radius: 0; }
-    .sidebar { width: 85%; max-width: 340px; position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.15); }
+    /* Le menu prend maintenant 100% de l'écran sur mobile (plus de carte visible à
+       côté), pour que ce soit un vrai écran de navigation à part entière. */
+    .sidebar { width: 100%; max-width: none; position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.15); }
     .sidebar.open { left: 0; }
+    /* .expanded (panneau de détail d'un lieu) a une règle desktop plus spécifique
+       (width fixe 480px) qui l'emporterait sinon même en mobile : on la neutralise
+       ici pour garder 100% de largeur. */
+    .sidebar.expanded { width: 100%; }
     .hamburger-btn { display: flex !important; }
 
-    .top-nav { top: 14px; right: 14px; gap: 7px; }
+    /* Le bouton hamburger doit rester cliquable AU-DESSUS du menu une fois ouvert,
+       pour pouvoir le refermer et revenir sur la carte : son conteneur (.top-nav)
+       avait un z-index inférieur à celui du menu (.sidebar), ce qui le rendait
+       invisible/incliquable dès que le menu s'ouvrait. */
+    .top-nav { top: 14px; right: 14px; gap: 7px; z-index: 3500; }
     .nav-btn, .header-icon-btn { width: 38px; height: 38px; }
 
     .filters-grid { grid-template-columns: 1fr; }
