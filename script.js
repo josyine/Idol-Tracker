@@ -96,8 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
         map.on('zoomend', function() {
             const zoom = map.getZoom();
             let markerSize = 32; let iconSize = 16;
-            if (zoom < 5) { markerSize = 12; iconSize = 0; }
-            else if (zoom < 9) { markerSize = 20; iconSize = 10; }
+            // Avec des lieux répartis sur plusieurs continents, la carte doit parfois
+            // dézoomer beaucoup pour tous les faire tenir : les marqueurs restent donc
+            // visibles (avec une icône, même petite) au lieu de devenir de simples
+            // anneaux à peine perceptibles.
+            if (zoom < 4) { markerSize = 16; iconSize = 8; }
+            else if (zoom < 6) { markerSize = 22; iconSize = 11; }
+            else if (zoom < 9) { markerSize = 26; iconSize = 13; }
             else { markerSize = 32; iconSize = 16; }
             document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
             document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
