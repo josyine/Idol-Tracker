@@ -45,22 +45,42 @@ function syncWishlist(wList) {
 }
 
 // Au chargement de la page, une fois que Firebase a déterminé si quelqu'un est
-// connecté : si oui, on va chercher sa wishlist réelle dans Firestore et on
-// l'utilise pour remplacer celle du navigateur (qui pourrait être vide, ou celle
-// d'un autre compte testé plus tôt sur ce même appareil), puis on rafraîchit
-// l'affichage si la page en a déjà dessiné une partie.
+// connecté (ou non) : si oui, on va chercher sa wishlist et ses pass réels dans
+// Firestore pour remplacer les valeurs locales (qui pourraient être vides, ou celles
+// d'un autre compte testé plus tôt sur ce même appareil). NOTE : le voile de
+// connexion et la fenêtre "aucun pass débloqué" de map.html sont gérés entièrement
+// par le script inline de map.html lui-même (voir ce fichier) — pas ici, pour éviter
+// tout doublon ou conflit entre les deux.
 window.addEventListener('firebase-ready', async (e) => {
     const user = e.detail && e.detail.user;
-    if (!user) return; // visiteur non connecté : on garde la wishlist locale telle quelle
+    if (!user) return; // visiteur non connecté : on garde les données locales telles quelles
 
     const cloudData = await window.loadUserCloudData();
-    if (cloudData && Array.isArray(cloudData.wishlistLocs)) {
-        localStorage.setItem('wishlistLocs', JSON.stringify(cloudData.wishlistLocs));
+    if (cloudData) {
+        if (Array.isArray(cloudData.wishlistLocs)) {
+            localStorage.setItem('wishlistLocs', JSON.stringify(cloudData.wishlistLocs));
 
-        // Rafraîchit les affichages déjà construits qui dépendent de la wishlist.
-        if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations();
-        if (document.getElementById('edit-trip-name') && typeof window.renderTrip === 'function' && currentTrip) window.renderTrip();
-        if (typeof window.refreshWishlistFromCloud === 'function') window.refreshWishlistFromCloud();
+            // Rafraîchit les affichages déjà construits qui dépendent de la wishlist.
+            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations();
+            if (document.getElementById('edit-trip-name') && typeof window.renderTrip === 'function' && currentTrip) window.renderTrip();
+            if (typeof window.refreshWishlistFromCloud === 'function') window.refreshWishlistFromCloud();
+        }
+        if (Array.isArray(cloudData.unlockedGroups)) {
+            localStorage.setItem('unlockedGroups', JSON.stringify(cloudData.unlockedGroups));
+        }
+    }
+});
+
+// Bouton "Log out" de la fenêtre de précaution "aucun pass débloqué" (map.html).
+document.addEventListener('DOMContentLoaded', () => {
+    const gateLogoutLink = document.getElementById('gate-logout-link');
+    if (gateLogoutLink) {
+        gateLogoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const finish = () => { localStorage.clear(); window.location.href = 'index.html'; };
+            if (typeof window.firebaseSignOut === 'function') window.firebaseSignOut().then(finish).catch(finish);
+            else finish();
+        });
     }
 });
 
@@ -160,10 +180,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('unlockedGroups');
-            window.location.href = 'index.html';
+            const finishLogout = () => {
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userFirstName');
+                localStorage.removeItem('unlockedGroups');
+                localStorage.removeItem('wishlistLocs');
+                localStorage.removeItem('visitedLocs');
+                localStorage.removeItem('myTrips');
+                localStorage.removeItem('activeTripId');
+                window.location.href = 'index.html';
+            };
+            // Ferme réellement la session Firebase (avant, ce bouton ne faisait que
+            // vider le localStorage : la session restait active côté Firebase, donc
+            // la personne restait connectée malgré elle en revenant sur le site).
+            if (typeof window.firebaseSignOut === 'function') {
+                window.firebaseSignOut().then(finishLogout).catch(finishLogout);
+            } else {
+                finishLogout();
+            }
         });
     }
 
@@ -497,7 +532,16 @@ const translations = {
         wishTitle: "My Wishlist", wishEmpty: "You haven't saved any places yet. Explore the map and click \"Add to Wishlist\"!", wishSomeday: "Someday / No trip yet",
         visitTitle: "My Visited Places", visitEmpty: "You haven't marked any place as visited yet. Explore the map and check \"I visited this place\"!",
         destTitle: "Explore Destinations", destSub: "Browse every country and city featured on Screen To Street", destCountries: "Countries", destCities: "Cities", destLocations: "Locations", destViewMap: "View on Map →",
-        artTitle: "Explore Artists", artSub: "Discover every group featured on Screen To Street", artGroups: "Groups", artFeatured: "Featured group"
+        artTitle: "Explore Artists", artSub: "Discover every group featured on Screen To Street", artGroups: "Groups", artFeatured: "Featured group",
+
+        gateLoginTitle: "Log in to continue", gateLoginDesc: "You need an account to explore the map.",
+        gateEmailLabel: "Email address", gatePasswordLabel: "Password", gateForgotPassword: "Forgot password?",
+        gateLoginBtn: "Log in", gateOrDivider: "OR", gateGoogleBtn: "Continue with Google",
+        gateSignupPrompt: "Don't have an account?", gateSignupLink: "Sign up",
+        gateNoGroupsTitle: "Unlock a group to see the map", gateNoGroupsDesc: "You haven't unlocked any group yet. Click below to choose a pass and start exploring.",
+        gateUnlockBtn: "Unlock a group", gateLogoutLink: "Log out",
+        gateErrorInvalid: "Incorrect email or password.", gateErrorGeneric: "Something went wrong. Please try again.",
+        gateResetSent: "Password reset email sent — check your inbox.", gateEnterEmailFirst: "Please enter your email address first."
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -523,7 +567,16 @@ const translations = {
         wishTitle: "Ma Wishlist", wishEmpty: "Vous n'avez encore enregistré aucun lieu. Explorez la carte et cliquez sur « Ajouter à ma Wishlist » !", wishSomeday: "Un jour / Pas de voyage prévu",
         visitTitle: "Mes lieux visités", visitEmpty: "Vous n'avez marqué aucun lieu comme visité. Explorez la carte et cochez « J'ai visité ce lieu » !",
         destTitle: "Explorer les destinations", destSub: "Parcourez tous les pays et villes présents sur Screen To Street", destCountries: "Pays", destCities: "Villes", destLocations: "Lieux", destViewMap: "Voir sur la carte →",
-        artTitle: "Explorer les artistes", artSub: "Découvrez tous les groupes présents sur Screen To Street", artGroups: "Groupes", artFeatured: "Groupe à la une"
+        artTitle: "Explorer les artistes", artSub: "Découvrez tous les groupes présents sur Screen To Street", artGroups: "Groupes", artFeatured: "Groupe à la une",
+
+        gateLoginTitle: "Se connecter pour continuer", gateLoginDesc: "Un compte est nécessaire pour explorer la carte.",
+        gateEmailLabel: "Adresse e-mail", gatePasswordLabel: "Mot de passe", gateForgotPassword: "Mot de passe oublié ?",
+        gateLoginBtn: "Se connecter", gateOrDivider: "OU", gateGoogleBtn: "Continuer avec Google",
+        gateSignupPrompt: "Vous n'avez pas de compte ?", gateSignupLink: "S'inscrire",
+        gateNoGroupsTitle: "Débloquez un groupe pour voir la carte", gateNoGroupsDesc: "Vous n'avez encore débloqué aucun groupe. Cliquez ci-dessous pour choisir un pass et commencer à explorer.",
+        gateUnlockBtn: "Débloquer un groupe", gateLogoutLink: "Se déconnecter",
+        gateErrorInvalid: "E-mail ou mot de passe incorrect.", gateErrorGeneric: "Une erreur est survenue. Réessayez.",
+        gateResetSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.", gateEnterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail."
     }
 };
 
@@ -1797,6 +1850,7 @@ if(cartForm) {
         let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
         document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
         localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
+        if (typeof window.syncUserData === 'function') window.syncUserData({ unlockedGroups: existingGroups });
         setTimeout(() => window.location.reload(), 1000);
     });
 }
