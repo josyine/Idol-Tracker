@@ -144,7 +144,13 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
    sépia (qui donne de la "couleur" aux tuiles OSM, très pâles à l'origine), puis on
    fait pivoter cette teinte vers le violet, et on ajuste la saturation pour qu'elle
    soit bien visible sans devenir criarde. */
-.leaflet-tile-pane { filter: sepia(0.45) saturate(1.8) hue-rotate(215deg) brightness(1.04) contrast(0.96); }
+/* Teinte violette sobre, façon Carto : on neutralise d'abord toute la couleur
+   d'origine (grayscale), puis on applique UNE seule teinte uniforme par-dessus
+   (sepia + hue-rotate) — cette méthode est prévisible, contrairement à teinter
+   directement les couleurs d'origine (bleu de l'eau, beige des terres), qui donnait
+   un résultat trop saturé et inégal selon les zones. Saturation volontairement
+   faible pour rester pâle et discret. */
+.leaflet-tile-pane { filter: grayscale(90%) sepia(18%) hue-rotate(230deg) saturate(1.15) brightness(1.12) contrast(0.94); }
 
 /* REVISION KPI COUNTRIES (0 en rose, hover rose que sur le texte) */
 .stat-pill { position: absolute; top: 20px; left: 20px; background: #fff; border-radius: 100px; padding: 6px 14px; font-size: 12.5px; font-weight: 700; color: #2E3644; box-shadow: 0 6px 18px rgba(80,60,120,.1); display: flex; gap: 10px; align-items: center; z-index: 1000; }
