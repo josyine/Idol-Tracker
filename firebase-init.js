@@ -14,9 +14,13 @@ import {
     signInWithPopup,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
-    signOut
+    signOut,
+    deleteUser,
+    reauthenticateWithPopup,
+    reauthenticateWithCredential,
+    EmailAuthProvider
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBa1e1JhWCxYI3fSWtVN6TsFiOnvxH7i5I",
@@ -44,6 +48,41 @@ window.firebaseSignInGoogle = () => signInWithPopup(auth, googleProvider);
 window.firebaseSendPasswordReset = (email) => sendPasswordResetEmail(auth, email);
 // Vraie déconnexion Firebase (ferme la session), pas juste un nettoyage du localStorage.
 window.firebaseSignOut = () => signOut(auth);
+
+// Suppression définitive du compte : le document Firestore ET le compte
+// d'authentification Firebase lui-même. Si Firebase exige une reconnexion récente
+// (mesure de sécurité pour les actions sensibles), on tente une ré-authentification
+// automatique (Google) ou on demande le mot de passe (email) avant de réessayer.
+// `password` est optionnel : fourni seulement lors d'une deuxième tentative, une
+// fois que la personne l'a saisi suite à l'erreur 'needs-password'.
+window.firebaseDeleteAccount = async function (password) {
+    const user = auth.currentUser;
+    if (!user) throw Object.assign(new Error('not-authenticated'), { code: 'not-authenticated' });
+
+    const doDelete = async () => {
+        try { await deleteDoc(doc(db, 'users', user.uid)); } catch (e) { /* on continue même si le document n'existe pas/plus */ }
+        await deleteUser(user);
+    };
+
+    try {
+        await doDelete();
+    } catch (err) {
+        if (err.code === 'auth/requires-recent-login') {
+            const providerId = user.providerData[0] && user.providerData[0].providerId;
+            if (providerId === 'google.com') {
+                await reauthenticateWithPopup(user, googleProvider);
+            } else if (password) {
+                const cred = EmailAuthProvider.credential(user.email, password);
+                await reauthenticateWithCredential(user, cred);
+            } else {
+                throw Object.assign(new Error('needs-password'), { code: 'needs-password' });
+            }
+            await doDelete();
+        } else {
+            throw err;
+        }
+    }
+};
 
 // Écrit (fusionne, sans écraser le reste du document) les champs donnés dans le
 // document Firestore de l'utilisateur actuellement connecté. Ne fait rien si
