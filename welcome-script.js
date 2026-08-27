@@ -12,7 +12,6 @@ import {
     createUserWithEmailAndPassword,
     sendPasswordResetEmail,
     updateProfile,
-    getAdditionalUserInfo,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 import {
@@ -321,13 +320,18 @@ window.openGooglePopup = async function() {
     clearAuthError();
     try {
         const result = await signInWithPopup(auth, googleProvider);
-        const info = getAdditionalUserInfo(result);
         const user = result.user;
 
-        if (info && info.isNewUser) {
-            // Première connexion Google : on repart d'un compte totalement vierge, on
-            // pré-remplit le pseudo suggéré et on continue l'inscription (profil, pass,
-            // paiement) comme pour un nouvel utilisateur.
+        // On ne se fie plus à additionalUserInfo.isNewUser : ce flag Firebase s'est
+        // avéré peu fiable en pratique (des comptes réellement nouveaux étaient parfois
+        // traités comme existants, ce qui sautait l'étape des pass et du paiement).
+        // À la place, on vérifie directement si un document existe déjà pour cet
+        // utilisateur dans Firestore — une source de vérité beaucoup plus sûre.
+        const snap = await getDoc(doc(db, 'users', user.uid));
+
+        if (!snap.exists()) {
+            // Vraiment nouveau compte : on repart d'une base vierge, on pré-remplit le
+            // pseudo suggéré et on continue l'inscription (profil, pass, paiement).
             resetFreshAccountData();
             localStorage.setItem('userEmail', user.email || '');
             const unameInput = document.getElementById('uname');
