@@ -150,7 +150,25 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
    directement les couleurs d'origine (bleu de l'eau, beige des terres), qui donnait
    un résultat trop saturé et inégal selon les zones. Saturation volontairement
    faible pour rester pâle et discret. */
-.leaflet-tile-pane { filter: grayscale(90%) sepia(18%) hue-rotate(230deg) saturate(1.15) brightness(1.12) contrast(0.94); }
+/* Teinte violette pâle et uniforme, façon Carto : passage complet par le gris puis
+   le sépia (au lieu d'un mélange partiel imprévisible comme avant), ce qui donne un
+   duoton totalement homogène qu'on peut ensuite faire pivoter vers un violet précis
+   et éclaircir pour rester très pâle, comme demandé. */
+/* Teinte violet pâle exacte demandée : on neutralise toute la couleur d'origine des
+   tuiles (grayscale), puis on impose LA couleur cible avec mix-blend-mode:"color" —
+   ce mode ne change que la teinte/saturation, en gardant la luminosité d'origine des
+   tuiles (routes, ombres, contours restent lisibles). C'est beaucoup plus précis et
+   prévisible que d'essayer de faire pivoter la couleur d'origine (sepia/hue-rotate),
+   qui donnait un résultat trop imprévisible selon les zones de la carte. */
+.leaflet-tile-pane { filter: grayscale(100%) brightness(1.18); position: relative; }
+.leaflet-tile-pane::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #E7E1F5; /* couleur cible — dis-moi le code hex exact si ce n'est pas parfait */
+    mix-blend-mode: color;
+    pointer-events: none;
+}
 
 /* REVISION KPI COUNTRIES (0 en rose, hover rose que sur le texte) */
 .stat-pill { position: absolute; top: 20px; left: 20px; background: #fff; border-radius: 100px; padding: 6px 14px; font-size: 12.5px; font-weight: 700; color: #2E3644; box-shadow: 0 6px 18px rgba(80,60,120,.1); display: flex; gap: 10px; align-items: center; z-index: 1000; }
