@@ -7,7 +7,15 @@
 // script.js (un script classique, pas un module) a besoin pour parler à Firestore,
 // via un pont simple : des fonctions globales + un événement "firebase-ready".
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import {
+    getAuth,
+    onAuthStateChanged,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -22,10 +30,20 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
 
 window.firebaseAuth = auth;
 window.firebaseDb = db;
 window.firebaseCurrentUser = null;
+
+// Fonctions de connexion exposées globalement, pour que des pages qui n'ont pas
+// leur propre module (map.html, legal.html...) puissent proposer un formulaire de
+// connexion sans dupliquer toute la logique Firebase.
+window.firebaseSignInEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
+window.firebaseSignInGoogle = () => signInWithPopup(auth, googleProvider);
+window.firebaseSendPasswordReset = (email) => sendPasswordResetEmail(auth, email);
+// Vraie déconnexion Firebase (ferme la session), pas juste un nettoyage du localStorage.
+window.firebaseSignOut = () => signOut(auth);
 
 // Écrit (fusionne, sans écraser le reste du document) les champs donnés dans le
 // document Firestore de l'utilisateur actuellement connecté. Ne fait rien si
