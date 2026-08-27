@@ -216,6 +216,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="firebase-init.js"></script>
 <script src="script.js"></script>
 <script>
     // La fenêtre "Unlock Passes" est entièrement gérée par script.js (openCartModal /
@@ -263,7 +264,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
     function renderVisited() {
         const vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-        const normalized = vList.map(v => (typeof v === 'object' ? v : { id: v }));
+        const normalized = vList.map(v => window.normalizeVisitEntry ? window.normalizeVisitEntry(v) : (typeof v === 'object' ? v : { id: v, visits: [] }));
         const visitedIds = normalized.map(v => Number(v.id));
 
         renderProgressBars(visitedIds);
@@ -286,9 +287,16 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
             const loc = celebLocations.find(l => l.id === Number(v.id));
             if (!loc) return;
 
+            const visits = (v.visits || []).slice().sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+            const latest = visits[0] || {};
+
             let starsHtml = '';
-            const rating = v.rating || 0;
+            const rating = latest.rating || 0;
             for (let i = 0; i < 5; i++) { starsHtml += i < rating ? starFullSvg : starEmptySvg; }
+
+            const visitCountLabel = visits.length > 1
+                ? (currentLang === 'fr' ? ` &middot; ${visits.length} visites` : ` &middot; ${visits.length} visits`)
+                : '';
 
             const row = document.createElement('div');
             row.className = 'visit-row';
@@ -297,13 +305,17 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
                 <div class="visit-thumb" style="background-image:url('${loc.img || ('https://img.youtube.com/vi/' + loc.ytId + '/hqdefault.jpg')}');"></div>
                 <div>
                     <div class="visit-name">${loc.name}</div>
-                    <div class="visit-meta">${loc.city}, ${loc.country} &middot; ${v.date || ''}</div>
+                    <div class="visit-meta">${loc.city}, ${loc.country} &middot; ${latest.date || ''}${visitCountLabel}</div>
                 </div>
                 <div class="visit-stars">${starsHtml}</div>
             `;
             container.appendChild(row);
         });
     }
+
+    // Permet à script.js de rafraîchir cette page une fois les vraies visites du
+    // compte récupérées depuis Firestore (voir l'écouteur "firebase-ready").
+    window.refreshVisitedFromCloud = renderVisited;
 
     renderVisited();
 
