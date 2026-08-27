@@ -111,6 +111,18 @@
 </style>
 </head>
 <body class="auth-gate-active">
+<script>
+    // Évite le flash de flou pour un utilisateur déjà connecté : s'il existe un
+    // indice fort qu'un compte était connecté lors de la dernière visite (email
+    // sauvegardé), on retire le voile immédiatement, avant même que la page ne soit
+    // dessinée. Le gestionnaire "firebase-ready" plus bas reste la seule source de
+    // vérité : si cet indice s'avère faux (session expirée, etc.), il réaffichera le
+    // voile normalement — on ne fait ici qu'éviter le clignotement pour le cas
+    // (largement majoritaire) où l'indice est correct.
+    if (localStorage.getItem('userEmail')) {
+        document.body.classList.remove('auth-gate-active');
+    }
+</script>
 
 <div class="app-container">
     
@@ -341,14 +353,11 @@
                 </div>
 
                 <div class="tab-panel" id="tab-visit">
-                    <div class="memory-card">
-                        <div class="memory-card-header">
-                            <div class="stars" id="display-memory-stars" style="pointer-events: none;"></div>
-                            <div class="memory-date" id="display-memory-date"></div>
-                        </div>
-                        <div class="memory-notes" id="display-memory-notes"></div>
-                        <button id="edit-memory-btn" style="background:transparent; border:1.5px solid #cbd5e1; color:#64748b; font-size:11px; font-weight:700; padding:6px 12px; border-radius:100px; margin-top:20px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit memory</button>
-                    </div>
+                    <div id="visits-list"></div>
+                    <button id="add-visit-btn" style="width:100%; margin-top:14px; background:transparent; border:1.5px dashed #cbd5e1; color:#64748b; font-size:12px; font-weight:700; padding:12px; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Poppins',sans-serif;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span id="add-visit-btn-label" data-i18n="addAnotherVisit">Add another visit</span>
+                    </button>
                 </div>
 
             </div>
