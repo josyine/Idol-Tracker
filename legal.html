@@ -71,6 +71,31 @@
   ul.plain { margin: 0 0 14px 20px; font-size: 13.5px; line-height: 1.8; color: #334155; }
   .placeholder { background: #FCE7F0; color: #D42759; padding: 1px 6px; border-radius: 5px; font-weight: 600; font-size: 12.5px; }
   .note { background: #faf9fc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; font-size: 12.5px; color: #64748b; line-height: 1.6; margin-top: 10px; }
+
+  /* FENÊTRE DE CONNEXION (affichée directement sur cette page, sans redirection) */
+  .login-overlay { position: fixed; inset: 0; z-index: 99999; display: none; align-items: center; justify-content: center; background: rgba(20,16,30,0.5); backdrop-filter: blur(4px); padding: 20px; }
+  .login-overlay.open { display: flex; }
+  .login-modal { background: #fff; border-radius: 18px; padding: 38px 34px; max-width: 400px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,.35); position: relative; }
+  .login-modal .close-login-btn { position: absolute; top: 14px; right: 16px; font-size: 24px; color: #94a3b8; cursor: pointer; background: none; border: none; line-height: 1; }
+  .login-modal .close-login-btn:hover { color: #D42759; }
+  .login-modal h2 { font-size: 21px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+  .login-modal p.login-desc { font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.55; }
+  .login-modal .input-group { margin-bottom: 14px; text-align: left; }
+  .login-modal label { font-size: 11.5px; font-weight: 700; color: #334155; margin-bottom: 5px; display: block; }
+  .login-modal .field-input { width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: 'Poppins', sans-serif; outline: none; }
+  .login-modal .field-input:focus { border-color: #D42759; box-shadow: 0 0 0 3px #FCE7F0; }
+  .login-forgot-link { display: block; text-align: right; font-size: 11px; color: #D42759; font-weight: 600; margin: -6px 0 14px 0; cursor: pointer; }
+  .login-modal .pay-btn { width: 100%; padding: 13px; border-radius: 10px; font-size: 13.5px; font-weight: 700; color: #fff; background: #D42759; border: none; cursor: pointer; font-family: 'Poppins', sans-serif; transition: 0.2s; }
+  .login-modal .pay-btn:hover { transform: translateY(-1px); }
+  .login-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+  .login-divider div { flex: 1; height: 1px; background: #e5e7eb; }
+  .login-divider span { font-size: 10.5px; color: #94a3b8; font-weight: 700; }
+  .login-modal .social-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; border: 1.5px solid #e5e7eb; color: #1e293b; transition: 0.2s; }
+  .login-modal .social-btn:hover { background: #f8fafc; }
+  .login-modal .social-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .login-modal .terms { font-size: 11px; text-align: center; color: #94a3b8; margin-top: 18px; }
+  .login-modal .terms a { color: #D42759; font-weight: 600; }
+  .login-error { background: #FFF1F3; border: 1px solid #FBD5DC; color: #D42759; font-size: 12px; font-weight: 600; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; text-align: left; }
 </style>
 
 <script>
@@ -133,7 +158,7 @@
                 <div class="lang-option" data-lang="en">English</div>
                 <div class="lang-option" data-lang="fr">Français</div>
             </div>
-            <a href="index.html?login=1" class="login-btn-v5" data-i18n="navLogin">Log in</a>
+            <button id="legal-login-btn" class="login-btn-v5" data-i18n="navLogin">Log in</button>
         </div>
     </div>
 </div>
@@ -263,6 +288,63 @@
     </div>
 </div>
 
+<!-- ==========================================
+     MODALE DE CONNEXION (affichée par-dessus la page legal.html elle-même —
+     ne redirige plus vers index.html)
+     ========================================== -->
+<div id="legal-login-modal" class="auth-modal hidden">
+    <div class="auth-modal-content" style="height: auto;">
+        <button class="close-auth-btn" id="legal-login-close" style="color:#94a3b8;">&times;</button>
+        <div class="auth-left" style="justify-content:center;">
+
+            <div id="legal-login-error" class="hidden" style="background:#FFF1F3; border:1px solid #FBD5DC; color:#D42759; font-size:12px; font-weight:600; padding:10px 14px; border-radius:8px; margin-bottom:16px;"></div>
+
+            <h2 data-i18n="loginModalTitle">Log in</h2>
+            <p data-i18n="loginModalDesc">Welcome back! Enter your email and password to continue.</p>
+
+            <div class="input-group">
+                <label data-i18n="loginEmailLabel">Email address</label>
+                <input type="email" id="legal-login-email" class="field-input" placeholder="jane.doe@example.com">
+            </div>
+            <div class="input-group">
+                <label data-i18n="loginPasswordLabel">Password</label>
+                <input type="password" id="legal-login-password" class="field-input" placeholder="••••••••">
+            </div>
+            <div style="text-align:right; margin-bottom:16px; margin-top:-6px;">
+                <a href="#" id="legal-forgot-password" style="font-size:11.5px; color:#D42759; font-weight:600;" data-i18n="loginForgotPw">Forgot password?</a>
+            </div>
+            <button class="pay-btn" id="legal-login-submit" data-i18n="loginBtnText">Log in</button>
+
+            <div style="display:flex; align-items:center; gap:10px; margin:18px 0;">
+                <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+                <span style="font-size:11px; color:#94a3b8; font-weight:600;" data-i18n="loginOrDivider">OR</span>
+                <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+            </div>
+
+            <div class="social-btn" id="legal-google-btn">
+                <svg viewBox="0 0 48 48" style="width:20px;height:20px;flex-shrink:0;"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4c-7.7 0-14.4 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c3.3 6.5 10 11 17.8 11z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C40.9 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>
+                <span data-i18n="loginGoogleBtn">Continue with Google</span>
+            </div>
+
+            <p class="terms" style="margin-top:18px;">
+                <span data-i18n="loginNoAccount">Don't have an account?</span> <a href="index.html" data-i18n="loginSignupLink">Sign up</a>
+            </p>
+        </div>
+
+        <div class="brand-panel">
+            <div class="auth-blob auth-blob-1"></div>
+            <div class="auth-blob auth-blob-2"></div>
+            <div class="auth-blob auth-blob-3"></div>
+            <div class="brand-content">
+                <svg width="56" height="56" viewBox="0 0 400 400" style="margin-bottom:16px;"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#fff"/><polygon points="176,110 176,182 236,146" fill="#D42759"/></svg>
+                <div style="font-size:18px;font-weight:600;color:#fff;margin-bottom:12px;">Screen To <span style="color:#F06090;">Street</span></div>
+                <div style="font-size:20px;font-weight:600;color:#fff;text-align:center;line-height:1.35;">Unlock the world<br>of your idols.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="firebase-init.js"></script>
 <script>
     let currentLang = localStorage.getItem('lang') || 'en';
 
@@ -322,7 +404,14 @@
             mentionsDisclaimerTitle: "Disclaimer",
             mentionsDisclaimerBody: "Screen To Street is an independent project created by fans. It is not affiliated, associated, authorized, or endorsed by HYBE Corporation, YG Entertainment, JYP Entertainment, or any of their subsidiaries or artists. All names, trademarks, and logos mentioned belong to their respective owners.",
 
-            cookiesAlert: "To manage your cookies, return to the homepage or open the settings."
+            cookiesAlert: "To manage your cookies, return to the homepage or open the settings.",
+
+            loginModalTitle: "Log in", loginModalDesc: "Welcome back! Enter your email and password to continue.",
+            loginEmailLabel: "Email address", loginPasswordLabel: "Password", loginForgotPw: "Forgot password?",
+            loginBtnText: "Log in", loginOrDivider: "OR", loginGoogleBtn: "Continue with Google",
+            loginNoAccount: "Don't have an account?", loginSignupLink: "Sign up",
+            loginErrorInvalid: "Incorrect email or password.", loginErrorGeneric: "Something went wrong. Please try again.",
+            loginResetSent: "Password reset email sent — check your inbox.", loginEnterEmailFirst: "Please enter your email address first."
         },
         fr: {
             navDest: "Destinations", navArtists: "Artistes", navLogin: "Se connecter",
@@ -379,7 +468,14 @@
             mentionsDisclaimerTitle: "Avertissement",
             mentionsDisclaimerBody: "Screen To Street est un projet indépendant créé par des fans. Il n'est affilié, associé, autorisé ni approuvé par HYBE Corporation, YG Entertainment, JYP Entertainment, ni aucune de leurs filiales ou artistes. Tous les noms, marques et logos mentionnés appartiennent à leurs détenteurs respectifs.",
 
-            cookiesAlert: "Pour gérer vos cookies, retournez à la page d'accueil ou ouvrez les paramètres."
+            cookiesAlert: "Pour gérer vos cookies, retournez à la page d'accueil ou ouvrez les paramètres.",
+
+            loginModalTitle: "Se connecter", loginModalDesc: "Ravis de vous revoir ! Entrez votre e-mail et votre mot de passe.",
+            loginEmailLabel: "Adresse e-mail", loginPasswordLabel: "Mot de passe", loginForgotPw: "Mot de passe oublié ?",
+            loginBtnText: "Se connecter", loginOrDivider: "OU", loginGoogleBtn: "Continuer avec Google",
+            loginNoAccount: "Vous n'avez pas de compte ?", loginSignupLink: "S'inscrire",
+            loginErrorInvalid: "E-mail ou mot de passe incorrect.", loginErrorGeneric: "Une erreur est survenue. Réessayez.",
+            loginResetSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.", loginEnterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail."
         }
     };
 
@@ -418,6 +514,86 @@
         const cookiesBtn = document.getElementById('cookies-settings-btn');
         if (cookiesBtn) cookiesBtn.addEventListener('click', () => alert(dict[currentLang].cookiesAlert));
     });
+
+    // ==========================================
+    // MODALE DE CONNEXION (reste sur legal.html, ne redirige plus vers index.html)
+    // ==========================================
+    function legalShowError(msg) {
+        const el = document.getElementById('legal-login-error');
+        if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+    }
+    function legalClearError() {
+        const el = document.getElementById('legal-login-error');
+        if (el) { el.classList.add('hidden'); el.textContent = ''; }
+    }
+    function legalFriendlyError(code) {
+        if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+            return dict[currentLang].loginErrorInvalid;
+        }
+        return dict[currentLang].loginErrorGeneric;
+    }
+
+    const legalLoginBtn = document.getElementById('legal-login-btn');
+    const legalLoginModal = document.getElementById('legal-login-modal');
+    if (legalLoginBtn && legalLoginModal) {
+        legalLoginBtn.addEventListener('click', () => {
+            legalClearError();
+            legalLoginModal.classList.remove('hidden');
+        });
+    }
+
+    const legalLoginClose = document.getElementById('legal-login-close');
+    if (legalLoginClose) {
+        legalLoginClose.addEventListener('click', () => legalLoginModal.classList.add('hidden'));
+    }
+
+    const legalLoginSubmit = document.getElementById('legal-login-submit');
+    if (legalLoginSubmit) {
+        legalLoginSubmit.addEventListener('click', async () => {
+            const email = document.getElementById('legal-login-email').value.trim();
+            const pass = document.getElementById('legal-login-password').value;
+            if (!email || !pass) return;
+            legalClearError();
+            legalLoginSubmit.disabled = true;
+            try {
+                await window.firebaseSignInEmail(email, pass);
+                window.location.href = 'map.html';
+            } catch (err) {
+                legalLoginSubmit.disabled = false;
+                legalShowError(legalFriendlyError(err.code));
+            }
+        });
+    }
+
+    const legalGoogleBtn = document.getElementById('legal-google-btn');
+    if (legalGoogleBtn) {
+        legalGoogleBtn.addEventListener('click', async () => {
+            legalClearError();
+            try {
+                await window.firebaseSignInGoogle();
+                window.location.href = 'map.html';
+            } catch (err) {
+                if (err.code === 'auth/popup-closed-by-user') return;
+                legalShowError(legalFriendlyError(err.code));
+            }
+        });
+    }
+
+    const legalForgotLink = document.getElementById('legal-forgot-password');
+    if (legalForgotLink) {
+        legalForgotLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('legal-login-email');
+            const email = emailInput.value.trim();
+            if (!email) { legalShowError(dict[currentLang].loginEnterEmailFirst); emailInput.focus(); return; }
+            try {
+                await window.firebaseSendPasswordReset(email);
+                legalShowError(dict[currentLang].loginResetSent);
+            } catch (err) {
+                legalShowError(legalFriendlyError(err.code));
+            }
+        });
+    }
 </script>
 
 </body>
