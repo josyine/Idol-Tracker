@@ -44,6 +44,34 @@ function syncWishlist(wList) {
     }
 }
 
+// Une entrée "visited" peut être soit l'ancien format ({id, date, rating, notes}),
+// soit le nouveau format à plusieurs visites ({id, visits: [{date, rating, notes}, ...]}).
+// Cette fonction met toujours à niveau vers le nouveau format, pour que le reste du
+// code n'ait jamais à se soucier de la version des données.
+function normalizeVisitEntry(entry) {
+    if (typeof entry !== 'object' || entry === null) entry = { id: entry };
+    if (Array.isArray(entry.visits)) return entry;
+    if (entry.date || entry.rating || entry.notes) {
+        return { id: entry.id, visits: [{ date: entry.date || '', rating: entry.rating || 0, notes: entry.notes || '' }] };
+    }
+    return { id: entry.id, visits: [] };
+}
+window.normalizeVisitEntry = normalizeVisitEntry;
+
+function syncVisited(vList) {
+    if (typeof window.syncUserData === 'function') {
+        window.syncUserData({ visitedLocs: vList });
+    }
+}
+window.syncVisited = syncVisited;
+
+function syncTrips(trips) {
+    if (typeof window.syncUserData === 'function') {
+        window.syncUserData({ myTrips: trips });
+    }
+}
+window.syncTrips = syncTrips;
+
 // Au chargement de la page, une fois que Firebase a déterminé si quelqu'un est
 // connecté (ou non) : si oui, on va chercher sa wishlist et ses pass réels dans
 // Firestore pour remplacer les valeurs locales (qui pourraient être vides, ou celles
@@ -64,6 +92,16 @@ window.addEventListener('firebase-ready', async (e) => {
             if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations();
             if (document.getElementById('edit-trip-name') && typeof window.renderTrip === 'function' && currentTrip) window.renderTrip();
             if (typeof window.refreshWishlistFromCloud === 'function') window.refreshWishlistFromCloud();
+        }
+        if (Array.isArray(cloudData.visitedLocs)) {
+            localStorage.setItem('visitedLocs', JSON.stringify(cloudData.visitedLocs));
+            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations();
+            if (typeof window.refreshVisitedFromCloud === 'function') window.refreshVisitedFromCloud();
+        }
+        if (Array.isArray(cloudData.myTrips)) {
+            localStorage.setItem('myTrips', JSON.stringify(cloudData.myTrips));
+            if (document.getElementById('edit-trip-name') && typeof window.initTrips === 'function') window.initTrips();
+            if (typeof window.loadItineraryTabOptions === 'function' && document.getElementById('tab-itinerary-btn')) window.loadItineraryTabOptions();
         }
         if (Array.isArray(cloudData.unlockedGroups)) {
             localStorage.setItem('unlockedGroups', JSON.stringify(cloudData.unlockedGroups));
@@ -520,10 +558,15 @@ const translations = {
         tripName: "Trip name", tripWhen: "When are you planning to go?", tripFrom: "From", tripTo: "To", tripCreate: "Create trip", tripCancel: "Cancel",
         itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips",
         noTripsFound: "No trips found.", selectTripToView: "Select a trip to view", locationsWord: "location", locationsWordPlural: "locations",
+        addAnotherVisit: "Add another visit",
         backToMap: "← Back to Map", moreDetails: "More details", openInMaps: "Open in Google Maps", detailsLabel: "Details", aboutPlaceLabel: "About this place",
         accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accNameLabel: "Name", accEmailLabel: "Email address",
         accActivityTitle: "Your activity", accTrips: "Trips", accVisited: "Visited", accWishlist: "Wishlist", accPasses: "Passes & billing",
         accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes",
+        accDangerZone: "Danger zone",
+        accDeleteConfirmTitle: "Are you sure you want to delete your account?",
+        accDeleteConfirmBody: "This action is permanent. You will not be refunded for any unlocked passes, and all your data — trips, wishlist, and visited places — will be permanently lost.",
+        accDeletePasswordLabel: "Confirm your password", accDeleteCancel: "Cancel", accDeleteConfirmBtn: "Yes, delete my account",
         setTitle: "Settings", setSecurity: "Account & Security", setPassword: "Password", setPasswordSub: "Last changed 3 months ago", setChange: "Change",
         setSignedWith: "Signed in with", setPreferences: "Preferences", setLanguage: "Language", setCurrency: "Currency", setUnits: "Distance units",
         setEmailNotif: "Email notifications", setPushNotif: "Push notifications", setPrivacy: "Privacy", setCookiePrefs: "Cookie Preferences",
@@ -555,10 +598,15 @@ const translations = {
         tripName: "Nom du voyage", tripWhen: "Quand prévoyez-vous d'y aller ?", tripFrom: "De", tripTo: "À", tripCreate: "Créer", tripCancel: "Annuler",
         itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips",
         noTripsFound: "Aucun voyage trouvé.", selectTripToView: "Sélectionner un voyage", locationsWord: "lieu", locationsWordPlural: "lieux",
+        addAnotherVisit: "Ajouter une autre visite",
         backToMap: "← Retour à la carte", moreDetails: "Plus de détails", openInMaps: "Ouvrir dans Google Maps", detailsLabel: "Détails", aboutPlaceLabel: "À propos de ce lieu",
         accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accNameLabel: "Nom", accEmailLabel: "Adresse e-mail",
         accActivityTitle: "Votre activité", accTrips: "Voyages", accVisited: "Visités", accWishlist: "Wishlist", accPasses: "Pass et facturation",
         accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif",
+        accDangerZone: "Zone de danger",
+        accDeleteConfirmTitle: "Êtes-vous sûr(e) de vouloir supprimer votre compte ?",
+        accDeleteConfirmBody: "Cette action est définitive. Vous ne serez pas remboursé(e) pour les pass débloqués, et toutes vos données — voyages, wishlist et lieux visités — seront définitivement perdues.",
+        accDeletePasswordLabel: "Confirmez votre mot de passe", accDeleteCancel: "Annuler", accDeleteConfirmBtn: "Oui, supprimer mon compte",
         setTitle: "Paramètres", setSecurity: "Compte et sécurité", setPassword: "Mot de passe", setPasswordSub: "Dernière modification il y a 3 mois", setChange: "Modifier",
         setSignedWith: "Connecté avec", setPreferences: "Préférences", setLanguage: "Langue", setCurrency: "Devise", setUnits: "Unités de distance",
         setEmailNotif: "Notifications par e-mail", setPushNotif: "Notifications push", setPrivacy: "Confidentialité", setCookiePrefs: "Préférences de cookies",
@@ -1107,6 +1155,25 @@ function loadTripOptions() {
     select.innerHTML += `<option value="new">${newTripTxt}</option>`;
 }
 
+// Construit les options du sélecteur de voyage dans le popup "Add to Wishlist"
+// (voyages existants + "Créer un nouveau voyage"). Appelée à la fois quand on coche
+// la case (toggleWishlist) et quand le panneau s'ouvre avec la case déjà cochée
+// (openDetailsPanel) — avant, seul le second cas la remplissait, donc cocher la case
+// laissait le menu vide, sans option "Create a new trip".
+function populateTripSelectOptions(selectedTripId) {
+    const select = document.getElementById('trip-select');
+    if (!select) return;
+    const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    select.innerHTML = `<option value="none">${currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet"}</option>`;
+    trips.forEach(tr => { select.innerHTML += `<option value="${tr.id}">${tr.name}</option>`; });
+    select.innerHTML += `<option value="new">${currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip..."}</option>`;
+    if (selectedTripId && select.querySelector(`option[value="${selectedTripId}"]`)) {
+        select.value = selectedTripId;
+    } else {
+        select.value = 'none';
+    }
+}
+
 window.toggleWishlist = function() {
     const checked = document.getElementById('details-wishlist').checked;
     const box = document.getElementById('trip-box');
@@ -1117,6 +1184,7 @@ window.toggleWishlist = function() {
         if(!wList.some(w => w.id === currentLocationIdForMemory)) {
             wList.push({id: currentLocationIdForMemory, dateAdded: new Date().toLocaleDateString(), tripId: 'none'});
         }
+        populateTripSelectOptions('none');
     } else {
         box.classList.remove('open');
         window.cancelNewTrip();
@@ -1168,9 +1236,9 @@ window.createTrip = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
 
-    loadTripOptions(); 
-    document.getElementById('trip-select').value = newTripId;
+    populateTripSelectOptions(newTripId);
     window.handleTripSelect(); 
     window.cancelNewTrip();
 };
@@ -1271,14 +1339,15 @@ window.openDetailsPanel = function(id) {
     
     if(vCheck) {
         let vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-        let memoryData = vList.find(v => v.id === loc.id || v === loc.id);
+        let rawEntry = vList.find(v => v.id === loc.id || v === loc.id);
+        let memoryData = rawEntry ? normalizeVisitEntry(rawEntry) : null;
         
         vCheck.checked = !!memoryData;
         
-        if(vCheck.checked && memoryData && memoryData.rating) {
+        if(vCheck.checked && memoryData && memoryData.visits.length > 0) {
             tabBtnVisit.classList.remove('hidden');
             memoryDropdown.classList.remove('open');
-            window.displayMemoryData(memoryData);
+            window.renderVisitsList(memoryData.visits);
         } else {
             tabBtnVisit.classList.add('hidden');
             memoryDropdown.classList.remove('open');
@@ -1287,13 +1356,15 @@ window.openDetailsPanel = function(id) {
         vCheck.onchange = function() {
             let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
             if(this.checked) { 
-                if(!list.some(v => v.id === loc.id)) {
-                    list.push({id: loc.id, date: new Date().toISOString().split('T')[0]}); 
+                let idx = list.findIndex(v => (v.id === loc.id || v === loc.id));
+                if(idx === -1) {
+                    list.push({ id: loc.id, visits: [] });
+                } else {
+                    list[idx] = normalizeVisitEntry(list[idx]);
                 }
-                memoryDropdown.classList.add('open'); 
-                document.getElementById('memory-date').value = new Date().toISOString().split('T')[0];
-                document.getElementById('memory-notes').value = '';
-                window.setStars(4); 
+                localStorage.setItem('visitedLocs', JSON.stringify(list));
+                syncVisited(list);
+                openMemoryEditor(null); // ouvre le formulaire pour la première visite
             } else { 
                 list = list.filter(v => v.id !== loc.id && v !== loc.id); 
                 memoryDropdown.classList.remove('open'); 
@@ -1303,8 +1374,10 @@ window.openDetailsPanel = function(id) {
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 document.querySelector('.tab-btn[data-tab="info"]').classList.add('active');
                 document.getElementById('tab-info').classList.add('active');
+
+                localStorage.setItem('visitedLocs', JSON.stringify(list));
+                syncVisited(list);
             }
-            localStorage.setItem('visitedLocs', JSON.stringify(list));
             if(map) renderLocations(); 
         };
     }
@@ -1320,21 +1393,7 @@ window.openDetailsPanel = function(id) {
         
         if(wCheck.checked) {
             tripBox.classList.add('open');
-            const select = document.getElementById('trip-select');
-            
-            if(select) {
-                select.innerHTML = '';
-                const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-                select.innerHTML = `<option value="none">${currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet"}</option>`;
-                trips.forEach(t => { select.innerHTML += `<option value="${t.id}">${t.name}</option>`; });
-                select.innerHTML += `<option value="new">${currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip..."}</option>`;
-                
-                if(wishData && wishData.tripId && select.querySelector(`option[value="${wishData.tripId}"]`)) {
-                    select.value = wishData.tripId;
-                } else {
-                    select.value = 'none';
-                }
-            }
+            populateTripSelectOptions(wishData && wishData.tripId);
         } else {
             tripBox.classList.remove('open');
             window.cancelNewTrip();
@@ -1378,10 +1437,42 @@ document.querySelectorAll('#memory-stars .star').forEach(star => {
     star.addEventListener('click', function() { window.setStars(parseInt(this.getAttribute('data-val'))); });
 });
 
+// editingVisitIndex : null = on ajoute une NOUVELLE visite ; un nombre = on modifie
+// la visite existante à cet index dans le tableau "visits" du lieu courant.
+let editingVisitIndex = null;
+
+// Ouvre le formulaire (étoiles / date / notes) pour ajouter une nouvelle visite
+// (visitIndex = null) ou modifier une visite existante (visitIndex = un nombre).
+function openMemoryEditor(visitIndex) {
+    editingVisitIndex = visitIndex;
+    const dropdown = document.getElementById('memory-dropdown');
+
+    if (visitIndex === null) {
+        // Nouvelle visite : date du jour, note vierge, 4 étoiles par défaut.
+        document.getElementById('memory-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('memory-notes').value = '';
+        window.setStars(4);
+    } else {
+        let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        let entry = list.find(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
+        entry = entry ? normalizeVisitEntry(entry) : null;
+        const visit = entry && entry.visits[visitIndex];
+        if (visit) {
+            document.getElementById('memory-date').value = visit.date || '';
+            document.getElementById('memory-notes').value = visit.notes || '';
+            window.setStars(visit.rating || 4);
+        }
+    }
+
+    document.querySelector('.tab-btn[data-tab="info"]').click();
+    dropdown.classList.add('open');
+}
+window.openMemoryEditor = openMemoryEditor;
+
 const saveMemoryBtn = document.getElementById('save-memory-btn');
 if(saveMemoryBtn) {
     saveMemoryBtn.addEventListener('click', () => {
-        const rating = document.getElementById('memory-rating-val').value;
+        const rating = Number(document.getElementById('memory-rating-val').value);
         const date = document.getElementById('memory-date').value;
         const notes = document.getElementById('memory-notes').value;
         
@@ -1389,60 +1480,76 @@ if(saveMemoryBtn) {
         const idx = list.findIndex(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
         
         if(idx !== -1) {
-            if(typeof list[idx] !== 'object') { list[idx] = { id: list[idx] }; }
-            
-            list[idx].rating = rating;
-            list[idx].date = date;
-            list[idx].notes = notes;
+            list[idx] = normalizeVisitEntry(list[idx]);
+
+            if (editingVisitIndex === null) {
+                list[idx].visits.push({ date, rating, notes });
+            } else {
+                list[idx].visits[editingVisitIndex] = { date, rating, notes };
+            }
+
             localStorage.setItem('visitedLocs', JSON.stringify(list));
+            syncVisited(list);
             
             document.getElementById('memory-dropdown').classList.remove('open');
             document.getElementById('tab-btn-visit').classList.remove('hidden');
             
-            window.displayMemoryData(list[idx]);
+            window.renderVisitsList(list[idx].visits);
             document.getElementById('tab-btn-visit').click();
         }
     });
 }
 
-window.displayMemoryData = function(data) {
+// Affiche la liste de toutes les visites d'un lieu (les plus récentes en premier),
+// chacune avec son propre bouton "Edit", plus un bouton pour ajouter une nouvelle
+// visite en bas de la liste.
+window.renderVisitsList = function(visits) {
     const starSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     const emptyStarSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="#e2e8f0" stroke="#e2e8f0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-    
-    let starsHtml = '';
-    for(let i=0; i<5; i++) { starsHtml += (i < data.rating) ? starSvg : emptyStarSvg; }
-    
-    const displayStars = document.getElementById('display-memory-stars');
-    if(displayStars) displayStars.innerHTML = starsHtml;
-    
-    let formattedDate = data.date;
-    if(data.date) {
-        const d = new Date(data.date);
-        if(!isNaN(d.getTime())) {
-            formattedDate = d.toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-        }
-    }
-    
-    const displayDate = document.getElementById('display-memory-date');
-    if(displayDate) displayDate.textContent = formattedDate || 'Unknown date';
-    
-    const displayNotes = document.getElementById('display-memory-notes');
-    if(displayNotes) displayNotes.textContent = data.notes ? `"${data.notes}"` : (currentLang === 'fr' ? "Aucune note pour cette visite." : "No notes for this visit.");
-}
+    const editSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
 
-const editMemoryBtn = document.getElementById('edit-memory-btn');
-if(editMemoryBtn) {
-    editMemoryBtn.addEventListener('click', () => {
-        let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-        let data = list.find(v => v.id === currentLocationIdForMemory);
-        if(data) {
-            document.getElementById('memory-date').value = data.date || '';
-            document.getElementById('memory-notes').value = data.notes || '';
-            window.setStars(data.rating || 4);
+    // On garde une trace de l'index d'origine (dans le tableau non trié) pour que
+    // "Edit" modifie bien la bonne visite, même une fois la liste triée à l'affichage.
+    const withIndex = visits.map((v, i) => ({ ...v, __idx: i }));
+    withIndex.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+    const container = document.getElementById('visits-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    withIndex.forEach(v => {
+        let starsHtml = '';
+        for (let i = 0; i < 5; i++) { starsHtml += (i < v.rating) ? starSvg : emptyStarSvg; }
+
+        let formattedDate = v.date;
+        if (v.date) {
+            const d = new Date(v.date);
+            if (!isNaN(d.getTime())) {
+                formattedDate = d.toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
         }
-        document.querySelector('.tab-btn[data-tab="info"]').click(); 
-        document.getElementById('memory-dropdown').classList.add('open'); 
+
+        const notesText = v.notes ? `"${v.notes}"` : (currentLang === 'fr' ? "Aucune note pour cette visite." : "No notes for this visit.");
+        const editLabel = currentLang === 'fr' ? 'Modifier' : 'Edit memory';
+
+        const card = document.createElement('div');
+        card.className = 'memory-card';
+        card.innerHTML = `
+            <div class="memory-card-header">
+                <div class="stars" style="pointer-events:none;">${starsHtml}</div>
+                <div class="memory-date">${formattedDate || (currentLang === 'fr' ? 'Date inconnue' : 'Unknown date')}</div>
+            </div>
+            <div class="memory-notes">${notesText}</div>
+            <button class="edit-memory-btn" data-idx="${v.__idx}" style="background:transparent; border:1.5px solid #cbd5e1; color:#64748b; font-size:11px; font-weight:700; padding:6px 12px; border-radius:100px; margin-top:20px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">${editSvg} ${editLabel}</button>
+        `;
+        card.querySelector('.edit-memory-btn').addEventListener('click', () => openMemoryEditor(v.__idx));
+        container.appendChild(card);
     });
+};
+
+const addVisitBtn = document.getElementById('add-visit-btn');
+if (addVisitBtn) {
+    addVisitBtn.addEventListener('click', () => openMemoryEditor(null));
 }
 
 window.closeDetailsPanel = function() {
@@ -1745,6 +1852,7 @@ window.addSelectedDaysToTrip = function() {
     const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
     
     window.renderTrip(); 
     closeModal('itinerary-modal');
@@ -1781,6 +1889,7 @@ window.saveItineraryToTrips = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     syncWishlist(wList);
     localStorage.setItem('activeTripId', newTripId);
@@ -1922,8 +2031,8 @@ window.initTrips = function() {
     
     if (trips.length === 0) {
         document.getElementById('empty-state').innerHTML = currentLang === 'fr' 
-            ? "Vous n'avez pas encore de voyage.<br>Allez sur la carte et ajoutez des lieux !"
-            : "You haven't created any trips yet. <br>Go to the map, click on a location and 'Add to Wishlist'!";
+            ? "Vous n'avez pas encore de voyage.<br>Cliquez sur le bouton « New trip » pour en créer un !"
+            : "You haven't created any trips yet.<br>Click the 'New trip' button to create one!";
         document.getElementById('empty-state').classList.remove('hidden');
         document.getElementById('trip-detail-content').style.display = 'none';
         document.getElementById('sidebar-title').textContent = `MY TRIPS (0)`;
@@ -2014,6 +2123,7 @@ window.dropTrip = function(e, targetId) {
             const [moved] = trips.splice(fromIdx, 1);
             trips.splice(toIdx, 0, moved);
             localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
             window.renderTripsSidebar();
         }
     }
@@ -2420,6 +2530,7 @@ window.confirmRemoveLoc = function() {
     const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
 
     closeModal('remove-loc-modal');
     locToRemoveData = null;
@@ -2470,6 +2581,7 @@ window.saveTrip = function() {
     const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
     
     window.renderTripsSidebar();
     
@@ -2652,6 +2764,7 @@ window.createNewTripAdvanced = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
 
     localStorage.setItem('activeTripId', newTripId);
     
@@ -2674,6 +2787,7 @@ window.confirmDeleteTrip = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     trips = trips.filter(t => t.id !== tripIdToDelete);
     localStorage.setItem('myTrips', JSON.stringify(trips));
+    syncTrips(trips);
     
     let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
     wList = wList.filter(w => w.tripId !== tripIdToDelete);
