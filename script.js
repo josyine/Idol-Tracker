@@ -106,6 +106,17 @@ window.addEventListener('firebase-ready', async (e) => {
         if (Array.isArray(cloudData.unlockedGroups)) {
             localStorage.setItem('unlockedGroups', JSON.stringify(cloudData.unlockedGroups));
         }
+        if (cloudData.residenceCountry) {
+            const prevCountry = localStorage.getItem('userCountry');
+            localStorage.setItem('userCountry', cloudData.residenceCountry);
+            // Recentre seulement si la carte est déjà affichée et que la valeur cloud
+            // diffère de celle déjà utilisée pour le centrage initial (nouvel appareil,
+            // ou pays changé depuis account.html).
+            if (map && cloudData.residenceCountry !== prevCountry && typeof window.getMapCenterForCountry === 'function') {
+                const c = window.getMapCenterForCountry(cloudData.residenceCountry);
+                map.setView([c[0], c[1]], c[2]);
+            }
+        }
     }
 });
 
@@ -143,13 +154,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (document.getElementById('map') && typeof L !== 'undefined' && !map) {
-        map = L.map('map', { zoomControl: false }).setView([37.541, 127.025], 6);
+        // Centré par défaut sur le pays de résidence renseigné à l'inscription (lu en
+        // local pour éviter tout clignotement le temps que Firebase confirme la session ;
+        // voir le listener "firebase-ready" plus bas pour la mise à jour si le compte
+        // cloud a une valeur différente/plus fraîche).
+        const initialCenter = window.getMapCenterForCountry ? window.getMapCenterForCountry(localStorage.getItem('userCountry')) : [37.541, 127.025, 6];
+        map = L.map('map', { zoomControl: false }).setView([initialCenter[0], initialCenter[1]], initialCenter[2]);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
         L.tileLayer(OSM_TILE_URL, { 
             attribution: OSM_ATTRIBUTION, subdomains: 'abc', maxZoom: 19 
         }).addTo(map);
         markerGroup = L.layerGroup().addTo(map);
         setTimeout(() => { map.invalidateSize(); }, 200);
+
+        // Sur mobile, la barre d'adresse du navigateur qui apparaît/disparaît au scroll
+        // change la hauteur réelle de la fenêtre sans déclencher de resize fiable pour
+        // Leaflet : sans ce recalcul, la carte peut rester dimensionnée sur l'ancienne
+        // hauteur et laisser un bandeau vide en bas de l'écran.
+        window.addEventListener('resize', () => { if (map) map.invalidateSize(); });
 
         map.on('zoomend', function() {
             const zoom = map.getZoom();

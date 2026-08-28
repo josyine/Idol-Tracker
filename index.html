@@ -181,6 +181,10 @@
                     <div class="input-group"><label data-i18n="fname">First Name</label><input type="text" id="fname" class="field-input" placeholder="(Optional)"></div>
                     <div class="input-group"><label data-i18n="lname">Last Name</label><input type="text" id="lname" class="field-input" placeholder="(Optional)"></div>
                 </div>
+                <div class="input-group">
+                    <label data-i18n="countryLabel">Country of residence</label>
+                    <select id="residence-country" class="field-input"><option value="" data-i18n="countryPlaceholder">Select your country (optional)</option></select>
+                </div>
                 <div class="input-group" style="margin-bottom: 20px;">
                     <label data-i18n="reasonLabel">Why are you using Screen To Street?</label>
                     <select id="user-reason" class="field-input"><option value="" data-i18n="reasonPlaceholder">Select an option (optional)</option><option value="discover" data-i18n="reason1">To discover new places</option><option value="travel" data-i18n="reason2">To plan a trip</option><option value="addresses" data-i18n="reason3">To get good addresses</option><option value="idols" data-i18n="reason4">To follow my idol's footsteps</option><option value="other" data-i18n="reason5">Other</option></select>
@@ -250,6 +254,7 @@
     </div>
 </div>
 
+<script src="countries.js"></script>
 <script type="module" src="welcome-script.js"></script>
 </body>
 </html>

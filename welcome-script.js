@@ -68,6 +68,7 @@ const dict = {
         
         step2Title: "Profile", step2Desc: "Tell us a bit about yourself.",
         usernameLabel: "Username", fname: "First Name", lname: "Last Name",
+        countryLabel: "Country of residence", countryPlaceholder: "Select your country (optional)",
         reasonLabel: "Why are you using Screen To Street?", reasonPlaceholder: "Select an option (optional)",
         reason1: "To discover new places", reason2: "To plan a trip", reason3: "To get good addresses", reason4: "To follow my idol's footsteps", reason5: "Other",
         
@@ -113,6 +114,7 @@ const dict = {
         
         step2Title: "Profil", step2Desc: "Parlez-nous un peu de vous.",
         usernameLabel: "Nom d'utilisateur", fname: "Prénom", lname: "Nom",
+        countryLabel: "Pays de résidence", countryPlaceholder: "Sélectionnez votre pays (facultatif)",
         reasonLabel: "Pourquoi utilisez-vous Screen To Street ?", reasonPlaceholder: "Sélectionnez une option (facultatif)",
         reason1: "Pour découvrir de nouveaux lieux", reason2: "Pour préparer un voyage", reason3: "Pour avoir de bonnes adresses", reason4: "Pour suivre la trace de mon idole", reason5: "Autre",
         
@@ -151,6 +153,8 @@ function updateLangUI() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.populateCountrySelect === 'function') window.populateCountrySelect('residence-country');
+
     const langBtn = document.getElementById('lang-btn');
     if (langBtn) langBtn.addEventListener('click', (e) => {
         const lMenu = document.getElementById('lang-menu');
@@ -458,10 +462,12 @@ if(btnToStep3) {
         const usernameVal = uname.value.trim();
         const fnameVal = document.getElementById('fname').value.trim();
         const lnameVal = document.getElementById('lname').value.trim();
+        const countryVal = document.getElementById('residence-country').value;
         const reasonVal = document.getElementById('user-reason').value;
 
         localStorage.setItem('userName', usernameVal);
         if (fnameVal) localStorage.setItem('userFirstName', fnameVal);
+        if (countryVal) localStorage.setItem('userCountry', countryVal);
 
         const user = auth.currentUser;
         if (user) {
@@ -473,6 +479,7 @@ if(btnToStep3) {
                     firstName: fnameVal,
                     lastName: lnameVal,
                     email: user.email,
+                    residenceCountry: countryVal,
                     reason: reasonVal,
                     unlockedGroups: [],
                     wishlistLocs: [],
