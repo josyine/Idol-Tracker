@@ -18,7 +18,8 @@ import {
     deleteUser,
     reauthenticateWithPopup,
     reauthenticateWithCredential,
-    EmailAuthProvider
+    EmailAuthProvider,
+    updatePassword
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
@@ -82,6 +83,22 @@ window.firebaseDeleteAccount = async function (password) {
             throw err;
         }
     }
+};
+
+// Changement de mot de passe (settings.html) : ne s'applique qu'aux comptes
+// email/mot de passe — un compte connecté uniquement via Google n'a pas de mot de
+// passe Firebase à changer (settings.html détecte ce cas et n'appelle pas cette
+// fonction). On ré-authentifie toujours avec le mot de passe actuel avant de définir
+// le nouveau, ce qui satisfait au passage l'exigence Firebase de connexion récente
+// pour cette action sensible et vérifie naturellement que l'ancien mot de passe est
+// correct (sinon reauthenticateWithCredential rejette avec auth/wrong-password).
+window.firebaseChangePassword = async function (currentPassword, newPassword) {
+    const user = auth.currentUser;
+    if (!user) throw Object.assign(new Error('not-authenticated'), { code: 'not-authenticated' });
+
+    const cred = EmailAuthProvider.credential(user.email, currentPassword);
+    await reauthenticateWithCredential(user, cred);
+    await updatePassword(user, newPassword);
 };
 
 // Écrit (fusionne, sans écraser le reste du document) les champs donnés dans le
