@@ -144,10 +144,16 @@ const dict = {
 
 let currentActiveStep = 0; // 0 = social, 1 = account, 2 = profile, 3 = passes, 4 = payment
 
+// Repli sur l'anglais pour les langues pas encore traduites sur cette page (seuls en/fr
+// existent ici pour l'instant) : le sélecteur propose bien les 8 langues comme sur le
+// reste du site, mais le contenu reste lisible en attendant sa traduction complète.
+function curDict() { return dict[currentLang] || dict.en; }
+
 function updateLangUI() {
+    const d = curDict();
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if(dict[currentLang][key]) el.innerHTML = dict[currentLang][key]; 
+        if(d[key]) el.innerHTML = d[key];
     });
     updatePrice();
 }
@@ -270,7 +276,7 @@ function clearAuthError() {
     if(el) { el.classList.add('hidden'); el.textContent = ''; }
 }
 function friendlyAuthError(code) {
-    const t = dict[currentLang];
+    const t = curDict();
     const table = {
         'auth/invalid-email': t.errInvalidEmail,
         'auth/weak-password': t.errWeakPassword,
@@ -377,7 +383,7 @@ if (btnLoginSubmit) {
             btnLoginSubmit.disabled = false;
             btnLoginSubmit.textContent = originalLabel;
             if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
-                showAuthError(dict[currentLang].errInvalidLogin);
+                showAuthError(curDict().errInvalidLogin);
             } else {
                 showAuthError(friendlyAuthError(err.code));
             }
@@ -394,13 +400,13 @@ if (forgotPasswordLink) {
         const emailInput = document.getElementById('login-email');
         const emailVal = emailInput.value.trim();
         if (!emailVal) {
-            showAuthError(dict[currentLang].enterEmailFirst);
+            showAuthError(curDict().enterEmailFirst);
             emailInput.focus();
             return;
         }
         try {
             await sendPasswordResetEmail(auth, emailVal);
-            showAuthError(dict[currentLang].resetEmailSent);
+            showAuthError(curDict().resetEmailSent);
         } catch (err) {
             showAuthError(friendlyAuthError(err.code));
         }
@@ -441,7 +447,7 @@ if(btnToStep2) {
             btnToStep2.disabled = false;
             btnToStep2.textContent = originalLabel;
             if (createErr.code === 'auth/email-already-in-use') {
-                showAuthError(dict[currentLang].errEmailInUse);
+                showAuthError(curDict().errEmailInUse);
                 const loginEmailInput = document.getElementById('login-email');
                 if (loginEmailInput) loginEmailInput.value = emailVal;
             } else {
@@ -529,10 +535,10 @@ function updatePrice() {
     
     if (selectedCount > 0) {
         btnToStep4.disabled = false;
-        btnToStep4.textContent = dict[currentLang].btnToPayment;
+        btnToStep4.textContent = curDict().btnToPayment;
     } else {
         btnToStep4.disabled = true;
-        btnToStep4.textContent = dict[currentLang].payBtnEmpty;
+        btnToStep4.textContent = curDict().payBtnEmpty;
     }
 }
 checkboxes.forEach(cb => { cb.addEventListener('change', updatePrice); });

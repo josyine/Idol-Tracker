@@ -157,6 +157,12 @@
             <div id="lang-menu" class="lang-menu hidden">
                 <div class="lang-option" data-lang="en">English</div>
                 <div class="lang-option" data-lang="fr">Français</div>
+                <div class="lang-option" data-lang="es">Español</div>
+                <div class="lang-option" data-lang="it">Italiano</div>
+                <div class="lang-option" data-lang="pt">Português</div>
+                <div class="lang-option" data-lang="ko">한국어</div>
+                <div class="lang-option" data-lang="ja">日本語</div>
+                <div class="lang-option" data-lang="zh">中文</div>
             </div>
             <button id="legal-login-btn" class="login-btn-v5" data-i18n="navLogin">Log in</button>
         </div>
@@ -479,10 +485,16 @@
         }
     };
 
+    // Repli sur l'anglais pour les langues pas encore traduites sur cette page (seuls
+    // en/fr existent ici pour l'instant) : le sélecteur propose bien les 8 langues comme
+    // sur le reste du site, mais le contenu reste lisible en attendant sa traduction.
+    function curDict() { return dict[currentLang] || dict.en; }
+
     function applyTranslations() {
+        const d = curDict();
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
-            if (dict[currentLang] && dict[currentLang][key] !== undefined) el.innerHTML = dict[currentLang][key];
+            if (d[key] !== undefined) el.innerHTML = d[key];
         });
     }
 
@@ -512,7 +524,7 @@
         });
 
         const cookiesBtn = document.getElementById('cookies-settings-btn');
-        if (cookiesBtn) cookiesBtn.addEventListener('click', () => alert(dict[currentLang].cookiesAlert));
+        if (cookiesBtn) cookiesBtn.addEventListener('click', () => alert(curDict().cookiesAlert));
     });
 
     // ==========================================
@@ -528,9 +540,9 @@
     }
     function legalFriendlyError(code) {
         if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
-            return dict[currentLang].loginErrorInvalid;
+            return curDict().loginErrorInvalid;
         }
-        return dict[currentLang].loginErrorGeneric;
+        return curDict().loginErrorGeneric;
     }
 
     const legalLoginBtn = document.getElementById('legal-login-btn');
@@ -585,10 +597,10 @@
             e.preventDefault();
             const emailInput = document.getElementById('legal-login-email');
             const email = emailInput.value.trim();
-            if (!email) { legalShowError(dict[currentLang].loginEnterEmailFirst); emailInput.focus(); return; }
+            if (!email) { legalShowError(curDict().loginEnterEmailFirst); emailInput.focus(); return; }
             try {
                 await window.firebaseSendPasswordReset(email);
-                legalShowError(dict[currentLang].loginResetSent);
+                legalShowError(curDict().loginResetSent);
             } catch (err) {
                 legalShowError(legalFriendlyError(err.code));
             }
