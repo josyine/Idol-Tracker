@@ -146,8 +146,8 @@
 
             <!-- Les 2 Onglets (Explore / My Itinerary) -->
             <div class="sidebar-top-tabs" style="margin-top: 15px;">
-                <button id="tab-explore-btn" class="top-tab-btn active" onclick="switchMainTab('explore')">Explore</button>
-                <button id="tab-itinerary-btn" class="top-tab-btn" onclick="switchMainTab('itinerary')">My Itinerary</button>
+                <button id="tab-explore-btn" class="top-tab-btn active" onclick="switchMainTab('explore')" data-i18n="tabExplore">Explore</button>
+                <button id="tab-itinerary-btn" class="top-tab-btn" onclick="switchMainTab('itinerary')" data-i18n="tabMyItinerary">My Itinerary</button>
             </div>
 
             <!-- CONTENEUR PRINCIPAL DES ONGLETS -->
@@ -292,7 +292,7 @@
                     </div>
 
                     <div id="memory-dropdown" class="memory-dropdown">
-                        <span class="sub-label">Your rating</span>
+                        <span class="sub-label" data-i18n="yourRating">Your rating</span>
                         <div class="stars" id="memory-stars">
                             <svg class="star active" data-val="1" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                             <svg class="star active" data-val="2" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -302,20 +302,20 @@
                         </div>
                         <input type="hidden" id="memory-rating-val" value="4">
                         
-                        <span class="sub-label" style="margin-top:14px;">When did you visit?</span>
+                        <span class="sub-label" style="margin-top:14px;" data-i18n="whenDidYouVisit">When did you visit?</span>
                         <input type="date" id="memory-date" style="display:block; width:100%; background:#fff; border:1px solid #cbd5e1; border-radius:8px; padding:9px 12px; font-size:12px; color:#334155; margin-bottom:14px; outline:none; font-family:'Poppins', sans-serif;">
                         
                         <span class="sub-label">Your notes (optional)</span>
                         <textarea id="memory-notes" placeholder="What do you remember about this place?" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; font-family:'Poppins',sans-serif; height:60px; resize:none; margin-bottom:14px; outline:none;"></textarea>
                         
-                        <button id="save-memory-btn" style="width:100%; margin-top:10px; background:#D42759; color:#fff; border:none; border-radius:9px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;">Save memory</button>
+                        <button id="save-memory-btn" style="width:100%; margin-top:10px; background:#D42759; color:#fff; border:none; border-radius:9px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="saveMemory">Save memory</button>
                     </div>
                 </div>
 
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="info" data-i18n="tabInfo">Info</button>
                     <button class="tab-btn" data-tab="story" data-i18n="tabStory">Story</button>
-                    <button class="tab-btn hidden" id="tab-btn-visit" data-tab="visit">My Visit</button>
+                    <button class="tab-btn hidden" id="tab-btn-visit" data-tab="visit" data-i18n="myVisitTab">My Visit</button>
                 </div>
 
                 <div class="tab-panel active" id="tab-info">
@@ -372,12 +372,12 @@
             <div style="background: #fff; border-radius: 100px; padding: 10px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 13px; font-weight: 700;">
                 <div id="btn-show-locations" class="stat-pill-btn" onclick="openFilteredListModal('locations')">
                     <span id="stat-locations" class="stat-pill-num">0</span> 
-                    <span class="stat-pill-text">LOCATIONS</span>
+                    <span class="stat-pill-text" data-i18n="locationsCount">LOCATIONS</span>
                 </div>
                 <span style="color: #cbd5e1;">|</span>
                 <div id="btn-show-countries" class="stat-pill-btn" onclick="openFilteredListModal('countries')">
                     <span id="stat-countries" class="stat-pill-num">0</span> 
-                    <span class="stat-pill-text">COUNTRIES</span>
+                    <span class="stat-pill-text" data-i18n="statsCountries">COUNTRIES</span>
                 </div>
             </div>
         </div>
