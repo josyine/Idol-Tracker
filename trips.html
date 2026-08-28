@@ -119,9 +119,32 @@
   .add-day-btn:hover { border-color: #D42759; color: #D42759; }
 
   .empty-state { text-align: center; color: #94a3b8; padding: 80px 0; font-size: 15px; width: 100%; }
+  .empty-state-new-trip-btn { margin-top: 20px; }
+
+  /* Logo toujours visible sur mobile : sur le reste du site, le logo vit dans la
+     sidebar (tiroir fermé par défaut sur mobile, donc invisible tant qu'on n'ouvre pas
+     le menu hamburger). Ce doublon compact, en dehors de la sidebar, reste affiché même
+     tiroir fermé. */
+  .mobile-logo { display: none; align-items: center; gap: 8px; position: absolute; top: 14px; left: 14px; z-index: 1500; text-decoration: none; }
+  .mobile-logo-text { font-size: 14px; font-weight: 700; color: #2E3644; }
 
   @media (max-width: 800px) {
-      .app-container { flex-direction: row; }
+      /* L'ancienne règle flex-direction:row ci-dessus contredisait le tiroir mobile
+         partagé (style.css) qui attend flex-direction:column ; elle est retirée pour
+         laisser le tiroir/plein-écran standard s'appliquer normalement. */
+      .mobile-logo { display: flex; }
+
+      /* Ces valeurs reprennent celles déjà prévues pour mobile dans style.css, mais
+         doivent être redéclarées ici : les règles définies plus haut dans ce même
+         fichier (sans media query) passent après style.css dans la cascade et
+         l'emportaient donc à tort sur les valeurs mobiles, même sur petit écran. */
+      .trips-main { padding: 90px 16px 40px 16px; }
+      .trip-detail-wrapper { padding: 22px 18px; }
+      .trip-hero { flex-direction: column; align-items: stretch; gap: 14px; }
+      .trip-name-input { font-size: 24px; }
+      .edit-banner { padding: 16px; }
+      .itinerary-box { padding: 16px; }
+      .day-card { padding: 14px 16px; }
   }
 </style>
 <script>
@@ -145,6 +168,14 @@
 </div>
 
 <div class="app-container">
+
+    <a href="map.html" class="mobile-logo">
+        <svg width="28" height="28" viewBox="0 0 400 400" style="flex-shrink:0;">
+            <path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/>
+            <circle cx="200" cy="150" r="26" fill="#D42759"/>
+        </svg>
+        <span class="mobile-logo-text">Screen To <b style="color:#D42759;">Street</b></span>
+    </a>
 
     <!-- COLONNE DE GAUCHE : ALIGNEMENT PARFAIT (logo identique à map.html : 38x38) -->
     <aside class="sidebar" id="app-sidebar">
