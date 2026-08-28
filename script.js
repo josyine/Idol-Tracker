@@ -2445,9 +2445,13 @@ window.initTrips = function() {
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
     
     if (trips.length === 0) {
-        document.getElementById('empty-state').innerHTML = currentLang === 'fr' 
+        // Le bouton "+ New trip" de la sidebar est caché par défaut sur mobile (tiroir
+        // fermé) : on duplique donc un bouton directement dans l'état vide, au premier
+        // plan, pour qu'il reste cliquable sans devoir d'abord ouvrir le menu.
+        document.getElementById('empty-state').innerHTML = (currentLang === 'fr'
             ? "Vous n'avez pas encore de voyage.<br>Cliquez sur le bouton « New trip » pour en créer un !"
-            : "You haven't created any trips yet.<br>Click the 'New trip' button to create one!";
+            : "You haven't created any trips yet.<br>Click the 'New trip' button to create one!")
+            + `<br><button class="gen-btn empty-state-new-trip-btn" onclick="openNewTripModal()">+ ${currentLang === 'fr' ? 'Nouveau voyage' : 'New trip'}</button>`;
         document.getElementById('empty-state').classList.remove('hidden');
         document.getElementById('trip-detail-content').style.display = 'none';
         document.getElementById('sidebar-title').textContent = `MY TRIPS (0)`;
