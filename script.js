@@ -652,6 +652,7 @@ const translations = {
         itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips",
         noTripsFound: "No trips found.", selectTripToView: "Select a trip to view", locationsWord: "location", locationsWordPlural: "locations",
         addAnotherVisit: "Add another visit",
+        tabExplore: "Explore", tabMyItinerary: "My Itinerary", yourRating: "Your rating", whenDidYouVisit: "When did you visit?", saveMemory: "Save memory", myVisitTab: "My Visit",
         backToMap: "← Back to Map", moreDetails: "More details", openInMaps: "Open in Google Maps", detailsLabel: "Details", aboutPlaceLabel: "About this place",
         accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accNameLabel: "Name", accEmailLabel: "Email address",
         accActivityTitle: "Your activity", accTrips: "Trips", accVisited: "Visited", accWishlist: "Wishlist", accPasses: "Passes & billing",
@@ -692,6 +693,7 @@ const translations = {
         itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips",
         noTripsFound: "Aucun voyage trouvé.", selectTripToView: "Sélectionner un voyage", locationsWord: "lieu", locationsWordPlural: "lieux",
         addAnotherVisit: "Ajouter une autre visite",
+        tabExplore: "Explorer", tabMyItinerary: "Mon Itinéraire", yourRating: "Votre note", whenDidYouVisit: "Quand avez-vous visité ce lieu ?", saveMemory: "Enregistrer le souvenir", myVisitTab: "Ma Visite",
         backToMap: "← Retour à la carte", moreDetails: "Plus de détails", openInMaps: "Ouvrir dans Google Maps", detailsLabel: "Détails", aboutPlaceLabel: "À propos de ce lieu",
         accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accNameLabel: "Nom", accEmailLabel: "Adresse e-mail",
         accActivityTitle: "Votre activité", accTrips: "Voyages", accVisited: "Visités", accWishlist: "Wishlist", accPasses: "Pass et facturation",
@@ -732,6 +734,7 @@ const translations = {
         itiTitle: "Generador de Itinerarios", itiDesc: "Selecciona un grupo, un país y cuántos días te quedas.", itiCreateBtn: "Crear mi guía", itiExport: "Exportar guía en PDF", itiSave: "Guardar en Mis Viajes",
         noTripsFound: "No se encontraron viajes.", selectTripToView: "Selecciona un viaje para ver", locationsWord: "lugar", locationsWordPlural: "lugares",
         addAnotherVisit: "Añadir otra visita",
+        tabExplore: "Explorar", tabMyItinerary: "Mi Itinerario", yourRating: "Tu valoración", whenDidYouVisit: "¿Cuándo visitaste este lugar?", saveMemory: "Guardar recuerdo", myVisitTab: "Mi Visita",
         backToMap: "← Volver al mapa", moreDetails: "Más detalles", openInMaps: "Abrir en Google Maps", detailsLabel: "Detalles", aboutPlaceLabel: "Sobre este lugar",
         accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accNameLabel: "Nombre", accEmailLabel: "Correo electrónico",
         accActivityTitle: "Tu actividad", accTrips: "Viajes", accVisited: "Visitados", accWishlist: "Lista de deseos", accPasses: "Pases y facturación",
@@ -772,6 +775,7 @@ const translations = {
         itiTitle: "Generatore di Itinerari", itiDesc: "Seleziona un gruppo, un paese e quanti giorni resti.", itiCreateBtn: "Crea la mia guida", itiExport: "Esporta guida in PDF", itiSave: "Salva nei Miei Viaggi",
         noTripsFound: "Nessun viaggio trovato.", selectTripToView: "Seleziona un viaggio da vedere", locationsWord: "luogo", locationsWordPlural: "luoghi",
         addAnotherVisit: "Aggiungi un'altra visita",
+        tabExplore: "Esplora", tabMyItinerary: "Il Mio Itinerario", yourRating: "La tua valutazione", whenDidYouVisit: "Quando hai visitato questo posto?", saveMemory: "Salva ricordo", myVisitTab: "La Mia Visita",
         backToMap: "← Torna alla mappa", moreDetails: "Maggiori dettagli", openInMaps: "Apri in Google Maps", detailsLabel: "Dettagli", aboutPlaceLabel: "Informazioni su questo luogo",
         accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accNameLabel: "Nome", accEmailLabel: "Indirizzo email",
         accActivityTitle: "La tua attività", accTrips: "Viaggi", accVisited: "Visitati", accWishlist: "Wishlist", accPasses: "Pass e fatturazione",
@@ -812,6 +816,7 @@ const translations = {
         itiTitle: "Gerador de Roteiros", itiDesc: "Selecione um grupo, um país e quantos dias você fica.", itiCreateBtn: "Criar meu guia", itiExport: "Exportar guia em PDF", itiSave: "Salvar em Minhas Viagens",
         noTripsFound: "Nenhuma viagem encontrada.", selectTripToView: "Selecione uma viagem para ver", locationsWord: "local", locationsWordPlural: "locais",
         addAnotherVisit: "Adicionar outra visita",
+        tabExplore: "Explorar", tabMyItinerary: "Meu Itinerário", yourRating: "Sua avaliação", whenDidYouVisit: "Quando você visitou este lugar?", saveMemory: "Salvar lembrança", myVisitTab: "Minha Visita",
         backToMap: "← Voltar ao mapa", moreDetails: "Mais detalhes", openInMaps: "Abrir no Google Maps", detailsLabel: "Detalhes", aboutPlaceLabel: "Sobre este local",
         accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accNameLabel: "Nome", accEmailLabel: "Endereço de e-mail",
         accActivityTitle: "Sua atividade", accTrips: "Viagens", accVisited: "Visitados", accWishlist: "Wishlist", accPasses: "Passes e faturamento",
@@ -852,6 +857,7 @@ const translations = {
         itiTitle: "자동 일정 생성기", itiDesc: "그룹, 국가, 체류 일수를 선택하세요.", itiCreateBtn: "가이드 만들기", itiExport: "가이드 PDF로 내보내기", itiSave: "내 여행에 저장",
         noTripsFound: "여행을 찾을 수 없습니다.", selectTripToView: "볼 여행을 선택하세요", locationsWord: "장소", locationsWordPlural: "장소",
         addAnotherVisit: "다른 방문 추가",
+        tabExplore: "탐색", tabMyItinerary: "내 일정", yourRating: "평점", whenDidYouVisit: "언제 방문하셨나요?", saveMemory: "추억 저장", myVisitTab: "내 방문",
         backToMap: "← 지도로 돌아가기", moreDetails: "자세히 보기", openInMaps: "구글 지도에서 열기", detailsLabel: "상세 정보", aboutPlaceLabel: "이 장소에 대해",
         accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accNameLabel: "이름", accEmailLabel: "이메일 주소",
         accActivityTitle: "내 활동", accTrips: "여행", accVisited: "방문함", accWishlist: "위시리스트", accPasses: "이용권 및 결제",
@@ -892,6 +898,7 @@ const translations = {
         itiTitle: "自動旅程ジェネレーター", itiDesc: "グループ、国、滞在日数を選択してください。", itiCreateBtn: "ガイドを作成", itiExport: "ガイドをPDFで出力", itiSave: "マイトリップに保存",
         noTripsFound: "旅行が見つかりません。", selectTripToView: "表示する旅行を選択", locationsWord: "スポット", locationsWordPlural: "スポット",
         addAnotherVisit: "別の訪問を追加",
+        tabExplore: "探索", tabMyItinerary: "マイ旅程", yourRating: "評価", whenDidYouVisit: "いつ訪れましたか？", saveMemory: "思い出を保存", myVisitTab: "マイビジット",
         backToMap: "← 地図に戻る", moreDetails: "詳細を見る", openInMaps: "Googleマップで開く", detailsLabel: "詳細", aboutPlaceLabel: "この場所について",
         accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accNameLabel: "名前", accEmailLabel: "メールアドレス",
         accActivityTitle: "アクティビティ", accTrips: "旅行", accVisited: "訪問済み", accWishlist: "ウィッシュリスト", accPasses: "パスとお支払い",
@@ -932,6 +939,7 @@ const translations = {
         itiTitle: "自动行程生成器", itiDesc: "选择一个团体、一个国家，以及停留天数。", itiCreateBtn: "生成我的指南", itiExport: "导出指南为 PDF", itiSave: "保存到我的行程",
         noTripsFound: "未找到任何行程。", selectTripToView: "选择要查看的行程", locationsWord: "个地点", locationsWordPlural: "个地点",
         addAnotherVisit: "添加另一次访问",
+        tabExplore: "探索", tabMyItinerary: "我的行程", yourRating: "你的评分", whenDidYouVisit: "你什么时候去的？", saveMemory: "保存回忆", myVisitTab: "我的到访",
         backToMap: "← 返回地图", moreDetails: "更多详情", openInMaps: "在 Google 地图中打开", detailsLabel: "详情", aboutPlaceLabel: "关于这个地方",
         accTitle: "我的账户", accChangePhoto: "更换头像", accNameLabel: "姓名", accEmailLabel: "电子邮箱",
         accActivityTitle: "我的动态", accTrips: "行程", accVisited: "已访问", accWishlist: "收藏清单", accPasses: "通行证与账单",
@@ -1243,6 +1251,7 @@ window.toggleTripDropdown = function(e) {
     const chevron = document.getElementById('trip-select-chevron');
     const header = document.getElementById('trip-select-header-box');
     if(!dropdown || !chevron) return;
+    if(header && header.classList.contains('disabled')) return; // rien à sélectionner, on ne fait rien
     
     if(dropdown.classList.contains('hidden')) {
         dropdown.classList.remove('hidden');
@@ -1269,6 +1278,8 @@ document.addEventListener('click', (e) => {
 
 window.loadItineraryTabOptions = function() {
     const dropdownList = document.getElementById('trip-dropdown-list');
+    const headerBox = document.getElementById('trip-select-header-box');
+    const label = document.getElementById('trip-select-label');
     if(!dropdownList) return;
     
     let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
@@ -1276,6 +1287,9 @@ window.loadItineraryTabOptions = function() {
     dropdownList.innerHTML = '';
     
     if(trips.length > 0) {
+        // Des voyages existent : le sélecteur redevient normalement cliquable.
+        if(headerBox) headerBox.classList.remove('disabled');
+
         trips.forEach(tr => {
             let allAssignedIds = (tr.days || []).flat().map(Number);
             let durationTxt = tr.dateType === 'duration' ? (tr.duration || 'Flexible') : `${tr.days ? tr.days.length : 0} ${currentLang === 'fr' ? 'jours' : 'Days'}`;
@@ -1313,7 +1327,11 @@ window.loadItineraryTabOptions = function() {
             dropdownList.appendChild(opt);
         });
     } else {
+        // Aucun voyage : inutile de proposer un menu cliquable qui ne mènerait nulle
+        // part — on le désactive et on l'indique directement dans le libellé.
         dropdownList.innerHTML = `<div class="trip-select-empty">${t('noTripsFound')}</div>`;
+        if(headerBox) headerBox.classList.add('disabled');
+        if(label) { label.textContent = t('noTripsFound'); label.style.color = '#94a3b8'; }
     }
 
     // NE PAS masquer/réinitialiser le voyage actif quand on rouvre l'onglet :
