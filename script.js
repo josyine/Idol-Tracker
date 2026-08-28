@@ -168,10 +168,17 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { map.invalidateSize(); }, 200);
 
         // Sur mobile, la barre d'adresse du navigateur qui apparaît/disparaît au scroll
-        // change la hauteur réelle de la fenêtre sans déclencher de resize fiable pour
-        // Leaflet : sans ce recalcul, la carte peut rester dimensionnée sur l'ancienne
-        // hauteur et laisser un bandeau vide en bas de l'écran.
-        window.addEventListener('resize', () => { if (map) map.invalidateSize(); });
+        // change la hauteur réelle de la fenêtre sans que l'évènement "resize" classique
+        // ne se déclenche de façon fiable (en particulier sur Safari iOS) : sans ce
+        // recalcul, Leaflet garde la carte dimensionnée sur l'ancienne hauteur et laisse
+        // un bandeau gris en haut/bas de l'écran. window.visualViewport.resize suit ce
+        // changement bien plus fidèlement quand il est disponible ; orientationchange
+        // couvre en plus la rotation de l'écran (dimensions mises à jour avec un léger
+        // délai après l'évènement, d'où le setTimeout).
+        const refreshMapSize = () => { if (map) map.invalidateSize(); };
+        window.addEventListener('resize', refreshMapSize);
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', refreshMapSize);
+        window.addEventListener('orientationchange', () => setTimeout(refreshMapSize, 300));
 
         map.on('zoomend', function() {
             const zoom = map.getZoom();
@@ -186,6 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
             else { markerSize = 32; iconSize = 16; }
             document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
             document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
+
+            // Recalcule le regroupement des marqueurs proches pour le nouveau zoom (des
+            // lieux fusionnés en un seul cluster peuvent redevenir individuels en
+            // zoomant, et l'inverse en dézoomant) — sans reconstruire la liste latérale
+            // ni relancer un fitBounds, seulement pour ce zoom-ci.
+            if (typeof renderMapMarkers === 'function' && Array.isArray(currentFilteredLocations)) {
+                renderMapMarkers(currentFilteredLocations, { fitBounds: false });
+            }
         });
     }
 
@@ -294,6 +309,11 @@ const iconsSVG = {
     "Landmarks": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="13" x="4" y="8" rx="2" ry="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
     "Default": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`
 };
+
+// Icône générique utilisée pour un marqueur de cluster (plusieurs lieux regroupés) —
+// volontairement neutre plutôt qu'une icône de catégorie précise, puisqu'un cluster
+// mélange souvent plusieurs catégories/groupes différents.
+const CLUSTER_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`;
 
 const groupColors = { "BTS": "#8b5cf6", "Blackpink": "#ec4899", "Twice": "#f43f5e", "Seventeen": "#3b82f6", "Katseye": "#10b981", "TXT": "#f59e0b" };
 
@@ -1231,22 +1251,12 @@ function renderLocations() {
     const sCountries = document.getElementById('stat-countries');
     if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
-    const mapMarkers = [];
     let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
 
     filteredLocations.forEach(loc => {
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
         const isVisited = visitedData.some(v => v.id === loc.id || v === loc.id);
         const baseColor = groupColors[loc.group] || '#334e68';
-        
-        let inlineStyle = `border-color: ${baseColor}; --marker-color: ${baseColor};`;
-        inlineStyle += isVisited ? ` background-color: ${baseColor}; color: white;` : ` background-color: white; color: ${baseColor};`;
-        
-        const customIcon = L.divIcon({ className: 'custom-category-marker', html: `<div style="${inlineStyle}">${catIconSvg}</div>`, iconSize: [32,32], iconAnchor: [16,16] });
-        const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(markerGroup);
-        mapMarkers.push(marker);
-
-        marker.on('click', () => window.openDetailsPanel(loc.id));
 
         const cardBgColor = isVisited ? `${baseColor}15` : '#faf9fc';
         const card = document.createElement('div');
@@ -1263,7 +1273,95 @@ function renderLocations() {
         locationListElement.appendChild(card);
     });
 
-    if (mapMarkers.length > 0) map.fitBounds(new L.featureGroup(mapMarkers).getBounds(), { padding: [50, 50], maxZoom: 16 });
+    renderMapMarkers(filteredLocations, { fitBounds: true });
+}
+
+// ==========================================
+// 4bis. REGROUPEMENT DES MARQUEURS TROP PROCHES (CLUSTERING)
+// ==========================================
+// Quand on dézoome (ex: toute la Corée du Sud visible d'un coup), des dizaines de lieux
+// très proches géographiquement finissent en pixels quasi au même endroit et deviennent
+// une bouillie d'icônes illisible. On les regroupe alors en un seul marqueur avec un
+// badge "×N" ; recalculé à chaque changement de zoom (les lieux qui se séparent
+// suffisamment en zoomant redeviennent des marqueurs individuels).
+const CLUSTER_PIXEL_RADIUS = 45;
+
+function clusterLocationsForZoom(locations, zoom) {
+    const points = locations.map(loc => ({ loc, px: map.project([loc.lat, loc.lng], zoom) }));
+    const used = new Array(points.length).fill(false);
+    const clusters = [];
+
+    for (let i = 0; i < points.length; i++) {
+        if (used[i]) continue;
+        const group = [points[i]];
+        used[i] = true;
+        for (let j = i + 1; j < points.length; j++) {
+            if (used[j]) continue;
+            if (points[i].px.distanceTo(points[j].px) <= CLUSTER_PIXEL_RADIUS) {
+                group.push(points[j]);
+                used[j] = true;
+            }
+        }
+        const avgLat = group.reduce((sum, g) => sum + g.loc.lat, 0) / group.length;
+        const avgLng = group.reduce((sum, g) => sum + g.loc.lng, 0) / group.length;
+        clusters.push({ locs: group.map(g => g.loc), center: [avgLat, avgLng] });
+    }
+    return clusters;
+}
+
+function addSingleLocationMarker(loc, visitedData) {
+    const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
+    const isVisited = visitedData.some(v => v.id === loc.id || v === loc.id);
+    const baseColor = groupColors[loc.group] || '#334e68';
+
+    let inlineStyle = `border-color: ${baseColor}; --marker-color: ${baseColor};`;
+    inlineStyle += isVisited ? ` background-color: ${baseColor}; color: white;` : ` background-color: white; color: ${baseColor};`;
+
+    const customIcon = L.divIcon({ className: 'custom-category-marker', html: `<div style="${inlineStyle}">${catIconSvg}</div>`, iconSize: [32,32], iconAnchor: [16,16] });
+    const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(markerGroup);
+    marker.on('click', () => window.openDetailsPanel(loc.id));
+}
+
+function addClusterMarker(cluster) {
+    // Couleur représentative : le groupe le plus fréquent dans le cluster, pour que le
+    // marqueur groupé garde un sens visuel même quand plusieurs groupes sont mélangés.
+    const groupCounts = {};
+    cluster.locs.forEach(l => { groupCounts[l.group] = (groupCounts[l.group] || 0) + 1; });
+    const dominantGroup = Object.keys(groupCounts).sort((a, b) => groupCounts[b] - groupCounts[a])[0];
+    const baseColor = groupColors[dominantGroup] || '#334e68';
+    const count = cluster.locs.length;
+
+    // Le badge (span, pas div) et le conteneur (span aussi) évitent volontairement le
+    // sélecteur CSS ".custom-category-marker div", qui appliquerait sinon le style rond
+    // du marqueur à tout div descendant, y compris le conteneur et le badge.
+    const html = `
+        <span style="position:relative; display:inline-block;">
+            <div style="border-color:${baseColor}; --marker-color:${baseColor}; background-color:${baseColor}; color:#fff;">${CLUSTER_ICON_SVG}</div>
+            <span class="cluster-badge">×${count}</span>
+        </span>
+    `;
+    const clusterIcon = L.divIcon({ className: 'custom-category-marker', html, iconSize: [32, 32], iconAnchor: [16, 16] });
+    const marker = L.marker(cluster.center, { icon: clusterIcon }).addTo(markerGroup);
+    marker.on('click', () => { map.setView(cluster.center, Math.min(map.getZoom() + 3, 18)); });
+}
+
+function renderMapMarkers(locations, opts) {
+    if (!map || !markerGroup) return;
+    markerGroup.clearLayers();
+    const visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    const clusters = clusterLocationsForZoom(locations, map.getZoom());
+
+    clusters.forEach(cluster => {
+        if (cluster.locs.length === 1) addSingleLocationMarker(cluster.locs[0], visitedData);
+        else addClusterMarker(cluster);
+    });
+
+    // Le fitBounds initial doit couvrir les vraies coordonnées de chaque lieu (pas les
+    // centres de cluster, qui donneraient un cadrage trop serré) — seulement au premier
+    // rendu / changement de filtre, jamais depuis le ré-agencement au zoom.
+    if (opts && opts.fitBounds && locations.length > 0) {
+        map.fitBounds(L.latLngBounds(locations.map(l => [l.lat, l.lng])), { padding: [50, 50], maxZoom: 16 });
+    }
 }
 
 // ==========================================
