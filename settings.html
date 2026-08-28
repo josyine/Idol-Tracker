@@ -167,18 +167,24 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
             <select id="lang-select" onchange="changeLanguage(this.value)">
                 <option value="en">English</option>
                 <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="it">Italiano</option>
+                <option value="pt">Português</option>
+                <option value="ko">한국어</option>
+                <option value="ja">日本語</option>
+                <option value="zh">中文</option>
             </select>
         </div>
         <div class="row"><div class="row-label" data-i18n="setCurrency">Currency</div><select><option>EUR (€)</option></select></div>
         <div class="row"><div class="row-label" data-i18n="setUnits">Distance units</div><select><option>Kilometers</option></select></div>
-        <div class="row"><div class="row-label" data-i18n="setEmailNotif">Email notifications</div><div class="toggle on" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
-        <div class="row" style="border-bottom:none;"><div class="row-label" data-i18n="setPushNotif">Push notifications</div><div class="toggle off" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></div></div>
+        <div class="row"><div class="row-label" data-i18n="setEmailNotif">Email notifications</div><div class="toggle off" id="email-notif-toggle"></div></div>
+        <div class="row" style="border-bottom:none;"><div class="row-label" data-i18n="setPushNotif">Push notifications</div><div class="toggle off" id="push-notif-toggle"></div></div>
       </div>
 
       <div class="section-title" data-i18n="setPrivacy">Privacy</div>
       <div class="box-container">
-        <div class="row"><div class="row-label" data-i18n="setCookiePrefs">Cookie Preferences</div><button class="btn-outline" onclick="resetCookies()" data-i18n="setResetBanners">Reset Banners</button></div>
-        <div class="row" style="border-bottom:none;"><div><div class="row-label" data-i18n="setDownloadData">Download my data</div><div class="row-sub" data-i18n="setExportSub">Export everything in JSON</div></div><button class="btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span data-i18n="setExport">Export</span></button></div>
+        <div class="row"><div class="row-label" data-i18n="setCookiePrefs">Cookie Preferences</div><button class="btn-outline" id="cookie-prefs-btn" data-i18n="setManage">Manage</button></div>
+        <div class="row" style="border-bottom:none;"><div><div class="row-label" data-i18n="setDownloadData">Download my data</div><div class="row-sub" data-i18n="setExportSub">Export everything in JSON</div></div><button class="btn-outline" id="download-data-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span data-i18n="setExport">Export</span></button></div>
       </div>
     </div>
 </div>
@@ -214,6 +220,65 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
     </div>
 </div>
 
+<!-- Modale de confirmation "Email notifications" -->
+<div id="email-notif-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 420px; text-align: center; padding: 32px 28px;">
+        <span class="close-btn" onclick="closeModal('email-notif-modal')" style="color:#94a3b8; text-shadow:none; top:14px; right:16px;">&times;</span>
+        <h2 style="font-size:18px; color:#1e293b; margin-bottom:10px;" data-i18n="setNotifConfirmTitle">Enable email notifications?</h2>
+        <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:22px;" data-i18n="setNotifConfirmBody">By enabling this, you agree to receive an email whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise).</p>
+        <div style="display:flex; gap:10px;">
+            <button id="email-notif-cancel" style="flex:1; background:#fff; color:#334155; border:1.5px solid #cbd5e1; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="accDeleteCancel">Cancel</button>
+            <button id="email-notif-accept" style="flex:1; background:#D42759; color:#fff; border:none; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="setNotifEnableBtn">Enable</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale de confirmation + préférences "Push notifications" -->
+<div id="push-notif-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 440px; text-align: center; padding: 32px 28px;">
+        <span class="close-btn" onclick="closeModal('push-notif-modal')" style="color:#94a3b8; text-shadow:none; top:14px; right:16px;">&times;</span>
+        <h2 style="font-size:18px; color:#1e293b; margin-bottom:10px;" data-i18n="setPushNotifConfirmTitle">Enable push notifications?</h2>
+        <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:20px;" data-i18n="setPushNotifConfirmBody">By enabling this, you agree to receive a push notification whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise). Choose which groups and country you care about below.</p>
+
+        <div style="text-align:left; margin-bottom:16px;">
+            <label class="field-label" data-i18n="setNotifGroupsLabel">Notify me for these groups</label>
+            <div id="push-notif-groups" style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;"></div>
+        </div>
+
+        <div style="text-align:left; margin-bottom:22px;">
+            <label class="field-label" data-i18n="setNotifCountryLabel">Notify me for this country</label>
+            <select id="push-notif-country" class="field-value" style="cursor:pointer;">
+                <option value="" data-i18n="setNotifAllCountries">All countries</option>
+            </select>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button id="push-notif-cancel" style="flex:1; background:#fff; color:#334155; border:1.5px solid #cbd5e1; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="accDeleteCancel">Cancel</button>
+            <button id="push-notif-accept" style="flex:1; background:#D42759; color:#fff; border:none; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="setNotifEnableBtn">Enable</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale "Cookie Preferences" -->
+<div id="cookie-prefs-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 420px; padding: 32px 28px;">
+        <span class="close-btn" onclick="closeModal('cookie-prefs-modal')" style="color:#94a3b8; text-shadow:none; top:14px; right:16px;">&times;</span>
+        <h2 style="font-size:18px; color:#1e293b; margin-bottom:10px; text-align:center;" data-i18n="setCookiePrefsTitle">Cookie Preferences</h2>
+        <p style="font-size:12.5px; color:#64748b; line-height:1.6; margin-bottom:20px; text-align:center;" data-i18n="setCookiePrefsBody">Necessary cookies keep the site working (login, saved wishlist) and can't be turned off. You choose whether we also use cookies to remember your preferences across visits.</p>
+
+        <div class="row" style="padding:12px 0;">
+            <div><div class="row-label" style="font-size:13px;" data-i18n="setCookieNecessary">Necessary</div><div class="row-sub" data-i18n="setCookieNecessarySub">Always active</div></div>
+            <div class="toggle on" style="opacity:.5; cursor:not-allowed;"></div>
+        </div>
+        <div class="row" style="padding:12px 0; border-bottom:none;">
+            <div><div class="row-label" style="font-size:13px;" data-i18n="setCookieAnalytics">Preferences &amp; analytics</div><div class="row-sub" data-i18n="setCookieAnalyticsSub">Remember your choices between visits</div></div>
+            <div class="toggle off" id="cookie-analytics-toggle"></div>
+        </div>
+
+        <button id="cookie-prefs-save" style="width:100%; margin-top:20px; background:#D42759; color:#fff; border:none; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="setSavePreferences">Save preferences</button>
+    </div>
+</div>
+
 <!-- Modal Panier (Cart) — identique à celui de map.html -->
 <div id="cart-modal" class="modal hidden">
     <div class="modal-content" style="max-width: 500px;">
@@ -237,6 +302,7 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
     </div>
 </div>
 
+<script src="countries.js"></script>
 <script type="module" src="firebase-init.js"></script>
 <script src="script.js"></script>
 <script>
@@ -363,6 +429,200 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
             } finally {
                 changePwConfirmBtn.disabled = false;
                 changePwConfirmBtn.textContent = originalLabel;
+            }
+        });
+    }
+
+    // ==========================================
+    // NOTIFICATIONS (Email / Push) — confirmation + préférences
+    // ==========================================
+    const emailToggle = document.getElementById('email-notif-toggle');
+    const emailModal = document.getElementById('email-notif-modal');
+    const pushToggle = document.getElementById('push-notif-toggle');
+    const pushModal = document.getElementById('push-notif-modal');
+    const pushGroupsContainer = document.getElementById('push-notif-groups');
+    const pushCountrySelect = document.getElementById('push-notif-country');
+
+    function setToggleState(el, on) {
+        el.classList.toggle('on', on);
+        el.classList.toggle('off', !on);
+    }
+
+    // Cases à cocher des groupes, générées depuis groupColors (script.js) pour rester
+    // alignées avec la liste réelle des groupes du site (BTS, Blackpink, Twice...).
+    if (pushGroupsContainer && typeof groupColors === 'object') {
+        Object.keys(groupColors).forEach(group => {
+            const label = document.createElement('label');
+            label.style.cssText = 'display:flex; align-items:center; gap:6px; font-size:12.5px; color:#334155; cursor:pointer;';
+            label.innerHTML = `<input type="checkbox" class="push-group-checkbox" value="${group}" style="accent-color:#D42759;"> ${group}`;
+            pushGroupsContainer.appendChild(label);
+        });
+    }
+    if (pushCountrySelect && typeof window.populateCountrySelect === 'function') {
+        window.populateCountrySelect('push-notif-country');
+    }
+
+    // État initial : restauré depuis localStorage (et écrasé par la version cloud, si
+    // connecté, via l'écouteur firebase-ready plus bas).
+    function applyNotifPrefsToUI(prefs) {
+        setToggleState(emailToggle, !!prefs.emailNotifEnabled);
+        setToggleState(pushToggle, !!prefs.pushNotifEnabled);
+        if (Array.isArray(prefs.pushNotifGroups)) {
+            document.querySelectorAll('.push-group-checkbox').forEach(cb => { cb.checked = prefs.pushNotifGroups.includes(cb.value); });
+        }
+        if (pushCountrySelect && prefs.pushNotifCountry) pushCountrySelect.value = prefs.pushNotifCountry;
+    }
+    function readNotifPrefsFromStorage() {
+        return {
+            emailNotifEnabled: localStorage.getItem('emailNotifEnabled') === 'true',
+            pushNotifEnabled: localStorage.getItem('pushNotifEnabled') === 'true',
+            pushNotifGroups: JSON.parse(localStorage.getItem('pushNotifGroups') || '[]'),
+            pushNotifCountry: localStorage.getItem('pushNotifCountry') || '',
+        };
+    }
+    applyNotifPrefsToUI(readNotifPrefsFromStorage());
+
+    function saveNotifPrefs(fields) {
+        Object.keys(fields).forEach(k => {
+            const v = fields[k];
+            localStorage.setItem(k, typeof v === 'boolean' ? String(v) : (Array.isArray(v) ? JSON.stringify(v) : v));
+        });
+        if (typeof window.syncUserData === 'function') window.syncUserData(fields);
+    }
+
+    if (emailToggle) {
+        emailToggle.addEventListener('click', () => {
+            if (emailToggle.classList.contains('on')) {
+                // Désactivation : pas besoin de re-confirmer, on coupe directement.
+                setToggleState(emailToggle, false);
+                saveNotifPrefs({ emailNotifEnabled: false });
+            } else {
+                emailModal.classList.remove('hidden');
+            }
+        });
+    }
+    const emailNotifCancel = document.getElementById('email-notif-cancel');
+    if (emailNotifCancel) emailNotifCancel.addEventListener('click', () => emailModal.classList.add('hidden'));
+    const emailNotifAccept = document.getElementById('email-notif-accept');
+    if (emailNotifAccept) emailNotifAccept.addEventListener('click', () => {
+        setToggleState(emailToggle, true);
+        saveNotifPrefs({ emailNotifEnabled: true });
+        emailModal.classList.add('hidden');
+    });
+
+    if (pushToggle) {
+        pushToggle.addEventListener('click', () => {
+            if (pushToggle.classList.contains('on')) {
+                setToggleState(pushToggle, false);
+                saveNotifPrefs({ pushNotifEnabled: false });
+            } else {
+                pushModal.classList.remove('hidden');
+            }
+        });
+    }
+    const pushNotifCancel = document.getElementById('push-notif-cancel');
+    if (pushNotifCancel) pushNotifCancel.addEventListener('click', () => pushModal.classList.add('hidden'));
+    const pushNotifAccept = document.getElementById('push-notif-accept');
+    if (pushNotifAccept) pushNotifAccept.addEventListener('click', () => {
+        const groups = Array.from(document.querySelectorAll('.push-group-checkbox:checked')).map(cb => cb.value);
+        setToggleState(pushToggle, true);
+        saveNotifPrefs({ pushNotifEnabled: true, pushNotifGroups: groups, pushNotifCountry: pushCountrySelect.value });
+        pushModal.classList.add('hidden');
+    });
+
+    // Une fois connu, le compte cloud remplace les préférences locales (nouvel appareil,
+    // ou préférences changées ailleurs) — même patron que le reste du site.
+    window.addEventListener('firebase-ready', async (e) => {
+        if (!e.detail || !e.detail.user || typeof window.loadUserCloudData !== 'function') return;
+        const cloudData = await window.loadUserCloudData();
+        if (!cloudData) return;
+        const prefs = {
+            emailNotifEnabled: !!cloudData.emailNotifEnabled,
+            pushNotifEnabled: !!cloudData.pushNotifEnabled,
+            pushNotifGroups: Array.isArray(cloudData.pushNotifGroups) ? cloudData.pushNotifGroups : [],
+            pushNotifCountry: cloudData.pushNotifCountry || '',
+        };
+        localStorage.setItem('emailNotifEnabled', String(prefs.emailNotifEnabled));
+        localStorage.setItem('pushNotifEnabled', String(prefs.pushNotifEnabled));
+        localStorage.setItem('pushNotifGroups', JSON.stringify(prefs.pushNotifGroups));
+        localStorage.setItem('pushNotifCountry', prefs.pushNotifCountry);
+        applyNotifPrefsToUI(prefs);
+    });
+
+    // ==========================================
+    // COOKIE PREFERENCES
+    // ==========================================
+    const cookiePrefsBtn = document.getElementById('cookie-prefs-btn');
+    const cookiePrefsModal = document.getElementById('cookie-prefs-modal');
+    const cookieAnalyticsToggle = document.getElementById('cookie-analytics-toggle');
+    const cookiePrefsSave = document.getElementById('cookie-prefs-save');
+
+    if (cookiePrefsBtn) {
+        cookiePrefsBtn.addEventListener('click', () => {
+            setToggleState(cookieAnalyticsToggle, localStorage.getItem('cookiesAccepted') === 'true');
+            cookiePrefsModal.classList.remove('hidden');
+        });
+    }
+    if (cookieAnalyticsToggle) {
+        cookieAnalyticsToggle.addEventListener('click', () => {
+            setToggleState(cookieAnalyticsToggle, !cookieAnalyticsToggle.classList.contains('on'));
+        });
+    }
+    if (cookiePrefsSave) {
+        cookiePrefsSave.addEventListener('click', () => {
+            localStorage.setItem('cookiesAccepted', cookieAnalyticsToggle.classList.contains('on') ? 'true' : 'false');
+            if (document.getElementById('cookie-banner')) document.getElementById('cookie-banner').classList.add('hidden');
+            cookiePrefsModal.classList.add('hidden');
+        });
+    }
+
+    // ==========================================
+    // TÉLÉCHARGER MES DONNÉES
+    // ==========================================
+    const downloadDataBtn = document.getElementById('download-data-btn');
+    if (downloadDataBtn) {
+        downloadDataBtn.addEventListener('click', async () => {
+            const originalHtml = downloadDataBtn.innerHTML;
+            downloadDataBtn.disabled = true;
+            downloadDataBtn.textContent = '...';
+
+            try {
+                const localData = {
+                    username: localStorage.getItem('userName') || null,
+                    firstName: localStorage.getItem('userFirstName') || null,
+                    email: localStorage.getItem('userEmail') || null,
+                    country: localStorage.getItem('userCountry') || null,
+                    lang: localStorage.getItem('lang') || null,
+                    unlockedGroups: JSON.parse(localStorage.getItem('unlockedGroups') || '[]'),
+                    wishlistLocs: JSON.parse(localStorage.getItem('wishlistLocs') || '[]'),
+                    visitedLocs: JSON.parse(localStorage.getItem('visitedLocs') || '[]'),
+                    myTrips: JSON.parse(localStorage.getItem('myTrips') || '[]'),
+                    notificationPreferences: readNotifPrefsFromStorage(),
+                };
+
+                let cloudData = null;
+                if (typeof window.loadUserCloudData === 'function' && window.firebaseCurrentUser) {
+                    cloudData = await window.loadUserCloudData();
+                }
+
+                const exportPayload = {
+                    exportedAt: new Date().toISOString(),
+                    source: 'Screen To Street — Download my data',
+                    account: cloudData || localData,
+                };
+
+                const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'screen-to-street-my-data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } finally {
+                downloadDataBtn.disabled = false;
+                downloadDataBtn.innerHTML = originalHtml;
             }
         });
     }

@@ -52,10 +52,21 @@ window.firebaseSignOut = () => signOut(auth);
 
 // Suppression définitive du compte : le document Firestore ET le compte
 // d'authentification Firebase lui-même. Si Firebase exige une reconnexion récente
-// (mesure de sécurité pour les actions sensibles), on tente une ré-authentification
-// automatique (Google) ou on demande le mot de passe (email) avant de réessayer.
-// `password` est optionnel : fourni seulement lors d'une deuxième tentative, une
-// fois que la personne l'a saisi suite à l'erreur 'needs-password'.
+// (mesure de sécurité pour les actions sensibles) : pour un compte email/mot de passe,
+// on demande le mot de passe avant de réessayer. `password` est optionnel : fourni
+// seulement lors d'une deuxième tentative, une fois que la personne l'a saisi suite à
+// l'erreur 'needs-password'.
+//
+// Pour un compte Google, on NE tente PAS reauthenticateWithPopup ici : ce code
+// s'exécute après un premier `await doDelete()` qui a échoué, donc plusieurs ticks
+// après le clic d'origine — la plupart des navigateurs ne considèrent alors plus
+// l'ouverture d'une popup comme un geste utilisateur direct et la bloquent
+// silencieusement (l'erreur qui en résulte, ex. 'auth/popup-blocked', ne correspond à
+// aucun cas géré par l'appelant, d'où le message générique "Something went wrong"
+// observé). On renvoie donc 'needs-google-reauth' pour que l'UI propose un bouton
+// dédié : reauthenticateWithPopup sera alors appelée en tout premier, directement
+// depuis le gestionnaire de clic de CE bouton (voir firebaseReauthenticateGoogleAndDelete
+// ci-dessous), ce qui reste un geste utilisateur direct aux yeux du navigateur.
 window.firebaseDeleteAccount = async function (password) {
     const user = auth.currentUser;
     if (!user) throw Object.assign(new Error('not-authenticated'), { code: 'not-authenticated' });
@@ -71,18 +82,31 @@ window.firebaseDeleteAccount = async function (password) {
         if (err.code === 'auth/requires-recent-login') {
             const providerId = user.providerData[0] && user.providerData[0].providerId;
             if (providerId === 'google.com') {
-                await reauthenticateWithPopup(user, googleProvider);
+                throw Object.assign(new Error('needs-google-reauth'), { code: 'needs-google-reauth' });
             } else if (password) {
                 const cred = EmailAuthProvider.credential(user.email, password);
                 await reauthenticateWithCredential(user, cred);
+                await doDelete();
             } else {
                 throw Object.assign(new Error('needs-password'), { code: 'needs-password' });
             }
-            await doDelete();
         } else {
             throw err;
         }
     }
+};
+
+// Déclenchée directement par le clic sur le bouton "Confirm with Google" (geste
+// utilisateur direct requis pour que la popup Google ne soit pas bloquée par le
+// navigateur) : ré-authentifie puis relance la suppression, sans repasser par
+// firebaseDeleteAccount ni par un quelconque await intermédiaire avant l'appel popup.
+window.firebaseReauthenticateGoogleAndDelete = async function () {
+    const user = auth.currentUser;
+    if (!user) throw Object.assign(new Error('not-authenticated'), { code: 'not-authenticated' });
+
+    await reauthenticateWithPopup(user, googleProvider);
+    try { await deleteDoc(doc(db, 'users', user.uid)); } catch (e) { /* on continue même si le document n'existe pas/plus */ }
+    await deleteUser(user);
 };
 
 // Changement de mot de passe (settings.html) : ne s'applique qu'aux comptes

@@ -200,6 +200,8 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
             <input type="password" id="delete-account-password" class="field-value" placeholder="••••••••" style="outline:none;">
         </div>
 
+        <div id="delete-account-google-note" class="hidden" style="text-align:left; margin-bottom:16px; font-size:12.5px; color:#64748b; line-height:1.5;" data-i18n="accDeleteGoogleReauthNote">For your security, Google needs to confirm it's really you before we permanently delete your account. Click "Confirm with Google" below.</div>
+
         <div style="display:flex; gap:10px;">
             <button id="delete-account-cancel" style="flex:1; background:#fff; color:#334155; border:1.5px solid #cbd5e1; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="accDeleteCancel">Cancel</button>
             <button id="delete-account-confirm" style="flex:1; background:#ef4444; color:#fff; border:none; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="accDeleteConfirmBtn">Yes, delete my account</button>
@@ -369,7 +371,14 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     const deleteConfirmBtn = document.getElementById('delete-account-confirm');
     const deletePasswordGroup = document.getElementById('delete-account-password-group');
     const deletePasswordInput = document.getElementById('delete-account-password');
+    const deleteGoogleNote = document.getElementById('delete-account-google-note');
     const deleteErrorBox = document.getElementById('delete-account-error');
+    const deleteConfirmBtnDefaultLabel = deleteConfirmBtn ? deleteConfirmBtn.textContent : '';
+    // Vrai une fois qu'on sait qu'il faut passer par la ré-authentification Google : le
+    // prochain clic sur ce même bouton doit alors appeler firebaseReauthenticateGoogleAndDelete
+    // en tout premier (avant tout await), pour rester un geste utilisateur direct aux
+    // yeux du navigateur et éviter que la popup Google soit bloquée silencieusement.
+    let needsGoogleReauth = false;
 
     function showDeleteError(msg) {
         if (deleteErrorBox) { deleteErrorBox.textContent = msg; deleteErrorBox.classList.remove('hidden'); }
@@ -381,8 +390,11 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     if (deleteBtn && deleteModal) {
         deleteBtn.addEventListener('click', () => {
             clearDeleteError();
+            needsGoogleReauth = false;
             deletePasswordGroup.classList.add('hidden');
+            deleteGoogleNote.classList.add('hidden');
             deletePasswordInput.value = '';
+            deleteConfirmBtn.textContent = deleteConfirmBtnDefaultLabel;
             deleteModal.classList.remove('hidden');
         });
     }
@@ -393,28 +405,56 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     if (deleteConfirmBtn) {
         deleteConfirmBtn.addEventListener('click', async () => {
             clearDeleteError();
-            const password = deletePasswordGroup.classList.contains('hidden') ? undefined : deletePasswordInput.value;
-            const originalLabel = deleteConfirmBtn.textContent;
             deleteConfirmBtn.disabled = true;
+            const originalLabel = deleteConfirmBtn.textContent;
             deleteConfirmBtn.textContent = '...';
 
             try {
-                await window.firebaseDeleteAccount(password);
+                if (needsGoogleReauth) {
+                    // Appelée en tout premier, sans await avant elle : reste un geste
+                    // utilisateur direct pour ce clic-ci, même si le clic précédent
+                    // (qui a détecté le besoin de ré-authentifier) était lui asynchrone.
+                    await window.firebaseReauthenticateGoogleAndDelete();
+                } else {
+                    const password = deletePasswordGroup.classList.contains('hidden') ? undefined : deletePasswordInput.value;
+                    await window.firebaseDeleteAccount(password);
+                }
                 localStorage.clear();
                 window.location.href = 'index.html';
             } catch (err) {
                 deleteConfirmBtn.disabled = false;
-                deleteConfirmBtn.textContent = originalLabel;
 
                 if (err.code === 'needs-password') {
+                    deleteConfirmBtn.textContent = originalLabel;
                     deletePasswordGroup.classList.remove('hidden');
                     showDeleteError(currentLang === 'fr'
                         ? "Pour votre sécurité, merci de confirmer votre mot de passe avant de continuer."
                         : "For your security, please confirm your password before continuing.");
                     deletePasswordInput.focus();
+                } else if (err.code === 'needs-google-reauth') {
+                    needsGoogleReauth = true;
+                    deleteGoogleNote.classList.remove('hidden');
+                    deleteConfirmBtn.textContent = currentLang === 'fr' ? 'Confirmer avec Google' : 'Confirm with Google';
                 } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                    deleteConfirmBtn.textContent = originalLabel;
                     showDeleteError(currentLang === 'fr' ? "Mot de passe incorrect." : "Incorrect password.");
+                } else if (err.code === 'auth/popup-blocked') {
+                    deleteConfirmBtn.textContent = originalLabel;
+                    showDeleteError(currentLang === 'fr'
+                        ? "Votre navigateur a bloqué la fenêtre de confirmation Google. Autorisez les pop-ups pour ce site puis réessayez."
+                        : "Your browser blocked the Google confirmation window. Please allow pop-ups for this site and try again.");
+                } else if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+                    deleteConfirmBtn.textContent = originalLabel;
+                    showDeleteError(currentLang === 'fr'
+                        ? "Fenêtre Google fermée avant la fin. Réessayez."
+                        : "Google confirmation window closed before finishing. Please try again.");
+                } else if (err.code === 'auth/network-request-failed') {
+                    deleteConfirmBtn.textContent = originalLabel;
+                    showDeleteError(currentLang === 'fr'
+                        ? "Problème de connexion réseau. Vérifiez votre connexion internet."
+                        : "Network connection issue. Check your internet connection.");
                 } else {
+                    deleteConfirmBtn.textContent = originalLabel;
                     showDeleteError(currentLang === 'fr' ? "Une erreur est survenue. Réessayez." : "Something went wrong. Please try again.");
                 }
             }
