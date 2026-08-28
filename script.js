@@ -1636,12 +1636,38 @@ window.openDetailsPanel = function(id) {
     const dSub = document.getElementById('details-location-sub');
     if(dSub) dSub.textContent = `${loc.city}, ${loc.country}`;
     
-    const dDesc = document.getElementById('details-desc');
-    if(dDesc) dDesc.innerHTML = getLocText(loc.fullDescription); 
-    
-    const dDir = document.getElementById('details-directions');
-    if(dDir) dDir.textContent = getLocText(loc.directions);
-    
+    // Story tab : le fullDescription (1er paragraphe = le lieu, paragraphes suivants = le lien avec BTS)
+    // est découpé automatiquement par balises <p>, sans toucher aux données des 57 lieux.
+    const descPlaceEl = document.getElementById('details-desc-place');
+    const descBtsSection = document.getElementById('story-section-bts');
+    const descBtsEl = document.getElementById('details-desc-bts');
+    if(descPlaceEl) {
+        const descHtml = getLocText(loc.fullDescription);
+        const temp = document.createElement('div');
+        temp.innerHTML = descHtml || '';
+        let paragraphs = Array.from(temp.querySelectorAll('p'));
+        if(paragraphs.length === 0 && descHtml) {
+            const onlyP = document.createElement('p');
+            onlyP.innerHTML = descHtml;
+            paragraphs = [onlyP];
+        }
+        descPlaceEl.innerHTML = paragraphs.length > 0 ? paragraphs[0].outerHTML : '';
+        if(paragraphs.length > 1) {
+            descBtsEl.innerHTML = paragraphs.slice(1).map(p => p.outerHTML).join('');
+            if(descBtsSection) descBtsSection.classList.remove('hidden');
+        } else {
+            descBtsEl.innerHTML = '';
+            if(descBtsSection) descBtsSection.classList.add('hidden');
+        }
+    }
+
+    // Practical information & access : le champ directions existant devient un item unique de la liste.
+    const practicalList = document.getElementById('details-practical-list');
+    if(practicalList) {
+        const directionsText = getLocText(loc.directions);
+        practicalList.innerHTML = directionsText ? `<div class="practical-item"><b>How to get there:</b> ${directionsText}</div>` : '';
+    }
+
     const dGroup = document.getElementById('details-group');
     if(dGroup) dGroup.textContent = loc.group;
     
@@ -1684,11 +1710,20 @@ window.openDetailsPanel = function(id) {
         } else { videoSection.classList.add('hidden'); }
     }
 
+    // Tips box : le champ tip existant (un seul conseil) est enveloppé dans un tableau à un élément
+    // pour remplir la liste de conseils numérotée, sans réécrire les données des 57 lieux.
     const tipText = getLocText(loc.tip);
+    const tips = tipText ? [tipText] : [];
     const tipSection = document.getElementById('details-tip-section');
-    if(tipSection) {
-        if (tipText) { document.getElementById('details-tip').textContent = tipText; tipSection.classList.remove('hidden'); } 
-        else { tipSection.classList.add('hidden'); }
+    const tipsList = document.getElementById('details-tips-list');
+    if(tipSection && tipsList) {
+        if(tips.length > 0) {
+            tipsList.innerHTML = tips.map((tip, i) => `<div class="tip-line"><div class="num">${i + 1}</div><div>${tip}</div></div>`).join('');
+            tipSection.classList.remove('hidden');
+        } else {
+            tipsList.innerHTML = '';
+            tipSection.classList.add('hidden');
+        }
     }
     
     const vCheck = document.getElementById('details-visited');

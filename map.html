@@ -324,7 +324,6 @@
                         <b data-i18n="lMembers">Members:</b> <span id="details-member"></span><br>
                         <b data-i18n="lCountry">Country:</b> <span id="details-country"></span><br>
                         <b data-i18n="lCity">City:</b> <span id="details-city"></span><br>
-                        <b data-i18n="lAddress">Address:</b> <span id="details-full-address"></span><br>
                         <b data-i18n="lDate">Date:</b> <span id="details-date"></span><br>
                         <span id="details-episode-container"><b data-i18n="lEpisode">Episode:</b> <span id="details-episode"></span></span>
                         <span id="details-link-container"><br><b data-i18n="lWatch">Watch:</b> <a id="details-episode-link" href="#" target="_blank" data-i18n="lOfficialLink">Official Link</a></span>
@@ -335,13 +334,12 @@
                         <div class="video-wrapper" id="details-video-container"></div>
                     </div>
 
-                    <div id="details-tip-section" class="tip-box hidden">
-                        <div class="tip-title">💡 <span data-i18n="lTipTitle">The "Screen to Street" Tip</span></div>
-                        <p id="details-tip"></p>
-                    </div>
+                    <span class="sub-label" data-i18n="lPractical">Practical information &amp; access</span>
+                    <div class="practical-box" id="details-practical-list"></div>
 
-                    <span class="sub-label" data-i18n="lHowToGetThere">How to get there</span>
-                    <p class="directions-text" id="details-directions"></p>
+                    <div class="address-block">
+                        <div class="address-text"><b data-i18n="lAddress">Address</b><span id="details-full-address"></span></div>
+                    </div>
                     <a class="gmaps-btn" id="details-map-link" href="#" target="_blank">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E3644" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                         <span data-i18n="lOpenMap">Open in Google Maps</span>
@@ -349,7 +347,22 @@
                 </div>
 
                 <div class="tab-panel" id="tab-story">
-                    <div class="story" id="details-desc"></div>
+                    <div class="story-section" id="story-section-place">
+                        <div class="story-heading"><span class="dot"></span><span data-i18n="lStoryPlace">The story of this place</span></div>
+                        <div id="details-desc-place"></div>
+                    </div>
+
+                    <div class="story-section hidden" id="story-section-bts">
+                        <div class="story-heading"><span class="dot"></span><span data-i18n="lStoryBts">Following in BTS's footsteps</span></div>
+                        <div id="details-desc-bts"></div>
+                    </div>
+
+                    <div class="story-section hidden" id="details-tip-section" style="margin-bottom:0;">
+                        <div class="tips-box">
+                            <div class="tips-title">💡 <span data-i18n="lTipsTitle">THE "SCREEN TO STREET" TIPS</span></div>
+                            <div id="details-tips-list"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="tab-panel" id="tab-visit">
