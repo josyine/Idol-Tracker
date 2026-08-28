@@ -216,6 +216,11 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 }
 .trip-select-header:hover { border-color: var(--primary-magenta); box-shadow: 0 6px 18px rgba(212,39,89,.12); }
 .trip-select-header.open { border-color: var(--primary-magenta); border-radius: 16px 16px 0 0; box-shadow: 0 6px 18px rgba(212,39,89,.12); }
+/* Aucun voyage créé : le sélecteur est visuellement et fonctionnellement désactivé
+   plutôt que de proposer un clic qui n'ouvrirait qu'un menu vide. */
+.trip-select-header.disabled { cursor: default; opacity: 0.65; pointer-events: none; }
+.trip-select-header.disabled:hover { border-color: #e2e8f0; box-shadow: 0 4px 14px rgba(80,60,120,.05); }
+.trip-select-header.disabled .trip-select-chevron { display: none; }
 .trip-select-icon { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-pink); color: var(--primary-magenta); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 10px; }
 .trip-select-header-text { display: flex; align-items: center; flex: 1; overflow: hidden; }
 .trip-select-label-main { font-weight: 700; color: #1e293b; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -252,6 +257,12 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
    ========================================== */
 @media (max-width: 800px) {
     .app-container { flex-direction: column; width: 100%; height: 100vh; border-radius: 0; }
+    /* 100vh inclut, sur mobile, l'espace caché derrière la barre d'adresse du
+       navigateur — ce qui laissait un vide visible en bas de l'écran. 100dvh suit la
+       hauteur réellement visible ; on la déclare en second pour que les navigateurs
+       qui ne la connaissent pas gardent simplement le 100vh ci-dessus en repli. */
+    html, body { height: 100dvh; }
+    .app-container { height: 100dvh; }
     /* Le menu prend maintenant 100% de l'écran sur mobile (plus de carte visible à
        côté), pour que ce soit un vrai écran de navigation à part entière. */
     .sidebar { width: 100%; max-width: none; position: absolute; top: 0; left: -100%; height: 100%; z-index: 3000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.15); }
