@@ -260,6 +260,26 @@
     </div>
 </div>
 
+<!-- MODALE "COOKIE PREFERENCES" (ouverte par le bouton "Manage" ci-dessus) -->
+<div id="cookie-prefs-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('cookie-prefs-modal').classList.add('hidden')">&times;</span>
+        <h2 style="font-size:18px; color:#1e293b; margin-bottom:10px; text-align:center;" data-i18n="setCookiePrefsTitle">Cookie Preferences</h2>
+        <p style="font-size:12.5px; color:#64748b; line-height:1.6; margin-bottom:16px; text-align:center;" data-i18n="setCookiePrefsBody">Necessary cookies keep the site working (login, saved wishlist) and can't be turned off. You choose whether we also use cookies to remember your preferences across visits.</p>
+
+        <div class="pref-row">
+            <div><div class="pref-row-label" data-i18n="setCookieNecessary">Necessary</div><div class="pref-row-sub" data-i18n="setCookieNecessarySub">Always active</div></div>
+            <div class="toggle on" style="opacity:.5; cursor:not-allowed;"></div>
+        </div>
+        <div class="pref-row">
+            <div><div class="pref-row-label" data-i18n="setCookieAnalytics">Preferences &amp; analytics</div><div class="pref-row-sub" data-i18n="setCookieAnalyticsSub">Remember your choices between visits</div></div>
+            <div class="toggle off" id="cookie-analytics-toggle"></div>
+        </div>
+
+        <button id="cookie-prefs-save" style="width:100%; margin-top:20px; background:#D42759; color:#fff; border:none; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="setSavePreferences">Save preferences</button>
+    </div>
+</div>
+
 <script src="countries.js"></script>
 <script type="module" src="welcome-script.js"></script>
 </body>

@@ -1285,8 +1285,17 @@ function renderLocations() {
 // badge "×N" ; recalculé à chaque changement de zoom (les lieux qui se séparent
 // suffisamment en zoomant redeviennent des marqueurs individuels).
 const CLUSTER_PIXEL_RADIUS = 45;
+// Au zoom maximal (limite de la tuile OSM, voir maxZoom du tileLayer plus bas), deux
+// lieux réellement distincts mais très proches en vrai (ex: deux cafés de la même rue)
+// peuvent encore projeter à moins de 45px l'un de l'autre et rester fusionnés en un
+// cluster "×2" — trompeur puisque l'utilisateur est déjà au niveau de zoom maximum et ne
+// peut pas zoomer davantage pour les séparer. On désactive donc le clustering dès ce
+// niveau : chaque lieu redevient son propre marqueur individuel.
+const MAP_MAX_ZOOM = 19;
 
 function clusterLocationsForZoom(locations, zoom) {
+    if (zoom >= MAP_MAX_ZOOM) return locations.map(loc => ({ locs: [loc], center: [loc.lat, loc.lng] }));
+
     const points = locations.map(loc => ({ loc, px: map.project([loc.lat, loc.lng], zoom) }));
     const used = new Array(points.length).fill(false);
     const clusters = [];

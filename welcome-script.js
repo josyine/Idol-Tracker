@@ -80,8 +80,10 @@ const dict = {
         cardNum: "Card Number", expiry: "Expiry Date", cvc: "CVC", paySecurely: "Pay securely",
         
         processing: "Processing securely...", authRightTitle: "Unlock the world of your idols.",
-        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy", 
+        cookieText: "We use cookies to enhance your experience.", cookiePolicy: "Cookie Policy",
         cookieManage: "Manage", cookieReject: "Reject", cookieAccept: "Accept",
+        setCookiePrefsTitle: "Cookie Preferences", setCookiePrefsBody: "Necessary cookies keep the site working (login, saved wishlist) and can't be turned off. You choose whether we also use cookies to remember your preferences across visits.",
+        setCookieNecessary: "Necessary", setCookieNecessarySub: "Always active", setCookieAnalytics: "Preferences & analytics", setCookieAnalyticsSub: "Remember your choices between visits", setSavePreferences: "Save preferences",
 
         errInvalidEmail: "Invalid email address.",
         errWeakPassword: "Password must be at least 6 characters.",
@@ -126,8 +128,10 @@ const dict = {
         cardNum: "Numéro de carte", expiry: "Date d'expiration", cvc: "CVC", paySecurely: "Payer en toute sécurité",
         
         processing: "Traitement sécurisé...", authRightTitle: "Débloquez le monde de vos idoles.",
-        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies", 
+        cookieText: "Nous utilisons des cookies pour améliorer votre expérience.", cookiePolicy: "Politique de cookies",
         cookieManage: "Gérer", cookieReject: "Refuser", cookieAccept: "Accepter",
+        setCookiePrefsTitle: "Préférences de cookies", setCookiePrefsBody: "Les cookies nécessaires font fonctionner le site (connexion, wishlist sauvegardée) et ne peuvent pas être désactivés. Vous choisissez si on utilise aussi des cookies pour mémoriser vos préférences d'une visite à l'autre.",
+        setCookieNecessary: "Nécessaires", setCookieNecessarySub: "Toujours actifs", setCookieAnalytics: "Préférences et analyse", setCookieAnalyticsSub: "Mémorise vos choix d'une visite à l'autre", setSavePreferences: "Enregistrer les préférences",
 
         errInvalidEmail: "Adresse e-mail invalide.",
         errWeakPassword: "Le mot de passe doit contenir au moins 6 caractères.",
@@ -578,15 +582,51 @@ if(!localStorage.getItem('cookiesAccepted')) {
     const cBanner = document.getElementById('cookie-banner');
     if(cBanner) cBanner.classList.remove('hidden'); 
 }
-function closeCookies() { 
-    localStorage.setItem('cookiesAccepted', 'true'); 
+// `cookiesAccepted` sert deux rôles à la fois : sa seule présence indique que la
+// personne a déjà fait un choix (la bannière ne se réaffiche plus), et sa valeur
+// indique ce choix (cookies "préférences & analyse" activés ou non) — même convention
+// que le toggle de la modale "Cookie Preferences" sur settings.html.
+function closeCookies(accepted) {
+    localStorage.setItem('cookiesAccepted', accepted ? 'true' : 'false');
     const cBanner = document.getElementById('cookie-banner');
-    if(cBanner) cBanner.classList.add('hidden'); 
+    if(cBanner) cBanner.classList.add('hidden');
 }
 const cookieAccept = document.getElementById('cookie-accept');
 const cookieReject = document.getElementById('cookie-reject');
-if(cookieAccept) cookieAccept.addEventListener('click', closeCookies);
-if(cookieReject) cookieReject.addEventListener('click', closeCookies);
+// "Reject" fermait jusqu'ici la bannière en marquant silencieusement les cookies
+// comme acceptés (même code que "Accept") : le choix de la personne n'était jamais
+// réellement respecté. Corrigé pour enregistrer le refus.
+if(cookieAccept) cookieAccept.addEventListener('click', () => closeCookies(true));
+if(cookieReject) cookieReject.addEventListener('click', () => closeCookies(false));
+
+// "Manage" : ouvre une vraie modale de préférences (nécessaires/toujours actifs +
+// préférences & analyse, activable) au lieu de ne rien faire.
+const cookieManageBtn = document.getElementById('cookie-manage');
+const cookiePrefsModal = document.getElementById('cookie-prefs-modal');
+const cookieAnalyticsToggle = document.getElementById('cookie-analytics-toggle');
+const cookiePrefsSave = document.getElementById('cookie-prefs-save');
+function setToggleState(el, on) {
+    if (!el) return;
+    el.classList.toggle('on', on);
+    el.classList.toggle('off', !on);
+}
+if (cookieManageBtn && cookiePrefsModal) {
+    cookieManageBtn.addEventListener('click', () => {
+        setToggleState(cookieAnalyticsToggle, localStorage.getItem('cookiesAccepted') === 'true');
+        cookiePrefsModal.classList.remove('hidden');
+    });
+}
+if (cookieAnalyticsToggle) {
+    cookieAnalyticsToggle.addEventListener('click', () => {
+        setToggleState(cookieAnalyticsToggle, !cookieAnalyticsToggle.classList.contains('on'));
+    });
+}
+if (cookiePrefsSave) {
+    cookiePrefsSave.addEventListener('click', () => {
+        closeCookies(cookieAnalyticsToggle.classList.contains('on'));
+        cookiePrefsModal.classList.add('hidden');
+    });
+}
 
 // ==========================================
 // OUVERTURE AUTOMATIQUE DU FORMULAIRE DE CONNEXION

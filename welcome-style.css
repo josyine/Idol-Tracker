@@ -85,6 +85,21 @@ body { margin: 0; padding: 0; min-height: 100vh; min-height: 100dvh; display: fl
 .filter-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--primary-magenta); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
 .action-btn { background: var(--primary-magenta); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
 
+/* MODALE "COOKIE PREFERENCES" (ouverte par le bouton "Manage" de la bannière cookies) */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 10000; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: white; width: 90%; max-width: 420px; border-radius: 16px; padding: 32px 28px; overflow-y: auto; position: relative; }
+.modal .close-btn { position: absolute; top: 14px; right: 16px; font-size: 1.7rem; color: #94a3b8; cursor: pointer; text-shadow: none; }
+.pref-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+.pref-row:last-of-type { border-bottom: none; }
+.pref-row-label { font-size: 13px; font-weight: 700; color: var(--text-main); }
+.pref-row-sub { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+.toggle { width: 46px; height: 26px; border-radius: 100px; position: relative; cursor: pointer; flex-shrink: 0; transition: 0.3s; }
+.toggle.on { background: var(--primary-magenta); }
+.toggle.off { background: #e2e8f0; }
+.toggle::after { content: ''; position: absolute; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: 0.3s; }
+.toggle.on::after { right: 3px; }
+.toggle.off::after { left: 3px; }
+
 /* MODALE D'AUTHENTIFICATION */
 .auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
 .auth-modal-content { width: 920px; max-width: 94vw; height: 620px; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.4); display: flex; position: relative; background: #fff; }
