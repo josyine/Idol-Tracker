@@ -28,6 +28,7 @@ let dayToRemoveBtn = null;
 let tripPageMap = null;
 let tripPageLayer = null;
 let tripMainLayerGroup = null;
+let dayMiniMaps = []; // instances Leaflet des mini-cartes par jour (une par .day-card), à détruire avant chaque re-render puisque box.innerHTML='' supprime leur conteneur DOM sans les libérer
 
 // ==========================================
 // 0bis. SYNCHRONISATION CLOUD DE LA WISHLIST (Firestore)
@@ -1624,16 +1625,17 @@ window.clearTripFromMainMap = function() {
     }
 }
 
+const TRIP_DAY_COLORS = ['#D42759', '#8b5cf6', '#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#14b8a6', '#f43f5e', '#6366f1', '#84cc16'];
+
 function drawTripOnMap(trip, targetMap, targetLayerGroup) {
     if(!targetLayerGroup) return;
     targetLayerGroup.clearLayers();
     if(!trip || !trip.days || trip.days.length === 0) return;
-    
-    const dayColors = ['#D42759', '#8b5cf6', '#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#14b8a6', '#f43f5e', '#6366f1', '#84cc16'];
+
     let allPoints = [];
-    
+
     trip.days.forEach((dayIds, idx) => {
-        const color = dayColors[idx % dayColors.length];
+        const color = TRIP_DAY_COLORS[idx % TRIP_DAY_COLORS.length];
         let coords = [];
         dayIds.forEach((id, locIdx) => {
             const loc = celebLocations.find(l => Number(l.id) === Number(id));
@@ -1656,6 +1658,56 @@ function drawTripOnMap(trip, targetMap, targetLayerGroup) {
     if(allPoints.length > 0 && targetMap) {
         targetMap.fitBounds(L.polyline(allPoints).getBounds(), { padding: [40, 40], maxZoom: 16 });
     }
+}
+
+// Recrée les mini-cartes par jour affichées dans chaque .day-card. Appelée après chaque
+// re-render de l'itinéraire : les anciennes instances Leaflet sont détruites au préalable
+// (leur conteneur DOM a été supprimé par box.innerHTML='' dans renderTrip, ce qui ne libère
+// pas la mémoire ni le "._leaflet_id" du conteneur tant qu'on n'appelle pas .remove()).
+function renderDayMiniMaps(trip) {
+    dayMiniMaps.forEach(m => { if(m) m.remove(); });
+    dayMiniMaps = [];
+    if(!trip || !trip.days) return;
+
+    trip.days.forEach((dayIds, idx) => {
+        const container = document.getElementById(`day-map-${idx}`);
+        if(!container) return;
+
+        const color = TRIP_DAY_COLORS[idx % TRIP_DAY_COLORS.length];
+        const coords = dayIds
+            .map(id => celebLocations.find(l => Number(l.id) === Number(id)))
+            .filter(Boolean)
+            .map(loc => [loc.lat, loc.lng]);
+
+        if(coords.length === 0) {
+            dayMiniMaps[idx] = null;
+            return;
+        }
+
+        const dayMap = L.map(container, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, attributionControl: false }).setView(coords[0], 13);
+        L.tileLayer(OSM_TILE_URL).addTo(dayMap);
+        const dayLayer = L.featureGroup().addTo(dayMap);
+
+        coords.forEach((c, locIdx) => {
+            const markerHtml = `<div style="background:${color}; width:22px; height:22px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:10.5px; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.3);">${locIdx + 1}</div>`;
+            const icon = L.divIcon({ className: '', html: markerHtml, iconSize: [22,22], iconAnchor: [11,11] });
+            L.marker(c, { icon: icon }).addTo(dayLayer);
+        });
+        if(coords.length > 1) {
+            L.polyline(coords, { color: color, weight: 3, opacity: 0.8, dashArray: '7, 5' }).addTo(dayLayer);
+        }
+
+        setTimeout(() => {
+            dayMap.invalidateSize();
+            if(coords.length > 1) {
+                dayMap.fitBounds(L.polyline(coords).getBounds(), { padding: [24, 24], maxZoom: 15 });
+            } else {
+                dayMap.setView(coords[0], 14);
+            }
+        }, 50);
+
+        dayMiniMaps[idx] = dayMap;
+    });
 }
 
 
@@ -2853,10 +2905,11 @@ window.renderTrip = function() {
                 <div class="x-btn edit-only" style="display:block;" onclick="removeDay(this)">✕</div>
             </div>
             <div class="day-items">${itemsHtml}</div>
+            ${dayIds.length > 0 ? `<div class="day-mini-map" id="day-map-${index}"></div>` : ''}
         `;
         box.appendChild(card);
     });
-    box.appendChild(addBtn); 
+    box.appendChild(addBtn);
 
     let tripCountries = [currentTrip.country].filter(Boolean);
     if(tripCountries.length === 0) {
@@ -2890,6 +2943,7 @@ window.renderTrip = function() {
     if(tripPageMap) {
         setTimeout(() => { tripPageMap.invalidateSize(); drawTripOnMap(currentTrip, tripPageMap, tripPageLayer); }, 200);
     }
+    renderDayMiniMaps(currentTrip);
 }
 
 window.switchEditDateTab = function(tab) {
@@ -3146,10 +3200,27 @@ window.saveTrip = function() {
     syncTrips(trips);
     
     window.renderTripsSidebar();
-    
+
     if(tripPageMap) {
         drawTripOnMap(currentTrip, tripPageMap, tripPageLayer);
     }
+
+    // saveTrip() ne reconstruit pas le HTML des .day-card (pour ne pas perturber le drag & drop
+    // en cours) : on ajoute/retire seulement le conteneur de mini-carte selon que le jour a
+    // désormais des lieux ou non, avant de redessiner les mini-cartes elles-mêmes.
+    document.querySelectorAll('.day-card').forEach((card, idx) => {
+        let mapDiv = card.querySelector('.day-mini-map');
+        const hasLocs = currentTrip.days[idx] && currentTrip.days[idx].length > 0;
+        if(hasLocs && !mapDiv) {
+            mapDiv = document.createElement('div');
+            mapDiv.className = 'day-mini-map';
+            mapDiv.id = `day-map-${idx}`;
+            card.appendChild(mapDiv);
+        } else if(!hasLocs && mapDiv) {
+            mapDiv.remove();
+        }
+    });
+    renderDayMiniMaps(currentTrip);
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
