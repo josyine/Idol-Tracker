@@ -203,6 +203,10 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .custom-category-marker div svg { width: var(--icon-size); height: var(--icon-size); transition: all 0.2s ease;}
 .custom-category-marker:hover div { transform: scale(1.15) translateY(-2px); background-color: var(--marker-color) !important; color: white !important; }
 
+/* Badge "×N" en haut à droite d'un marqueur regroupant plusieurs lieux trop proches
+   pour être affichés séparément à ce niveau de zoom. */
+.cluster-badge { position: absolute; top: -6px; right: -6px; background: var(--primary-magenta); color: #fff; font-size: 9.5px; font-weight: 800; line-height: 1; border-radius: 100px; min-width: 18px; height: 18px; padding: 0 4px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,.3); }
+
 /* Marqueur utilisé dans les pop-ups de visited.html / wishlist.html
    (même charte graphique que la carte de map.html) */
 .popup-marker-icon { border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,.3); border: 2px solid #fff; }

@@ -168,10 +168,17 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { map.invalidateSize(); }, 200);
 
         // Sur mobile, la barre d'adresse du navigateur qui apparaît/disparaît au scroll
-        // change la hauteur réelle de la fenêtre sans déclencher de resize fiable pour
-        // Leaflet : sans ce recalcul, la carte peut rester dimensionnée sur l'ancienne
-        // hauteur et laisser un bandeau vide en bas de l'écran.
-        window.addEventListener('resize', () => { if (map) map.invalidateSize(); });
+        // change la hauteur réelle de la fenêtre sans que l'évènement "resize" classique
+        // ne se déclenche de façon fiable (en particulier sur Safari iOS) : sans ce
+        // recalcul, Leaflet garde la carte dimensionnée sur l'ancienne hauteur et laisse
+        // un bandeau gris en haut/bas de l'écran. window.visualViewport.resize suit ce
+        // changement bien plus fidèlement quand il est disponible ; orientationchange
+        // couvre en plus la rotation de l'écran (dimensions mises à jour avec un léger
+        // délai après l'évènement, d'où le setTimeout).
+        const refreshMapSize = () => { if (map) map.invalidateSize(); };
+        window.addEventListener('resize', refreshMapSize);
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', refreshMapSize);
+        window.addEventListener('orientationchange', () => setTimeout(refreshMapSize, 300));
 
         map.on('zoomend', function() {
             const zoom = map.getZoom();
@@ -186,6 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
             else { markerSize = 32; iconSize = 16; }
             document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
             document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
+
+            // Recalcule le regroupement des marqueurs proches pour le nouveau zoom (des
+            // lieux fusionnés en un seul cluster peuvent redevenir individuels en
+            // zoomant, et l'inverse en dézoomant) — sans reconstruire la liste latérale
+            // ni relancer un fitBounds, seulement pour ce zoom-ci.
+            if (typeof renderMapMarkers === 'function' && Array.isArray(currentFilteredLocations)) {
+                renderMapMarkers(currentFilteredLocations, { fitBounds: false });
+            }
         });
     }
 
@@ -294,6 +309,11 @@ const iconsSVG = {
     "Landmarks": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="13" x="4" y="8" rx="2" ry="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
     "Default": `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`
 };
+
+// Icône générique utilisée pour un marqueur de cluster (plusieurs lieux regroupés) —
+// volontairement neutre plutôt qu'une icône de catégorie précise, puisqu'un cluster
+// mélange souvent plusieurs catégories/groupes différents.
+const CLUSTER_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`;
 
 const groupColors = { "BTS": "#8b5cf6", "Blackpink": "#ec4899", "Twice": "#f43f5e", "Seventeen": "#3b82f6", "Katseye": "#10b981", "TXT": "#f59e0b" };
 
@@ -683,10 +703,13 @@ const translations = {
         accDeleteConfirmTitle: "Are you sure you want to delete your account?",
         accDeleteConfirmBody: "This action is permanent. You will not be refunded for any unlocked passes, and all your data — trips, wishlist, and visited places — will be permanently lost.",
         accDeletePasswordLabel: "Confirm your password", accDeleteCancel: "Cancel", accDeleteConfirmBtn: "Yes, delete my account",
+        accDeleteGoogleReauthNote: "For your security, Google needs to confirm it's really you before we permanently delete your account. Click \"Confirm with Google\" below.",
         setTitle: "Settings", setSecurity: "Account & Security", setPassword: "Password", setPasswordSub: "Last changed 3 months ago", setChange: "Change",
+        setChangePwTitle: "Change your password", setChangePwGoogleNote: "Your account uses Google Sign-In, so it has no Screen To Street password to change — manage it from your Google Account instead.", setCurrentPwLabel: "Current password", setNewPwLabel: "New password", setConfirmPwLabel: "Confirm new password", setChangePwBtn: "Change password",
         setSignedWith: "Signed in with", setPreferences: "Preferences", setLanguage: "Language", setCurrency: "Currency", setUnits: "Distance units",
         setEmailNotif: "Email notifications", setPushNotif: "Push notifications", setPrivacy: "Privacy", setCookiePrefs: "Cookie Preferences",
         setResetBanners: "Reset Banners", setDownloadData: "Download my data", setExportSub: "Export everything in JSON", setExport: "Export",
+        setManage: "Manage", setNotifConfirmTitle: "Enable email notifications?", setNotifConfirmBody: "By enabling this, you agree to receive an email whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise).", setNotifEnableBtn: "Enable", setPushNotifConfirmTitle: "Enable push notifications?", setPushNotifConfirmBody: "By enabling this, you agree to receive a push notification whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise). Choose which groups and country you care about below.", setNotifGroupsLabel: "Notify me for these groups", setNotifCountryLabel: "Notify me for this country", setNotifAllCountries: "All countries", setCookiePrefsTitle: "Cookie Preferences", setCookiePrefsBody: "Necessary cookies keep the site working (login, saved wishlist) and can't be turned off. You choose whether we also use cookies to remember your preferences across visits.", setCookieNecessary: "Necessary", setCookieNecessarySub: "Always active", setCookieAnalytics: "Preferences & analytics", setCookieAnalyticsSub: "Remember your choices between visits", setSavePreferences: "Save preferences",
         setDanger: "Danger zone", setDeleteAccTitle: "Delete account", setDeleteAccSub: "This permanently deletes your trips, wishlist and unlocked passes.", setDeleteAccBtn: "Delete Account",
         wishTitle: "My Wishlist", wishEmpty: "You haven't saved any places yet. Explore the map and click \"Add to Wishlist\"!", wishSomeday: "Someday / No trip yet",
         visitTitle: "My Visited Places", visitEmpty: "You haven't marked any place as visited yet. Explore the map and check \"I visited this place\"!",
@@ -724,10 +747,13 @@ const translations = {
         accDeleteConfirmTitle: "Êtes-vous sûr(e) de vouloir supprimer votre compte ?",
         accDeleteConfirmBody: "Cette action est définitive. Vous ne serez pas remboursé(e) pour les pass débloqués, et toutes vos données — voyages, wishlist et lieux visités — seront définitivement perdues.",
         accDeletePasswordLabel: "Confirmez votre mot de passe", accDeleteCancel: "Annuler", accDeleteConfirmBtn: "Oui, supprimer mon compte",
+        accDeleteGoogleReauthNote: "Pour votre sécurité, Google doit confirmer qu'il s'agit bien de vous avant la suppression définitive de votre compte. Cliquez sur « Confirmer avec Google » ci-dessous.",
         setTitle: "Paramètres", setSecurity: "Compte et sécurité", setPassword: "Mot de passe", setPasswordSub: "Dernière modification il y a 3 mois", setChange: "Modifier",
+        setChangePwTitle: "Changer votre mot de passe", setChangePwGoogleNote: "Votre compte utilise la connexion Google, il n'a donc pas de mot de passe Screen To Street à changer — gérez-le depuis votre compte Google.", setCurrentPwLabel: "Mot de passe actuel", setNewPwLabel: "Nouveau mot de passe", setConfirmPwLabel: "Confirmer le nouveau mot de passe", setChangePwBtn: "Changer le mot de passe",
         setSignedWith: "Connecté avec", setPreferences: "Préférences", setLanguage: "Langue", setCurrency: "Devise", setUnits: "Unités de distance",
         setEmailNotif: "Notifications par e-mail", setPushNotif: "Notifications push", setPrivacy: "Confidentialité", setCookiePrefs: "Préférences de cookies",
         setResetBanners: "Réinitialiser la bannière", setDownloadData: "Télécharger mes données", setExportSub: "Exporter toutes les données en JSON", setExport: "Exporter",
+        setManage: "Gérer", setNotifConfirmTitle: "Activer les notifications par e-mail ?", setNotifConfirmBody: "En activant cette option, vous acceptez de recevoir un e-mail à chaque nouveau lieu ajouté — à une fréquence qui dépend de l'activité actuelle de l'artiste (plus fréquent lors d'un comeback ou d'une tournée, plus calme sinon).", setNotifEnableBtn: "Activer", setPushNotifConfirmTitle: "Activer les notifications push ?", setPushNotifConfirmBody: "En activant cette option, vous acceptez de recevoir une notification push à chaque nouveau lieu ajouté — à une fréquence qui dépend de l'activité actuelle de l'artiste (plus fréquent lors d'un comeback ou d'une tournée, plus calme sinon). Choisissez ci-dessous les groupes et le pays qui vous intéressent.", setNotifGroupsLabel: "Me notifier pour ces groupes", setNotifCountryLabel: "Me notifier pour ce pays", setNotifAllCountries: "Tous les pays", setCookiePrefsTitle: "Préférences de cookies", setCookiePrefsBody: "Les cookies nécessaires font fonctionner le site (connexion, wishlist sauvegardée) et ne peuvent pas être désactivés. Vous choisissez si on utilise aussi des cookies pour mémoriser vos préférences d'une visite à l'autre.", setCookieNecessary: "Nécessaires", setCookieNecessarySub: "Toujours actifs", setCookieAnalytics: "Préférences et analyse", setCookieAnalyticsSub: "Mémorise vos choix d'une visite à l'autre", setSavePreferences: "Enregistrer les préférences",
         setDanger: "Zone de danger", setDeleteAccTitle: "Supprimer le compte", setDeleteAccSub: "Ceci supprime définitivement vos voyages, votre wishlist et vos pass débloqués.", setDeleteAccBtn: "Supprimer le compte",
         wishTitle: "Ma Wishlist", wishEmpty: "Vous n'avez encore enregistré aucun lieu. Explorez la carte et cliquez sur « Ajouter à ma Wishlist » !", wishSomeday: "Un jour / Pas de voyage prévu",
         visitTitle: "Mes lieux visités", visitEmpty: "Vous n'avez marqué aucun lieu comme visité. Explorez la carte et cochez « J'ai visité ce lieu » !",
@@ -765,10 +791,13 @@ const translations = {
         accDeleteConfirmTitle: "¿Seguro que quieres eliminar tu cuenta?",
         accDeleteConfirmBody: "Esta acción es permanente. No se te reembolsará ningún pase desbloqueado, y todos tus datos — viajes, lista de deseos y lugares visitados — se perderán definitivamente.",
         accDeletePasswordLabel: "Confirma tu contraseña", accDeleteCancel: "Cancelar", accDeleteConfirmBtn: "Sí, eliminar mi cuenta",
+        accDeleteGoogleReauthNote: "Por tu seguridad, Google debe confirmar que eres tú antes de eliminar tu cuenta de forma permanente. Haz clic en «Confirmar con Google» a continuación.",
         setTitle: "Ajustes", setSecurity: "Cuenta y seguridad", setPassword: "Contraseña", setPasswordSub: "Última modificación hace 3 meses", setChange: "Cambiar",
+        setChangePwTitle: "Cambia tu contraseña", setChangePwGoogleNote: "Tu cuenta usa el inicio de sesión con Google, por lo que no tiene una contraseña de Screen To Street que cambiar — gestiónala desde tu cuenta de Google.", setCurrentPwLabel: "Contraseña actual", setNewPwLabel: "Nueva contraseña", setConfirmPwLabel: "Confirmar nueva contraseña", setChangePwBtn: "Cambiar contraseña",
         setSignedWith: "Sesión iniciada con", setPreferences: "Preferencias", setLanguage: "Idioma", setCurrency: "Moneda", setUnits: "Unidades de distancia",
         setEmailNotif: "Notificaciones por correo", setPushNotif: "Notificaciones push", setPrivacy: "Privacidad", setCookiePrefs: "Preferencias de cookies",
         setResetBanners: "Restablecer banner", setDownloadData: "Descargar mis datos", setExportSub: "Exportar todo en JSON", setExport: "Exportar",
+        setManage: "Gestionar", setNotifConfirmTitle: "¿Activar las notificaciones por correo?", setNotifConfirmBody: "Al activarlo, aceptas recibir un correo cada vez que se añadan nuevos lugares — con una frecuencia que depende de la actividad actual del artista (más frecuente durante un comeback o gira, más tranquilo el resto del tiempo).", setNotifEnableBtn: "Activar", setPushNotifConfirmTitle: "¿Activar las notificaciones push?", setPushNotifConfirmBody: "Al activarlo, aceptas recibir una notificación push cada vez que se añadan nuevos lugares — con una frecuencia que depende de la actividad actual del artista (más frecuente durante un comeback o gira, más tranquilo el resto del tiempo). Elige a continuación los grupos y el país que te interesan.", setNotifGroupsLabel: "Notificarme para estos grupos", setNotifCountryLabel: "Notificarme para este país", setNotifAllCountries: "Todos los países", setCookiePrefsTitle: "Preferencias de cookies", setCookiePrefsBody: "Las cookies necesarias hacen que el sitio funcione (inicio de sesión, lista de deseos guardada) y no se pueden desactivar. Tú decides si también usamos cookies para recordar tus preferencias entre visitas.", setCookieNecessary: "Necesarias", setCookieNecessarySub: "Siempre activas", setCookieAnalytics: "Preferencias y análisis", setCookieAnalyticsSub: "Recuerda tus elecciones entre visitas", setSavePreferences: "Guardar preferencias",
         setDanger: "Zona de peligro", setDeleteAccTitle: "Eliminar cuenta", setDeleteAccSub: "Esto elimina permanentemente tus viajes, lista de deseos y pases desbloqueados.", setDeleteAccBtn: "Eliminar cuenta",
         wishTitle: "Mi Lista de Deseos", wishEmpty: "Aún no has guardado ningún lugar. ¡Explora el mapa y haz clic en «Añadir a mi lista»!", wishSomeday: "Algún día / Sin viaje aún",
         visitTitle: "Mis Lugares Visitados", visitEmpty: "Aún no has marcado ningún lugar como visitado. ¡Explora el mapa y marca «He visitado este lugar»!",
@@ -806,10 +835,13 @@ const translations = {
         accDeleteConfirmTitle: "Sei sicuro di voler eliminare il tuo account?",
         accDeleteConfirmBody: "Questa azione è permanente. Non riceverai rimborsi per i pass sbloccati e tutti i tuoi dati — viaggi, wishlist e luoghi visitati — andranno persi definitivamente.",
         accDeletePasswordLabel: "Conferma la tua password", accDeleteCancel: "Annulla", accDeleteConfirmBtn: "Sì, elimina il mio account",
+        accDeleteGoogleReauthNote: "Per la tua sicurezza, Google deve confermare che sei davvero tu prima di eliminare definitivamente il tuo account. Fai clic su \"Conferma con Google\" qui sotto.",
         setTitle: "Impostazioni", setSecurity: "Account e sicurezza", setPassword: "Password", setPasswordSub: "Ultima modifica 3 mesi fa", setChange: "Modifica",
+        setChangePwTitle: "Cambia la tua password", setChangePwGoogleNote: "Il tuo account usa l'accesso con Google, quindi non ha una password di Screen To Street da cambiare — gestiscila dal tuo Account Google.", setCurrentPwLabel: "Password attuale", setNewPwLabel: "Nuova password", setConfirmPwLabel: "Conferma nuova password", setChangePwBtn: "Cambia password",
         setSignedWith: "Accesso effettuato con", setPreferences: "Preferenze", setLanguage: "Lingua", setCurrency: "Valuta", setUnits: "Unità di distanza",
         setEmailNotif: "Notifiche email", setPushNotif: "Notifiche push", setPrivacy: "Privacy", setCookiePrefs: "Preferenze cookie",
         setResetBanners: "Reimposta banner", setDownloadData: "Scarica i miei dati", setExportSub: "Esporta tutto in JSON", setExport: "Esporta",
+        setManage: "Gestisci", setNotifConfirmTitle: "Attivare le notifiche email?", setNotifConfirmBody: "Attivandole, accetti di ricevere un'email ogni volta che vengono aggiunti nuovi luoghi — con una frequenza che dipende dall'attività attuale dell'artista (più frequente durante un comeback o un tour, più tranquilla altrimenti).", setNotifEnableBtn: "Attiva", setPushNotifConfirmTitle: "Attivare le notifiche push?", setPushNotifConfirmBody: "Attivandole, accetti di ricevere una notifica push ogni volta che vengono aggiunti nuovi luoghi — con una frequenza che dipende dall'attività attuale dell'artista (più frequente durante un comeback o un tour, più tranquilla altrimenti). Scegli qui sotto i gruppi e il paese che ti interessano.", setNotifGroupsLabel: "Notificami per questi gruppi", setNotifCountryLabel: "Notificami per questo paese", setNotifAllCountries: "Tutti i paesi", setCookiePrefsTitle: "Preferenze cookie", setCookiePrefsBody: "I cookie necessari fanno funzionare il sito (accesso, lista dei desideri salvata) e non possono essere disattivati. Puoi scegliere se usiamo anche cookie per ricordare le tue preferenze tra una visita e l'altra.", setCookieNecessary: "Necessari", setCookieNecessarySub: "Sempre attivi", setCookieAnalytics: "Preferenze e analisi", setCookieAnalyticsSub: "Ricorda le tue scelte tra una visita e l'altra", setSavePreferences: "Salva preferenze",
         setDanger: "Zona pericolosa", setDeleteAccTitle: "Elimina account", setDeleteAccSub: "Questo elimina definitivamente i tuoi viaggi, la wishlist e i pass sbloccati.", setDeleteAccBtn: "Elimina account",
         wishTitle: "La Mia Wishlist", wishEmpty: "Non hai ancora salvato nessun luogo. Esplora la mappa e clicca su «Aggiungi alla wishlist»!", wishSomeday: "Un giorno / Nessun viaggio ancora",
         visitTitle: "I Miei Luoghi Visitati", visitEmpty: "Non hai ancora segnato nessun luogo come visitato. Esplora la mappa e seleziona «Ho visitato questo posto»!",
@@ -847,10 +879,13 @@ const translations = {
         accDeleteConfirmTitle: "Tem certeza de que deseja excluir sua conta?",
         accDeleteConfirmBody: "Esta ação é permanente. Você não será reembolsado por nenhum passe desbloqueado, e todos os seus dados — viagens, wishlist e locais visitados — serão perdidos definitivamente.",
         accDeletePasswordLabel: "Confirme sua senha", accDeleteCancel: "Cancelar", accDeleteConfirmBtn: "Sim, excluir minha conta",
+        accDeleteGoogleReauthNote: "Para sua segurança, o Google precisa confirmar que é realmente você antes de excluirmos sua conta permanentemente. Clique em \"Confirmar com o Google\" abaixo.",
         setTitle: "Configurações", setSecurity: "Conta e segurança", setPassword: "Senha", setPasswordSub: "Última alteração há 3 meses", setChange: "Alterar",
+        setChangePwTitle: "Altere sua senha", setChangePwGoogleNote: "Sua conta usa login com Google, portanto não tem uma senha do Screen To Street para alterar — gerencie-a na sua Conta Google.", setCurrentPwLabel: "Senha atual", setNewPwLabel: "Nova senha", setConfirmPwLabel: "Confirmar nova senha", setChangePwBtn: "Alterar senha",
         setSignedWith: "Conectado com", setPreferences: "Preferências", setLanguage: "Idioma", setCurrency: "Moeda", setUnits: "Unidades de distância",
         setEmailNotif: "Notificações por e-mail", setPushNotif: "Notificações push", setPrivacy: "Privacidade", setCookiePrefs: "Preferências de cookies",
         setResetBanners: "Redefinir banner", setDownloadData: "Baixar meus dados", setExportSub: "Exportar tudo em JSON", setExport: "Exportar",
+        setManage: "Gerenciar", setNotifConfirmTitle: "Ativar notificações por e-mail?", setNotifConfirmBody: "Ao ativar, você concorda em receber um e-mail sempre que novos locais forem adicionados — com uma frequência que depende da atividade atual do artista (mais frequente durante um comeback ou turnê, mais tranquila fora disso).", setNotifEnableBtn: "Ativar", setPushNotifConfirmTitle: "Ativar notificações push?", setPushNotifConfirmBody: "Ao ativar, você concorda em receber uma notificação push sempre que novos locais forem adicionados — com uma frequência que depende da atividade atual do artista (mais frequente durante um comeback ou turnê, mais tranquila fora disso). Escolha abaixo os grupos e o país do seu interesse.", setNotifGroupsLabel: "Notificar-me para estes grupos", setNotifCountryLabel: "Notificar-me para este país", setNotifAllCountries: "Todos os países", setCookiePrefsTitle: "Preferências de cookies", setCookiePrefsBody: "Os cookies necessários fazem o site funcionar (login, lista de desejos salva) e não podem ser desativados. Você escolhe se também usamos cookies para lembrar suas preferências entre visitas.", setCookieNecessary: "Necessários", setCookieNecessarySub: "Sempre ativos", setCookieAnalytics: "Preferências e análise", setCookieAnalyticsSub: "Lembra suas escolhas entre visitas", setSavePreferences: "Salvar preferências",
         setDanger: "Zona de perigo", setDeleteAccTitle: "Excluir conta", setDeleteAccSub: "Isso exclui permanentemente suas viagens, wishlist e passes desbloqueados.", setDeleteAccBtn: "Excluir conta",
         wishTitle: "Minha Wishlist", wishEmpty: "Você ainda não salvou nenhum local. Explore o mapa e clique em «Adicionar à wishlist»!", wishSomeday: "Algum dia / Ainda sem viagem",
         visitTitle: "Meus Locais Visitados", visitEmpty: "Você ainda não marcou nenhum local como visitado. Explore o mapa e marque «Eu visitei este lugar»!",
@@ -888,10 +923,13 @@ const translations = {
         accDeleteConfirmTitle: "정말 계정을 삭제하시겠습니까?",
         accDeleteConfirmBody: "이 작업은 되돌릴 수 없습니다. 잠금 해제한 이용권에 대한 환불은 제공되지 않으며, 여행·위시리스트·방문한 장소를 포함한 모든 데이터가 영구적으로 사라집니다.",
         accDeletePasswordLabel: "비밀번호를 확인해주세요", accDeleteCancel: "취소", accDeleteConfirmBtn: "네, 계정을 삭제합니다",
+        accDeleteGoogleReauthNote: "보안을 위해 계정을 영구 삭제하기 전에 Google에서 본인 확인이 필요합니다. 아래의 'Google로 확인'을 클릭하세요.",
         setTitle: "설정", setSecurity: "계정 및 보안", setPassword: "비밀번호", setPasswordSub: "3개월 전에 마지막으로 변경됨", setChange: "변경",
+        setChangePwTitle: "비밀번호 변경", setChangePwGoogleNote: "이 계정은 Google 로그인을 사용하므로 변경할 Screen To Street 비밀번호가 없습니다 — Google 계정에서 관리해 주세요.", setCurrentPwLabel: "현재 비밀번호", setNewPwLabel: "새 비밀번호", setConfirmPwLabel: "새 비밀번호 확인", setChangePwBtn: "비밀번호 변경",
         setSignedWith: "로그인 방식", setPreferences: "환경설정", setLanguage: "언어", setCurrency: "통화", setUnits: "거리 단위",
         setEmailNotif: "이메일 알림", setPushNotif: "푸시 알림", setPrivacy: "개인정보", setCookiePrefs: "쿠키 설정",
         setResetBanners: "배너 초기화", setDownloadData: "내 데이터 다운로드", setExportSub: "모든 데이터를 JSON으로 내보내기", setExport: "내보내기",
+        setManage: "관리", setNotifConfirmTitle: "이메일 알림을 활성화할까요?", setNotifConfirmBody: "이 옵션을 켜면 새 장소가 추가될 때마다 이메일을 받는 것에 동의하는 것입니다 — 빈도는 아티스트의 현재 활동량에 따라 달라집니다(컴백이나 투어 중에는 더 자주, 그 외에는 더 조용하게).", setNotifEnableBtn: "활성화", setPushNotifConfirmTitle: "푸시 알림을 활성화할까요?", setPushNotifConfirmBody: "이 옵션을 켜면 새 장소가 추가될 때마다 푸시 알림을 받는 것에 동의하는 것입니다 — 빈도는 아티스트의 현재 활동량에 따라 달라집니다(컴백이나 투어 중에는 더 자주, 그 외에는 더 조용하게). 아래에서 관심 있는 그룹과 국가를 선택하세요.", setNotifGroupsLabel: "알림을 받을 그룹", setNotifCountryLabel: "알림을 받을 국가", setNotifAllCountries: "모든 국가", setCookiePrefsTitle: "쿠키 설정", setCookiePrefsBody: "필수 쿠키는 사이트가 작동하는 데 필요하며(로그인, 저장된 위시리스트) 끌 수 없습니다. 방문 간에 선호도를 기억하는 쿠키를 추가로 사용할지는 직접 선택할 수 있습니다.", setCookieNecessary: "필수", setCookieNecessarySub: "항상 활성화됨", setCookieAnalytics: "선호도 및 분석", setCookieAnalyticsSub: "방문 간 선택 사항을 기억합니다", setSavePreferences: "환경설정 저장",
         setDanger: "위험 구역", setDeleteAccTitle: "계정 삭제", setDeleteAccSub: "여행, 위시리스트, 잠금 해제된 이용권이 영구적으로 삭제됩니다.", setDeleteAccBtn: "계정 삭제",
         wishTitle: "내 위시리스트", wishEmpty: "아직 저장한 장소가 없습니다. 지도를 둘러보고 「위시리스트에 추가」를 클릭해보세요!", wishSomeday: "언젠가 / 아직 정해진 여행 없음",
         visitTitle: "내가 방문한 장소", visitEmpty: "아직 방문으로 표시한 장소가 없습니다. 지도를 둘러보고 「이 장소를 방문했어요」를 체크해보세요!",
@@ -929,10 +967,13 @@ const translations = {
         accDeleteConfirmTitle: "本当にアカウントを削除しますか？",
         accDeleteConfirmBody: "この操作は取り消せません。解除済みのパスは返金されず、旅行・ウィッシュリスト・訪れた場所を含むすべてのデータが完全に失われます。",
         accDeletePasswordLabel: "パスワードを確認してください", accDeleteCancel: "キャンセル", accDeleteConfirmBtn: "はい、アカウントを削除します",
+        accDeleteGoogleReauthNote: "セキュリティのため、アカウントを完全に削除する前にGoogleでご本人確認が必要です。下の「Googleで確認」をクリックしてください。",
         setTitle: "設定", setSecurity: "アカウントとセキュリティ", setPassword: "パスワード", setPasswordSub: "3か月前に変更済み", setChange: "変更",
+        setChangePwTitle: "パスワードを変更", setChangePwGoogleNote: "このアカウントはGoogleログインを使用しているため、変更できるScreen To Streetのパスワードはありません — Googleアカウントから管理してください。", setCurrentPwLabel: "現在のパスワード", setNewPwLabel: "新しいパスワード", setConfirmPwLabel: "新しいパスワード（確認）", setChangePwBtn: "パスワードを変更",
         setSignedWith: "ログイン方法", setPreferences: "環境設定", setLanguage: "言語", setCurrency: "通貨", setUnits: "距離の単位",
         setEmailNotif: "メール通知", setPushNotif: "プッシュ通知", setPrivacy: "プライバシー", setCookiePrefs: "クッキー設定",
         setResetBanners: "バナーをリセット", setDownloadData: "データをダウンロード", setExportSub: "すべてのデータをJSONで出力", setExport: "出力",
+        setManage: "管理", setNotifConfirmTitle: "メール通知を有効にしますか？", setNotifConfirmBody: "有効にすると、新しい場所が追加されるたびにメールを受け取ることに同意したことになります — 頻度はアーティストの現在の活動状況によって変わります（カムバックやツアー中は頻繁に、それ以外は控えめに）。", setNotifEnableBtn: "有効にする", setPushNotifConfirmTitle: "プッシュ通知を有効にしますか？", setPushNotifConfirmBody: "有効にすると、新しい場所が追加されるたびにプッシュ通知を受け取ることに同意したことになります — 頻度はアーティストの現在の活動状況によって変わります（カムバックやツアー中は頻繁に、それ以外は控えめに）。以下で興味のあるグループと国を選んでください。", setNotifGroupsLabel: "通知を受け取るグループ", setNotifCountryLabel: "通知を受け取る国", setNotifAllCountries: "すべての国", setCookiePrefsTitle: "クッキー設定", setCookiePrefsBody: "必須クッキーはサイトの動作（ログイン、保存されたウィッシュリスト）に必要で、無効にはできません。訪問間で設定を記憶するクッキーを追加で使うかどうかは選択できます。", setCookieNecessary: "必須", setCookieNecessarySub: "常に有効", setCookieAnalytics: "設定と分析", setCookieAnalyticsSub: "訪問間で選択内容を記憶します", setSavePreferences: "設定を保存",
         setDanger: "危険ゾーン", setDeleteAccTitle: "アカウントを削除", setDeleteAccSub: "旅行、ウィッシュリスト、解除済みパスが完全に削除されます。", setDeleteAccBtn: "アカウントを削除",
         wishTitle: "ウィッシュリスト", wishEmpty: "まだ保存した場所がありません。地図を見て「ウィッシュリストに追加」をクリックしてみましょう！", wishSomeday: "いつか / まだ旅行の予定なし",
         visitTitle: "訪れた場所", visitEmpty: "まだ訪問済みにした場所がありません。地図を見て「この場所を訪れました」にチェックしてみましょう！",
@@ -970,10 +1011,13 @@ const translations = {
         accDeleteConfirmTitle: "确定要删除您的账户吗？",
         accDeleteConfirmBody: "此操作不可撤销。已解锁的通行证不会退款，且您的所有数据——行程、收藏清单和已访问地点——都将被永久删除。",
         accDeletePasswordLabel: "请确认您的密码", accDeleteCancel: "取消", accDeleteConfirmBtn: "是的，删除我的账户",
+        accDeleteGoogleReauthNote: "出于安全考虑，在永久删除您的账户之前，需要通过 Google 确认您的身份。请点击下方的「通过 Google 确认」。",
         setTitle: "设置", setSecurity: "账户与安全", setPassword: "密码", setPasswordSub: "上次修改于 3 个月前", setChange: "修改",
+        setChangePwTitle: "修改密码", setChangePwGoogleNote: "您的账户使用 Google 登录，因此没有需要修改的 Screen To Street 密码——请通过您的 Google 账户进行管理。", setCurrentPwLabel: "当前密码", setNewPwLabel: "新密码", setConfirmPwLabel: "确认新密码", setChangePwBtn: "修改密码",
         setSignedWith: "登录方式", setPreferences: "偏好设置", setLanguage: "语言", setCurrency: "货币", setUnits: "距离单位",
         setEmailNotif: "邮件通知", setPushNotif: "推送通知", setPrivacy: "隐私", setCookiePrefs: "Cookie 偏好设置",
         setResetBanners: "重置提示横幅", setDownloadData: "下载我的数据", setExportSub: "以 JSON 格式导出全部数据", setExport: "导出",
+        setManage: "管理", setNotifConfirmTitle: "开启邮件通知？", setNotifConfirmBody: "开启后，即表示您同意在新增地点时收到邮件通知——频率取决于该艺人当前的活跃程度（回归或巡演期间更频繁，其余时间较少）。", setNotifEnableBtn: "开启", setPushNotifConfirmTitle: "开启推送通知？", setPushNotifConfirmBody: "开启后，即表示您同意在新增地点时收到推送通知——频率取决于该艺人当前的活跃程度（回归或巡演期间更频繁，其余时间较少）。请在下方选择您关心的组合和国家。", setNotifGroupsLabel: "为以下组合通知我", setNotifCountryLabel: "为以下国家通知我", setNotifAllCountries: "所有国家", setCookiePrefsTitle: "Cookie 偏好设置", setCookiePrefsBody: "必要 Cookie 用于保证网站正常运行（登录、已保存的心愿单），无法关闭。您可以选择是否同时使用 Cookie 来记住您在不同访问之间的偏好设置。", setCookieNecessary: "必要", setCookieNecessarySub: "始终启用", setCookieAnalytics: "偏好与分析", setCookieAnalyticsSub: "记住您在不同访问之间的选择", setSavePreferences: "保存偏好设置",
         setDanger: "危险区域", setDeleteAccTitle: "删除账户", setDeleteAccSub: "此操作将永久删除您的行程、收藏清单和已解锁的通行证。", setDeleteAccBtn: "删除账户",
         wishTitle: "我的收藏清单", wishEmpty: "您还没有收藏任何地点。快去地图上点击「添加到收藏清单」吧！", wishSomeday: "以后再说 / 暂无行程",
         visitTitle: "我已访问的地点", visitEmpty: "您还没有标记任何已访问的地点。快去地图上勾选「我去过这个地方」吧！",
@@ -1207,22 +1251,12 @@ function renderLocations() {
     const sCountries = document.getElementById('stat-countries');
     if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
-    const mapMarkers = [];
     let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
 
     filteredLocations.forEach(loc => {
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
         const isVisited = visitedData.some(v => v.id === loc.id || v === loc.id);
         const baseColor = groupColors[loc.group] || '#334e68';
-        
-        let inlineStyle = `border-color: ${baseColor}; --marker-color: ${baseColor};`;
-        inlineStyle += isVisited ? ` background-color: ${baseColor}; color: white;` : ` background-color: white; color: ${baseColor};`;
-        
-        const customIcon = L.divIcon({ className: 'custom-category-marker', html: `<div style="${inlineStyle}">${catIconSvg}</div>`, iconSize: [32,32], iconAnchor: [16,16] });
-        const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(markerGroup);
-        mapMarkers.push(marker);
-
-        marker.on('click', () => window.openDetailsPanel(loc.id));
 
         const cardBgColor = isVisited ? `${baseColor}15` : '#faf9fc';
         const card = document.createElement('div');
@@ -1239,7 +1273,95 @@ function renderLocations() {
         locationListElement.appendChild(card);
     });
 
-    if (mapMarkers.length > 0) map.fitBounds(new L.featureGroup(mapMarkers).getBounds(), { padding: [50, 50], maxZoom: 16 });
+    renderMapMarkers(filteredLocations, { fitBounds: true });
+}
+
+// ==========================================
+// 4bis. REGROUPEMENT DES MARQUEURS TROP PROCHES (CLUSTERING)
+// ==========================================
+// Quand on dézoome (ex: toute la Corée du Sud visible d'un coup), des dizaines de lieux
+// très proches géographiquement finissent en pixels quasi au même endroit et deviennent
+// une bouillie d'icônes illisible. On les regroupe alors en un seul marqueur avec un
+// badge "×N" ; recalculé à chaque changement de zoom (les lieux qui se séparent
+// suffisamment en zoomant redeviennent des marqueurs individuels).
+const CLUSTER_PIXEL_RADIUS = 45;
+
+function clusterLocationsForZoom(locations, zoom) {
+    const points = locations.map(loc => ({ loc, px: map.project([loc.lat, loc.lng], zoom) }));
+    const used = new Array(points.length).fill(false);
+    const clusters = [];
+
+    for (let i = 0; i < points.length; i++) {
+        if (used[i]) continue;
+        const group = [points[i]];
+        used[i] = true;
+        for (let j = i + 1; j < points.length; j++) {
+            if (used[j]) continue;
+            if (points[i].px.distanceTo(points[j].px) <= CLUSTER_PIXEL_RADIUS) {
+                group.push(points[j]);
+                used[j] = true;
+            }
+        }
+        const avgLat = group.reduce((sum, g) => sum + g.loc.lat, 0) / group.length;
+        const avgLng = group.reduce((sum, g) => sum + g.loc.lng, 0) / group.length;
+        clusters.push({ locs: group.map(g => g.loc), center: [avgLat, avgLng] });
+    }
+    return clusters;
+}
+
+function addSingleLocationMarker(loc, visitedData) {
+    const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
+    const isVisited = visitedData.some(v => v.id === loc.id || v === loc.id);
+    const baseColor = groupColors[loc.group] || '#334e68';
+
+    let inlineStyle = `border-color: ${baseColor}; --marker-color: ${baseColor};`;
+    inlineStyle += isVisited ? ` background-color: ${baseColor}; color: white;` : ` background-color: white; color: ${baseColor};`;
+
+    const customIcon = L.divIcon({ className: 'custom-category-marker', html: `<div style="${inlineStyle}">${catIconSvg}</div>`, iconSize: [32,32], iconAnchor: [16,16] });
+    const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(markerGroup);
+    marker.on('click', () => window.openDetailsPanel(loc.id));
+}
+
+function addClusterMarker(cluster) {
+    // Couleur représentative : le groupe le plus fréquent dans le cluster, pour que le
+    // marqueur groupé garde un sens visuel même quand plusieurs groupes sont mélangés.
+    const groupCounts = {};
+    cluster.locs.forEach(l => { groupCounts[l.group] = (groupCounts[l.group] || 0) + 1; });
+    const dominantGroup = Object.keys(groupCounts).sort((a, b) => groupCounts[b] - groupCounts[a])[0];
+    const baseColor = groupColors[dominantGroup] || '#334e68';
+    const count = cluster.locs.length;
+
+    // Le badge (span, pas div) et le conteneur (span aussi) évitent volontairement le
+    // sélecteur CSS ".custom-category-marker div", qui appliquerait sinon le style rond
+    // du marqueur à tout div descendant, y compris le conteneur et le badge.
+    const html = `
+        <span style="position:relative; display:inline-block;">
+            <div style="border-color:${baseColor}; --marker-color:${baseColor}; background-color:${baseColor}; color:#fff;">${CLUSTER_ICON_SVG}</div>
+            <span class="cluster-badge">×${count}</span>
+        </span>
+    `;
+    const clusterIcon = L.divIcon({ className: 'custom-category-marker', html, iconSize: [32, 32], iconAnchor: [16, 16] });
+    const marker = L.marker(cluster.center, { icon: clusterIcon }).addTo(markerGroup);
+    marker.on('click', () => { map.setView(cluster.center, Math.min(map.getZoom() + 3, 18)); });
+}
+
+function renderMapMarkers(locations, opts) {
+    if (!map || !markerGroup) return;
+    markerGroup.clearLayers();
+    const visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    const clusters = clusterLocationsForZoom(locations, map.getZoom());
+
+    clusters.forEach(cluster => {
+        if (cluster.locs.length === 1) addSingleLocationMarker(cluster.locs[0], visitedData);
+        else addClusterMarker(cluster);
+    });
+
+    // Le fitBounds initial doit couvrir les vraies coordonnées de chaque lieu (pas les
+    // centres de cluster, qui donneraient un cadrage trop serré) — seulement au premier
+    // rendu / changement de filtre, jamais depuis le ré-agencement au zoom.
+    if (opts && opts.fitBounds && locations.length > 0) {
+        map.fitBounds(L.latLngBounds(locations.map(l => [l.lat, l.lng])), { padding: [50, 50], maxZoom: 16 });
+    }
 }
 
 // ==========================================
