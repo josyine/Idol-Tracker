@@ -101,12 +101,16 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
   .universal-icons { top: 14px; right: 14px; gap: 6px; }
   .header-icon-btn { width: 36px; height: 36px; }
 
-  .page { padding: 92px 12px 50px 12px; }
-  .card { padding: 26px 18px; border-radius: 16px; }
+  /* Plein-bleed sur mobile : le bloc blanc de la page touche les bords de l'écran
+     (pas de marge latérale sur .page, pas d'arrondi sur .card) pour qu'on ne voie
+     jamais le fond dégradé sur les côtés et que le contenu utilise toute la largeur. */
+  .page { padding: 92px 0 50px 0; }
+  .card { padding: 26px 16px; border-radius: 0; }
   h1.pg-title { font-size: 22px; }
   .wish-thumb { width: 46px; height: 46px; }
+  .modal-content { width: 97%; border-radius: 12px; }
   .modal-body { padding: 18px 18px 22px 18px; }
-  #modal-hero { height: 170px; }
+  #modal-hero { height: 170px; border-radius: 12px 12px 0 0; }
 }
 </style>
 <script>

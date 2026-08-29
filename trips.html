@@ -118,6 +118,17 @@
   .add-day-btn { display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px dashed #cbd5e1;border-radius:12px; padding:16px;font-size:13.5px;font-weight:700;color:#64748b;cursor:pointer;background:#fff;width:100%; transition: 0.2s; }
   .add-day-btn:hover { border-color: #D42759; color: #D42759; }
 
+  /* Carte globale du trip (tracé de tous les jours, une couleur par jour) */
+  #trip-map-container { width: 100%; height: 280px; border-radius: 16px; margin-bottom: 30px; border: 1px solid #e2e8f0; background: #e2e8f0; }
+
+  /* Mini-carte par jour, à l'intérieur de chaque bloc .day-card */
+  .day-mini-map { width: 100%; height: 150px; border-radius: 10px; margin-top: 14px; border: 1px solid #e2e8f0; background: #f1f5f9; }
+
+  @media (max-width: 800px) {
+      #trip-map-container { height: 220px; border-radius: 12px; }
+      .day-mini-map { height: 130px; }
+  }
+
   .empty-state { text-align: center; color: #94a3b8; padding: 80px 0; font-size: 15px; width: 100%; }
   .empty-state-new-trip-btn { margin-top: 20px; }
 
@@ -256,6 +267,8 @@
                         <button class="gen-btn ghost" style="border-color:#ef4444; color:#ef4444;" onclick="openDeleteModal()" id="i18n-delete-trip">Delete</button>
                     </div>
                 </div>
+
+                <div id="trip-map-container"></div>
 
                 <div class="edit-banner" style="margin-bottom:30px;">
                     <div class="section-label" style="margin-top:0;">Trip Duration & Dates</div>
