@@ -106,14 +106,18 @@ window.addEventListener('firebase-ready', async (e) => {
         if (Array.isArray(cloudData.unlockedGroups)) {
             localStorage.setItem('unlockedGroups', JSON.stringify(cloudData.unlockedGroups));
         }
-        if (cloudData.residenceCountry) {
+        // `interestCountry` (le pays qu'on veut visiter) a remplacé `residenceCountry`
+        // (le pays où l'on habite) — repli sur l'ancien champ pour les comptes créés
+        // avant ce changement, qui n'ont que residenceCountry en base.
+        const interestCountry = cloudData.interestCountry || cloudData.residenceCountry;
+        if (interestCountry) {
             const prevCountry = localStorage.getItem('userCountry');
-            localStorage.setItem('userCountry', cloudData.residenceCountry);
+            localStorage.setItem('userCountry', interestCountry);
             // Recentre seulement si la carte est déjà affichée et que la valeur cloud
             // diffère de celle déjà utilisée pour le centrage initial (nouvel appareil,
             // ou pays changé depuis account.html).
-            if (map && cloudData.residenceCountry !== prevCountry && typeof window.getMapCenterForCountry === 'function') {
-                const c = window.getMapCenterForCountry(cloudData.residenceCountry);
+            if (map && interestCountry !== prevCountry && typeof window.getMapCenterForCountry === 'function') {
+                const c = window.getMapCenterForCountry(interestCountry);
                 map.setView([c[0], c[1]], c[2]);
             }
         }
