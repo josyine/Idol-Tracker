@@ -96,6 +96,18 @@
   .login-modal .terms { font-size: 11px; text-align: center; color: #94a3b8; margin-top: 18px; }
   .login-modal .terms a { color: #D42759; font-weight: 600; }
   .login-error { background: #FFF1F3; border: 1px solid #FBD5DC; color: #D42759; font-size: 12px; font-weight: 600; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; text-align: left; }
+
+/* ==========================================
+   RESPONSIVE MOBILE (n'affecte pas le desktop) — cette page n'avait jusqu'ici aucune
+   règle mobile du tout : le bloc blanc gardait ses marges et son arrondi desktop,
+   laissant le fond dégradé visible sur les côtés au lieu d'utiliser toute la largeur.
+   ========================================== */
+@media (max-width: 760px) {
+  .legal-container { padding: 92px 0 50px 0; }
+  .legal-card { padding: 22px 16px; border-radius: 0; }
+  h1.legal-title { font-size: 22px; }
+  .login-modal { max-width: 94%; padding: 28px 22px; }
+}
 </style>
 
 <script>
