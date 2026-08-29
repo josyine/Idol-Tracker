@@ -72,6 +72,19 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
 .field-label { font-size: 11px; font-weight: 700; letter-spacing: .6px; color: #94a3b8; text-transform: uppercase; margin-bottom: 7px; display: block; }
 .field-value { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 9px; padding: 12px 15px; font-size: 14px; color: #334155; font-weight: 600; width: 100%; outline: none; font-family: 'Poppins', sans-serif; }
 
+/* CSS DES MODALES "NOTIFICATIONS" (groupes + pays, communes à Email et Push) */
+.notif-groups-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+.notif-groups-grid label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #334155; cursor: pointer; }
+.notif-groups-grid input { accent-color: #D42759; }
+.country-multiselect { border: 1px solid #e2e8f0; border-radius: 9px; overflow: hidden; }
+.country-search { border: none; border-bottom: 1px solid #e2e8f0; border-radius: 0; font-size: 12.5px; padding: 10px 12px; }
+.country-checkbox-list { max-height: 160px; overflow-y: auto; padding: 6px 4px; }
+.country-checkbox-list label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #334155; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+.country-checkbox-list label:hover { background: #faf9fc; }
+.country-checkbox-list label.all-countries-option { font-weight: 700; border-bottom: 1px solid #f1f5f9; margin-bottom: 4px; padding-bottom: 8px; }
+.country-checkbox-list input { accent-color: #D42759; flex-shrink: 0; }
+.country-checkbox-list .country-cb-hidden { display: none; }
+
 /* ==========================================
    RESPONSIVE MOBILE (n'affecte pas le desktop)
    ========================================== */
@@ -220,12 +233,26 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
     </div>
 </div>
 
-<!-- Modale de confirmation "Email notifications" -->
+<!-- Modale de confirmation + préférences "Email notifications" (même forme que Push) -->
 <div id="email-notif-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 420px; text-align: center; padding: 32px 28px;">
+    <div class="modal-content" style="max-width: 440px; text-align: center; padding: 32px 28px;">
         <span class="close-btn" onclick="closeModal('email-notif-modal')" style="color:#94a3b8; text-shadow:none; top:14px; right:16px;">&times;</span>
         <h2 style="font-size:18px; color:#1e293b; margin-bottom:10px;" data-i18n="setNotifConfirmTitle">Enable email notifications?</h2>
-        <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:22px;" data-i18n="setNotifConfirmBody">By enabling this, you agree to receive an email whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise).</p>
+        <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:20px;" data-i18n="setNotifConfirmBody">By enabling this, you agree to receive an email whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise). Choose which groups and countries you care about below.</p>
+
+        <div style="text-align:left; margin-bottom:16px;">
+            <label class="field-label" data-i18n="setNotifGroupsLabel">Notify me for these groups</label>
+            <div id="email-notif-groups" class="notif-groups-grid"></div>
+        </div>
+
+        <div style="text-align:left; margin-bottom:22px;">
+            <label class="field-label" data-i18n="setNotifCountryLabel">Notify me for these countries</label>
+            <div class="country-multiselect">
+                <input type="text" class="country-search field-value" id="email-notif-country-search" placeholder="Search countries...">
+                <div class="country-checkbox-list" id="email-notif-countries"></div>
+            </div>
+        </div>
+
         <div style="display:flex; gap:10px;">
             <button id="email-notif-cancel" style="flex:1; background:#fff; color:#334155; border:1.5px solid #cbd5e1; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="accDeleteCancel">Cancel</button>
             <button id="email-notif-accept" style="flex:1; background:#D42759; color:#fff; border:none; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="setNotifEnableBtn">Enable</button>
@@ -238,18 +265,19 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
     <div class="modal-content" style="max-width: 440px; text-align: center; padding: 32px 28px;">
         <span class="close-btn" onclick="closeModal('push-notif-modal')" style="color:#94a3b8; text-shadow:none; top:14px; right:16px;">&times;</span>
         <h2 style="font-size:18px; color:#1e293b; margin-bottom:10px;" data-i18n="setPushNotifConfirmTitle">Enable push notifications?</h2>
-        <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:20px;" data-i18n="setPushNotifConfirmBody">By enabling this, you agree to receive a push notification whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise). Choose which groups and country you care about below.</p>
+        <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:20px;" data-i18n="setPushNotifConfirmBody">By enabling this, you agree to receive a push notification whenever new locations are added — at an interval that depends on how active the artist currently is (more frequent during a comeback or tour, quieter otherwise). Choose which groups and countries you care about below.</p>
 
         <div style="text-align:left; margin-bottom:16px;">
             <label class="field-label" data-i18n="setNotifGroupsLabel">Notify me for these groups</label>
-            <div id="push-notif-groups" style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;"></div>
+            <div id="push-notif-groups" class="notif-groups-grid"></div>
         </div>
 
         <div style="text-align:left; margin-bottom:22px;">
-            <label class="field-label" data-i18n="setNotifCountryLabel">Notify me for this country</label>
-            <select id="push-notif-country" class="field-value" style="cursor:pointer;">
-                <option value="" data-i18n="setNotifAllCountries">All countries</option>
-            </select>
+            <label class="field-label" data-i18n="setNotifCountryLabel">Notify me for these countries</label>
+            <div class="country-multiselect">
+                <input type="text" class="country-search field-value" id="push-notif-country-search" placeholder="Search countries...">
+                <div class="country-checkbox-list" id="push-notif-countries"></div>
+            </div>
         </div>
 
         <div style="display:flex; gap:10px;">
@@ -435,13 +463,11 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
 
     // ==========================================
     // NOTIFICATIONS (Email / Push) — confirmation + préférences
+    // Les deux modales partagent exactement la même forme (groupes + pays, pays en
+    // sélection multiple) : toute la logique ci-dessous est donc générique et
+    // paramétrée par préfixe ("email" / "push") plutôt que dupliquée deux fois.
     // ==========================================
-    const emailToggle = document.getElementById('email-notif-toggle');
-    const emailModal = document.getElementById('email-notif-modal');
-    const pushToggle = document.getElementById('push-notif-toggle');
-    const pushModal = document.getElementById('push-notif-modal');
-    const pushGroupsContainer = document.getElementById('push-notif-groups');
-    const pushCountrySelect = document.getElementById('push-notif-country');
+    const notifChannels = ['email', 'push'];
 
     function setToggleState(el, on) {
         el.classList.toggle('on', on);
@@ -450,35 +476,96 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
 
     // Cases à cocher des groupes, générées depuis groupColors (script.js) pour rester
     // alignées avec la liste réelle des groupes du site (BTS, Blackpink, Twice...).
-    if (pushGroupsContainer && typeof groupColors === 'object') {
+    function populateGroupCheckboxes(prefix) {
+        const container = document.getElementById(prefix + '-notif-groups');
+        if (!container || typeof groupColors !== 'object') return;
         Object.keys(groupColors).forEach(group => {
             const label = document.createElement('label');
-            label.style.cssText = 'display:flex; align-items:center; gap:6px; font-size:12.5px; color:#334155; cursor:pointer;';
-            label.innerHTML = `<input type="checkbox" class="push-group-checkbox" value="${group}" style="accent-color:#D42759;"> ${group}`;
-            pushGroupsContainer.appendChild(label);
+            label.innerHTML = `<input type="checkbox" class="${prefix}-group-checkbox" value="${group}"> ${group}`;
+            container.appendChild(label);
         });
     }
-    if (pushCountrySelect && typeof window.populateCountrySelect === 'function') {
-        window.populateCountrySelect('push-notif-country');
+
+    // Sélecteur de pays à choix multiples : une case "Tous les pays" (qui, cochée,
+    // désactive les autres — cohérent avec la convention existante où une valeur vide
+    // signifie "tous les pays"), une liste de cases à cocher filtrable par un champ de
+    // recherche. Remplace le <select> mono-sélection d'origine.
+    function populateCountryMultiSelect(prefix) {
+        const listContainer = document.getElementById(prefix + '-notif-countries');
+        const searchInput = document.getElementById(prefix + '-notif-country-search');
+        if (!listContainer || !window.COUNTRY_CENTERS) return;
+
+        searchInput.placeholder = t('setNotifSearchCountry');
+
+        const allLabel = document.createElement('label');
+        allLabel.className = 'all-countries-option';
+        allLabel.innerHTML = `<input type="checkbox" class="${prefix}-country-checkbox ${prefix}-country-all" value=""> <span data-i18n="setNotifAllCountries">${t('setNotifAllCountries')}</span>`;
+        listContainer.appendChild(allLabel);
+
+        const countryNames = Object.keys(window.COUNTRY_CENTERS).sort((a, b) => a.localeCompare(b));
+        countryNames.forEach(name => {
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="checkbox" class="${prefix}-country-checkbox" value="${name}"> ${name}`;
+            listContainer.appendChild(label);
+        });
+
+        const allCb = listContainer.querySelector('.' + prefix + '-country-all');
+        const otherCbs = () => Array.from(listContainer.querySelectorAll('.' + prefix + '-country-checkbox:not(.' + prefix + '-country-all)'));
+        allCb.addEventListener('change', () => {
+            if (allCb.checked) otherCbs().forEach(cb => { cb.checked = false; });
+        });
+        otherCbs().forEach(cb => cb.addEventListener('change', () => {
+            if (cb.checked) allCb.checked = false;
+        }));
+
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                const q = searchInput.value.trim().toLowerCase();
+                otherCbs().forEach(cb => {
+                    const label = cb.closest('label');
+                    label.classList.toggle('country-cb-hidden', q.length > 0 && !cb.value.toLowerCase().includes(q));
+                });
+            });
+        }
+    }
+
+    notifChannels.forEach(prefix => {
+        populateGroupCheckboxes(prefix);
+        populateCountryMultiSelect(prefix);
+    });
+
+    function getSelectedCountries(prefix) {
+        const allCb = document.querySelector('.' + prefix + '-country-all');
+        if (allCb && allCb.checked) return [];
+        return Array.from(document.querySelectorAll('.' + prefix + '-country-checkbox:not(.' + prefix + '-country-all):checked')).map(cb => cb.value);
+    }
+    function setSelectedCountries(prefix, countries) {
+        const allCb = document.querySelector('.' + prefix + '-country-all');
+        const list = Array.isArray(countries) ? countries : [];
+        if (allCb) allCb.checked = list.length === 0;
+        document.querySelectorAll('.' + prefix + '-country-checkbox:not(.' + prefix + '-country-all)').forEach(cb => { cb.checked = list.includes(cb.value); });
     }
 
     // État initial : restauré depuis localStorage (et écrasé par la version cloud, si
     // connecté, via l'écouteur firebase-ready plus bas).
     function applyNotifPrefsToUI(prefs) {
-        setToggleState(emailToggle, !!prefs.emailNotifEnabled);
-        setToggleState(pushToggle, !!prefs.pushNotifEnabled);
-        if (Array.isArray(prefs.pushNotifGroups)) {
-            document.querySelectorAll('.push-group-checkbox').forEach(cb => { cb.checked = prefs.pushNotifGroups.includes(cb.value); });
-        }
-        if (pushCountrySelect && prefs.pushNotifCountry) pushCountrySelect.value = prefs.pushNotifCountry;
+        notifChannels.forEach(prefix => {
+            setToggleState(document.getElementById(prefix + '-notif-toggle'), !!prefs[prefix + 'NotifEnabled']);
+            const groups = prefs[prefix + 'NotifGroups'];
+            if (Array.isArray(groups)) {
+                document.querySelectorAll('.' + prefix + '-group-checkbox').forEach(cb => { cb.checked = groups.includes(cb.value); });
+            }
+            setSelectedCountries(prefix, prefs[prefix + 'NotifCountries']);
+        });
     }
     function readNotifPrefsFromStorage() {
-        return {
-            emailNotifEnabled: localStorage.getItem('emailNotifEnabled') === 'true',
-            pushNotifEnabled: localStorage.getItem('pushNotifEnabled') === 'true',
-            pushNotifGroups: JSON.parse(localStorage.getItem('pushNotifGroups') || '[]'),
-            pushNotifCountry: localStorage.getItem('pushNotifCountry') || '',
-        };
+        const prefs = {};
+        notifChannels.forEach(prefix => {
+            prefs[prefix + 'NotifEnabled'] = localStorage.getItem(prefix + 'NotifEnabled') === 'true';
+            prefs[prefix + 'NotifGroups'] = JSON.parse(localStorage.getItem(prefix + 'NotifGroups') || '[]');
+            prefs[prefix + 'NotifCountries'] = JSON.parse(localStorage.getItem(prefix + 'NotifCountries') || '[]');
+        });
+        return prefs;
     }
     applyNotifPrefsToUI(readNotifPrefsFromStorage());
 
@@ -490,44 +577,29 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
         if (typeof window.syncUserData === 'function') window.syncUserData(fields);
     }
 
-    if (emailToggle) {
-        emailToggle.addEventListener('click', () => {
-            if (emailToggle.classList.contains('on')) {
-                // Désactivation : pas besoin de re-confirmer, on coupe directement.
-                setToggleState(emailToggle, false);
-                saveNotifPrefs({ emailNotifEnabled: false });
-            } else {
-                emailModal.classList.remove('hidden');
-            }
+    notifChannels.forEach(prefix => {
+        const toggle = document.getElementById(prefix + '-notif-toggle');
+        const modal = document.getElementById(prefix + '-notif-modal');
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                if (toggle.classList.contains('on')) {
+                    // Désactivation : pas besoin de re-confirmer, on coupe directement.
+                    setToggleState(toggle, false);
+                    saveNotifPrefs({ [prefix + 'NotifEnabled']: false });
+                } else {
+                    modal.classList.remove('hidden');
+                }
+            });
+        }
+        const cancelBtn = document.getElementById(prefix + '-notif-cancel');
+        if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        const acceptBtn = document.getElementById(prefix + '-notif-accept');
+        if (acceptBtn) acceptBtn.addEventListener('click', () => {
+            const groups = Array.from(document.querySelectorAll('.' + prefix + '-group-checkbox:checked')).map(cb => cb.value);
+            setToggleState(toggle, true);
+            saveNotifPrefs({ [prefix + 'NotifEnabled']: true, [prefix + 'NotifGroups']: groups, [prefix + 'NotifCountries']: getSelectedCountries(prefix) });
+            modal.classList.add('hidden');
         });
-    }
-    const emailNotifCancel = document.getElementById('email-notif-cancel');
-    if (emailNotifCancel) emailNotifCancel.addEventListener('click', () => emailModal.classList.add('hidden'));
-    const emailNotifAccept = document.getElementById('email-notif-accept');
-    if (emailNotifAccept) emailNotifAccept.addEventListener('click', () => {
-        setToggleState(emailToggle, true);
-        saveNotifPrefs({ emailNotifEnabled: true });
-        emailModal.classList.add('hidden');
-    });
-
-    if (pushToggle) {
-        pushToggle.addEventListener('click', () => {
-            if (pushToggle.classList.contains('on')) {
-                setToggleState(pushToggle, false);
-                saveNotifPrefs({ pushNotifEnabled: false });
-            } else {
-                pushModal.classList.remove('hidden');
-            }
-        });
-    }
-    const pushNotifCancel = document.getElementById('push-notif-cancel');
-    if (pushNotifCancel) pushNotifCancel.addEventListener('click', () => pushModal.classList.add('hidden'));
-    const pushNotifAccept = document.getElementById('push-notif-accept');
-    if (pushNotifAccept) pushNotifAccept.addEventListener('click', () => {
-        const groups = Array.from(document.querySelectorAll('.push-group-checkbox:checked')).map(cb => cb.value);
-        setToggleState(pushToggle, true);
-        saveNotifPrefs({ pushNotifEnabled: true, pushNotifGroups: groups, pushNotifCountry: pushCountrySelect.value });
-        pushModal.classList.add('hidden');
     });
 
     // Une fois connu, le compte cloud remplace les préférences locales (nouvel appareil,
@@ -536,16 +608,15 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
         if (!e.detail || !e.detail.user || typeof window.loadUserCloudData !== 'function') return;
         const cloudData = await window.loadUserCloudData();
         if (!cloudData) return;
-        const prefs = {
-            emailNotifEnabled: !!cloudData.emailNotifEnabled,
-            pushNotifEnabled: !!cloudData.pushNotifEnabled,
-            pushNotifGroups: Array.isArray(cloudData.pushNotifGroups) ? cloudData.pushNotifGroups : [],
-            pushNotifCountry: cloudData.pushNotifCountry || '',
-        };
-        localStorage.setItem('emailNotifEnabled', String(prefs.emailNotifEnabled));
-        localStorage.setItem('pushNotifEnabled', String(prefs.pushNotifEnabled));
-        localStorage.setItem('pushNotifGroups', JSON.stringify(prefs.pushNotifGroups));
-        localStorage.setItem('pushNotifCountry', prefs.pushNotifCountry);
+        const prefs = {};
+        notifChannels.forEach(prefix => {
+            prefs[prefix + 'NotifEnabled'] = !!cloudData[prefix + 'NotifEnabled'];
+            prefs[prefix + 'NotifGroups'] = Array.isArray(cloudData[prefix + 'NotifGroups']) ? cloudData[prefix + 'NotifGroups'] : [];
+            prefs[prefix + 'NotifCountries'] = Array.isArray(cloudData[prefix + 'NotifCountries']) ? cloudData[prefix + 'NotifCountries'] : [];
+            localStorage.setItem(prefix + 'NotifEnabled', String(prefs[prefix + 'NotifEnabled']));
+            localStorage.setItem(prefix + 'NotifGroups', JSON.stringify(prefs[prefix + 'NotifGroups']));
+            localStorage.setItem(prefix + 'NotifCountries', JSON.stringify(prefs[prefix + 'NotifCountries']));
+        });
         applyNotifPrefsToUI(prefs);
     });
 
