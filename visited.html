@@ -21,6 +21,22 @@ body{background:#E7E9EC;padding:0; height:100vh; overflow-x:hidden; overflow-y:a
 .blob-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: #e3d5f8; }
 .blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
 .blob-3 { top: 40%; left: 60%; width: 25vw; height: 25vw; background: #d9cdee; animation-delay: -8s; }
+.bg-route { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.5; }
+.route-line { stroke-dasharray: 1 12; animation: flow 14s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -260; } }
+.dot { transform-box: fill-box; transform-origin: center; }
+.dot-a { animation: floatA 3.2s ease-in-out infinite; }
+.dot-b { animation: floatB 3.6s ease-in-out infinite; animation-delay: .4s; }
+.dot-c { animation: floatC 2.8s ease-in-out infinite; animation-delay: .7s; }
+@keyframes floatA{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(16px,-20px);} }
+@keyframes floatB{ 0%,100%{transform:translate(0,0);} 50%{transform:translate(-18px,18px);} }
+@keyframes floatC{ 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(14px,16px) scale(1.35);} }
+@keyframes float { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(30px) scale(1.05); } }
+
+/* Synchronise les animations du fond avec index.html/trips.html, même si cette page a
+   été ouverte après (via --sync-t, calculé depuis un timestamp partagé en sessionStorage). */
+.hero-background { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
+.route-line { animation-delay: calc(0s - var(--sync-t, 0s)) !important; }
 
 /* HEADER SEPARÉ POUR LE Z-INDEX */
 .universal-logo { position: fixed; top: 25px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
@@ -109,6 +125,12 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
 <div class="hero-background">
     <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+    <svg class="bg-route" viewBox="0 0 1180 600" preserveAspectRatio="xMidYMid slice">
+      <path class="route-line" d="M-40,420 C160,380 220,300 380,340 C540,380 600,260 820,300 C980,330 1040,240 1220,260" fill="none" stroke="#C6B8E3" stroke-width="2.5" stroke-linecap="round"/>
+      <circle class="dot dot-a" cx="380" cy="340" r="6" fill="#B9A8DA"/>
+      <circle class="dot dot-b" cx="820" cy="300" r="6" fill="#B9A8DA"/>
+      <circle class="dot dot-c" cx="1040" cy="240" r="8" fill="#D42759"/>
+    </svg>
 </div>
 
 <a href="map.html" class="universal-logo">
