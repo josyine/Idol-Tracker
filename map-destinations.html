@@ -103,16 +103,34 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 .detail-body { padding: 28px 32px 34px 32px; }
 .detail-section-label { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
 .detail-blurb { font-size: 13px; color: #334155; line-height: 1.7; margin-bottom: 22px; }
-.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 22px; }
-.stat-card { background: #faf9fc; border-radius: 12px; padding: 14px 12px; text-align: center; border: 1px solid #e2e8f0; }
-.stat-card .num { font-size: 19px; font-weight: 800; color: #D42759; }
-.stat-card .lab { font-size: 9.5px; color: #94a3b8; font-weight: 600; margin-top: 3px; line-height: 1.3; }
 .city-list { margin-bottom: 22px; }
 .city-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f6f4fb; font-size: 12.5px; }
 .city-row:last-child { border-bottom: none; }
 .city-row span:first-child { color: #334155; font-weight: 600; }
 .city-row span:last-child { color: #94a3b8; }
 .example-note { font-size: 10px; color: #b0a8c4; font-style: italic; margin-bottom: 22px; }
+
+/* ===== KPI cliquables + sections narratives + essentiels de voyage ===== */
+.kpi3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.kpi-box { background: #faf9fc; border-radius: 10px; padding: 12px 6px; text-align: center; cursor: pointer; border: 1.5px solid transparent; transition: 0.15s; }
+.kpi-box:hover { border-color: #f0dbe4; }
+.kpi-box.active { background: #FCE7F0; border-color: #D42759; }
+.kpi-n { font-size: 18px; font-weight: 800; color: #D42759; }
+.kpi-l { font-size: 9px; color: #94a3b8; margin-top: 2px; line-height: 1.3; }
+.kpi-note { font-size: 10.5px; font-style: italic; color: #b0a8c4; margin-bottom: 8px; }
+.kpi-detail { max-height: 0; overflow: hidden; transition: max-height .25s ease; background: #faf9fc; border-radius: 12px; }
+.kpi-detail.open { max-height: 320px; overflow-y: auto; margin-bottom: 16px; }
+.kpi-detail-inner { padding: 12px 14px; }
+.kpi-detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 11.5px; border-bottom: 1px solid #f1f5f9; }
+.kpi-detail-row:last-child { border-bottom: none; }
+.kpi-detail-row span:first-child { color: #334155; font-weight: 600; }
+.kpi-detail-row span:last-child { color: #94a3b8; }
+.trip-box { background: #faf9fc; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 11.5px; line-height: 2; color: #334155; }
+.trip-box b { color: #212832; display: inline-block; min-width: 118px; }
+.blog-heading { font-size: 13px; font-weight: 700; color: #D42759; margin-bottom: 7px; }
+.para { font-size: 12.5px; line-height: 1.8; color: #3f495c; margin-bottom: 14px; }
+.para:last-child { margin-bottom: 0; }
+.section-sep { border: none; height: 1px; background: #EFECF6; margin: 18px 0; }
 
 @media (max-width: 760px) {
   .universal-logo { top: 14px; left: 14px; gap: 8px; }
@@ -134,7 +152,6 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
   .detail-window { max-width: 94%; }
   .detail-body { padding: 22px 20px 26px 20px; }
-  .stat-grid { grid-template-columns: repeat(2,1fr); }
 }
 </style>
 <script>
@@ -510,7 +527,9 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         exploreKr: "Explore South Korea", exploreFr: "Explore France", explorePt: "Explore Portugal", exploreMt: "Explore Malta", exploreUs: "Explore United States", exploreNz: "Explore New Zealand", exploreNo: "Explore Norway", exploreSe: "Explore Sweden", exploreFi: "Explore Finland",
         since13: "Mapped since 2013", since19: "Mapped since 2019", since26: "Mapped since 2026", since18: "Mapped since 2018", since17: "Mapped since 2017", since19b: "Mapped since 2019", since16: "Mapped since 2016", since16b: "Mapped since 2016", since16c: "Mapped since 2016",
         historyTitle: "History & context", statsTitle: "At a glance",
-        citiesTitle: "Cities covered", exampleNote: "Figures are calculated live from every location currently mapped on Screen To Street."
+        citiesTitle: "Cities covered", exampleNote: "Figures are calculated live from every location currently mapped on Screen To Street.",
+        tripEssentials: "Trip essentials", lStay: "Recommended stay", lSeason: "Best season", lTransport: "Getting around", lTimezone: "Time zone",
+        lGroupsBreakdown: "Groups on the map"
       },
       fr: {
         title: "Explorer les Destinations", statsCountries: "Pays", statsCities: "Villes", statsLocs: "Lieux",
@@ -534,7 +553,9 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         exploreKr: "Explorer la Corée du Sud", exploreFr: "Explorer la France", explorePt: "Explorer le Portugal", exploreMt: "Explorer Malte", exploreUs: "Explorer les États-Unis", exploreNz: "Explorer la Nouvelle-Zélande", exploreNo: "Explorer la Norvège", exploreSe: "Explorer la Suède", exploreFi: "Explorer la Finlande",
         since13: "Sur la carte depuis 2013", since19: "Sur la carte depuis 2019", since26: "Sur la carte depuis 2026", since18: "Sur la carte depuis 2018", since17: "Sur la carte depuis 2017", since19b: "Sur la carte depuis 2019", since16: "Sur la carte depuis 2016", since16b: "Sur la carte depuis 2016", since16c: "Sur la carte depuis 2016",
         historyTitle: "Histoire et contexte", statsTitle: "En un coup d'œil",
-        citiesTitle: "Villes couvertes", exampleNote: "Ces chiffres sont calculés en direct à partir de tous les lieux actuellement cartographiés sur Screen To Street."
+        citiesTitle: "Villes couvertes", exampleNote: "Ces chiffres sont calculés en direct à partir de tous les lieux actuellement cartographiés sur Screen To Street.",
+        tripEssentials: "Essentiels du voyage", lStay: "Durée recommandée", lSeason: "Meilleure saison", lTransport: "Se déplacer", lTimezone: "Fuseau horaire",
+        lGroupsBreakdown: "Groupes présents sur la carte"
       }
     };
 
@@ -552,6 +573,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     document.addEventListener('DOMContentLoaded', applyTranslations);
 
     let lastOpenedCountry = null;
+    let activeKpi = null;
     function setLang(lang) {
         currentLang = lang;
         localStorage.setItem('lang', lang);
@@ -587,13 +609,124 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
       }
     };
 
+    // Contenu enrichi (sections narratives développées, essentiels de voyage,
+    // répartition par groupe) pour la fiche détaillée de chaque pays. Anglais
+    // uniquement pour l'instant, même logique de repli que GROUP_DETAILS sur
+    // map-artists.html : openDetail() y recourt quel que soit currentLang, en
+    // complément des champs déjà bilingues (name/history/cities/stats) qui restent
+    // affichés dans la langue choisie. Les répartitions par groupe (`groups`) sont
+    // dérivées uniquement des chiffres déjà affichés ailleurs sur cette page (nombre
+    // total de lieux + groupes listés dans `stats`), jamais de chiffres inventés.
+    const COUNTRY_DETAILS = {
+      southkorea: {
+        locationNames: ["Cafe Camptong", "Ossu Seiromushi", "Lotte World Adventure", "Ahwon Museum & Hotel", "Cafe Kitsun\u00e9 Seoul", "Cheonggu Building", "The First BTS Dorm", "Hyangho Beach Bus Stop", "Iryeong Station", "Sunhyewon", "In the SOOP Estate", "Happy Meadow Ranch", "Cafe Magnate", "Oldeugnseu (Oldeugns)", "Cafe Hyuga", "Seoul Olympic Stadium", "HYBE Headquarters", "Yoojung Sikdang", "Gwanghwamun Square", "HiKR Ground", "The Min's", "Giani's Napoli", "MMCA Seoul", "K-Star Road", "Achasan Mountain", "Hakdong Park", "Laundry Pizza", "Yongin Daejanggeum Park", "Eulji Dabang", "Jumunjin Beach Bus Stop", "Jecheon Mosan Airfield"],
+        essentials: { stay: "5–7 days", season: "Spring (Apr–May) or Autumn (Sep–Oct)", transport: "Seoul subway + KTX for countryside stops", timezone: "KST (UTC+9)" },
+        groups: [["BTS", 30], ["Blackpink", 1]],
+        sections: [
+          ["Where it all began", "Long before it became a global pop-culture capital, Seoul was already a city of contrasts — centuries-old palaces sitting a few blocks from neon-lit shopping districts. Rookie-era practice rooms in Gangnam sit alongside purpose-built mountain retreats in Gangwon-do, each telling a different chapter of an artist's story."],
+          ["The scene today", "Nine cities now share space on this map, from dense Seoul neighbourhoods — Gangnam, Songpa-gu, Yongsan — to quieter countryside filming spots hours outside the capital. It remains, by a wide margin, the most mapped country on Screen To Street."],
+          ["Planning a visit", "Most Seoul locations sit within a short subway ride of each other, making a 3–4 day city stay realistic for covering the bulk of them; the countryside spots (Chuncheon, Gangneung) are better treated as separate day trips or overnight stays."]
+        ]
+      },
+      france: {
+        locationNames: ["Pozzetto", "Mus\u00e9e Nissim de Camondo", "Montmartre Stairs", "Wall of Love", "Palais de Tokyo", "Stade de France"],
+        essentials: { stay: "3–4 days", season: "Spring (Apr–Jun) or Autumn (Sep–Oct)", transport: "Paris Métro + RER", timezone: "CET (UTC+1)" },
+        groups: [["BTS", 6]],
+        sections: [
+          ["Where it all began", "Paris has long been a stage for K-pop's biggest fashion moments — Fashion Week runways, flagship store openings, and quiet afternoons in Montmartre captured between official schedules."],
+          ["The scene today", "In 2026 the city also hosted a stop of the ARIRANG World Tour at the Stade de France, adding a very different kind of location — a full stadium show — to a map that had until then been mostly about fashion and quiet street moments."],
+          ["Planning a visit", "The fashion-district and Montmartre stops cluster tightly enough to cover on foot over a single day; the Stade de France sits outside the city centre in Saint-Denis, reachable by RER, and is worth pairing with the Basilica of Saint-Denis nearby."]
+        ]
+      },
+      portugal: {
+        locationNames: ["Quinta da Francelha de Cima", "Museu de Marinha"],
+        essentials: { stay: "2–3 days", season: "Spring (Mar–May) or Autumn (Sep–Oct)", transport: "Lisbon Metro + short taxi/rideshare rides", timezone: "WET (UTC+0)" },
+        groups: [["BTS", 2]],
+        sections: [
+          ["Where it all began", "Portugal's spot on the map exists almost by accident of production choices — a historic estate near Lisbon Airport and the Navy Museum in Belém were both chosen as filming backdrops for a single music video shoot."],
+          ["The scene today", "With just two confirmed locations, Portugal remains one of the smallest footprints on the map — but both stops put the country on ARMY's radar for the first time, and each draws a steady trickle of visiting fans exploring greater Lisbon."],
+          ["Planning a visit", "Both locations sit close enough to central Lisbon to fold into a single day of sightseeing alongside Belém's more famous landmarks — the Tower of Belém and Jerónimos Monastery are a short walk from the Navy Museum stop."]
+        ]
+      },
+      malta: {
+        locationNames: ["Triton Fountain", "Upper Barrakka Gardens", "Cafe del Mar Malta", "Mdina Old City", "St. John's Co-Cathedral", "Valletta"],
+        essentials: { stay: "3–4 days", season: "Spring (Apr–Jun) or Autumn (Sep–Oct)", transport: "Public buses + walking (compact island)", timezone: "CET (UTC+1)" },
+        groups: [["BTS", 6]],
+        sections: [
+          ["Where it all began", "Bon Voyage Season 3 spent its entire run on this single Mediterranean island — golden limestone, baroque interiors and sweeping harbour views replacing the wood and water of the earlier Nordic seasons entirely."],
+          ["The scene today", "It remains the most thoroughly mapped stop of any Bon Voyage season on the site, with locations spread across Valletta, St Paul's Bay and the silent medieval city of Mdina."],
+          ["Planning a visit", "Malta is small enough that all three cities are reachable by public bus within roughly 30–45 minutes of each other, making it realistic to base yourself in Valletta for the whole stay and day-trip out to Mdina and St Paul's Bay."]
+        ]
+      },
+      usa: {
+        locationNames: ["Aha'oulu (Bon Voyage 2)", "Gillette Stadium", "SoFi Stadium", "Allegiant Stadium"],
+        essentials: { stay: "7–10 days for multiple cities", season: "Spring or Autumn generally mildest, varies by region", transport: "Domestic flights + rental car between cities", timezone: "Multiple time zones (Pacific to Eastern)" },
+        groups: [["BTS", 4]],
+        sections: [
+          ["Where it all began", "The United States map spans two very different eras: a 2017 Bon Voyage stop on Oahu's North Shore for a first, chaotic attempt at surfing, and a string of stadium shows years later during the group's biggest world tours."],
+          ["The scene today", "Las Vegas, Massachusetts and California each hold a single stadium-show location, making the US the most geographically spread-out country on the entire map — no two stops are within reasonable driving distance of each other."],
+          ["Planning a visit", "Given the distances involved, most fans treat each US location as a stop tied to a specific trip rather than a single dedicated itinerary — pairing a Las Vegas or Los Angeles visit with the nearest mapped stop makes more sense than trying to cover all four in one trip."]
+        ]
+      },
+      newzealand: {
+        locationNames: ["Lake Pukaki", "Mount Cook National Park", "Queenstown Skyline", "Nevis Swing"],
+        essentials: { stay: "7–10 days", season: "Southern Hemisphere summer (Dec–Feb) for outdoor activities", transport: "Rental car — public transport is limited outside cities", timezone: "NZST/NZDT (UTC+12/+13)" },
+        groups: [["BTS", 4]],
+        sections: [
+          ["Where it all began", "Bon Voyage Season 4 leaned harder into adventure than any season before it: camping under a genuinely dark sky at Lake Pukaki, hiking toward Aoraki/Mount Cook's glaciers, and — for the boldest members — a 300-metre freefall on the Nevis Swing outside Queenstown."],
+          ["The scene today", "The four locations split between the Canterbury region and Queenstown, making this the most physically adventurous Bon Voyage season on the map — most of the stops are outdoor and scenery-driven rather than urban."],
+          ["Planning a visit", "A rental car is close to essential here: the Canterbury and Queenstown locations sit roughly three to four hours apart by road, and several are only reachable via scenic drives with no public transport option."]
+        ]
+      },
+      norway: {
+        locationNames: ["Bryggen", "Fl\u00f8yen"],
+        essentials: { stay: "3–4 days", season: "Summer (Jun–Aug) for long daylight hours", transport: "Bergen Light Rail + Fløibanen funicular", timezone: "CET (UTC+1)" },
+        groups: [["BTS", 2]],
+        sections: [
+          ["Where it all began", "Norway opened the very first season of Bon Voyage in 2016, with the group's earliest real off-the-clock trip built around Bergen's colourful Hanseatic wharf."],
+          ["The scene today", "Both mapped locations sit in and around Bergen — the wharf itself and the mountaintop views from Fløyen just above it, reachable by funicular in a matter of minutes."],
+          ["Planning a visit", "Both stops can comfortably be covered in a single day from central Bergen; the funicular up to Fløyen gets busy in peak summer, so an early-morning ride is worth planning for photos with fewer crowds."]
+        ]
+      },
+      sweden: {
+        locationNames: ["Gamla Stan"],
+        essentials: { stay: "2–3 days", season: "Summer (May–Aug)", transport: "Stockholm Metro + walking in Gamla Stan", timezone: "CET (UTC+1)" },
+        groups: [["BTS", 1]],
+        sections: [
+          ["Where it all began", "A single, unhurried stop in Stockholm's old town, Gamla Stan, during the Nordic leg of Bon Voyage Season 1 — one of the quietest, least scripted afternoons the show has ever filmed."],
+          ["The scene today", "With only one confirmed location, Sweden's footprint on the map is deliberately modest — but Gamla Stan's cobbled lanes remain a popular stop for fans already in Stockholm for other reasons."],
+          ["Planning a visit", "Gamla Stan is walkable from most central Stockholm hotels and pairs naturally with a broader day of sightseeing in the old town rather than standing alone as a dedicated trip."]
+        ]
+      },
+      finland: {
+        locationNames: ["Suomenlinna"],
+        essentials: { stay: "2 days", season: "Summer (Jun–Aug)", transport: "Ferry from Helsinki + city trams", timezone: "EET (UTC+2)" },
+        groups: [["BTS", 1]],
+        sections: [
+          ["Where it all began", "The final stop of Bon Voyage Season 1's Nordic leg: the sea fortress of Suomenlinna, spread across six islands just off Helsinki."],
+          ["The scene today", "Like Sweden, Finland holds a single mapped location — but Suomenlinna's scale as a UNESCO World Heritage site means it draws a full afternoon on its own, well beyond the show's original visit."],
+          ["Planning a visit", "Suomenlinna is reached by a short public ferry from Helsinki's market square, running year-round; plan for at least half a day to explore the fortress islands properly on foot."]
+        ]
+      }
+    };
+
     function openDetail(key) {
       const c = (COUNTRIES[currentLang] || COUNTRIES.en)[key];
       const t = t_dest[currentLang] || t_dest.en;
+      // Contenu enrichi (sections narratives, essentiels de voyage, répartition par
+      // groupe) : anglais uniquement pour l'instant, voir la note au-dessus de
+      // COUNTRY_DETAILS.
+      const d = COUNTRY_DETAILS[key];
       lastOpenedCountry = key;
+      activeKpi = null;
 
       const cityRows = c.cities.map(([name,n]) => `<div class="city-row"><span>${name}</span><span>${n} ${n>1 ? (currentLang==='fr'?'lieux':'locations') : (currentLang==='fr'?'lieu':'location')}</span></div>`).join('');
-      const statCards = c.stats.map(([num,lab]) => `<div class="stat-card"><div class="num">${num}</div><div class="lab">${lab}</div></div>`).join('');
+
+      const sectionsHtml = d.sections.map(([heading, text]) => `
+        <div class="blog-heading">${heading}</div>
+        <p class="para">${text}</p>
+        <hr class="section-sep">
+      `).join('');
 
       document.getElementById('detail-window').innerHTML = `
         <div class="detail-hero" style="background-image:url('${c.photo}');">
@@ -605,20 +738,66 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
           </div>
         </div>
         <div class="detail-body">
-          <div class="detail-section-label">${t.historyTitle}</div>
-          <p class="detail-blurb">${c.history}</p>
+          <div class="kpi3">
+            <div class="kpi-box" id="kpi-locations" onclick="toggleKpi('locations')"><div class="kpi-n">${c.locations}</div><div class="kpi-l">${t.lLocs}</div></div>
+            <div class="kpi-box" id="kpi-cities" onclick="toggleKpi('cities')"><div class="kpi-n">${c.cities.length}</div><div class="kpi-l">${t.lCities}</div></div>
+            <div class="kpi-box" id="kpi-groups" onclick="toggleKpi('groups')"><div class="kpi-n">${d.groups.length}</div><div class="kpi-l">${t.lGroups}</div></div>
+          </div>
+          <div class="kpi-note">${t.exampleNote}</div>
+          <div class="kpi-detail" id="kpi-detail"><div class="kpi-detail-inner" id="kpi-detail-inner"></div></div>
 
-          <div class="detail-section-label">${t.statsTitle}</div>
-          <div class="stat-grid">${statCards}</div>
-          <div class="example-note">${t.exampleNote}</div>
+          <hr class="section-sep">
 
-          <div class="detail-section-label">${t.citiesTitle}</div>
+          <div class="detail-section-label">${t.tripEssentials}</div>
+          <div class="trip-box">
+            <b>${t.lStay}:</b> ${d.essentials.stay}<br>
+            <b>${t.lSeason}:</b> ${d.essentials.season}<br>
+            <b>${t.lTransport}:</b> ${d.essentials.transport}<br>
+            <b>${t.lTimezone}:</b> ${d.essentials.timezone}
+          </div>
+
+          ${sectionsHtml}
+
+          <div class="detail-section-label" style="margin-top:-4px;">${t.citiesTitle}</div>
           <div class="city-list">${cityRows}</div>
         </div>
       `;
       document.getElementById('overlay').classList.add('open');
     }
-    function closeDetail() { document.getElementById('overlay').classList.remove('open'); lastOpenedCountry = null; }
+
+    // Ouvre/ferme la liste détaillée sous une des 3 cartes KPI (lieux / villes /
+    // groupes). Les lieux et villes viennent des vraies données du site (script.js /
+    // COUNTRIES) ; la répartition par groupe est dérivée des chiffres déjà affichés
+    // sur cette même page (jamais de compteur inventé).
+    function toggleKpi(type) {
+      const detail = document.getElementById('kpi-detail');
+      const inner = document.getElementById('kpi-detail-inner');
+      document.querySelectorAll('.kpi-box').forEach(b => b.classList.remove('active'));
+
+      if (activeKpi === type) {
+        detail.classList.remove('open');
+        activeKpi = null;
+        return;
+      }
+      activeKpi = type;
+      document.getElementById('kpi-' + type).classList.add('active');
+
+      const c = (COUNTRIES[currentLang] || COUNTRIES.en)[lastOpenedCountry];
+      const d = COUNTRY_DETAILS[lastOpenedCountry];
+      const isFr = currentLang === 'fr';
+      let html = '';
+      if (type === 'locations') {
+        html = d.locationNames.map(name => `<div class="kpi-detail-row"><span>${name}</span></div>`).join('');
+      } else if (type === 'cities') {
+        html = c.cities.map(([name, n]) => `<div class="kpi-detail-row"><span>${name}</span><span>${n} ${n > 1 ? (isFr ? 'lieux' : 'locations') : (isFr ? 'lieu' : 'location')}</span></div>`).join('');
+      } else if (type === 'groups') {
+        html = d.groups.map(([name, n]) => `<div class="kpi-detail-row"><span>${name}</span><span>${n} ${n > 1 ? (isFr ? 'lieux' : 'locations') : (isFr ? 'lieu' : 'location')}</span></div>`).join('');
+      }
+      inner.innerHTML = html;
+      detail.classList.add('open');
+    }
+
+    function closeDetail() { document.getElementById('overlay').classList.remove('open'); lastOpenedCountry = null; activeKpi = null; }
 
     // --- GESTION DU PANIER "UNLOCK PASSES" (identique visuellement et fonctionnellement à map.html) ---
     function openCartModal() {
