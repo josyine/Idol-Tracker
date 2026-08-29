@@ -167,18 +167,26 @@ document.addEventListener('DOMContentLoaded', () => {
         markerGroup = L.layerGroup().addTo(map);
         setTimeout(() => { map.invalidateSize(); }, 200);
 
-        // Sur mobile, la barre d'adresse du navigateur qui apparaît/disparaît au scroll
-        // change la hauteur réelle de la fenêtre sans que l'évènement "resize" classique
-        // ne se déclenche de façon fiable (en particulier sur Safari iOS) : sans ce
-        // recalcul, Leaflet garde la carte dimensionnée sur l'ancienne hauteur et laisse
-        // un bandeau gris en haut/bas de l'écran. window.visualViewport.resize suit ce
-        // changement bien plus fidèlement quand il est disponible ; orientationchange
-        // couvre en plus la rotation de l'écran (dimensions mises à jour avec un léger
-        // délai après l'évènement, d'où le setTimeout).
+        // Sur mobile, plusieurs choses peuvent faire que la taille réelle du conteneur
+        // #map ne corresponde plus à ce que Leaflet a mesuré en dernier — la barre
+        // d'adresse du navigateur qui apparaît/disparaît au scroll (Safari iOS en
+        // particulier), le clavier virtuel, une police qui finit de charger après coup...
+        // — sans que "resize" ou même "visualViewport.resize" ne se déclenchent de façon
+        // fiable dans tous les cas. Plutôt que d'écouter des évènements qui peuvent
+        // manquer certains de ces cas, un ResizeObserver posé directement sur le
+        // conteneur de la carte réagit à TOUT changement de sa taille réellement rendue,
+        // quelle qu'en soit la cause — c'est la source la plus fiable possible. On garde
+        // en plus les écouteurs resize/orientationchange en repli pour les navigateurs
+        // sans ResizeObserver (très rare aujourd'hui).
         const refreshMapSize = () => { if (map) map.invalidateSize(); };
-        window.addEventListener('resize', refreshMapSize);
-        if (window.visualViewport) window.visualViewport.addEventListener('resize', refreshMapSize);
-        window.addEventListener('orientationchange', () => setTimeout(refreshMapSize, 300));
+        const mapContainerEl = document.querySelector('.map-container');
+        if (typeof ResizeObserver !== 'undefined' && mapContainerEl) {
+            new ResizeObserver(refreshMapSize).observe(mapContainerEl);
+        } else {
+            window.addEventListener('resize', refreshMapSize);
+            if (window.visualViewport) window.visualViewport.addEventListener('resize', refreshMapSize);
+            window.addEventListener('orientationchange', () => setTimeout(refreshMapSize, 300));
+        }
 
         map.on('zoomend', function() {
             const zoom = map.getZoom();
