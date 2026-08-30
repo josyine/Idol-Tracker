@@ -167,7 +167,12 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
   .row { flex-wrap: wrap; }
   .row-explore { margin-left: auto; }
 
-  .detail-window { max-width: 97%; }
+  /* Pop up de détail agrandie sur mobile : l'overlay perdait 30px de padding fixe de
+     chaque côté (hérité du desktop) même sur un écran de 360px, ce qui rétrécissait
+     inutilement la fenêtre. On réduit ce padding et on laisse la fenêtre grandir en
+     largeur et en hauteur pour une bien meilleure lisibilité du contenu. */
+  .overlay { padding: 8px; }
+  .detail-window { max-width: 100%; max-height: 94vh; border-radius: 16px; }
   .detail-hero { padding: 24px 22px 20px 22px; }
   .detail-body { padding: 22px 20px 26px 20px; }
   .stat-grid { grid-template-columns: 1fr 1fr; }
