@@ -1,13 +1,98 @@
 // ==========================================
-// 0. CONFIGURATION DU FOND DE CARTE (OpenStreetMap standard)
+// 0. CONFIGURATION DU FOND DE CARTE
 // ==========================================
-// On utilise directement les tuiles publiques d'OpenStreetMap : entièrement gratuites,
-// sans inscription et sans clé API — contrairement à CARTO, qui a changé sa politique
-// en août 2026 et impose désormais une clé. OSM ne demandera jamais de clé.
+// Le style OSM Carto standard (tile.openstreetmap.org) affiche les noms de lieux
+// uniquement dans la langue/écriture locale (ex: 서울특별시 plutôt que "Seoul" en Corée),
+// illisible pour une bonne partie des visiteurs du site. On utilise donc le style
+// "osm-intl" de Wikimedia — construit par Wikimedia précisément pour son public
+// multilingue mondial : mêmes données et mêmes couleurs qu'OSM Carto standard (fond
+// crème, parcs en vert, eau en bleu, routes en jaune/orange), mais avec les noms
+// internationaux/latins ajoutés à côté du nom local. Entièrement gratuit, sans
+// inscription ni clé API, un seul hôte (pas de sous-domaines a/b/c comme OSM standard).
 // (Seule condition d'usage : garder l'attribution "OpenStreetMap contributors" visible,
 // déjà incluse ci-dessous, et rester dans un usage raisonnable — largement le cas ici.)
-const OSM_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+// CARTO a été écarté : il a changé sa politique en août 2026 et impose désormais une clé.
+const OSM_TILE_URL = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png';
+// Repli automatique sur OSM Carto standard (labels locaux uniquement, mais robuste et
+// toujours disponible) si le style Wikimedia venait à devenir inaccessible — mieux vaut
+// une carte lisible dans une langue que pas de carte du tout. Voir attachOSMFallback().
+const OSM_TILE_FALLBACK_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+// Bascule silencieusement une couche de tuiles vers le repli OSM standard si trop de
+// tuiles du style principal échouent à charger (ex: service Wikimedia temporairement
+// indisponible) — au-delà d'un petit nombre d'échecs pour ne pas réagir à une simple
+// tuile isolée en erreur réseau.
+function attachOSMFallback(tileLayer, map) {
+    let failCount = 0;
+    let switched = false;
+    tileLayer.on('tileerror', () => {
+        if (switched) return;
+        failCount++;
+        if (failCount > 5) {
+            switched = true;
+            tileLayer.setUrl(OSM_TILE_FALLBACK_URL);
+        }
+    });
+    return tileLayer;
+}
+
+function createOSMTileLayer(map, opts) {
+    const layer = L.tileLayer(OSM_TILE_URL, Object.assign({ attribution: OSM_ATTRIBUTION, maxZoom: 19, maxNativeZoom: 18 }, opts));
+    if (map) attachOSMFallback(layer, map);
+    return layer;
+}
+
+// ==========================================
+// 0ter. MODE TOURNÉE EN DIRECT (Tour Mode)
+// ==========================================
+// Le site est 100% statique (pas de backend/serveur), donc il n'existe aucun moyen
+// fiable côté client de "vérifier en direct sur le site de BTS" leur position actuelle
+// (pas de flux officiel public exploitable en JS, et scraper un site externe depuis le
+// navigateur se heurte systématiquement à CORS). La seule approche techniquement saine
+// pour un site comme celui-ci est donc une liste de dates tenue à jour manuellement —
+// exactement comme le fait n'importe quel site d'actus de tournée.
+//
+// Dates ci-dessous recherchées le 30/08/2026 et recoupées entre plusieurs sources, mais
+// à prendre avec précaution : plusieurs sites consultés se contredisaient légèrement sur
+// certaines dates (ex : villes nord-américaines), et Wikipedia (source la plus fiable
+// pour ce sujet) était bloqué dans cet environnement de développement, donc impossible à
+// recouper directement ici. LISTE À VÉRIFIER ET AJUSTER dès que HYBE/BigHit publie le
+// calendrier officiel complet — c'est un tableau simple, une ville se modifie en une ligne.
+const TOUR_MODE_DATA = {
+    tourName: "Arirang World Tour",
+    group: "BTS",
+    stops: [
+        { id: 'goyang',     city: 'Goyang',     country: 'South Korea', venue: 'Goyang Stadium',           lat: 37.6584, lng: 126.7828,  dateStart: '2026-04-09', dateEnd: '2026-04-12' },
+        { id: 'vegas',      city: 'Las Vegas',  country: 'USA',         venue: 'Allegiant Stadium',         lat: 36.0908, lng: -115.1833, dateStart: '2026-05-20', dateEnd: '2026-05-31' },
+        { id: 'busan',      city: 'Busan',      country: 'South Korea', venue: 'Busan Asiad Main Stadium',  lat: 35.1907, lng: 129.0587,  dateStart: '2026-06-05', dateEnd: '2026-06-21' },
+        { id: 'london',     city: 'London',     country: 'UK',          venue: 'Wembley Stadium',           lat: 51.5560, lng: -0.2795,   dateStart: '2026-07-04', dateEnd: '2026-07-10' },
+        { id: 'newyork',    city: 'New York',   country: 'USA',         venue: 'MetLife Stadium',           lat: 40.8135, lng: -74.0745,  dateStart: '2026-07-24', dateEnd: '2026-08-03' },
+        { id: 'toronto',    city: 'Toronto',    country: 'Canada',      venue: 'Rogers Stadium',            lat: 43.6532, lng: -79.3832,  dateStart: '2026-08-22', dateEnd: '2026-08-23' },
+        { id: 'la',         city: 'Inglewood (Los Angeles)', country: 'USA', venue: 'SoFi Stadium',         lat: 33.9535, lng: -118.3392, dateStart: '2026-09-01', dateEnd: '2026-09-06' },
+        { id: 'kaohsiung',  city: 'Kaohsiung',  country: 'Taiwan',      venue: 'Kaohsiung National Stadium', lat: 22.7469, lng: 120.2966, dateStart: '2026-11-21', dateEnd: '2026-11-22' },
+        { id: 'manila',     city: 'Manila',     country: 'Philippines', venue: 'Philippine Arena',          lat: 14.6939, lng: 120.9483,  dateStart: '2027-03-13', dateEnd: '2027-03-14' }
+    ]
+};
+
+// window.__tourModeNowOverride (chaîne ISO, ex: '2026-09-03') permet aux tests
+// automatisés de simuler une autre date sans jamais toucher à Date() global ni aux
+// données réelles ci-dessus — ignoré en production (jamais posé par le site lui-même).
+function getTourNow() {
+    return window.__tourModeNowOverride ? new Date(window.__tourModeNowOverride) : new Date();
+}
+function getTourStopStatus(stop, nowDate) {
+    const now = nowDate.getTime();
+    const start = new Date(stop.dateStart + 'T00:00:00').getTime();
+    const end = new Date(stop.dateEnd + 'T23:59:59').getTime();
+    if (now > end) return 'done';
+    if (now >= start && now <= end) return 'current';
+    return 'upcoming';
+}
+function getCurrentTourStop() {
+    const now = getTourNow();
+    return TOUR_MODE_DATA.stops.find(s => getTourStopStatus(s, now) === 'current') || null;
+}
 
 // ==========================================
 // 1. INITIALISATION ROBUSTE DE L'APPLICATION
@@ -27,6 +112,22 @@ let currentLang = localStorage.getItem('lang') || 'en';
 function getUnlockedGroups() {
     if (window.__demoMode) return ['BTS'];
     return JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+}
+
+// Même principe pour les listes personnelles : en mode démo, la carte doit se comporter
+// comme une page modèle (aucune visite/wishlist/trip réels affichés), jamais comme la
+// page d'un compte existant qui traînerait dans le localStorage de cet appareil.
+function getVisitedLocs() {
+    if (window.__demoMode) return [];
+    return JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+}
+function getWishlistLocs() {
+    if (window.__demoMode) return [];
+    return JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+}
+function getMyTripsList() {
+    if (window.__demoMode) return [];
+    return JSON.parse(localStorage.getItem('myTrips') || '[]');
 }
 
 let currentTrip = null;
@@ -70,23 +171,48 @@ function normalizeVisitEntry(entry) {
 }
 window.normalizeVisitEntry = normalizeVisitEntry;
 
-// Note affichée dans la fiche détail, à côté de "I visited this place" / "Add to
-// Wishlist" : la moyenne des notes que CET utilisateur a lui-même attribuées lors de
-// ses visites enregistrées pour ce lieu. Le site n'a pas de note communautaire
-// partagée entre utilisateurs (pas de backend d'agrégation cross-users), donc on
-// n'affiche jamais une moyenne globale inventée — seulement les vraies notes de la
-// personne connectée, ou rien si elle n'en a encore attribué aucune.
-window.refreshLocationRating = function(visits) {
+// Note communautaire (/5) affichée dans la fiche détail et dans la liste "LOCATIONS" du
+// menu de gauche : moyenne partagée entre TOUS les utilisateurs du site (pas seulement
+// les visites de la personne connectée), agrégée côté Firestore dans la collection
+// publique `locationRatings` (voir firebase-init.js — nécessite une règle Firestore
+// dédiée, non déployable depuis ce fichier). Cache local {locationId: {sum, count}},
+// rempli une fois au chargement (voir le listener "firebase-ready" de map.html) puis
+// mis à jour de façon optimiste dès qu'on enregistre/modifie/retire une note, pour un
+// affichage immédiat sans attendre l'aller-retour réseau.
+let communityRatings = {};
+
+function communityRatingAvg(locId) {
+    const r = communityRatings[locId];
+    if (!r || !r.count) return null;
+    return r.sum / r.count;
+}
+
+window.setCommunityRatings = function(ratings) {
+    communityRatings = ratings || {};
+};
+
+// Applique un delta au cache local (affichage immédiat) ET le persiste sur Firestore
+// pour que les autres utilisateurs le voient aussi à leur prochain chargement.
+function applyCommunityRatingDelta(locId, sumDelta, countDelta) {
+    if (!sumDelta && !countDelta) return;
+    const cur = communityRatings[locId] || { sum: 0, count: 0 };
+    communityRatings[locId] = { sum: cur.sum + sumDelta, count: Math.max(0, cur.count + countDelta) };
+    if (typeof window.updateLocationRatingAggregate === 'function') {
+        window.updateLocationRatingAggregate(locId, sumDelta, countDelta);
+    }
+}
+window.applyCommunityRatingDelta = applyCommunityRatingDelta;
+
+window.refreshLocationRating = function(locId) {
     const ratingEl = document.getElementById('details-rating');
     const ratingValEl = document.getElementById('details-rating-value');
     if (!ratingEl || !ratingValEl) return;
-    const ratings = (visits || []).map(v => v.rating).filter(r => r > 0);
-    if (ratings.length === 0) {
+    const avg = communityRatingAvg(locId);
+    if (avg === null) {
         ratingEl.classList.add('hidden');
         return;
     }
-    const mean = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-    ratingValEl.textContent = mean.toFixed(1);
+    ratingValEl.textContent = avg.toFixed(1);
     ratingEl.classList.remove('hidden');
 };
 
@@ -197,9 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const initialCenter = window.getMapCenterForCountry ? window.getMapCenterForCountry(localStorage.getItem('userCountry')) : [37.541, 127.025, 6];
         map = L.map('map', { zoomControl: false }).setView([initialCenter[0], initialCenter[1]], initialCenter[2]);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-        L.tileLayer(OSM_TILE_URL, { 
-            attribution: OSM_ATTRIBUTION, subdomains: 'abc', maxZoom: 19 
-        }).addTo(map);
+        createOSMTileLayer(map).addTo(map);
         markerGroup = L.layerGroup().addTo(map);
         setTimeout(() => { map.invalidateSize(); }, 200);
 
@@ -1097,7 +1221,9 @@ const translations = {
         gateNoGroupsTitle: "Unlock a group to see the map", gateNoGroupsDesc: "You haven't unlocked any group yet. Click below to choose a pass and start exploring.",
         gateUnlockBtn: "Unlock a group", gateLogoutLink: "Log out",
         gateErrorInvalid: "Incorrect email or password.", gateErrorGeneric: "Something went wrong. Please try again.",
-        gateResetSent: "Password reset email sent — check your inbox.", gateEnterEmailFirst: "Please enter your email address first."
+        gateResetSent: "Password reset email sent — check your inbox.", gateEnterEmailFirst: "Please enter your email address first.",
+        tourModeLiveIn: "Live now — BTS is live in {city}", tourModeSchedule: "Tour Schedule", tourModeLive: "Live", tourModeDone: "Done", tourModeUpcoming: "Upcoming", tourModePrev: "Previous", tourModeNext: "Next",
+        tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel."
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -1141,7 +1267,9 @@ const translations = {
         gateNoGroupsTitle: "Débloquez un groupe pour voir la carte", gateNoGroupsDesc: "Vous n'avez encore débloqué aucun groupe. Cliquez ci-dessous pour choisir un pass et commencer à explorer.",
         gateUnlockBtn: "Débloquer un groupe", gateLogoutLink: "Se déconnecter",
         gateErrorInvalid: "E-mail ou mot de passe incorrect.", gateErrorGeneric: "Une erreur est survenue. Réessayez.",
-        gateResetSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.", gateEnterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail."
+        gateResetSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.", gateEnterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail.",
+        tourModeLiveIn: "En direct — BTS est en concert à {city}", tourModeSchedule: "Calendrier de la tournée", tourModeLive: "En direct", tourModeDone: "Terminé", tourModeUpcoming: "À venir", tourModePrev: "Précédent", tourModeNext: "Suivant",
+        tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage."
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -1185,7 +1313,9 @@ const translations = {
         gateNoGroupsTitle: "Desbloquea un grupo para ver el mapa", gateNoGroupsDesc: "Aún no has desbloqueado ningún grupo. Haz clic abajo para elegir un pase y empezar a explorar.",
         gateUnlockBtn: "Desbloquear un grupo", gateLogoutLink: "Cerrar sesión",
         gateErrorInvalid: "Correo o contraseña incorrectos.", gateErrorGeneric: "Algo salió mal. Inténtalo de nuevo.",
-        gateResetSent: "Correo de restablecimiento enviado — revisa tu bandeja de entrada.", gateEnterEmailFirst: "Indica primero tu correo electrónico."
+        gateResetSent: "Correo de restablecimiento enviado — revisa tu bandeja de entrada.", gateEnterEmailFirst: "Indica primero tu correo electrónico.",
+        tourModeLiveIn: "En directo — BTS está actuando en {city}", tourModeSchedule: "Calendario de la gira", tourModeLive: "En directo", tourModeDone: "Finalizado", tourModeUpcoming: "Próximamente", tourModePrev: "Anterior", tourModeNext: "Siguiente",
+        tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje."
     },
     it: {
         btnGenerateIti: "Generatore di Itinerari", filterGroup: "GRUPPO", filterMember: "MEMBRO", filterArea: "ZONA", filterYear: "ANNO", filterCategories: "CATEGORIE",
@@ -1229,7 +1359,9 @@ const translations = {
         gateNoGroupsTitle: "Sblocca un gruppo per vedere la mappa", gateNoGroupsDesc: "Non hai ancora sbloccato nessun gruppo. Clicca qui sotto per scegliere un pass e iniziare a esplorare.",
         gateUnlockBtn: "Sblocca un gruppo", gateLogoutLink: "Esci",
         gateErrorInvalid: "Email o password errati.", gateErrorGeneric: "Qualcosa è andato storto. Riprova.",
-        gateResetSent: "Email di reimpostazione inviata — controlla la posta in arrivo.", gateEnterEmailFirst: "Inserisci prima il tuo indirizzo email."
+        gateResetSent: "Email di reimpostazione inviata — controlla la posta in arrivo.", gateEnterEmailFirst: "Inserisci prima il tuo indirizzo email.",
+        tourModeLiveIn: "In diretta — I BTS si esibiscono a {city}", tourModeSchedule: "Calendario del tour", tourModeLive: "In diretta", tourModeDone: "Concluso", tourModeUpcoming: "In arrivo", tourModePrev: "Precedente", tourModeNext: "Successivo",
+        tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio."
     },
     pt: {
         btnGenerateIti: "Gerador de Roteiros", filterGroup: "GRUPO", filterMember: "MEMBRO", filterArea: "REGIÃO", filterYear: "ANO", filterCategories: "CATEGORIAS",
@@ -1273,7 +1405,9 @@ const translations = {
         gateNoGroupsTitle: "Desbloqueie um grupo para ver o mapa", gateNoGroupsDesc: "Você ainda não desbloqueou nenhum grupo. Clique abaixo para escolher um passe e começar a explorar.",
         gateUnlockBtn: "Desbloquear um grupo", gateLogoutLink: "Sair",
         gateErrorInvalid: "E-mail ou senha incorretos.", gateErrorGeneric: "Algo deu errado. Tente novamente.",
-        gateResetSent: "E-mail de redefinição enviado — verifique sua caixa de entrada.", gateEnterEmailFirst: "Informe primeiro seu endereço de e-mail."
+        gateResetSent: "E-mail de redefinição enviado — verifique sua caixa de entrada.", gateEnterEmailFirst: "Informe primeiro seu endereço de e-mail.",
+        tourModeLiveIn: "Ao vivo — BTS está se apresentando em {city}", tourModeSchedule: "Calendário da turnê", tourModeLive: "Ao vivo", tourModeDone: "Concluído", tourModeUpcoming: "Em breve", tourModePrev: "Anterior", tourModeNext: "Próximo",
+        tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem."
     },
     ko: {
         btnGenerateIti: "자동 일정 생성기", filterGroup: "그룹", filterMember: "멤버", filterArea: "지역", filterYear: "연도", filterCategories: "카테고리",
@@ -1317,7 +1451,9 @@ const translations = {
         gateNoGroupsTitle: "지도를 보려면 그룹을 잠금 해제하세요", gateNoGroupsDesc: "아직 잠금 해제한 그룹이 없습니다. 아래를 클릭해 이용권을 선택하고 둘러보기를 시작하세요.",
         gateUnlockBtn: "그룹 잠금 해제하기", gateLogoutLink: "로그아웃",
         gateErrorInvalid: "이메일 또는 비밀번호가 올바르지 않습니다.", gateErrorGeneric: "문제가 발생했습니다. 다시 시도해주세요.",
-        gateResetSent: "비밀번호 재설정 이메일을 보냈습니다 — 받은편지함을 확인해주세요.", gateEnterEmailFirst: "먼저 이메일 주소를 입력해주세요."
+        gateResetSent: "비밀번호 재설정 이메일을 보냈습니다 — 받은편지함을 확인해주세요.", gateEnterEmailFirst: "먼저 이메일 주소를 입력해주세요.",
+        tourModeLiveIn: "라이브 중 — BTS가 {city}에서 공연 중입니다", tourModeSchedule: "투어 일정", tourModeLive: "라이브", tourModeDone: "종료", tourModeUpcoming: "예정", tourModePrev: "이전", tourModeNext: "다음",
+        tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요."
     },
     ja: {
         btnGenerateIti: "自動旅程ジェネレーター", filterGroup: "グループ", filterMember: "メンバー", filterArea: "エリア", filterYear: "年", filterCategories: "カテゴリー",
@@ -1361,7 +1497,9 @@ const translations = {
         gateNoGroupsTitle: "地図を見るにはグループを解除してください", gateNoGroupsDesc: "まだグループを解除していません。下のボタンからパスを選んで探索を始めましょう。",
         gateUnlockBtn: "グループを解除する", gateLogoutLink: "ログアウト",
         gateErrorInvalid: "メールアドレスまたはパスワードが正しくありません。", gateErrorGeneric: "問題が発生しました。もう一度お試しください。",
-        gateResetSent: "パスワード再設定メールを送信しました — 受信トレイをご確認ください。", gateEnterEmailFirst: "先にメールアドレスを入力してください。"
+        gateResetSent: "パスワード再設定メールを送信しました — 受信トレイをご確認ください。", gateEnterEmailFirst: "先にメールアドレスを入力してください。",
+        tourModeLiveIn: "ライブ配信中 — BTSは{city}で公演中です", tourModeSchedule: "ツアースケジュール", tourModeLive: "ライブ", tourModeDone: "終了", tourModeUpcoming: "開催予定", tourModePrev: "前へ", tourModeNext: "次へ",
+        tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。"
     },
     zh: {
         btnGenerateIti: "自动行程生成器", filterGroup: "团体", filterMember: "成员", filterArea: "地区", filterYear: "年份", filterCategories: "分类",
@@ -1405,7 +1543,9 @@ const translations = {
         gateNoGroupsTitle: "解锁一个团体以查看地图", gateNoGroupsDesc: "您还没有解锁任何团体。点击下方选择通行证，开始探索吧。",
         gateUnlockBtn: "解锁一个团体", gateLogoutLink: "退出登录",
         gateErrorInvalid: "邮箱或密码不正确。", gateErrorGeneric: "出现了一些问题，请重试。",
-        gateResetSent: "密码重置邮件已发送——请查收您的收件箱。", gateEnterEmailFirst: "请先输入您的电子邮箱。"
+        gateResetSent: "密码重置邮件已发送——请查收您的收件箱。", gateEnterEmailFirst: "请先输入您的电子邮箱。",
+        tourModeLiveIn: "直播中 — BTS 正在{city}演出", tourModeSchedule: "巡演日程", tourModeLive: "直播中", tourModeDone: "已结束", tourModeUpcoming: "即将开始", tourModePrev: "上一个", tourModeNext: "下一个",
+        tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。"
     }
 };
 
@@ -1496,6 +1636,8 @@ function updateUI() {
     if(tripLabel && !localStorage.getItem('activeTripId')) {
         tripLabel.textContent = t('selectTripToView');
     }
+
+    if (typeof window.initTourModeBadge === 'function') window.initTourModeBadge();
 }
 
 window.openItineraryModal = function() {
@@ -1664,7 +1806,7 @@ function renderLocations() {
     const sCountries = document.getElementById('stat-countries');
     if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
-    let visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    let visitedData = getVisitedLocs();
 
     filteredLocations.forEach(loc => {
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
@@ -1675,12 +1817,20 @@ function renderLocations() {
         const card = document.createElement('div');
         card.className = 'loc-item';
         card.style.background = cardBgColor;
+        const commAvg = communityRatingAvg(loc.id);
+        const ratingBadgeHtml = commAvg !== null
+            ? `<div class="loc-rating" style="margin-left:auto; flex-shrink:0; display:flex; align-items:center; gap:3px; font-size:11.5px; font-weight:700; color:#f59e0b;">
+                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+                 ${commAvg.toFixed(1)}
+               </div>`
+            : '';
         card.innerHTML = `
             <div class="loc-icon-box" style="color:${baseColor}; background:${baseColor}1A;">${catIconSvg}</div>
             <div class="loc-info">
                 <div class="loc-cat">${getCatName(loc.category)} &middot; ${loc.city || ''}</div>
                 <div class="loc-name">${loc.name}</div>
             </div>
+            ${ratingBadgeHtml}
         `;
         card.addEventListener('click', () => { map.flyTo([loc.lat, loc.lng], 16); window.openDetailsPanel(loc.id); });
         locationListElement.appendChild(card);
@@ -1770,7 +1920,7 @@ function addClusterMarker(cluster) {
 function renderMapMarkers(locations, opts) {
     if (!map || !markerGroup) return;
     markerGroup.clearLayers();
-    const visitedData = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+    const visitedData = getVisitedLocs();
     const clusters = clusterLocationsForZoom(locations, map.getZoom());
 
     clusters.forEach(cluster => {
@@ -1848,7 +1998,7 @@ window.loadItineraryTabOptions = function() {
     const label = document.getElementById('trip-select-label');
     if(!dropdownList) return;
     
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     const activeId = localStorage.getItem('activeTripId');
     dropdownList.innerHTML = '';
     
@@ -1932,7 +2082,7 @@ window.loadItineraryView = function(tripId) {
         return;
     }
 
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     const trip = trips.find(t => t.id === tripId);
     if(!trip) return;
 
@@ -1947,7 +2097,7 @@ window.loadItineraryView = function(tripId) {
     let allAssignedIds = (trip.days || []).flat().map(Number);
     document.getElementById('iti-view-loc-count').textContent = `${allAssignedIds.length} location${allAssignedIds.length > 1 ? 's' : ''}`;
 
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
     let totalSaved = wList.filter(w => w.tripId === trip.id).length;
     
     let countries = [...new Set(allAssignedIds.map(id => {
@@ -2085,7 +2235,7 @@ function renderDayMiniMaps(trip) {
         }
 
         const dayMap = L.map(container, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, attributionControl: false }).setView(coords[0], 13);
-        L.tileLayer(OSM_TILE_URL).addTo(dayMap);
+        createOSMTileLayer(dayMap).addTo(dayMap);
         const dayLayer = L.featureGroup().addTo(dayMap);
 
         coords.forEach((c, locIdx) => {
@@ -2119,7 +2269,7 @@ function loadTripOptions() {
     if(!select) return;
     
     select.innerHTML = '';
-    const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const trips = getMyTripsList();
     const noTripTxt = currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet";
     const newTripTxt = currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip...";
     
@@ -2138,7 +2288,7 @@ function loadTripOptions() {
 function populateTripSelectOptions(selectedTripId) {
     const select = document.getElementById('trip-select');
     if (!select) return;
-    const trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    const trips = getMyTripsList();
     select.innerHTML = `<option value="none">${currentLang === 'fr' ? "Un jour / Pas de voyage prévu" : "Someday / no trip yet"}</option>`;
     trips.forEach(tr => { select.innerHTML += `<option value="${tr.id}">${tr.name}</option>`; });
     select.innerHTML += `<option value="new">${currentLang === 'fr' ? "+ Créer un nouveau voyage..." : "+ Create a new trip..."}</option>`;
@@ -2152,7 +2302,7 @@ function populateTripSelectOptions(selectedTripId) {
 window.toggleWishlist = function() {
     const checked = document.getElementById('details-wishlist').checked;
     const box = document.getElementById('trip-box');
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
     
     if (checked) {
         box.classList.add('open');
@@ -2178,7 +2328,7 @@ window.handleTripSelect = function() {
         field.classList.add('open');
     } else {
         field.classList.remove('open');
-        let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+        let wList = getWishlistLocs();
         let idx = wList.findIndex(w => w.id === currentLocationIdForMemory);
         if(idx !== -1) {
             wList[idx].tripId = value;
@@ -2208,7 +2358,7 @@ window.createTrip = function() {
     }
 
     const newTripId = 'trip-' + Date.now();
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     trips.push({ id: newTripId, name: label, dateType: 'specific', startDate: start, endDate: end, days: [] });
     localStorage.setItem('myTrips', JSON.stringify(trips));
     syncTrips(trips);
@@ -2348,7 +2498,7 @@ window.openDetailsPanel = function(id) {
     const tabBtnVisit = document.getElementById('tab-btn-visit');
     
     if(vCheck) {
-        let vList = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        let vList = getVisitedLocs();
         let rawEntry = vList.find(v => v.id === loc.id || v === loc.id);
         let memoryData = rawEntry ? normalizeVisitEntry(rawEntry) : null;
         
@@ -2363,11 +2513,11 @@ window.openDetailsPanel = function(id) {
             memoryDropdown.classList.remove('open');
         }
 
-        window.refreshLocationRating(memoryData ? memoryData.visits : []);
+        window.refreshLocationRating(loc.id);
 
         vCheck.onchange = function() {
-            let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
-            if(this.checked) { 
+            let list = getVisitedLocs();
+            if(this.checked) {
                 let idx = list.findIndex(v => (v.id === loc.id || v === loc.id));
                 if(idx === -1) {
                     list.push({ id: loc.id, visits: [] });
@@ -2377,11 +2527,20 @@ window.openDetailsPanel = function(id) {
                 localStorage.setItem('visitedLocs', JSON.stringify(list));
                 syncVisited(list);
                 openMemoryEditor(null); // ouvre le formulaire pour la première visite
-            } else { 
-                list = list.filter(v => v.id !== loc.id && v !== loc.id); 
-                memoryDropdown.classList.remove('open'); 
+            } else {
+                // On retire la contribution de toutes les visites notées de CET utilisateur
+                // à la moyenne communautaire avant de les supprimer localement.
+                const removedEntry = list.find(v => (v.id === loc.id || v === loc.id));
+                const removedVisits = removedEntry ? normalizeVisitEntry(removedEntry).visits : [];
+                const removedRatings = removedVisits.map(v => v.rating).filter(r => r > 0);
+                if (removedRatings.length > 0) {
+                    applyCommunityRatingDelta(loc.id, -removedRatings.reduce((a,b) => a+b, 0), -removedRatings.length);
+                }
+
+                list = list.filter(v => v.id !== loc.id && v !== loc.id);
+                memoryDropdown.classList.remove('open');
                 tabBtnVisit.classList.add('hidden');
-                
+
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 document.querySelector('.tab-btn[data-tab="info"]').classList.add('active');
@@ -2389,7 +2548,7 @@ window.openDetailsPanel = function(id) {
 
                 localStorage.setItem('visitedLocs', JSON.stringify(list));
                 syncVisited(list);
-                window.refreshLocationRating([]);
+                window.refreshLocationRating(loc.id);
             }
             if(map) renderLocations();
         };
@@ -2399,7 +2558,7 @@ window.openDetailsPanel = function(id) {
     const tripBox = document.getElementById('trip-box');
     
     if(wCheck) {
-        let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+        let wList = getWishlistLocs();
         let wishData = wList.find(w => w.id === loc.id || w === loc.id);
         
         wCheck.checked = !!wishData;
@@ -2466,7 +2625,7 @@ function openMemoryEditor(visitIndex) {
         document.getElementById('memory-notes').value = '';
         window.setStars(4);
     } else {
-        let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        let list = getVisitedLocs();
         let entry = list.find(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
         entry = entry ? normalizeVisitEntry(entry) : null;
         const visit = entry && entry.visits[visitIndex];
@@ -2489,26 +2648,32 @@ if(saveMemoryBtn) {
         const date = document.getElementById('memory-date').value;
         const notes = document.getElementById('memory-notes').value;
         
-        let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
+        let list = getVisitedLocs();
         const idx = list.findIndex(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
         
         if(idx !== -1) {
             list[idx] = normalizeVisitEntry(list[idx]);
 
+            // Nouvelle visite : la note s'ajoute intégralement à la moyenne communautaire.
+            // Modification d'une visite existante : seule la différence avec l'ancienne
+            // note compte (le nombre de visites, lui, ne change pas).
             if (editingVisitIndex === null) {
                 list[idx].visits.push({ date, rating, notes });
+                applyCommunityRatingDelta(currentLocationIdForMemory, rating, 1);
             } else {
+                const oldRating = list[idx].visits[editingVisitIndex].rating || 0;
                 list[idx].visits[editingVisitIndex] = { date, rating, notes };
+                applyCommunityRatingDelta(currentLocationIdForMemory, rating - oldRating, 0);
             }
 
             localStorage.setItem('visitedLocs', JSON.stringify(list));
             syncVisited(list);
-            
+
             document.getElementById('memory-dropdown').classList.remove('open');
             document.getElementById('tab-btn-visit').classList.remove('hidden');
-            
+
             window.renderVisitsList(list[idx].visits);
-            window.refreshLocationRating(list[idx].visits);
+            window.refreshLocationRating(currentLocationIdForMemory);
             document.getElementById('tab-btn-visit').click();
         }
     });
@@ -2663,9 +2828,7 @@ window.openLocModal = function(id) {
 
         if(!popupMap) {
             popupMap = L.map('modal-map', { zoomControl: false, attributionControl: false }).setView([loc.lat, loc.lng], 15);
-            L.tileLayer(OSM_TILE_URL, {
-                subdomains: 'abc', maxZoom: 19
-            }).addTo(popupMap);
+            createOSMTileLayer(popupMap).addTo(popupMap);
             popupMarker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(popupMap);
         } else {
             popupMap.setView([loc.lat, loc.lng], 15);
@@ -2867,7 +3030,7 @@ window.generateItinerary = function() {
                 itiLeafletMap = null;
             }
             itiLeafletMap = L.map('iti-map-container', { zoomControl: false }).setView([0,0], 2);
-            L.tileLayer(OSM_TILE_URL).addTo(itiLeafletMap);
+            createOSMTileLayer(itiLeafletMap).addTo(itiLeafletMap);
             itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
 
             // Un tracé par jour, dans la couleur de ce jour (mêmes couleurs que la carte
@@ -2908,7 +3071,7 @@ window.addSelectedDaysToTrip = function() {
     }
     
     window.saveTrip(); 
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
     
     checkboxes.forEach(cb => {
         const dayIndex = parseInt(cb.value);
@@ -2928,7 +3091,7 @@ window.addSelectedDaysToTrip = function() {
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     syncWishlist(wList);
     
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
@@ -2952,7 +3115,7 @@ window.saveItineraryToTrips = function() {
         days: []
     };
 
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
 
     currentGeneratedItinerary.forEach((dayLocs) => {
         let dayIds = [];
@@ -2966,7 +3129,7 @@ window.saveItineraryToTrips = function() {
         newTrip.days.push(dayIds);
     });
 
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     syncTrips(trips);
@@ -3142,7 +3305,7 @@ if(btnReject) btnReject.addEventListener('click', closeCookies);
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
 window.initTrips = function() {
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     
     if (trips.length === 0) {
         // Le bouton "+ New trip" de la sidebar est caché par défaut sur mobile (tiroir
@@ -3173,7 +3336,7 @@ window.initTrips = function() {
 
     if(document.getElementById('trip-map-container') && !tripPageMap) {
         tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
-        L.tileLayer(OSM_TILE_URL).addTo(tripPageMap);
+        createOSMTileLayer(tripPageMap).addTo(tripPageMap);
         tripPageLayer = L.featureGroup().addTo(tripPageMap);
     }
 
@@ -3185,8 +3348,8 @@ window.renderTripsSidebar = function() {
     const listContainer = document.getElementById('trips-list-container');
     if(!listContainer) return;
     
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let trips = getMyTripsList();
+    let wList = getWishlistLocs();
     
     listContainer.innerHTML = '';
     document.getElementById('sidebar-title').textContent = `MY TRIPS (${trips.length})`;
@@ -3235,7 +3398,7 @@ window.dropTrip = function(e, targetId) {
     e.currentTarget.classList.remove('drag-over-trip');
     const draggedId = e.dataTransfer.getData('text/plain');
     if(draggedId && draggedId !== targetId) {
-        let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+        let trips = getMyTripsList();
         const fromIdx = trips.findIndex(t => t.id === draggedId);
         const toIdx = trips.findIndex(t => t.id === targetId);
         if(fromIdx > -1 && toIdx > -1) {
@@ -3371,7 +3534,7 @@ window.renderTrip = function() {
     });
 
     // Ne garder dans unassignedLocs QUE les lieux qui sont explicitement dans wishlistLocs pour ce voyage ET qui ne sont pas déjà assignés.
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
     let unassignedLocs = wList
         .filter(w => w.tripId === currentTrip.id && !allAssignedIds.includes(Number(w.id)))
         .map(w => celebLocations.find(l => l.id === Number(w.id)))
@@ -3636,7 +3799,7 @@ window.removeFromTrip = function(btn, locId) {
 window.confirmRemoveLoc = function() {
     if(!locToRemoveData) return;
     
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
     wList = wList.filter(w => !(Number(w.id) === locToRemoveData.id && w.tripId === currentTrip.id));
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     syncWishlist(wList);
@@ -3647,7 +3810,7 @@ window.confirmRemoveLoc = function() {
     // On n'utilise pas saveTrip() ici, car elle reconstruit currentTrip.days en relisant le DOM
     // (qui contient encore l'ancien lieu tant que renderTrip() n'a pas tourné), ce qui annulait
     // silencieusement la suppression qu'on vient de faire.
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
@@ -3661,7 +3824,7 @@ window.confirmRemoveLoc = function() {
 
 window.quickAddLoc = function(locId) {
     locId = Number(locId);
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
     if(!wList.some(w => Number(w.id) === locId && w.tripId === currentTrip.id)) {
         wList.push({ id: locId, dateAdded: new Date().toLocaleDateString(), tripId: currentTrip.id });
         localStorage.setItem('wishlistLocs', JSON.stringify(wList));
@@ -3698,7 +3861,7 @@ window.saveTrip = function() {
     });
     currentTrip.days = newDays;
     
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
     if(tripIndex !== -1) trips[tripIndex] = currentTrip;
     localStorage.setItem('myTrips', JSON.stringify(trips));
@@ -3899,7 +4062,7 @@ window.createNewTripAdvanced = function() {
         group: group, member: member, country: country, city: city
     };
     
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     syncTrips(trips);
@@ -3922,12 +4085,12 @@ window.openDeleteModal = function(id = null, event = null) {
 window.confirmDeleteTrip = function() {
     if (!tripIdToDelete) return;
 
-    let trips = JSON.parse(localStorage.getItem('myTrips') || '[]');
+    let trips = getMyTripsList();
     trips = trips.filter(t => t.id !== tripIdToDelete);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     syncTrips(trips);
     
-    let wList = JSON.parse(localStorage.getItem('wishlistLocs') || '[]');
+    let wList = getWishlistLocs();
     wList = wList.filter(w => w.tripId !== tripIdToDelete);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     syncWishlist(wList);

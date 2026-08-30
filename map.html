@@ -108,6 +108,50 @@
   .gate-modal .terms { font-size: 11px; text-align: center; color: #94a3b8; margin-top: 18px; }
   .gate-modal .terms a { color: #D42759; font-weight: 600; }
   .gate-error { background: #FFF1F3; border: 1px solid #FBD5DC; color: #D42759; font-size: 12px; font-weight: 600; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; text-align: left; }
+
+  /* ==========================================
+     MODE TOURNÉE EN DIRECT (Tour Mode) — badge + panneau
+     ========================================== */
+  .tour-mode-badge { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; background: #211C2E; color: #fff; border: none; border-radius: 100px; padding: 9px 18px 9px 14px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; font-family: 'Poppins', sans-serif; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transition: transform 0.2s ease; }
+  .tour-mode-badge:hover { transform: translateX(-50%) translateY(-2px); }
+  .tour-mode-badge.hidden { display: none; }
+  .tour-mode-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: tourModePulse 1.6s infinite; }
+  @keyframes tourModePulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow: 0 0 0 8px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+
+  .tour-mode-panel { position: fixed; inset: 0; z-index: 9500; }
+  .tour-mode-panel.hidden { display: none; }
+  .tour-mode-panel-backdrop { position: absolute; inset: 0; background: rgba(20,16,30,0.55); opacity: 0; transition: opacity .3s ease; }
+  .tour-mode-panel.open .tour-mode-panel-backdrop { opacity: 1; }
+  .tour-mode-panel-sheet { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 100%); width: min(640px, 92vw); max-height: 82vh; overflow-y: auto; background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.3); padding: 26px 26px 22px; transition: transform .35s cubic-bezier(0.25,1,0.5,1); font-family: 'Poppins', sans-serif; }
+  .tour-mode-panel.open .tour-mode-panel-sheet { transform: translate(-50%, 0); }
+  .tour-mode-panel-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; gap: 12px; }
+  .tour-mode-panel-livetag { font-size: 11px; font-weight: 800; color: #D42759; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 4px; }
+  .tour-mode-panel-title { font-size: 19px; font-weight: 800; color: var(--text-main); }
+  .tour-mode-close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; color: #64748b; cursor: pointer; line-height: 1; flex-shrink: 0; }
+  .tour-mode-close-btn:hover { background: #e2e8f0; }
+  .tour-mode-route-wrap { width: 100%; overflow-x: auto; margin-bottom: 18px; }
+  .tour-mode-route-wrap svg { width: 100%; min-width: 560px; height: 70px; display: block; }
+  .tour-mode-plane { transition: transform .4s cubic-bezier(0.25,1,0.5,1); }
+  .tour-mode-stop-card { background: var(--sidebar-bg); border-radius: 16px; padding: 18px 20px; margin-bottom: 16px; }
+  .tour-mode-stop-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
+  .tour-mode-stop-tag { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: .3px; flex-shrink: 0; }
+  .tour-mode-tag-live { background: #D42759; color: #fff; }
+  .tour-mode-tag-done { background: #e2e8f0; color: #64748b; }
+  .tour-mode-tag-upcoming { background: var(--accent-pink); color: #D42759; }
+  .tour-mode-stop-dates { font-size: 11.5px; font-weight: 700; color: #64748b; text-align: right; }
+  .tour-mode-stop-city { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
+  .tour-mode-stop-venue { font-size: 13px; color: #64748b; }
+  .tour-mode-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .tour-mode-nav-btn { background: #fff; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 9px 16px; font-size: 12.5px; font-weight: 700; color: var(--text-main); cursor: pointer; font-family: 'Poppins', sans-serif; }
+  .tour-mode-nav-btn:hover:not(:disabled) { border-color: var(--primary-magenta); color: var(--primary-magenta); }
+  .tour-mode-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .tour-mode-stop-index { font-size: 12px; font-weight: 700; color: #94a3b8; }
+  .tour-mode-footer { font-size: 11px; color: #94a3b8; text-align: center; padding-top: 14px; border-top: 1px solid #f1f5f9; line-height: 1.5; }
+  @media (max-width: 800px) {
+      .tour-mode-badge { top: 60px; left: 14px; right: 14px; transform: none; width: auto; max-width: none; padding: 8px 14px 8px 12px; font-size: 11.5px; z-index: 3400; justify-content: center; }
+      .tour-mode-badge:hover { transform: translateY(-2px); }
+      .tour-mode-badge span#tour-mode-badge-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
 </style>
 </head>
 <body class="auth-gate-active">
@@ -454,8 +498,38 @@
             </div>
         </div>
         
+        <!-- Mode Tournée : badge "Live now" (visible uniquement si un arrêt de tournée est en cours) -->
+        <button id="tour-mode-badge" class="tour-mode-badge hidden" onclick="openTourModePanel()" type="button">
+            <span class="tour-mode-live-dot"></span>
+            <span id="tour-mode-badge-text"></span>
+        </button>
+
         <div id="map"></div>
     </main>
+</div>
+
+<!-- Mode Tournée : panneau détaillé (route + navigation entre les arrêts) -->
+<div id="tour-mode-panel" class="tour-mode-panel hidden">
+    <div class="tour-mode-panel-backdrop" onclick="closeTourModePanel()"></div>
+    <div class="tour-mode-panel-sheet">
+        <div class="tour-mode-panel-header">
+            <div>
+                <div class="tour-mode-panel-livetag" id="tour-mode-panel-livetag"></div>
+                <div class="tour-mode-panel-title" id="tour-mode-panel-title"></div>
+            </div>
+            <button class="tour-mode-close-btn" onclick="closeTourModePanel()" type="button">&times;</button>
+        </div>
+        <div class="tour-mode-route-wrap">
+            <svg id="tour-mode-route-svg" viewBox="0 0 900 70" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="tour-mode-stop-card" id="tour-mode-stop-card"></div>
+        <div class="tour-mode-nav">
+            <button id="tour-mode-prev" class="tour-mode-nav-btn" onclick="tourModeNavigate(-1)" type="button">‹ <span data-i18n="tourModePrev">Previous</span></button>
+            <span id="tour-mode-stop-index" class="tour-mode-stop-index"></span>
+            <button id="tour-mode-next" class="tour-mode-nav-btn" onclick="tourModeNavigate(1)" type="button"><span data-i18n="tourModeNext">Next</span> ›</button>
+        </div>
+        <div class="tour-mode-footer" data-i18n="tourModeFooterNote">Dates as announced by the tour — always double-check official ticketing sites before booking travel.</div>
+    </div>
 </div>
 
 <!-- Modal Liste (Locations / Countries filtrées) -->
@@ -568,6 +642,7 @@
 <script src="countries.js"></script>
 <script type="module" src="firebase-init.js"></script>
 <script src="script.js"></script>
+<script src="tour-mode.js"></script>
 <script src="map-tour.js"></script>
 <script>
     // ==========================================
@@ -593,6 +668,14 @@
     }
 
     window.addEventListener('firebase-ready', async (e) => {
+        // Note communautaire (/5) : lue une seule fois ici (avant tout rendu de la liste
+        // LOCATIONS ou de la fiche détail), disponible même pour un visiteur non connecté
+        // puisque la lecture de cette collection publique ne nécessite pas d'être
+        // authentifié (voir la règle Firestore documentée dans firebase-init.js).
+        if (typeof window.loadAllLocationRatings === 'function' && typeof window.setCommunityRatings === 'function') {
+            window.setCommunityRatings(await window.loadAllLocationRatings());
+        }
+
         if (window.__demoMode) {
             // Mode démo : la carte reste débloquée quel que soit l'état de connexion réel
             // (voir getUnlockedGroups() dans script.js pour les données BTS de démo).
