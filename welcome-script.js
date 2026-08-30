@@ -44,7 +44,10 @@ onAuthStateChanged(auth, (user) => { firebaseCurrentUser = user || null; });
 // ==========================================
 // TRADUCTIONS ET LOGIQUE DE PAGE (inchangé)
 // ==========================================
-const PRICE_PER_GROUP = 14.99;
+// Pass Guide (30/08/2026) : deux pass génériques (jamais liés à un artiste), les mêmes
+// que le paywall de map.html (voir hasGuidePass()/buyGuidePass() dans script.js) — plus
+// de sélection de groupe ni de prix par groupe à l'inscription.
+const GUIDE_PASS_PRICES = { monthly: 9.99, lifetime: 19.99 };
 let currentLang = localStorage.getItem('lang') || 'en';
 
 const dict = {
@@ -72,8 +75,12 @@ const dict = {
         reasonLabel: "Why are you using Screen To Street?", reasonPlaceholder: "Select an option (optional)",
         reason1: "To discover new places", reason2: "To plan a trip", reason3: "To get good addresses", reason4: "To follow my idol's footsteps", reason5: "Other",
         
-        step3Title: "Choose Your Passes", passDesc: "Select the groups you want to unlock. (14.99€ per group)",
-        subtotalLabel: "Subtotal:", payBtnEmpty: "Select a group", btnToPayment: "Continue to Payment",
+        step3Title: "Passes", passDesc: "Select the groups you want to unlock. (14.99€ per group)",
+        step3TitleGuide: "Unlock the full guide?", step3DescGuide: "Optional — you can also explore the map for free first (3 locations) and decide later.",
+        skipPassesLink: "Continue without a pass — explore for free →",
+        paywallMonthlyName: "🎟️ TRAVEL PASS (1 Month)", paywallMonthlyPrice: "€9.99 / month",
+        paywallVipName: "👑 VIP PASS (Lifetime Access)", paywallVipPrice: "€19.99 (one-time payment)",
+        subtotalLabel: "Subtotal:", payBtnEmpty: "Select a pass", btnToPayment: "Continue to Payment",
         
         step4Title: "Payment", step4Desc: "Complete your purchase to unlock the guides.",
         summaryPasses: "Selected Passes:", summaryTotal: "Total Due:",
@@ -120,8 +127,12 @@ const dict = {
         reasonLabel: "Pourquoi utilisez-vous Screen To Street ?", reasonPlaceholder: "Sélectionnez une option (facultatif)",
         reason1: "Pour découvrir de nouveaux lieux", reason2: "Pour préparer un voyage", reason3: "Pour avoir de bonnes adresses", reason4: "Pour suivre la trace de mon idole", reason5: "Autre",
         
-        step3Title: "Vos Pass", passDesc: "Sélectionnez les groupes à débloquer. (14.99€ par groupe)",
-        subtotalLabel: "Sous-total :", payBtnEmpty: "Sélectionnez un groupe", btnToPayment: "Passer au paiement",
+        step3Title: "Pass", passDesc: "Sélectionnez les groupes à débloquer. (14.99€ par groupe)",
+        step3TitleGuide: "Débloquer le guide complet ?", step3DescGuide: "Facultatif — vous pouvez aussi explorer la carte gratuitement d'abord (3 lieux) et décider plus tard.",
+        skipPassesLink: "Continuer sans pass — explorer gratuitement →",
+        paywallMonthlyName: "🎟️ PASS VOYAGE (1 Mois)", paywallMonthlyPrice: "9,99 € / mois",
+        paywallVipName: "👑 PASS VIP (Accès à vie)", paywallVipPrice: "19,99 € (paiement unique)",
+        subtotalLabel: "Sous-total :", payBtnEmpty: "Sélectionnez un pass", btnToPayment: "Passer au paiement",
         
         step4Title: "Paiement", step4Desc: "Finalisez votre achat pour débloquer les guides.",
         summaryPasses: "Pass sélectionnés :", summaryTotal: "Total à payer :",
@@ -159,7 +170,7 @@ function updateLangUI() {
         const key = el.getAttribute('data-i18n');
         if(d[key]) el.innerHTML = d[key];
     });
-    updatePrice();
+    if (btnToStep4 && selectedSignupPlan) btnToStep4.textContent = curDict().btnToPayment;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -519,57 +530,67 @@ if(btnToStep3) {
     });
 }
 
+// Choix du pass (étape 3) : au clic sur une des deux cartes, plus de case à cocher —
+// une seule carte sélectionnée à la fois (pas un panier), voir .pass-card.selected
+// dans welcome-style.css.
+let selectedSignupPlan = null;
+window.selectSignupPlan = function (plan) {
+    selectedSignupPlan = plan;
+    document.querySelectorAll('.pass-card[data-plan]').forEach(card => {
+        card.classList.toggle('selected', card.getAttribute('data-plan') === plan);
+    });
+    if (btnToStep4) {
+        btnToStep4.disabled = false;
+        btnToStep4.textContent = curDict().btnToPayment;
+    }
+};
+
 // Step 3 -> Step 4 (Passes -> Payment)
 const btnToStep4 = document.getElementById('btn-to-step4');
 if(btnToStep4) {
     btnToStep4.addEventListener('click', () => {
-        const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
-        let selectedNames = [];
-        checkedBoxes.forEach(cb => selectedNames.push(cb.value));
-        
+        if (!selectedSignupPlan) return;
         const sumPasses = document.getElementById('summary-passes');
         const sumPrice = document.getElementById('summary-price');
-        const subtotal = document.getElementById('subtotal-display');
-        
-        if(sumPasses) sumPasses.textContent = selectedNames.join(', ');
-        if(sumPrice && subtotal) sumPrice.textContent = subtotal.textContent;
+        const price = GUIDE_PASS_PRICES[selectedSignupPlan];
+        const isFr = currentLang === 'fr';
+        if (sumPasses) sumPasses.textContent = selectedSignupPlan === 'lifetime'
+            ? (isFr ? 'Pass VIP (accès à vie)' : 'VIP Pass (lifetime access)')
+            : (isFr ? 'Pass Voyage (1 mois)' : 'Travel Pass (1 month)');
+        if (sumPrice) sumPrice.textContent = `${price.toFixed(2).replace('.', isFr ? ',' : '.')} €`;
 
         showStep(4);
     });
 }
 
-// --- LOGIQUE PRIX ET PAIEMENT --- //
-const checkboxes = document.querySelectorAll('.group-checkbox');
-const subtotalDisplay = document.getElementById('subtotal-display');
-
-function updatePrice() {
-    if(!subtotalDisplay || !btnToStep4) return;
-    const selectedCount = document.querySelectorAll('.group-checkbox:checked').length;
-    const totalPrice = selectedCount * PRICE_PER_GROUP;
-    subtotalDisplay.textContent = `${totalPrice.toFixed(2)} €`;
-    
-    if (selectedCount > 0) {
-        btnToStep4.disabled = false;
-        btnToStep4.textContent = curDict().btnToPayment;
-    } else {
-        btnToStep4.disabled = true;
-        btnToStep4.textContent = curDict().payBtnEmpty;
-    }
+// Continuer sans pass : va directement à la carte, avec 3 fiches lieu consultables
+// gratuitement (voir hasGuidePass()/FREE_LOCATION_VIEW_LIMIT dans script.js) — c'est
+// le chemin normal désormais, pas une exception.
+const btnSkipPasses = document.getElementById('btn-skip-passes');
+if (btnSkipPasses) {
+    btnSkipPasses.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'map.html';
+    });
 }
-checkboxes.forEach(cb => { cb.addEventListener('change', updatePrice); });
 
 // Paiement (toujours simulé pour l'instant — aucun vrai système de paiement n'est branché) :
-// on enregistre les pass choisis dans Firestore et dans localStorage, puis on redirige.
+// on enregistre le pass choisi dans Firestore et dans localStorage, puis on redirige.
+// Même schéma de données que buyGuidePass() dans script.js (guidePassType /
+// guidePassExpiresAt), pour que map.html reconnaisse le pass dès l'arrivée.
 const checkoutForm = document.getElementById('checkout-form');
 if(checkoutForm) {
     checkoutForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const checkedBoxes = document.querySelectorAll('.group-checkbox:checked');
-        if(checkedBoxes.length === 0) return;
+        if (!selectedSignupPlan) return;
 
-        let selectedGroups = [];
-        checkedBoxes.forEach(cb => selectedGroups.push(cb.value));
-        localStorage.setItem('unlockedGroups', JSON.stringify(selectedGroups));
+        localStorage.setItem('guidePassType', selectedSignupPlan);
+        const fields = { guidePassType: selectedSignupPlan };
+        if (selectedSignupPlan === 'monthly') {
+            const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+            localStorage.setItem('guidePassExpiresAt', String(expiresAt));
+            fields.guidePassExpiresAt = expiresAt;
+        }
 
         document.getElementById('btn-submit-payment').style.display = 'none';
         const paymentLoader = document.getElementById('payment-loader');
@@ -578,12 +599,12 @@ if(checkoutForm) {
         const user = auth.currentUser;
         if (user) {
             try {
-                await setDoc(doc(db, 'users', user.uid), { unlockedGroups: selectedGroups }, { merge: true });
+                await setDoc(doc(db, 'users', user.uid), fields, { merge: true });
             } catch (e) {
                 // Silencieux : le paiement reste simulé, on ne bloque pas la personne pour ça.
             }
         }
-        
+
         setTimeout(() => { window.location.href = 'map.html'; }, 2000);
     });
 }

@@ -77,69 +77,69 @@ const ARIRANG_TOUR = {
     stops: [
         { id: 'goyang',      city: 'Goyang',        country: 'South Korea', venue: 'Goyang Stadium',            lat: 37.6584,  lng: 126.7828,  showDates: ['2026-04-09', '2026-04-11', '2026-04-12'],
           nights: [
-              { dates: ['2026-04-09'], highlights: ["Le tout premier concert de retrouvailles après le service militaire : <b>Jin</b> et <b>Jungkook</b> ont fondu en larmes dès la chanson d'ouverture en voyant l'océan violet."] },
-              { dates: ['2026-04-11', '2026-04-12'], highlights: ["<b>RM</b> a fait un discours bouleversant sur leur promesse tenue de revenir à sept, provoquant une standing ovation de 5 minutes."] }
+              { dates: ['2026-04-09'], highlights: { en: ["The very first reunion concert after military service: <b>Jin</b> and <b>Jungkook</b> burst into tears during the opening song at the sight of the sea of purple."], fr: ["Le tout premier concert de retrouvailles après le service militaire : <b>Jin</b> et <b>Jungkook</b> ont fondu en larmes dès la chanson d'ouverture en voyant l'océan violet."], es: ["El primerísimo concierto de reencuentro tras el servicio militar: <b>Jin</b> y <b>Jungkook</b> rompieron a llorar desde la canción de apertura al ver el océano violeta."], it: ["Il primissimo concerto di riunione dopo il servizio militare: <b>Jin</b> e <b>Jungkook</b> sono scoppiati in lacrime già dalla canzone d'apertura, alla vista dell'oceano viola."], pt: ["O primeiríssimo show de reencontro após o serviço militar: <b>Jin</b> e <b>Jungkook</b> começaram a chorar já na música de abertura, ao ver o oceano roxo."], ko: ["군 복무 후 첫 재회 콘서트: <b>진</b>과 <b>정국</b>은 오프닝 곡에서부터 보라색 바다를 보고 눈물을 터뜨렸다."], ja: ["兵役後、初めての再会コンサート。<b>ジン</b>と<b>ジョングク</b>はオープニング曲から紫色の海を見て涙をこぼした。"], zh: ["服兵役后的首场重聚演唱会：<b>Jin</b>和<b>Jungkook</b>在开场曲时看到紫色的海洋便落泪了。"] } },
+              { dates: ['2026-04-11', '2026-04-12'], highlights: { en: ["<b>RM</b> gave a moving speech about their kept promise to return as seven, sparking a 5-minute standing ovation."], fr: ["<b>RM</b> a fait un discours bouleversant sur leur promesse tenue de revenir à sept, provoquant une standing ovation de 5 minutes."], es: ["<b>RM</b> dio un discurso conmovedor sobre su promesa cumplida de volver siendo siete, provocando una ovación de pie de 5 minutos."], it: ["<b>RM</b> ha tenuto un discorso commovente sulla promessa mantenuta di tornare in sette, scatenando una standing ovation di 5 minuti."], pt: ["<b>RM</b> fez um discurso emocionante sobre a promessa cumprida de voltarem sendo sete, provocando uma ovação de pé de 5 minutos."], ko: ["<b>RM</b>은 일곱 명이 함께 돌아오겠다는 약속을 지켰다는 감동적인 연설을 했고, 5분간의 기립박수가 이어졌다."], ja: ["<b>RM</b>は「7人で戻る」という約束を守れたことについて感動的なスピーチを行い、5分間のスタンディングオベーションが起きた。"], zh: ["<b>RM</b>发表了关于七人一起回归这一承诺兑现的感人演讲，引发了长达5分钟的起立鼓掌。"] } }
           ] },
         { id: 'tokyo',       city: 'Tokyo',         country: 'Japan',       venue: 'Tokyo Dome',                 lat: 35.7056,  lng: 139.7519,  showDates: ['2026-04-17', '2026-04-18'],
           nights: [
-              { dates: ['2026-04-17', '2026-04-18'], highlights: ["<b>V</b> a chanté un extrait de sa chanson solo a cappella.", "<b>Jimin</b> s'est amusé à porter un chapeau en forme de mont Fuji lancé par une fan."] }
+              { dates: ['2026-04-17', '2026-04-18'], highlights: { en: ["<b>V</b> sang a snippet of his solo song a cappella.", "<b>Jimin</b> had fun wearing a Mount Fuji-shaped hat thrown by a fan."], fr: ["<b>V</b> a chanté un extrait de sa chanson solo a cappella.", "<b>Jimin</b> s'est amusé à porter un chapeau en forme de mont Fuji lancé par une fan."], es: ["<b>V</b> cantó a capela un fragmento de su canción en solitario.", "<b>Jimin</b> se divirtió llevando un sombrero con forma del Monte Fuji lanzado por una fan."], it: ["<b>V</b> ha cantato a cappella un estratto della sua canzone da solista.", "<b>Jimin</b> si è divertito a indossare un cappello a forma di Monte Fuji lanciato da una fan."], pt: ["<b>V</b> cantou a capella um trecho de sua música solo.", "<b>Jimin</b> se divertiu usando um chapéu em forma do Monte Fuji jogado por uma fã."], ko: ["<b>뷔</b>는 자신의 솔로 곡 일부를 아카펠라로 불렀다.", "<b>지민</b>은 한 팬이 던진 후지산 모양 모자를 쓰고 즐거워했다."], ja: ["<b>V</b>はソロ曲の一部をアカペラで歌った。", "<b>ジミン</b>はファンが投げた富士山型の帽子をかぶって楽しんだ。"], zh: ["<b>V</b>清唱了一段他的个人歌曲。", "<b>Jimin</b>开心地戴上了一位粉丝扔来的富士山形状帽子。"] } }
           ] },
         { id: 'tampa',       city: 'Tampa',         country: 'USA',         venue: 'Raymond James Stadium',      lat: 27.9759,  lng: -82.5033,  showDates: ['2026-04-25', '2026-04-26', '2026-04-28'],
           nights: [
-              { dates: ['2026-04-25', '2026-04-26'], highlights: ['La "Maknae Line" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) a improvisé une chorégraphie chaotique pendant le rappel, finissant par s\'écrouler de rire sur scène.'] },
-              { dates: ['2026-04-28'], surpriseSongs: ['Life Goes On', '뱁새 (Silver Spoon)'], highlights: ["<b>RM</b> a été complètement trempé lors de la bataille d'eau traditionnelle du rappel et a glissé de façon comique sans se faire mal, amusant tout le stade."] }
+              { dates: ['2026-04-25', '2026-04-26'], highlights: { en: ["The \"Maknae Line\" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) improvised a chaotic choreography during the encore, ending up collapsing with laughter on stage."], fr: ["La \"Maknae Line\" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) a improvisé une chorégraphie chaotique pendant le rappel, finissant par s'écrouler de rire sur scène."], es: ["La \"Maknae Line\" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) improvisó una coreografía caótica durante el bis, terminando desplomados de risa en el escenario."], it: ["La \"Maknae Line\" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) ha improvvisato una coreografia caotica durante il bis, finendo per crollare dalle risate sul palco."], pt: ["A \"Maknae Line\" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) improvisou uma coreografia caótica durante o bis, acabando desabando de rir no palco."], ko: ["\"막내 라인\"(<b>지민</b>, <b>뷔</b>, <b>정국</b>)이 앙코르 중 즉흥적으로 엉망진창인 안무를 선보이다 결국 무대 위에서 웃음을 참지 못하고 주저앉았다."], ja: ["「マンネライン」(<b>ジミン</b>、<b>V</b>、<b>ジョングク</b>)がアンコール中に即興でめちゃくちゃな振り付けを披露し、最後はステージ上で笑い転げた。"], zh: ["\"忙内line\"（<b>Jimin</b>、<b>V</b>、<b>Jungkook</b>）在安可环节即兴表演了一段混乱的舞蹈，最后笑到瘫倒在舞台上。"] } },
+              { dates: ['2026-04-28'], surpriseSongs: ['Life Goes On', '뱁새 (Silver Spoon)'], highlights: { en: ["<b>RM</b> got completely soaked during the traditional water fight of the encore and comically slipped without getting hurt, amusing the whole stadium."], fr: ["<b>RM</b> a été complètement trempé lors de la bataille d'eau traditionnelle du rappel et a glissé de façon comique sans se faire mal, amusant tout le stade."], es: ["<b>RM</b> quedó completamente empapado durante la tradicional batalla de agua del bis y resbaló de forma cómica sin hacerse daño, divirtiendo a todo el estadio."], it: ["<b>RM</b> è rimasto completamente fradicio durante la tradizionale battaglia d'acqua del bis ed è scivolato in modo comico senza farsi male, divertendo tutto lo stadio."], pt: ["<b>RM</b> ficou completamente encharcado durante a tradicional batalha de água do bis e escorregou de forma cômica sem se machucar, divertindo todo o estádio."], ko: ["<b>RM</b>은 앙코르에서 전통이 된 물총 싸움 중 흠뻑 젖었고, 다치지 않고 코믹하게 미끄러져 경기장 전체를 즐겁게 했다."], ja: ["<b>RM</b>はアンコールの恒例となった水かけ合戦でずぶ濡れになり、怪我なくコミカルに滑って会場中を沸かせた。"], zh: ["<b>RM</b>在安可环节的传统泼水大战中被彻底淋湿，还滑稽地滑倒（没有受伤），逗乐了全场。"] } }
           ] },
         { id: 'elpaso',      city: 'El Paso',       country: 'USA',         venue: 'Sun Bowl Stadium',           lat: 31.7757,  lng: -106.5004, showDates: ['2026-05-02', '2026-05-03'],
           nights: [
-              { dates: ['2026-05-02'], surpriseSongs: ['On', 'Outro: Wings'], highlights: ['<b>Suga</b> a souri tendrement à une pancarte d\'une fan qui disait "I will sue Min Yoongi again in 2026".'] },
+              { dates: ['2026-05-02'], surpriseSongs: ['On', 'Outro: Wings'], highlights: { en: ["<b>Suga</b> smiled tenderly at a fan sign that read \"I will sue Min Yoongi again in 2026.\""], fr: ["<b>Suga</b> a souri tendrement à une pancarte d'une fan qui disait \"I will sue Min Yoongi again in 2026\"."], es: ["<b>Suga</b> sonrió con ternura a un cartel de una fan que decía \"I will sue Min Yoongi again in 2026\"."], it: ["<b>Suga</b> ha sorriso teneramente a un cartello di una fan con scritto \"I will sue Min Yoongi again in 2026\"."], pt: ["<b>Suga</b> sorriu com ternura para uma placa de uma fã que dizia \"I will sue Min Yoongi again in 2026\"."], ko: ["<b>슈가</b>는 한 팬이 든 \"I will sue Min Yoongi again in 2026\"이라는 팻말을 보고 다정하게 미소지었다."], ja: ["<b>シュガ</b>はファンが掲げた「I will sue Min Yoongi again in 2026」というボードを見て優しく微笑んだ。"], zh: ["<b>Suga</b>看到一位粉丝举着写有\"I will sue Min Yoongi again in 2026\"的牌子，露出了温柔的微笑。"] } },
               { dates: ['2026-05-03'], surpriseSongs: ['Dionysus', 'Best of Me'] }
           ] },
         { id: 'mexicocity',  city: 'Mexico City',   country: 'Mexico',      venue: 'Estadio GNP Seguros',        lat: 19.3046,  lng: -99.1505,  showDates: ['2026-05-07', '2026-05-09', '2026-05-10'],
           nights: [
-              { dates: ['2026-05-07'], surpriseSongs: ['상남자 (Boy in Luv)', 'So What'], highlights: ['Le public a chanté un "Cielito Lindo" assourdissant avant le rappel, ce qui a profondément ému <b>J-Hope</b>.'] },
-              { dates: ['2026-05-09', '2026-05-10'], highlights: ['Les fans mexicains ont organisé un projet lumineux aux couleurs du drapeau coréen et mexicain.'] }
+              { dates: ['2026-05-07'], surpriseSongs: ['상남자 (Boy in Luv)', 'So What'], highlights: { en: ["The crowd sang a deafening \"Cielito Lindo\" before the encore, which deeply moved <b>J-Hope</b>."], fr: ["Le public a chanté un \"Cielito Lindo\" assourdissant avant le rappel, ce qui a profondément ému <b>J-Hope</b>."], es: ["El público cantó un ensordecedor \"Cielito Lindo\" antes del bis, lo que emocionó profundamente a <b>J-Hope</b>."], it: ["Il pubblico ha cantato un assordante \"Cielito Lindo\" prima del bis, commuovendo profondamente <b>J-Hope</b>."], pt: ["O público cantou um ensurdecedor \"Cielito Lindo\" antes do bis, o que emocionou profundamente <b>J-Hope</b>."], ko: ["앙코르 전 관객들이 귀청이 떨어질 듯한 \"Cielito Lindo\"를 떼창해 <b>제이홉</b>을 깊이 감동시켰다."], ja: ["アンコール前、観客が耳をつんざくような大合唱で「Cielito Lindo」を歌い、<b>J-Hope</b>を深く感動させた。"], zh: ["安可前，观众齐声高唱震耳欲聋的《Cielito Lindo》，深深打动了<b>J-Hope</b>。"] } },
+              { dates: ['2026-05-09', '2026-05-10'], highlights: { en: ["Mexican fans organized a light project in the colors of the Korean and Mexican flags."], fr: ["Les fans mexicains ont organisé un projet lumineux aux couleurs du drapeau coréen et mexicain."], es: ["Los fans mexicanos organizaron un proyecto de luces con los colores de las banderas coreana y mexicana."], it: ["I fan messicani hanno organizzato un progetto luminoso con i colori delle bandiere coreana e messicana."], pt: ["Os fãs mexicanos organizaram um projeto luminoso com as cores das bandeiras coreana e mexicana."], ko: ["멕시코 팬들은 한국과 멕시코 국기 색상으로 이루어진 조명 프로젝트를 준비했다."], ja: ["メキシコのファンは韓国とメキシコの国旗の色を使ったライトプロジェクトを企画した。"], zh: ["墨西哥粉丝组织了一场以韩国和墨西哥国旗颜色为主题的灯光应援。"] } }
           ] },
         { id: 'stanford',    city: 'Stanford',      country: 'USA',         venue: 'Stanford Stadium',           lat: 37.4342,  lng: -122.1610, showDates: ['2026-05-16', '2026-05-17', '2026-05-19'],
           nights: [
-              { dates: ['2026-05-16', '2026-05-17'], highlights: ['<b>Jungkook</b> a remarqué un enfant déguisé en Cooky (BT21) dans la fosse et est descendu lui taper dans la main.'] },
-              { dates: ['2026-05-19'], surpriseSongs: ['I Need U', 'No More Dream'], highlights: ['Moment iconique : les ARMYs de la Bay Area ont organisé un projet massif en levant simultanément le drapeau de la Corée du Sud tout en chantant Arirang pendant la chanson Body to Body.'] }
+              { dates: ['2026-05-16', '2026-05-17'], highlights: { en: ["<b>Jungkook</b> spotted a child dressed as Cooky (BT21) in the pit and came down to give them a high-five."], fr: ["<b>Jungkook</b> a remarqué un enfant déguisé en Cooky (BT21) dans la fosse et est descendu lui taper dans la main."], es: ["<b>Jungkook</b> vio a un niño disfrazado de Cooky (BT21) en el foso y bajó a chocarle la mano."], it: ["<b>Jungkook</b> ha notato un bambino travestito da Cooky (BT21) nel parterre ed è sceso per dargli il cinque."], pt: ["<b>Jungkook</b> notou uma criança fantasiada de Cooky (BT21) na pista e desceu para bater a mão com ela."], ko: ["<b>정국</b>은 스탠딩석에서 쿠키(BT21) 옷을 입은 아이를 발견하고 내려가 하이파이브를 해주었다."], ja: ["<b>ジョングク</b>はスタンディングエリアでクッキー(BT21)の衣装を着た子どもを見つけ、降りてハイタッチをした。"], zh: ["<b>Jungkook</b>注意到内场有个打扮成Cooky（BT21）的小孩，特意走下去和他击掌。"] } },
+              { dates: ['2026-05-19'], surpriseSongs: ['I Need U', 'No More Dream'], highlights: { en: ["Iconic moment: Bay Area ARMYs organized a massive project, simultaneously raising the South Korean flag while singing Arirang during the song Body to Body."], fr: ["Moment iconique : les ARMYs de la Bay Area ont organisé un projet massif en levant simultanément le drapeau de la Corée du Sud tout en chantant Arirang pendant la chanson Body to Body."], es: ["Momento icónico: las ARMYs del Área de la Bahía organizaron un proyecto masivo, levantando simultáneamente la bandera de Corea del Sur mientras cantaban Arirang durante la canción Body to Body."], it: ["Momento iconico: le ARMY della Bay Area hanno organizzato un progetto di massa, alzando simultaneamente la bandiera della Corea del Sud mentre cantavano Arirang durante la canzone Body to Body."], pt: ["Momento icônico: as ARMYs da Bay Area organizaram um projeto em massa, erguendo simultaneamente a bandeira da Coreia do Sul enquanto cantavam Arirang durante a música Body to Body."], ko: ["상징적인 순간: 베이 에어리어의 아미들은 Body to Body 곡이 나오는 동안 다 함께 태극기를 들어올리며 아리랑을 합창하는 대규모 프로젝트를 준비했다."], ja: ["象徴的な瞬間：ベイエリアのARMYは、Body to Bodyの曲中に韓国国旗を一斉に掲げながらアリランを合唱する大規模プロジェクトを企画した。"], zh: ["标志性时刻：湾区ARMY组织了一场大型应援，在《Body to Body》歌曲响起时齐声高唱《阿里郎》，同时一起挥舞韩国国旗。"] } }
           ] },
         { id: 'vegas',       city: 'Las Vegas',     country: 'USA',         venue: 'Allegiant Stadium',          lat: 36.0908,  lng: -115.1833, showDates: ['2026-05-23', '2026-05-24', '2026-05-27', '2026-05-28'],
           nights: [
               { dates: ['2026-05-23'], surpriseSongs: ['Permission to Dance', '고민보다 Go (Go Go)'] },
-              { dates: ['2026-05-24'], surpriseSongs: ['Black Swan', '등골브레이커 (Spine Breaker)'], highlights: ['<b>Jin</b>, avec ses fameuses lunettes humoristiques, a livré une performance de danse complètement décalée sur Spine Breaker, soutenu par <b>Suga</b>.'] },
+              { dates: ['2026-05-24'], surpriseSongs: ['Black Swan', '등골브레이커 (Spine Breaker)'], highlights: { en: ["<b>Jin</b>, wearing his famous joke glasses, delivered a completely off-beat dance performance to Spine Breaker, backed up by <b>Suga</b>."], fr: ["<b>Jin</b>, avec ses fameuses lunettes humoristiques, a livré une performance de danse complètement décalée sur Spine Breaker, soutenu par <b>Suga</b>."], es: ["<b>Jin</b>, con sus famosas gafas cómicas, ofreció una actuación de baile totalmente disparatada con Spine Breaker, respaldado por <b>Suga</b>."], it: ["<b>Jin</b>, con i suoi famosi occhiali buffi, ha regalato un'esibizione di ballo completamente fuori dagli schemi su Spine Breaker, supportato da <b>Suga</b>."], pt: ["<b>Jin</b>, com seus famosos óculos engraçados, entregou uma performance de dança completamente fora do tom em Spine Breaker, apoiado por <b>Suga</b>."], ko: ["<b>진</b>은 특유의 개그 안경을 쓰고 Spine Breaker 무대에서 완전히 엉뚱한 춤을 선보였고, <b>슈가</b>가 이를 받쳐주었다."], ja: ["<b>ジン</b>は例のギャグ眼鏡をかけ、Spine Breakerで完全にズレたダンスパフォーマンスを披露し、<b>シュガ</b>がそれを支えた。"], zh: ["<b>Jin</b>戴着他那标志性的搞笑眼镜，在《Spine Breaker》中奉献了一段完全跑调的舞蹈表演，<b>Suga</b>在一旁配合。"] } },
               { dates: ['2026-05-27'], surpriseSongs: ['Anpanman', '진격의 방탄 (Attack on Bangtan)'] },
-              { dates: ['2026-05-28'], surpriseSongs: ['흥탄소년단 (Boyz with Fun)', 'Danger'], highlights: ["Le concert s'est terminé sous un feu d'artifice spectaculaire au-dessus de l'Allegiant Stadium."] }
+              { dates: ['2026-05-28'], surpriseSongs: ['흥탄소년단 (Boyz with Fun)', 'Danger'], highlights: { en: ["The concert ended under a spectacular fireworks display above Allegiant Stadium."], fr: ["Le concert s'est terminé sous un feu d'artifice spectaculaire au-dessus de l'Allegiant Stadium."], es: ["El concierto terminó bajo unos fuegos artificiales espectaculares sobre el Allegiant Stadium."], it: ["Il concerto si è concluso sotto uno spettacolare spettacolo pirotecnico sopra l'Allegiant Stadium."], pt: ["O show terminou sob um espetacular show de fogos de artifício sobre o Allegiant Stadium."], ko: ["콘서트는 알리전트 스타디움 상공에서 펼쳐진 화려한 불꽃놀이와 함께 마무리되었다."], ja: ["コンサートはアリージアント・スタジアム上空の壮大な花火とともに幕を閉じた。"], zh: ["演唱会在Allegiant体育场上空绚丽的烟花中落下帷幕。"] } }
           ] },
         { id: 'busan',       city: 'Busan',         country: 'South Korea', venue: 'Busan Asiad Main Stadium',   lat: 35.1907,  lng: 129.0587,  showDates: ['2026-06-12', '2026-06-13'],
           nights: [
-              { dates: ['2026-06-12'], surpriseSongs: ['팔도강산 (Paldogangsan)', 'Ma City'], highlights: ["Retour sur les terres de <b>Jimin</b> et <b>Jungkook</b> : <b>Jimin</b> a pleuré à chaudes larmes en s'adressant à sa famille présente dans le public."] },
-              { dates: ['2026-06-13'], surpriseSongs: ['보조개 (Dimple)', '땡 (Ddaeng)', 'Magic Shop'], highlights: ['Anniversaire des 13 ans de BTS, retransmis en direct dans les cinémas du monde entier : le groupe a partagé un énorme gâteau sur scène, et l\'interprétation de Ddaeng a rendu le stade complètement hystérique.'] }
+              { dates: ['2026-06-12'], surpriseSongs: ['팔도강산 (Paldogangsan)', 'Ma City'], highlights: { en: ["A return to <b>Jimin</b> and <b>Jungkook</b>'s hometown region: <b>Jimin</b> cried heavily while addressing his family in the audience."], fr: ["Retour sur les terres de <b>Jimin</b> et <b>Jungkook</b> : <b>Jimin</b> a pleuré à chaudes larmes en s'adressant à sa famille présente dans le public."], es: ["Regreso a la tierra natal de <b>Jimin</b> y <b>Jungkook</b>: <b>Jimin</b> lloró desconsoladamente al dirigirse a su familia presente entre el público."], it: ["Ritorno nella terra natale di <b>Jimin</b> e <b>Jungkook</b>: <b>Jimin</b> ha pianto a dirotto rivolgendosi alla sua famiglia presente tra il pubblico."], pt: ["Retorno à terra natal de <b>Jimin</b> e <b>Jungkook</b>: <b>Jimin</b> chorou muito ao se dirigir à sua família presente na plateia."], ko: ["<b>지민</b>과 <b>정국</b>의 고향으로의 귀환: <b>지민</b>은 객석에 있는 가족에게 인사를 건네며 펑펑 울었다."], ja: ["<b>ジミン</b>と<b>ジョングク</b>の故郷への凱旋公演：<b>ジミン</b>は客席にいる家族に呼びかけながら号泣した。"], zh: ["重返<b>Jimin</b>和<b>Jungkook</b>的家乡：<b>Jimin</b>在向台下的家人喊话时泪流满面。"] } },
+              { dates: ['2026-06-13'], surpriseSongs: ['보조개 (Dimple)', '땡 (Ddaeng)', 'Magic Shop'], highlights: { en: ["BTS's 13th anniversary, broadcast live in cinemas around the world: the group shared a huge cake on stage, and the performance of Ddaeng sent the stadium into a complete frenzy."], fr: ["Anniversaire des 13 ans de BTS, retransmis en direct dans les cinémas du monde entier : le groupe a partagé un énorme gâteau sur scène, et l'interprétation de Ddaeng a rendu le stade complètement hystérique."], es: ["13.º aniversario de BTS, retransmitido en directo en cines de todo el mundo: el grupo compartió una enorme tarta en el escenario, y la interpretación de Ddaeng dejó al estadio completamente enloquecido."], it: ["Il 13° anniversario dei BTS, trasmesso in diretta nei cinema di tutto il mondo: il gruppo ha condiviso un'enorme torta sul palco, e l'esibizione di Ddaeng ha mandato lo stadio completamente in delirio."], pt: ["13º aniversário do BTS, transmitido ao vivo em cinemas do mundo todo: o grupo compartilhou um enorme bolo no palco, e a apresentação de Ddaeng deixou o estádio completamente em êxtase."], ko: ["전 세계 영화관에 생중계된 BTS 데뷔 13주년: 멤버들은 무대 위에서 커다란 케이크를 나눴고, Ddaeng 무대는 경기장을 완전히 열광의 도가니로 만들었다."], ja: ["世界中の映画館で生中継されたBTSデビュー13周年: メンバーはステージ上で大きなケーキを分け合い、「Ddaeng」のパフォーマンスはスタジアムを完全な熱狂に包んだ。"], zh: ["BTS出道13周年，全球影院同步直播：成员们在台上分享了一个巨大的蛋糕，《Ddaeng》的表演更是让全场彻底沸腾。"] } }
           ] },
         { id: 'madrid',      city: 'Madrid',        country: 'Spain',       venue: 'Riyadh Air Metropolitano',   lat: 40.4362,  lng: -3.5995,   showDates: ['2026-06-26', '2026-06-27'],
           nights: [
               { dates: ['2026-06-26'], surpriseSongs: ['Airplane Pt.2', 'Outro: Wings'] },
-              { dates: ['2026-06-27'], surpriseSongs: ['소우주 (Mikrokosmos)', 'Best of Me'], highlights: ['<b>V</b> s\'est amusé avec les mots espagnols appris pour l\'occasion, lâchant des "Te amo mucho" enflammés.'] }
+              { dates: ['2026-06-27'], surpriseSongs: ['소우주 (Mikrokosmos)', 'Best of Me'], highlights: { en: ["<b>V</b> had fun with the Spanish words he'd learned for the occasion, throwing out passionate \"Te amo mucho\"s."], fr: ["<b>V</b> s'est amusé avec les mots espagnols appris pour l'occasion, lâchant des \"Te amo mucho\" enflammés."], es: ["<b>V</b> se divirtió con las palabras en español que aprendió para la ocasión, soltando efusivos \"Te amo mucho\"."], it: ["<b>V</b> si è divertito con le parole spagnole imparate per l'occasione, lanciando appassionati \"Te amo mucho\"."], pt: ["<b>V</b> se divertiu com as palavras em espanhol que aprendeu para a ocasião, soltando apaixonados \"Te amo mucho\"."], ko: ["<b>뷔</b>는 이번 공연을 위해 배운 스페인어로 열정적인 \"Te amo mucho\"를 외치며 즐거워했다."], ja: ["<b>V</b>はこの日のために覚えたスペイン語を使い、情熱的に「Te amo mucho」を連発して楽しんだ。"], zh: ["<b>V</b>兴致勃勃地用为此特意学的西班牙语，热情地喊出\"Te amo mucho\"。"] } }
           ] },
         { id: 'brussels',    city: 'Brussels',      country: 'Belgium',     venue: 'Stade Roi Baudouin',         lat: 50.8951,  lng: 4.3411,    showDates: ['2026-07-01', '2026-07-02'],
           nights: [
               { dates: ['2026-07-01'], surpriseSongs: ['Tomorrow', '작은 것들을 위한 시 (Boy with Luv)'] },
-              { dates: ['2026-07-02'], surpriseSongs: ['On', 'For Youth'], highlights: ["<b>Jungkook</b> a récupéré le téléphone d'une ARMY au premier rang pour se filmer avec pendant le concert."] }
+              { dates: ['2026-07-02'], surpriseSongs: ['On', 'For Youth'], highlights: { en: ["<b>Jungkook</b> grabbed a front-row ARMY's phone to film himself with it during the concert."], fr: ["<b>Jungkook</b> a récupéré le téléphone d'une ARMY au premier rang pour se filmer avec pendant le concert."], es: ["<b>Jungkook</b> tomó el teléfono de una ARMY en primera fila para grabarse con él durante el concierto."], it: ["<b>Jungkook</b> ha preso il telefono di una ARMY in prima fila per filmarsi durante il concerto."], pt: ["<b>Jungkook</b> pegou o celular de uma ARMY da primeira fila para se filmar com ele durante o show."], ko: ["<b>정국</b>은 맨 앞줄 아미의 휴대폰을 가져가 공연 중 직접 자신을 촬영했다."], ja: ["<b>ジョングク</b>は最前列のARMYのスマホを受け取り、コンサート中に自分で撮影した。"], zh: ["<b>Jungkook</b>拿起前排一位ARMY的手机，在演唱会中自拍了一段视频。"] } }
           ] },
         { id: 'london',      city: 'London',        country: 'UK',          venue: 'Tottenham Hotspur Stadium',  lat: 51.6043,  lng: -0.0668,   showDates: ['2026-07-06', '2026-07-07'],
           nights: [
-              { dates: ['2026-07-06'], surpriseSongs: ['Life Goes On', 'Dionysus'], highlights: ["<b>J-Hope</b> s'est lancé dans un freestyle de danse absolument dantesque sous la pluie londonienne."] },
-              { dates: ['2026-07-07'], highlights: ["Séance classique : OT7 a chaleureusement remercié l'Europe pour sa loyauté."] }
+              { dates: ['2026-07-06'], surpriseSongs: ['Life Goes On', 'Dionysus'], highlights: { en: ["<b>J-Hope</b> launched into an absolutely epic freestyle dance in the London rain."], fr: ["<b>J-Hope</b> s'est lancé dans un freestyle de danse absolument dantesque sous la pluie londonienne."], es: ["<b>J-Hope</b> se lanzó a un freestyle de baile absolutamente descomunal bajo la lluvia londinense."], it: ["<b>J-Hope</b> si è lanciato in un freestyle di ballo assolutamente epico sotto la pioggia londinese."], pt: ["<b>J-Hope</b> se lançou em um freestyle de dança absolutamente épico sob a chuva londrina."], ko: ["<b>제이홉</b>은 런던의 빗속에서 그야말로 압도적인 프리스타일 댄스를 선보였다."], ja: ["<b>J-Hope</b>はロンドンの雨の中、まさに圧巻のフリースタイルダンスを繰り広げた。"], zh: ["<b>J-Hope</b>在伦敦的雨中即兴跳了一段极其震撼的freestyle舞蹈。"] } },
+              { dates: ['2026-07-07'], highlights: { en: ["A classic moment: OT7 warmly thanked Europe for its loyalty."], fr: ["Séance classique : OT7 a chaleureusement remercié l'Europe pour sa loyauté."], es: ["Un momento clásico: OT7 agradeció calurosamente a Europa por su lealtad."], it: ["Un momento classico: gli OT7 hanno ringraziato calorosamente l'Europa per la sua fedeltà."], pt: ["Um momento clássico: OT7 agradeceu calorosamente à Europa por sua lealdade."], ko: ["클래식한 순간: OT7은 유럽 팬들의 변함없는 사랑에 따뜻한 감사를 전했다."], ja: ["定番の瞬間：OT7はヨーロッパの変わらぬ愛に温かく感謝を伝えた。"], zh: ["经典时刻：OT7全员向欧洲粉丝的忠诚支持表达了温暖的感谢。"] } }
           ] },
         { id: 'munich',      city: 'Munich',        country: 'Germany',     venue: 'Allianz Arena',              lat: 48.2188,  lng: 11.6247,   showDates: ['2026-07-11', '2026-07-12'],
           nights: [
               { dates: ['2026-07-11'], surpriseSongs: ['뱁새 (Silver Spoon)', 'Pied Piper'] },
-              { dates: ['2026-07-12'], surpriseSongs: ['Louder than Bombs', '피 땀 눈물 (Blood Sweat & Tears)'], highlights: ["Chanter Louder than Bombs en live était une immense demande des fans : l'arène a tremblé tellement les fans criaient."] }
+              { dates: ['2026-07-12'], surpriseSongs: ['Louder than Bombs', '피 땀 눈물 (Blood Sweat & Tears)'], highlights: { en: ["Performing Louder than Bombs live was a huge fan request: the arena shook from how loud the fans were screaming."], fr: ["Chanter Louder than Bombs en live était une immense demande des fans : l'arène a tremblé tellement les fans criaient."], es: ["Interpretar Louder than Bombs en directo era una gran petición de los fans: la arena tembló de lo fuerte que gritaban los fans."], it: ["Cantare Louder than Bombs dal vivo era una grande richiesta dei fan: l'arena ha tremato per quanto i fan urlavano."], pt: ["Cantar Louder than Bombs ao vivo era um grande pedido dos fãs: a arena tremeu de tão alto que os fãs gritavam."], ko: ["Louder than Bombs 라이브는 팬들의 오랜 요청이었고, 팬들의 함성이 얼마나 컸던지 경기장이 흔들릴 정도였다."], ja: ["Louder than Bombsのライブ披露はファンの強い要望だった。ファンの歓声があまりに大きく、会場が揺れるほどだった。"], zh: ["现场演唱《Louder than Bombs》是粉丝们一直以来的强烈心愿：全场尖叫声之大，甚至让场馆都为之震动。"] } }
           ] },
         { id: 'paris',       city: 'Paris',         country: 'France',      venue: 'Stade de France',            lat: 48.9244,  lng: 2.3601,    showDates: ['2026-07-17', '2026-07-18'],
           nights: [
-              { dates: ['2026-07-17'], surpriseSongs: ['작은 것들을 위한 시 (Boy with Luv)', 'Jump'], highlights: ["Lors des salutations finales, <b>Jimin</b> a retiré son t-shirt de la tournée (le fameux t-shirt blanc Layered de l'édition Arirang) et l'a donné directement à un jeune enfant sur les épaules de son père dans la fosse, créant un moment viral mondial."] },
-              { dates: ['2026-07-18'], surpriseSongs: ['So What', 'We Are Bulletproof: The Eternal'], highlights: ["Projet monumental du public français au Stade de France, qui a illuminé les gradins aux couleurs de la France puis en violet intégral. <b>Jungkook</b> a de nouveau lâché quelques larmes lors du discours final."] }
+              { dates: ['2026-07-17'], surpriseSongs: ['작은 것들을 위한 시 (Boy with Luv)', 'Jump'], highlights: { en: ["During the closing bows, <b>Jimin</b> took off his tour t-shirt (the famous white Layered t-shirt from the Arirang edition) and handed it directly to a young child on their father's shoulders in the pit, creating a moment that went viral worldwide."], fr: ["Lors des salutations finales, <b>Jimin</b> a retiré son t-shirt de la tournée (le fameux t-shirt blanc Layered de l'édition Arirang) et l'a donné directement à un jeune enfant sur les épaules de son père dans la fosse, créant un moment viral mondial."], es: ["Durante los saludos finales, <b>Jimin</b> se quitó su camiseta de la gira (la famosa camiseta blanca Layered de la edición Arirang) y se la entregó directamente a un niño pequeño subido a los hombros de su padre en el foso, creando un momento viral a nivel mundial."], it: ["Durante i saluti finali, <b>Jimin</b> si è tolto la maglietta del tour (la famosa maglietta bianca Layered dell'edizione Arirang) e l'ha data direttamente a un bambino sulle spalle del padre nel parterre, creando un momento diventato virale in tutto il mondo."], pt: ["Durante as reverências finais, <b>Jimin</b> tirou sua camiseta da turnê (a famosa camiseta branca Layered da edição Arirang) e a entregou diretamente a uma criança nos ombros do pai na pista, criando um momento que viralizou no mundo todo."], ko: ["마지막 인사 시간에 <b>지민</b>은 투어 티셔츠(아리랑 에디션의 그 유명한 화이트 레이어드 티셔츠)를 벗어 스탠딩석에서 아버지 어깨 위에 있던 어린아이에게 직접 건네주었고, 이는 전 세계적으로 화제가 된 순간이 되었다."], ja: ["最後の挨拶の際、<b>ジミン</b>はツアーTシャツ(アリラン・エディションの有名な白いレイヤードTシャツ)を脱ぎ、スタンディングエリアで父親の肩の上にいた小さな子どもに直接手渡し、世界的に話題となる瞬間を作り出した。"], zh: ["在最后的谢幕环节，<b>Jimin</b>脱下了他的巡演T恤（Arirang版本那件著名的白色叠层T恤），直接送给了内场一位坐在父亲肩膀上的小朋友，这一幕在全球引发轰动。"] } },
+              { dates: ['2026-07-18'], surpriseSongs: ['So What', 'We Are Bulletproof: The Eternal'], highlights: { en: ["A monumental project from the French crowd at Stade de France, lighting up the stands in the colors of France and then in solid purple. <b>Jungkook</b> once again shed a few tears during the closing speech."], fr: ["Projet monumental du public français au Stade de France, qui a illuminé les gradins aux couleurs de la France puis en violet intégral. <b>Jungkook</b> a de nouveau lâché quelques larmes lors du discours final."], es: ["Un proyecto monumental del público francés en el Stade de France, que iluminó las gradas con los colores de Francia y luego en violeta total. <b>Jungkook</b> volvió a derramar algunas lágrimas durante el discurso final."], it: ["Un progetto monumentale del pubblico francese allo Stade de France, che ha illuminato le tribune con i colori della Francia e poi tutto in viola. <b>Jungkook</b> ha di nuovo versato qualche lacrima durante il discorso finale."], pt: ["Um projeto monumental do público francês no Stade de France, que iluminou as arquibancadas com as cores da França e depois em roxo total. <b>Jungkook</b> mais uma vez derramou algumas lágrimas durante o discurso final."], ko: ["스타드 드 프랑스에서 프랑스 관객들이 준비한 대규모 프로젝트: 관중석을 프랑스 국기 색으로, 이어서 보라색으로 물들였다. <b>정국</b>은 마지막 인사말에서 또다시 눈물을 보였다."], ja: ["スタッド・ド・フランスでフランスの観客が行った壮大なプロジェクト：客席をフランス国旗の色に、続いて紫一色に染め上げた。<b>ジョングク</b>は最後の挨拶で再び涙を見せた。"], zh: ["法国观众在法兰西大球场组织了一场盛大的应援：先将看台点亮成法国国旗的颜色，随后又变为一片紫色。<b>Jungkook</b>在最后致辞时再次落泪。"] } }
           ] },
         { id: 'newyork',     city: 'East Rutherford (New York)', country: 'USA', venue: 'MetLife Stadium',       lat: 40.8135,  lng: -74.0745,  showDates: ['2026-08-01', '2026-08-02'],
           nights: [
@@ -149,7 +149,7 @@ const ARIRANG_TOUR = {
         { id: 'foxborough',  city: 'Foxborough (Boston)', country: 'USA',   venue: 'Gillette Stadium',           lat: 42.0909,  lng: -71.2643,  showDates: ['2026-08-05', '2026-08-06'],
           nights: [
               { dates: ['2026-08-05'], surpriseSongs: ['낙원 (Paradise)', 'No More Dream'] },
-              { dates: ['2026-08-06'], surpriseSongs: ['Make It Right', 'N.O'], highlights: ['<b>Jin</b> a fait une blague légendaire sur les "homards de Boston" avant de mimer un homard pendant 3 minutes sur scène.'] }
+              { dates: ['2026-08-06'], surpriseSongs: ['Make It Right', 'N.O'], highlights: { en: ["<b>Jin</b> made a legendary joke about \"Boston lobsters\" before miming a lobster on stage for 3 minutes."], fr: ["<b>Jin</b> a fait une blague légendaire sur les \"homards de Boston\" avant de mimer un homard pendant 3 minutes sur scène."], es: ["<b>Jin</b> hizo una broma legendaria sobre las \"langostas de Boston\" antes de imitar a una langosta durante 3 minutos en el escenario."], it: ["<b>Jin</b> ha fatto una battuta leggendaria sulle \"aragoste di Boston\" prima di imitare un'aragosta per 3 minuti sul palco."], pt: ["<b>Jin</b> fez uma piada lendária sobre as \"lagostas de Boston\" antes de imitar uma lagosta por 3 minutos no palco."], ko: ["<b>진</b>은 \"보스턴 랍스터\"에 대한 전설적인 농담을 던진 뒤, 무대 위에서 3분 동안 랍스터 흉내를 냈다."], ja: ["<b>ジン</b>は「ボストンのロブスター」についての伝説的なジョークを言った後、ステージ上で3分間ロブスターの真似をした。"], zh: ["<b>Jin</b>讲了一个关于\"波士顿龙虾\"的经典笑话，随后在舞台上模仿龙虾长达3分钟。"] } }
           ] },
         { id: 'baltimore',   city: 'Baltimore',     country: 'USA',         venue: 'M&T Bank Stadium',           lat: 39.2780,  lng: -76.6227,  showDates: ['2026-08-10', '2026-08-11'],
           nights: [
@@ -164,12 +164,12 @@ const ARIRANG_TOUR = {
         { id: 'toronto',     city: 'Toronto',       country: 'Canada',      venue: 'Rogers Stadium',             lat: 43.6532,  lng: -79.3832,  showDates: ['2026-08-22', '2026-08-23'],
           nights: [
               { dates: ['2026-08-22'], surpriseSongs: ['Outro: Wings', '쩔어 (Dope)'] },
-              { dates: ['2026-08-23'], surpriseSongs: ["00:00 (Zero O'Clock)", 'Outro: Tear'], highlights: ["La Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) a offert une performance de Outro: Tear tellement intense que même les autres membres du groupe s'inclinaient devant eux sur les côtés de la scène."] }
+              { dates: ['2026-08-23'], surpriseSongs: ["00:00 (Zero O'Clock)", 'Outro: Tear'], highlights: { en: ["The Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) delivered such an intense performance of Outro: Tear that even the other members bowed to them from the sides of the stage."], fr: ["La Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) a offert une performance de Outro: Tear tellement intense que même les autres membres du groupe s'inclinaient devant eux sur les côtés de la scène."], es: ["La Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) ofreció una interpretación de Outro: Tear tan intensa que incluso los demás miembros se inclinaron ante ellos desde los laterales del escenario."], it: ["La Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) ha regalato un'esibizione di Outro: Tear così intensa che perfino gli altri membri si sono inchinati a loro dai lati del palco."], pt: ["A Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) entregou uma performance de Outro: Tear tão intensa que até os outros membros se curvaram para eles das laterais do palco."], ko: ["랩 라인(<b>RM</b>, <b>슈가</b>, <b>제이홉</b>)은 Outro: Tear 무대를 매우 강렬하게 선보여, 다른 멤버들조차 무대 옆에서 그들에게 고개 숙여 인사할 정도였다."], ja: ["ラップライン(<b>RM</b>、<b>シュガ</b>、<b>J-Hope</b>)は「Outro: Tear」を非常に強烈に披露し、他のメンバーたちもステージの脇から彼らにお辞儀をするほどだった。"], zh: ["Rap Line（<b>RM</b>、<b>Suga</b>、<b>J-Hope</b>）演绎的《Outro: Tear》气场极强，以至于其他成员都在舞台两侧向他们鞠躬致意。"] } }
           ] },
         { id: 'chicago',     city: 'Chicago',       country: 'USA',         venue: 'Soldier Field',              lat: 41.8623,  lng: -87.6167,  showDates: ['2026-08-27', '2026-08-28'],
           nights: [
               { dates: ['2026-08-27'], surpriseSongs: ['Tomorrow', '힙합성애자 (Hip Hop Phile)'] },
-              { dates: ['2026-08-28'], surpriseSongs: ['134340', '소우주 (Mikrokosmos)'], highlights: ['Pendant Mikrokosmos, une pluie fine a commencé à tomber sur le stade ouvert, rendant l\'atmosphère magique et très poétique.'] }
+              { dates: ['2026-08-28'], surpriseSongs: ['134340', '소우주 (Mikrokosmos)'], highlights: { en: ["During Mikrokosmos, a light rain began to fall over the open-air stadium, making the atmosphere magical and deeply poetic."], fr: ["Pendant Mikrokosmos, une pluie fine a commencé à tomber sur le stade ouvert, rendant l'atmosphère magique et très poétique."], es: ["Durante Mikrokosmos, comenzó a caer una lluvia fina sobre el estadio al aire libre, creando una atmósfera mágica y muy poética."], it: ["Durante Mikrokosmos, una pioggerellina ha iniziato a cadere sullo stadio all'aperto, rendendo l'atmosfera magica e molto poetica."], pt: ["Durante Mikrokosmos, uma chuva fina começou a cair sobre o estádio a céu aberto, tornando a atmosfera mágica e muito poética."], ko: ["Mikrokosmos가 흐르는 동안 개방형 경기장 위로 가랑비가 내리기 시작해, 마법 같고 매우 시적인 분위기를 자아냈다."], ja: ["Mikrokosmosが流れている間、屋外スタジアムに小雨が降り始め、幻想的でとても詩的な雰囲気を作り出した。"], zh: ["在演唱《Mikrokosmos》期间，露天体育场开始下起细雨，营造出如梦似幻、诗意十足的氛围。"] } }
           ] },
         { id: 'la',          city: 'Los Angeles',   country: 'USA',         venue: 'SoFi Stadium',               lat: 33.9535,  lng: -118.3392, showDates: ['2026-09-01', '2026-09-02', '2026-09-05', '2026-09-06'] },
         { id: 'bogota',      city: 'Bogota',        country: 'Colombia',    venue: 'Estadio El Campín',          lat: 4.6486,   lng: -74.0925,  showDates: ['2026-10-02', '2026-10-03'] },
@@ -335,10 +335,76 @@ let currentLang = localStorage.getItem('lang') || 'en';
 // écrire dans le localStorage réel de l'utilisateur (qui pourrait déjà avoir un compte
 // avec d'autres groupes débloqués). window.__demoMode est posé tout en haut de
 // map.html, avant même le chargement de ce fichier.
+// ==========================================
+// MONÉTISATION : "Pass Guide" générique (30/08/2026)
+// ==========================================
+// Ancien modèle : on vendait l'accès À UN GROUPE PRÉCIS ("Débloquer BTS", 14.99€/groupe),
+// avec la carte entièrement bloquée tant qu'aucun groupe n'était acheté. Remplacé par un
+// modèle qui découple délibérément la transaction financière du nom de l'artiste (moins
+// exposé juridiquement) : TOUS les lieux sont désormais toujours visibles sur la carte
+// (effet "wow, 500+ lieux !" dès l'arrivée), et on vend l'accès aux FICHES DÉTAIL du
+// guide dans son ensemble — jamais "l'accès BTS" — après 3 consultations gratuites.
+// getUnlockedGroups() reflète ça : elle ne sert plus qu'à filtrer par groupe demandé
+// par l'utilisateur (ex: le sélecteur "GROUPE" de la sidebar), plus jamais à bloquer
+// l'accès — elle renvoie donc toujours la liste complète des groupes du catalogue.
 function getUnlockedGroups() {
     if (window.__demoMode) return ['BTS'];
-    return JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    return [...new Set(celebLocations.map(l => l.group))];
 }
+
+const FREE_LOCATION_VIEW_LIMIT = 3;
+
+function getViewedLocationIds() {
+    return JSON.parse(localStorage.getItem('viewedLocationIds') || '[]');
+}
+
+// Vrai s'il existe un pass actif — Pass VIP (accès à vie) ou Pass Voyage (1 mois) non
+// expiré. Ni l'un ni l'autre ne sont liés à un groupe précis : un pass débloque la
+// totalité du guide.
+function hasGuidePass() {
+    const type = localStorage.getItem('guidePassType');
+    if (type === 'lifetime') return true;
+    if (type === 'monthly') {
+        const expiresAt = parseInt(localStorage.getItem('guidePassExpiresAt') || '0', 10);
+        return Date.now() < expiresAt;
+    }
+    return false;
+}
+window.hasGuidePass = hasGuidePass;
+
+// Achat toujours simulé pour l'instant (aucun vrai système de paiement branché, voir
+// buyGuidePass ci-dessous et le texte du popup du paywall) : enregistre le pass dans
+// Firestore + localStorage, ferme le paywall, puis rouvre automatiquement la fiche lieu
+// qui avait déclenché le mur de paiement pour ne pas casser l'élan de la personne.
+window.buyGuidePass = async function (type) {
+    localStorage.setItem('guidePassType', type);
+    const fields = { guidePassType: type };
+    if (type === 'monthly') {
+        const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        localStorage.setItem('guidePassExpiresAt', String(expiresAt));
+        fields.guidePassExpiresAt = expiresAt;
+    } else {
+        localStorage.removeItem('guidePassExpiresAt');
+        fields.guidePassExpiresAt = null;
+    }
+    if (typeof window.syncUserData === 'function') await window.syncUserData(fields);
+
+    closeModal('cart-modal');
+    const pendingId = window.__pendingPaywallLocId;
+    window.__pendingPaywallLocId = null;
+    if (pendingId != null && typeof window.openDetailsPanel === 'function') {
+        window.openDetailsPanel(pendingId);
+    }
+};
+
+window.openGuidePaywallModal = function () {
+    const modal = document.getElementById('cart-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+};
+// Alias conservé : le bouton "Unlock Passes" du header (toutes les pages) appelle encore
+// openCartModal() par son nom historique — inutile de renommer chaque bouton.
+window.openCartModal = window.openGuidePaywallModal;
 
 // Même principe pour les listes personnelles : en mode démo, la carte doit se comporter
 // comme une page modèle (aucune visite/wishlist/trip réels affichés), jamais comme la
@@ -489,7 +555,24 @@ window.addEventListener('firebase-ready', async (e) => {
             if (typeof window.loadItineraryTabOptions === 'function' && document.getElementById('tab-itinerary-btn')) window.loadItineraryTabOptions();
         }
         if (Array.isArray(cloudData.unlockedGroups)) {
+            // Champ historique de l'ancien modèle par groupe : plus lu pour la
+            // monétisation (voir hasGuidePass()), gardé en local uniquement au cas où
+            // un ancien code y ferait encore référence quelque part.
             localStorage.setItem('unlockedGroups', JSON.stringify(cloudData.unlockedGroups));
+        }
+        // Pass Guide (voir hasGuidePass()) : synchronisé entre appareils comme le reste
+        // du compte, pour qu'un pass acheté sur un appareil s'applique partout.
+        if (cloudData.guidePassType) {
+            localStorage.setItem('guidePassType', cloudData.guidePassType);
+            if (cloudData.guidePassExpiresAt) localStorage.setItem('guidePassExpiresAt', String(cloudData.guidePassExpiresAt));
+            else localStorage.removeItem('guidePassExpiresAt');
+        }
+        if (Array.isArray(cloudData.viewedLocationIds)) {
+            // Fusion (pas remplacement) : un lieu vu gratuitement sur un autre appareil
+            // reste compté, on ne veut pas offrir 3 nouvelles vues gratuites par appareil.
+            const localViewed = getViewedLocationIds();
+            const merged = [...new Set([...localViewed, ...cloudData.viewedLocationIds])];
+            localStorage.setItem('viewedLocationIds', JSON.stringify(merged));
         }
         // `interestCountry` (le pays qu'on veut visiter) a remplacé `residenceCountry`
         // (le pays où l'on habite) — repli sur l'ancien champ pour les comptes créés
@@ -1620,7 +1703,10 @@ const translations = {
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
         tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
         mapLoading: "Loading map…",
-        newLocationToastLabel: "New location added"
+        newLocationToastLabel: "New location added",
+        paywallTitle: "🔒 You've reached your free limit (3/3)", paywallBody: "Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.",
+        paywallMonthlyName: "🎟️ TRAVEL PASS (1 Month)", paywallMonthlyDesc: "Perfect for planning a short trip.", paywallFeatureFullAccess: "Full access to 500+ addresses", paywallFeatureGPS: "Exact GPS coordinates", paywallMonthlyPrice: "€9.99 / month", paywallMonthlyTerms: "No commitment", paywallBuyMonthly: "Get the Travel Pass",
+        paywallVipName: "👑 VIP PASS (Lifetime Access)", paywallVipBadge: "⭐️ BEST VALUE", paywallVipDesc: "For true fans. Pay once, enjoy forever.", paywallFeatureUpdates: "Updates included (new locations added monthly)", paywallFeatureOffline: "Offline mode (coming soon)", paywallVipPrice: "€19.99 (one-time payment)", paywallBuyVip: "Get the VIP Pass"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -1672,7 +1758,10 @@ const translations = {
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
         tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
         mapLoading: "Chargement de la carte…",
-        newLocationToastLabel: "Nouveau lieu ajouté"
+        newLocationToastLabel: "Nouveau lieu ajouté",
+        paywallTitle: "🔒 Vous avez atteint votre limite gratuite (3/3)", paywallBody: "La carte secrète vous plaît ? Il reste encore plus de 500 adresses à découvrir ! Débloquez l'intégralité des lieux de tournages, restaurants iconiques et adresses fréquentées par vos idoles pour préparer le voyage de vos rêves.",
+        paywallMonthlyName: "🎟️ PASS VOYAGE (1 Mois)", paywallMonthlyDesc: "Parfait pour planifier un séjour court.", paywallFeatureFullAccess: "Accès total aux 500+ adresses", paywallFeatureGPS: "Coordonnées GPS exactes", paywallMonthlyPrice: "9,99 € / mois", paywallMonthlyTerms: "Sans engagement", paywallBuyMonthly: "Obtenir le Pass Voyage",
+        paywallVipName: "👑 PASS VIP (Accès à vie)", paywallVipBadge: "⭐️ MEILLEUR CHOIX", paywallVipDesc: "Pour les vrais passionnés. Payez une fois, profitez-en pour toujours.", paywallFeatureUpdates: "Mises à jour incluses (nouveaux lieux ajoutés chaque mois)", paywallFeatureOffline: "Mode Hors-Ligne (bientôt disponible)", paywallVipPrice: "19,99 € (paiement unique)", paywallBuyVip: "Obtenir le Pass VIP"
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -1724,7 +1813,10 @@ const translations = {
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
         mapLoading: "Cargando el mapa…",
-        newLocationToastLabel: "Nuevo lugar añadido"
+        newLocationToastLabel: "Nuevo lugar añadido",
+        paywallTitle: "🔒 Has alcanzado tu límite gratuito (3/3)", paywallBody: "¿Te gusta el mapa secreto? ¡Todavía quedan más de 500 direcciones por descubrir! Desbloquea todos los lugares de rodaje, restaurantes icónicos y direcciones que frecuentan tus ídolos para preparar el viaje de tus sueños.",
+        paywallMonthlyName: "🎟️ PASE VIAJE (1 Mes)", paywallMonthlyDesc: "Perfecto para planificar una estancia corta.", paywallFeatureFullAccess: "Acceso total a más de 500 direcciones", paywallFeatureGPS: "Coordenadas GPS exactas", paywallMonthlyPrice: "9,99 € / mes", paywallMonthlyTerms: "Sin compromiso", paywallBuyMonthly: "Obtener el Pase Viaje",
+        paywallVipName: "👑 PASE VIP (Acceso de por vida)", paywallVipBadge: "⭐️ MEJOR OPCIÓN", paywallVipDesc: "Para los verdaderos fans. Paga una vez, disfruta para siempre.", paywallFeatureUpdates: "Actualizaciones incluidas (nuevos lugares cada mes)", paywallFeatureOffline: "Modo sin conexión (próximamente)", paywallVipPrice: "19,99 € (pago único)", paywallBuyVip: "Obtener el Pase VIP"
     },
     it: {
         btnGenerateIti: "Generatore di Itinerari", filterGroup: "GRUPPO", filterMember: "MEMBRO", filterArea: "ZONA", filterYear: "ANNO", filterCategories: "CATEGORIE",
@@ -1776,7 +1868,10 @@ const translations = {
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
         tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
         mapLoading: "Caricamento della mappa…",
-        newLocationToastLabel: "Nuovo luogo aggiunto"
+        newLocationToastLabel: "Nuovo luogo aggiunto",
+        paywallTitle: "🔒 Hai raggiunto il tuo limite gratuito (3/3)", paywallBody: "Ti piace la mappa segreta? Ci sono ancora più di 500 indirizzi da scoprire! Sblocca tutti i luoghi delle riprese, i ristoranti iconici e gli indirizzi frequentati dai tuoi idoli per preparare il viaggio dei tuoi sogni.",
+        paywallMonthlyName: "🎟️ PASS VIAGGIO (1 Mese)", paywallMonthlyDesc: "Perfetto per pianificare un soggiorno breve.", paywallFeatureFullAccess: "Accesso completo a oltre 500 indirizzi", paywallFeatureGPS: "Coordinate GPS esatte", paywallMonthlyPrice: "9,99 € / mese", paywallMonthlyTerms: "Senza vincoli", paywallBuyMonthly: "Ottieni il Pass Viaggio",
+        paywallVipName: "👑 PASS VIP (Accesso a vita)", paywallVipBadge: "⭐️ SCELTA MIGLIORE", paywallVipDesc: "Per i veri appassionati. Paga una volta, goditelo per sempre.", paywallFeatureUpdates: "Aggiornamenti inclusi (nuovi luoghi ogni mese)", paywallFeatureOffline: "Modalità offline (presto disponibile)", paywallVipPrice: "19,99 € (pagamento unico)", paywallBuyVip: "Ottieni il Pass VIP"
     },
     pt: {
         btnGenerateIti: "Gerador de Roteiros", filterGroup: "GRUPO", filterMember: "MEMBRO", filterArea: "REGIÃO", filterYear: "ANO", filterCategories: "CATEGORIAS",
@@ -1828,7 +1923,10 @@ const translations = {
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
         mapLoading: "Carregando o mapa…",
-        newLocationToastLabel: "Novo local adicionado"
+        newLocationToastLabel: "Novo local adicionado",
+        paywallTitle: "🔒 Você atingiu seu limite gratuito (3/3)", paywallBody: "Está gostando do mapa secreto? Ainda há mais de 500 endereços para descobrir! Desbloqueie todos os locais de filmagem, restaurantes icônicos e endereços frequentados pelos seus ídolos para planejar a viagem dos seus sonhos.",
+        paywallMonthlyName: "🎟️ PASSE VIAGEM (1 Mês)", paywallMonthlyDesc: "Perfeito para planejar uma estadia curta.", paywallFeatureFullAccess: "Acesso total a mais de 500 endereços", paywallFeatureGPS: "Coordenadas GPS exatas", paywallMonthlyPrice: "€9,99 / mês", paywallMonthlyTerms: "Sem compromisso", paywallBuyMonthly: "Obter o Passe Viagem",
+        paywallVipName: "👑 PASSE VIP (Acesso vitalício)", paywallVipBadge: "⭐️ MELHOR ESCOLHA", paywallVipDesc: "Para os verdadeiros fãs. Pague uma vez, aproveite para sempre.", paywallFeatureUpdates: "Atualizações incluídas (novos locais todo mês)", paywallFeatureOffline: "Modo offline (em breve)", paywallVipPrice: "€19,99 (pagamento único)", paywallBuyVip: "Obter o Passe VIP"
     },
     ko: {
         btnGenerateIti: "자동 일정 생성기", filterGroup: "그룹", filterMember: "멤버", filterArea: "지역", filterYear: "연도", filterCategories: "카테고리",
@@ -1880,7 +1978,10 @@ const translations = {
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
         tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
         mapLoading: "지도를 불러오는 중…",
-        newLocationToastLabel: "새로운 장소 추가됨"
+        newLocationToastLabel: "새로운 장소 추가됨",
+        paywallTitle: "🔒 무료 열람 한도에 도달했습니다 (3/3)", paywallBody: "비밀 지도가 마음에 드시나요? 아직 500개 이상의 주소가 더 남아있어요! 촬영지, 인기 맛집, 그리고 아이돌이 자주 찾는 장소까지 모두 잠금 해제하고 꿈꾸던 여행을 준비해 보세요.",
+        paywallMonthlyName: "🎟️ 트래블 패스 (1개월)", paywallMonthlyDesc: "짧은 여행 계획에 딱이에요.", paywallFeatureFullAccess: "500개 이상 주소 전체 이용 가능", paywallFeatureGPS: "정확한 GPS 좌표", paywallMonthlyPrice: "월 9.99€", paywallMonthlyTerms: "약정 없음", paywallBuyMonthly: "트래블 패스 구매",
+        paywallVipName: "👑 VIP 패스 (평생 이용)", paywallVipBadge: "⭐️ 최고의 선택", paywallVipDesc: "진짜 팬을 위한 패스. 한 번 결제로 평생 이용하세요.", paywallFeatureUpdates: "업데이트 포함 (매달 새로운 장소 추가)", paywallFeatureOffline: "오프라인 모드 (출시 예정)", paywallVipPrice: "19.99€ (일회성 결제)", paywallBuyVip: "VIP 패스 구매"
     },
     ja: {
         btnGenerateIti: "自動旅程ジェネレーター", filterGroup: "グループ", filterMember: "メンバー", filterArea: "エリア", filterYear: "年", filterCategories: "カテゴリー",
@@ -1932,7 +2033,10 @@ const translations = {
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
         tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
         mapLoading: "地図を読み込み中…",
-        newLocationToastLabel: "新しい場所が追加されました"
+        newLocationToastLabel: "新しい場所が追加されました",
+        paywallTitle: "🔒 無料閲覧の上限に達しました (3/3)", paywallBody: "シークレットマップは気に入りましたか？まだ500件以上の住所が残っています！ロケ地、人気レストラン、推しがよく訪れる場所をすべて解放して、夢の旅行を計画しましょう。",
+        paywallMonthlyName: "🎟️ トラベルパス（1ヶ月）", paywallMonthlyDesc: "短期旅行の計画にぴったり。", paywallFeatureFullAccess: "500件以上の住所に完全アクセス", paywallFeatureGPS: "正確なGPS座標", paywallMonthlyPrice: "月額 9.99€", paywallMonthlyTerms: "契約縛りなし", paywallBuyMonthly: "トラベルパスを購入",
+        paywallVipName: "👑 VIPパス（生涯アクセス）", paywallVipBadge: "⭐️ ベストチョイス", paywallVipDesc: "本気のファンのために。一度の支払いでずっと利用できます。", paywallFeatureUpdates: "アップデート込み（毎月新しい場所を追加）", paywallFeatureOffline: "オフラインモード（近日公開）", paywallVipPrice: "19.99€（一括払い）", paywallBuyVip: "VIPパスを購入"
     },
     zh: {
         btnGenerateIti: "自动行程生成器", filterGroup: "团体", filterMember: "成员", filterArea: "地区", filterYear: "年份", filterCategories: "分类",
@@ -1984,7 +2088,10 @@ const translations = {
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
         tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
         mapLoading: "地图加载中…",
-        newLocationToastLabel: "新增地点"
+        newLocationToastLabel: "新增地点",
+        paywallTitle: "🔒 已达到免费浏览上限 (3/3)", paywallBody: "喜欢这份秘密地图吗？还有500多个地址等你发现！解锁全部取景地、人气餐厅和爱豆常去的地方，规划你的梦想之旅。",
+        paywallMonthlyName: "🎟️ 旅行通行证（1个月）", paywallMonthlyDesc: "适合规划短途旅行。", paywallFeatureFullAccess: "解锁全部500+地址", paywallFeatureGPS: "精确GPS坐标", paywallMonthlyPrice: "€9.99 / 月", paywallMonthlyTerms: "随时可取消", paywallBuyMonthly: "获取旅行通行证",
+        paywallVipName: "👑 VIP通行证（终身访问）", paywallVipBadge: "⭐️ 最超值", paywallVipDesc: "为真正的粉丝打造。一次付款，永久使用。", paywallFeatureUpdates: "包含更新（每月新增地点）", paywallFeatureOffline: "离线模式（即将推出）", paywallVipPrice: "€19.99（一次性付款）", paywallBuyVip: "获取VIP通行证"
     }
 };
 
@@ -2077,6 +2184,7 @@ function updateUI() {
     }
 
     if (typeof window.initTourModeBadge === 'function') window.initTourModeBadge();
+    if (typeof window.refreshTourModeLanguage === 'function') window.refreshTourModeLanguage();
 }
 
 window.openItineraryModal = function() {
@@ -2853,6 +2961,25 @@ window.cancelNewTrip = function() {
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
+
+    // Mur de paiement : 3 fiches lieu différentes consultables gratuitement (comptées
+    // une seule fois par lieu, pas par clic — revoir un lieu déjà vu ne consomme rien),
+    // au-delà : paywall plutôt que la fiche. Voir hasGuidePass()/getViewedLocationIds()
+    // plus haut — jamais de blocage lié à un groupe/artiste précis.
+    if (!hasGuidePass()) {
+        const viewed = getViewedLocationIds();
+        if (!viewed.includes(id)) {
+            if (viewed.length >= FREE_LOCATION_VIEW_LIMIT) {
+                window.__pendingPaywallLocId = id;
+                window.openGuidePaywallModal();
+                return;
+            }
+            viewed.push(id);
+            localStorage.setItem('viewedLocationIds', JSON.stringify(viewed));
+            if (typeof window.syncUserData === 'function') window.syncUserData({ viewedLocationIds: viewed });
+        }
+    }
+
     currentLocationIdForMemory = loc.id;
     
     const heroBg = document.getElementById('detail-hero-bg');
@@ -3844,51 +3971,10 @@ window.exportItineraryPDF = function() {
 // ==========================================
 // 9. MODAL PANIER DEPUIS LA CARTE
 // ==========================================
-window.openCartModal = function() {
-    const modal = document.getElementById('cart-modal');
-    if(!modal) return;
-    modal.classList.remove('hidden');
-    const unlockedGroups = getUnlockedGroups();
-    document.querySelectorAll('.cart-checkbox').forEach(cb => {
-        cb.checked = false; 
-        const span = cb.nextElementSibling;
-        if(unlockedGroups.includes(cb.value)) { cb.disabled = true; span.style.background = "#f1f5f9"; span.style.color = "#94a3b8"; span.textContent = `${cb.value} (Purchased)`; }
-        else { cb.disabled = false; span.style.background = "white"; span.style.color = "#64748b"; span.textContent = cb.value; }
-    });
-    updateCartPrice();
-}
-
-function updateCartPrice() {
-    const selected = document.querySelectorAll('.cart-checkbox:not(:disabled):checked').length;
-    const priceDisplay = document.getElementById('cart-price');
-    if(priceDisplay) priceDisplay.textContent = `${(selected * 14.99).toFixed(2)} €`;
-    const btn = document.getElementById('cart-pay-btn');
-    if(btn) {
-        if (selected > 0) { btn.disabled = false; btn.textContent = `Pay ${(selected * 14.99).toFixed(2)} €`; } 
-        else { btn.disabled = true; btn.textContent = `Select a group`; }
-    }
-}
-
-document.querySelectorAll('.cart-checkbox').forEach(cb => {
-    cb.addEventListener('change', function() {
-        this.nextElementSibling.style.borderColor = this.checked ? "#D42759" : "#cbd5e1";
-        this.nextElementSibling.style.color = this.checked ? "#D42759" : "#64748b";
-        this.nextElementSibling.style.background = this.checked ? "#FCE7F0" : "white";
-        updateCartPrice();
-    });
-});
-
-const cartForm = document.getElementById('cart-form');
-if(cartForm) {
-    cartForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        let existingGroups = getUnlockedGroups();
-        document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
-        localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
-        if (typeof window.syncUserData === 'function') window.syncUserData({ unlockedGroups: existingGroups });
-        setTimeout(() => window.location.reload(), 1000);
-    });
-}
+// window.openCartModal / openGuidePaywallModal / buyGuidePass sont définies plus haut,
+// à côté de getUnlockedGroups() / hasGuidePass() (voir le paywall "Pass Guide" du
+// 30/08/2026) — l'ancienne logique par groupe (checkboxes, prix par groupe) a été
+// entièrement retirée d'ici.
 
 // ==========================================
 // 10. GESTION DES MODALES "LIST" (Depuis KPI)

@@ -137,7 +137,7 @@ select.field-input { appearance: none; background-image: url("data:image/svg+xml
 
 .pass-card { position: relative; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px; text-align: center; font-size: 12.5px; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s ease;}
 .pass-card input { position: absolute; opacity: 0; cursor: pointer; }
-.pass-card:has(input:checked) { background: #FCE7F0; border-color: #D42759; color: #D42759; }
+.pass-card:has(input:checked), .pass-card.selected { background: #FCE7F0; border-color: #D42759; color: #D42759; }
 
 .total-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0;}
 .total-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }

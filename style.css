@@ -240,6 +240,29 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .modal-content { background: white; width: 90%; max-width: 600px; max-height: 90vh; border-radius: 16px; padding: 30px; overflow-y: auto; position: relative; }
 .close-btn { position: absolute; top: 15px; right: 25px; font-size: 2rem; color: var(--primary-magenta); cursor: pointer; }
 
+/* Paywall "Pass Guide" — voir #cart-modal dans map.html et openDetailsPanel()/
+   buyGuidePass() dans script.js. Deux pass génériques (jamais liés à un artiste). */
+.paywall-modal-content { max-width: 620px; text-align: center; }
+.paywall-title { font-size: 1.3rem; color: var(--text-main); margin-bottom: 8px; }
+.paywall-body { color: #64748b; font-size: 13.5px; line-height: 1.6; margin: 0 auto 24px; max-width: 480px; }
+.paywall-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; text-align: left; }
+.paywall-card { border: 1.5px solid var(--border-color); border-radius: 16px; padding: 22px 18px; display: flex; flex-direction: column; position: relative; background: #fff; }
+.paywall-card-vip { border-color: var(--primary-magenta); background: linear-gradient(160deg, #FCE7F0, #ffffff); box-shadow: 0 12px 30px rgba(212,39,89,0.15); }
+.paywall-vip-badge { position: absolute; top: -12px; right: 16px; background: var(--primary-magenta); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .04em; padding: 5px 12px; border-radius: 100px; }
+.paywall-card-name { font-size: 15px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+.paywall-card-desc { font-size: 12px; color: #64748b; margin-bottom: 14px; line-height: 1.4; min-height: 34px; }
+.paywall-features { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.paywall-features li { font-size: 12px; color: var(--text-main); line-height: 1.4; }
+.paywall-price { font-size: 1.15rem; font-weight: 800; color: var(--primary-magenta); margin-bottom: 2px; }
+.paywall-terms { font-size: 11px; color: #94a3b8; margin-bottom: 14px; }
+.paywall-card-vip .paywall-price { margin-bottom: 14px; }
+.paywall-buy-btn { border: none; border-radius: 100px; padding: 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; text-align: center; background: var(--sidebar-bg); color: var(--text-main); transition: transform 0.15s ease; margin-top: auto; }
+.paywall-buy-btn:hover { transform: translateY(-2px); }
+.paywall-buy-btn-vip { background: var(--primary-magenta); color: #fff; box-shadow: 0 8px 18px rgba(212,39,89,.3); }
+@media (max-width: 640px) {
+    .paywall-cards { grid-template-columns: 1fr; }
+}
+
 .cookie-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; width: 90%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; color: var(--text-main); }
 .cookie-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
 .cookie-content p { font-size: 13px; margin: 0; }

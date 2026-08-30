@@ -242,25 +242,40 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 </div>
 
 <!-- Modal Panier (Cart) — identique à celui de map.html -->
+<!-- Paywall "Pass Guide" (30/08/2026) : plus jamais "débloquer un groupe/artiste" — les
+     deux pass ci-dessous débloquent le GUIDE dans son ensemble. -->
 <div id="cart-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content paywall-modal-content">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 style="color: #1e293b; margin-bottom: 5px;">Unlock New Passes</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select the groups you want to unlock. (14.99€ per group)</p>
+        <h2 class="paywall-title" data-i18n="paywallTitle">🔒 You've reached your free limit (3/3)</h2>
+        <p class="paywall-body" data-i18n="paywallBody">Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.</p>
 
-        <form id="cart-form">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
+        <div class="paywall-cards">
+            <div class="paywall-card">
+                <div class="paywall-card-name" data-i18n="paywallMonthlyName">🎟️ TRAVEL PASS (1 Month)</div>
+                <div class="paywall-card-desc" data-i18n="paywallMonthlyDesc">Perfect for planning a short trip.</div>
+                <ul class="paywall-features">
+                    <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureGPS">Exact GPS coordinates</span></li>
+                </ul>
+                <div class="paywall-price" data-i18n="paywallMonthlyPrice">€9.99 / month</div>
+                <div class="paywall-terms" data-i18n="paywallMonthlyTerms">No commitment</div>
+                <button type="button" class="paywall-buy-btn" onclick="buyGuidePass('monthly')" data-i18n="paywallBuyMonthly">Get the Travel Pass</button>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
-                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
-                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
+            <div class="paywall-card paywall-card-vip">
+                <div class="paywall-vip-badge" data-i18n="paywallVipBadge">⭐️ BEST VALUE</div>
+                <div class="paywall-card-name" data-i18n="paywallVipName">👑 VIP PASS (Lifetime Access)</div>
+                <div class="paywall-card-desc" data-i18n="paywallVipDesc">For true fans. Pay once, enjoy forever.</div>
+                <ul class="paywall-features">
+                    <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureGPS">Exact GPS coordinates</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureUpdates">Updates included (new locations added monthly)</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureOffline">Offline mode (coming soon)</span></li>
+                </ul>
+                <div class="paywall-price" data-i18n="paywallVipPrice">€19.99 (one-time payment)</div>
+                <button type="button" class="paywall-buy-btn paywall-buy-btn-vip" onclick="buyGuidePass('lifetime')" data-i18n="paywallBuyVip">Get the VIP Pass</button>
             </div>
-            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;">Select a group</button>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -327,15 +342,19 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         if (typeof window.syncUserData === 'function') window.syncUserData({ photo: null });
     };
 
-    const unlocked = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-    if(unlocked.length > 0) {
-        document.getElementById('unlocked-passes').innerHTML = '';
-        document.getElementById('receipts').innerHTML = '';
-        unlocked.forEach(g => {
-            const color = g === 'BTS' ? '#8B5CF6' : '#D42759';
-            document.getElementById('unlocked-passes').innerHTML += `<span class="pill" style="background:${color}18;color:${color};">${g}</span>`;
-            document.getElementById('receipts').innerHTML += `<div class="receipt-row"><span style="font-weight:600;color:#212832;">${g} pass</span><span style="color:#94a3b8;">14.99€</span></div>`;
-        });
+    // Pass Guide (30/08/2026) : un seul pass possible à la fois, jamais lié à un
+    // artiste — voir hasGuidePass()/buyGuidePass() dans script.js.
+    const passType = localStorage.getItem('guidePassType');
+    const passExpiresAt = parseInt(localStorage.getItem('guidePassExpiresAt') || '0', 10);
+    const passActive = passType === 'lifetime' || (passType === 'monthly' && Date.now() < passExpiresAt);
+    if (passActive) {
+        const isFr = currentLang === 'fr';
+        const label = passType === 'lifetime'
+            ? (isFr ? 'Pass VIP (accès à vie)' : 'VIP Pass (lifetime)')
+            : (isFr ? `Pass Voyage · actif jusqu'au ${new Date(passExpiresAt).toLocaleDateString('fr-FR')}` : `Travel Pass · active until ${new Date(passExpiresAt).toLocaleDateString('en-US')}`);
+        const price = passType === 'lifetime' ? '19.99€' : '9.99€';
+        document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#D4275918;color:#D42759;">${label}</span>`;
+        document.getElementById('receipts').innerHTML = `<div class="receipt-row"><span style="font-weight:600;color:#212832;">${label}</span><span style="color:#94a3b8;">${price}</span></div>`;
     } else {
         document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#f1f5f9;color:#64748b;">${t('accNoPasses')}</span>`;
     }
@@ -414,9 +433,17 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     const _accOriginalChangeLang = window.changeLang;
     window.changeLang = function(lang) {
         _accOriginalChangeLang(lang);
-        const unlocked2 = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        if(unlocked2.length === 0) {
+        const passType2 = localStorage.getItem('guidePassType');
+        const passExpiresAt2 = parseInt(localStorage.getItem('guidePassExpiresAt') || '0', 10);
+        const passActive2 = passType2 === 'lifetime' || (passType2 === 'monthly' && Date.now() < passExpiresAt2);
+        if(!passActive2) {
             document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#f1f5f9;color:#64748b;">${t('accNoPasses')}</span>`;
+        } else {
+            const isFr2 = currentLang === 'fr';
+            const label2 = passType2 === 'lifetime'
+                ? (isFr2 ? 'Pass VIP (accès à vie)' : 'VIP Pass (lifetime)')
+                : (isFr2 ? `Pass Voyage · actif jusqu'au ${new Date(passExpiresAt2).toLocaleDateString('fr-FR')}` : `Travel Pass · active until ${new Date(passExpiresAt2).toLocaleDateString('en-US')}`);
+            document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#D4275918;color:#D42759;">${label2}</span>`;
         }
         if(!isEditing) actionBtn2Refresh();
     };

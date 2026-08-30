@@ -199,25 +199,31 @@
             </div>
 
             <div id="auth-step-3" class="auth-step hidden">
-                <h2 data-i18n="step3Title">Choose Your Passes</h2>
-                <p data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-                    <label class="pass-card"><input type="checkbox" name="groups" value="BTS" class="group-checkbox"><span class="card-content">BTS</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Blackpink" class="group-checkbox"><span class="card-content">Blackpink</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Twice" class="group-checkbox"><span class="card-content">Twice</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Seventeen" class="group-checkbox"><span class="card-content">Seventeen</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="Katseye" class="group-checkbox"><span class="card-content">Katseye</span></label>
-                    <label class="pass-card"><input type="checkbox" name="groups" value="TXT" class="group-checkbox"><span class="card-content">TXT</span></label>
+                <h2 data-i18n="step3TitleGuide">Unlock the full guide?</h2>
+                <p data-i18n="step3DescGuide">Optional — you can also explore the map for free first (3 locations) and decide later.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+                    <label class="pass-card" data-plan="monthly" onclick="window.selectSignupPlan('monthly')">
+                        <span class="card-content" style="display:block; text-align:left; padding:4px 2px;">
+                            <b data-i18n="paywallMonthlyName" style="display:block; font-size:13px;">🎟️ TRAVEL PASS (1 Month)</b>
+                            <span data-i18n="paywallMonthlyPrice" style="display:block; color:var(--primary-magenta); font-weight:700; margin-top:4px;">€9.99 / month</span>
+                        </span>
+                    </label>
+                    <label class="pass-card" data-plan="lifetime" onclick="window.selectSignupPlan('lifetime')">
+                        <span class="card-content" style="display:block; text-align:left; padding:4px 2px;">
+                            <b data-i18n="paywallVipName" style="display:block; font-size:13px;">👑 VIP PASS (Lifetime Access)</b>
+                            <span data-i18n="paywallVipPrice" style="display:block; color:var(--primary-magenta); font-weight:700; margin-top:4px;">€19.99 (one-time payment)</span>
+                        </span>
+                    </label>
                 </div>
-                <div class="total-row"><span class="total-label" data-i18n="subtotalLabel">Subtotal:</span><span class="total-price" id="subtotal-display">0.00 €</span></div>
-                <button class="pay-btn" id="btn-to-step4" disabled data-i18n="payBtnEmpty">Select a group</button>
+                <button class="pay-btn" id="btn-to-step4" disabled data-i18n="payBtnEmpty">Select a pass</button>
+                <a href="#" id="btn-skip-passes" style="display:block; text-align:center; margin-top:14px; font-size:12.5px; color:#64748b; font-weight:600;" data-i18n="skipPassesLink">Continue without a pass — explore for free →</a>
             </div>
 
             <div id="auth-step-4" class="auth-step hidden">
                 <h2 data-i18n="step4Title">Payment</h2>
                 <p data-i18n="step4Desc">Complete your purchase to unlock the guides.</p>
                 <div style="background:#f8fafc; border-radius:10px; padding:12px; font-size:12.5px; color:#334155; margin-bottom:15px; border:1px solid #e2e8f0;">
-                    <b data-i18n="summaryPasses">Selected Passes:</b> <span id="summary-passes" style="color:#64748b;">None</span><br>
+                    <b data-i18n="summaryPasses">Selected Pass:</b> <span id="summary-passes" style="color:#64748b;">None</span><br>
                     <b data-i18n="summaryTotal" style="display:inline-block; margin-top:5px;">Total Due:</b> <span id="summary-price" style="color:var(--primary-magenta); font-weight:bold; font-size:14px;">0.00 €</span>
                 </div>
                 <form id="checkout-form">

@@ -679,25 +679,42 @@
 </div>
 
 <!-- Modal Panier -->
+<!-- Paywall "Pass Guide" (30/08/2026) : plus jamais "débloquer un groupe/artiste" — les
+     deux pass ci-dessous débloquent le GUIDE dans son ensemble. Déclenché soit
+     manuellement (bouton "Unlock Passes" du header), soit automatiquement après la 3e
+     fiche lieu consultée gratuitement (voir openDetailsPanel() dans script.js). -->
 <div id="cart-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content paywall-modal-content">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 style="color: #1e293b; margin-bottom: 5px;" data-i18n="cartTitle">Unlock New Passes</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;" data-i18n="passDesc">Select the groups you want to unlock. (14.99€ per group)</p>
-        
-        <form id="cart-form">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
+        <h2 class="paywall-title" data-i18n="paywallTitle">🔒 You've reached your free limit (3/3)</h2>
+        <p class="paywall-body" data-i18n="paywallBody">Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.</p>
+
+        <div class="paywall-cards">
+            <div class="paywall-card">
+                <div class="paywall-card-name" data-i18n="paywallMonthlyName">🎟️ TRAVEL PASS (1 Month)</div>
+                <div class="paywall-card-desc" data-i18n="paywallMonthlyDesc">Perfect for planning a short trip.</div>
+                <ul class="paywall-features">
+                    <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureGPS">Exact GPS coordinates</span></li>
+                </ul>
+                <div class="paywall-price" data-i18n="paywallMonthlyPrice">€9.99 / month</div>
+                <div class="paywall-terms" data-i18n="paywallMonthlyTerms">No commitment</div>
+                <button type="button" class="paywall-buy-btn" onclick="buyGuidePass('monthly')" data-i18n="paywallBuyMonthly">Get the Travel Pass</button>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
-                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
-                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
+            <div class="paywall-card paywall-card-vip">
+                <div class="paywall-vip-badge" data-i18n="paywallVipBadge">⭐️ BEST VALUE</div>
+                <div class="paywall-card-name" data-i18n="paywallVipName">👑 VIP PASS (Lifetime Access)</div>
+                <div class="paywall-card-desc" data-i18n="paywallVipDesc">For true fans. Pay once, enjoy forever.</div>
+                <ul class="paywall-features">
+                    <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureGPS">Exact GPS coordinates</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureUpdates">Updates included (new locations added monthly)</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureOffline">Offline mode (coming soon)</span></li>
+                </ul>
+                <div class="paywall-price" data-i18n="paywallVipPrice">€19.99 (one-time payment)</div>
+                <button type="button" class="paywall-buy-btn paywall-buy-btn-vip" onclick="buyGuidePass('lifetime')" data-i18n="paywallBuyVip">Get the VIP Pass</button>
             </div>
-            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;" data-i18n="payBtnEmpty">Select a group</button>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -734,14 +751,6 @@
         </div>
 
         <p class="terms"><span data-i18n="gateSignupPrompt">Don't have an account?</span> <a href="index.html" data-i18n="gateSignupLink">Sign up</a></p>
-    </div>
-
-    <!-- Cas 2 : connecté, mais aucun groupe débloqué -->
-    <div class="gate-modal hidden" id="gate-no-groups">
-        <h2 data-i18n="gateNoGroupsTitle">Unlock a group to see the map</h2>
-        <p data-i18n="gateNoGroupsDesc">You haven't unlocked any group yet. Click below to choose a pass and start exploring.</p>
-        <button class="pay-btn" onclick="openCartModal()" data-i18n="gateUnlockBtn">Unlock a group</button>
-        <a href="#" id="gate-logout-link" style="display:block; margin-top:16px; font-size:12px; color:#94a3b8; font-weight:600;" data-i18n="gateLogoutLink">Log out</a>
     </div>
 
 </div>
@@ -799,33 +808,20 @@
         const user = e.detail && e.detail.user;
 
         if (!user) {
-            document.getElementById('gate-no-groups').classList.add('hidden');
             document.getElementById('gate-not-logged-in').classList.remove('hidden');
             document.body.classList.add('auth-gate-active');
             return;
         }
 
-        // Connecté : on vérifie les groupes débloqués directement depuis Firestore
-        // (source de vérité), pas depuis le localStorage qui peut être obsolète.
-        const cloudData = await window.loadUserCloudData();
-        let unlocked = [];
-        if (cloudData && Array.isArray(cloudData.unlockedGroups)) {
-            unlocked = cloudData.unlockedGroups;
-            localStorage.setItem('unlockedGroups', JSON.stringify(unlocked));
-        } else {
-            unlocked = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
-        }
-
-        if (unlocked.length === 0) {
-            document.getElementById('gate-not-logged-in').classList.add('hidden');
-            document.getElementById('gate-no-groups').classList.remove('hidden');
-            document.body.classList.add('auth-gate-active');
-        } else {
-            document.body.classList.remove('auth-gate-active');
-            if (typeof initializeFilters === 'function') initializeFilters();
-            if (typeof renderLocations === 'function') renderLocations();
-            if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
-        }
+        // Connecté : la carte s'affiche entièrement, avec tous les lieux — voir la
+        // note du 30/08/2026 dans script.js (getUnlockedGroups()/hasGuidePass()).
+        // Il n'existe plus de blocage "aucun groupe débloqué" : le mur de paiement est
+        // désormais géré à l'intérieur de la carte (openDetailsPanel()), au clic sur la
+        // 4e fiche lieu, jamais en bloquant l'accès à la carte elle-même.
+        document.body.classList.remove('auth-gate-active');
+        if (typeof initializeFilters === 'function') initializeFilters();
+        if (typeof renderLocations === 'function') renderLocations();
+        if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
     });
 
     const gateLoginBtn = document.getElementById('gate-login-btn');
