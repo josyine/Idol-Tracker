@@ -333,25 +333,40 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
 </div>
 
 <!-- Modal Panier (Cart) — identique à celui de map.html -->
+<!-- Paywall "Pass Guide" (30/08/2026) : plus jamais "débloquer un groupe/artiste" — les
+     deux pass ci-dessous débloquent le GUIDE dans son ensemble. -->
 <div id="cart-modal" class="modal hidden">
-    <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-content paywall-modal-content">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 style="color: #1e293b; margin-bottom: 5px;">Unlock New Passes</h2>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 20px;">Select the groups you want to unlock. (14.99€ per group)</p>
+        <h2 class="paywall-title" data-i18n="paywallTitle">🔒 You've reached your free limit (3/3)</h2>
+        <p class="paywall-body" data-i18n="paywallBody">Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.</p>
 
-        <form id="cart-form">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="BTS" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">BTS</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Blackpink" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Blackpink</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Twice" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Twice</span></label>
-                <label style="position:relative; cursor:pointer;"><input type="checkbox" value="Seventeen" class="cart-checkbox" style="position:absolute; opacity:0;"><span class="cat-card" style="display:block; text-align:center;">Seventeen</span></label>
+        <div class="paywall-cards">
+            <div class="paywall-card">
+                <div class="paywall-card-name" data-i18n="paywallMonthlyName">🎟️ TRAVEL PASS (1 Month)</div>
+                <div class="paywall-card-desc" data-i18n="paywallMonthlyDesc">Perfect for planning a short trip.</div>
+                <ul class="paywall-features">
+                    <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureGPS">Exact GPS coordinates</span></li>
+                </ul>
+                <div class="paywall-price" data-i18n="paywallMonthlyPrice">€9.99 / month</div>
+                <div class="paywall-terms" data-i18n="paywallMonthlyTerms">No commitment</div>
+                <button type="button" class="paywall-buy-btn" onclick="buyGuidePass('monthly')" data-i18n="paywallBuyMonthly">Get the Travel Pass</button>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #cbd5e1; padding-top:15px; margin-bottom:15px;">
-                <span style="font-weight:bold; font-size:12px; color:#64748b;">TOTAL:</span>
-                <strong id="cart-price" style="font-size:1.2rem; color:var(--primary-magenta);">0.00 €</strong>
+            <div class="paywall-card paywall-card-vip">
+                <div class="paywall-vip-badge" data-i18n="paywallVipBadge">⭐️ BEST VALUE</div>
+                <div class="paywall-card-name" data-i18n="paywallVipName">👑 VIP PASS (Lifetime Access)</div>
+                <div class="paywall-card-desc" data-i18n="paywallVipDesc">For true fans. Pay once, enjoy forever.</div>
+                <ul class="paywall-features">
+                    <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureGPS">Exact GPS coordinates</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureUpdates">Updates included (new locations added monthly)</span></li>
+                    <li>✔️ <span data-i18n="paywallFeatureOffline">Offline mode (coming soon)</span></li>
+                </ul>
+                <div class="paywall-price" data-i18n="paywallVipPrice">€19.99 (one-time payment)</div>
+                <button type="button" class="paywall-buy-btn paywall-buy-btn-vip" onclick="buyGuidePass('lifetime')" data-i18n="paywallBuyVip">Get the VIP Pass</button>
             </div>
-            <button type="submit" id="cart-pay-btn" class="gen-btn" disabled style="padding:14px; width:100%; justify-content:center;">Select a group</button>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -689,7 +704,9 @@ select{border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:13
                     email: localStorage.getItem('userEmail') || null,
                     country: localStorage.getItem('userCountry') || null,
                     lang: localStorage.getItem('lang') || null,
-                    unlockedGroups: JSON.parse(localStorage.getItem('unlockedGroups') || '[]'),
+                    guidePassType: localStorage.getItem('guidePassType') || null,
+                    guidePassExpiresAt: localStorage.getItem('guidePassExpiresAt') ? Number(localStorage.getItem('guidePassExpiresAt')) : null,
+                    viewedLocationIds: JSON.parse(localStorage.getItem('viewedLocationIds') || '[]'),
                     wishlistLocs: JSON.parse(localStorage.getItem('wishlistLocs') || '[]'),
                     visitedLocs: JSON.parse(localStorage.getItem('visitedLocs') || '[]'),
                     myTrips: JSON.parse(localStorage.getItem('myTrips') || '[]'),

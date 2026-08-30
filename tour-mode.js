@@ -353,8 +353,14 @@
         }
         const blocks = stop.nights.map(night => {
             let inner = '';
-            if (night.highlights && night.highlights.length) {
-                inner += `<ul class="tour-mode-tip-hl">${night.highlights.map(h => `<li class="tour-mode-tip-hl-item">${h}</li>`).join('')}</ul>`;
+            // `night.highlights` est un objet {en, fr, es, ...} — le texte narratif est
+            // traduit dans les 8 langues du site (voir ARIRANG_TOUR) et suit la langue
+            // actuellement choisie dans la carte ; seuls les titres de chansons
+            // (surpriseSongs, jamais traduits) et les noms propres à l'intérieur des
+            // <b> restent identiques quelle que soit la langue.
+            const hlText = night.highlights && getLocText(night.highlights);
+            if (hlText && hlText.length) {
+                inner += `<ul class="tour-mode-tip-hl">${hlText.map(h => `<li class="tour-mode-tip-hl-item">${h}</li>`).join('')}</ul>`;
             }
             if (night.surpriseSongs && night.surpriseSongs.length) {
                 inner += `<div class="tour-mode-tip-ss"><span class="tour-mode-tip-ss-label">${t('tourModeSurpriseSong')}</span>${night.surpriseSongs.join(' · ')}</div>`;
@@ -434,6 +440,14 @@
             map.setView([stop.lat, stop.lng], Math.max(map.getZoom(), TOUR_MODE_TIP_ZOOM), { animate: true });
             positionTip(idx);
             map.once('moveend', () => { if (tourModeTipIndex === idx) positionTip(idx); });
+        } else if (tip) {
+            // La carte peut ne pas encore exister (clic sur une étape du rail juste après
+            // l'ouverture du panneau, avant la fin des 320ms d'attente de ensureMap()) —
+            // plutôt que de laisser la bulle sans position (invisible ou coincée en
+            // 0,0), on la centre temporairement à l'écran ; positionTip() reprendra la
+            // main normalement dès le prochain clic une fois la carte prête.
+            tip.style.left = Math.max(8, (window.innerWidth - (tip.offsetWidth || 270)) / 2) + 'px';
+            tip.style.top = Math.max(8, (window.innerHeight - (tip.offsetHeight || 260)) / 2) + 'px';
         }
     };
     window.closeTourModeTip = function () {
@@ -476,4 +490,15 @@
         attachSwipeNavigation(document.getElementById('tour-mode-rail-list'));
         attachSwipeNavigation(document.querySelector('.tour-mode-stop-info'));
     });
+
+    // Appelée par updateUI() (script.js) à chaque changement de langue : sans ça, si le
+    // panneau Mode Tournée (ou sa bulle) est déjà ouvert au moment du changement, son
+    // contenu déjà affiché restait dans l'ancienne langue jusqu'à la prochaine
+    // navigation. Sans effet si le panneau est fermé (juste un re-rendu de DOM caché).
+    window.refreshTourModeLanguage = function () {
+        renderTourSelect();
+        renderRailList();
+        renderStopInfo(currentStopIndex);
+        if (tourModeTipIndex !== null) renderTipContent(tourModeTipIndex);
+    };
 })();
