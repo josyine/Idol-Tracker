@@ -190,13 +190,12 @@ const SPEAK_YOURSELF_TOUR_2019 = {
     ].map(s => Object.assign(s, { dateStart: s.showDates[0], dateEnd: s.showDates[s.showDates.length - 1] }))
 };
 
-// Liste transmise incomplète (le message s'est arrêté au 16 avril 2022) — à compléter
-// dès que tu me donnes la suite du calendrier (le reste 2022 et l'éventuelle suite).
 const PTD_TOUR_2021 = {
     id: 'ptd2021',
     tourName: "Permission to Dance on Stage",
     group: "BTS",
     stops: [
+        { id: 'ptd21-virtual', city: 'Seoul', country: 'South Korea', venue: 'Seoul Olympic Stadium (Concert virtuel / Weverse)', lat: 37.5153, lng: 127.0730, showDates: ['2021-10-24'] },
         { id: 'ptd21-la',    city: 'Los Angeles',  country: 'USA',         venue: 'SoFi Stadium',          lat: 33.9535, lng: -118.3392, showDates: ['2021-11-27', '2021-11-28', '2021-12-01', '2021-12-02'] },
         { id: 'ptd22-seoul', city: 'Seoul',        country: 'South Korea', venue: 'Seoul Olympic Stadium', lat: 37.5153, lng: 127.0730,  showDates: ['2022-03-10', '2022-03-12', '2022-03-13'] },
         { id: 'ptd22-vegas', city: 'Las Vegas',    country: 'USA',         venue: 'Allegiant Stadium',     lat: 36.0908, lng: -115.1833, showDates: ['2022-04-08', '2022-04-09', '2022-04-15', '2022-04-16'] }
