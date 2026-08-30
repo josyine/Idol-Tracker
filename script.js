@@ -29,6 +29,7 @@ let tripPageMap = null;
 let tripPageLayer = null;
 let tripMainLayerGroup = null;
 let dayMiniMaps = []; // instances Leaflet des mini-cartes par jour (une par .day-card), à détruire avant chaque re-render puisque box.innerHTML='' supprime leur conteneur DOM sans les libérer
+let itiSelectedCategories = []; // catégories cochées dans le multi-select de l'Auto-Itinerary Generator ; tableau vide = toutes les catégories
 
 // ==========================================
 // 0bis. SYNCHRONISATION CLOUD DE LA WISHLIST (Firestore)
@@ -704,7 +705,7 @@ const translations = {
         allGroups: "All Groups", allMembers: "All Members", allAreas: "All Areas", allYears: "All Years", allCategories: "All Categories",
         checkVisited: "I visited this place", checkWishlist: "Add to Wishlist", tripWhich: "Which trip is this for?",
         tripName: "Trip name", tripWhen: "When are you planning to go?", tripFrom: "From", tripTo: "To", tripCreate: "Create trip", tripCancel: "Cancel",
-        itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips",
+        itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiCatLabel: "Categories (optional, select multiple)", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips",
         noTripsFound: "No trips found.", selectTripToView: "Select a trip to view", locationsWord: "location", locationsWordPlural: "locations",
         addAnotherVisit: "Add another visit",
         tabExplore: "Explore", tabMyItinerary: "My Itinerary", yourRating: "Your rating", whenDidYouVisit: "When did you visit?", saveMemory: "Save memory", myVisitTab: "My Visit",
@@ -748,7 +749,7 @@ const translations = {
         allGroups: "Tous les groupes", allMembers: "Tous les membres", allAreas: "Toutes les régions", allYears: "Toutes les années", allCategories: "Toutes les catégories",
         checkVisited: "J'ai visité ce lieu", checkWishlist: "Ajouter à ma Wishlist", tripWhich: "Pour quel voyage ?",
         tripName: "Nom du voyage", tripWhen: "Quand prévoyez-vous d'y aller ?", tripFrom: "De", tripTo: "À", tripCreate: "Créer", tripCancel: "Annuler",
-        itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips",
+        itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiCatLabel: "Catégories (facultatif, sélection multiple)", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips",
         noTripsFound: "Aucun voyage trouvé.", selectTripToView: "Sélectionner un voyage", locationsWord: "lieu", locationsWordPlural: "lieux",
         addAnotherVisit: "Ajouter une autre visite",
         tabExplore: "Explorer", tabMyItinerary: "Mon Itinéraire", yourRating: "Votre note", whenDidYouVisit: "Quand avez-vous visité ce lieu ?", saveMemory: "Enregistrer le souvenir", myVisitTab: "Ma Visite",
@@ -792,7 +793,7 @@ const translations = {
         allGroups: "Todos los grupos", allMembers: "Todos los miembros", allAreas: "Todas las zonas", allYears: "Todos los años", allCategories: "Todas las categorías",
         checkVisited: "He visitado este lugar", checkWishlist: "Añadir a mi lista", tripWhich: "¿Para qué viaje es esto?",
         tripName: "Nombre del viaje", tripWhen: "¿Cuándo planeas ir?", tripFrom: "Desde", tripTo: "Hasta", tripCreate: "Crear viaje", tripCancel: "Cancelar",
-        itiTitle: "Generador de Itinerarios", itiDesc: "Selecciona un grupo, un país y cuántos días te quedas.", itiCreateBtn: "Crear mi guía", itiExport: "Exportar guía en PDF", itiSave: "Guardar en Mis Viajes",
+        itiTitle: "Generador de Itinerarios", itiDesc: "Selecciona un grupo, un país y cuántos días te quedas.", itiCreateBtn: "Crear mi guía", itiCatLabel: "Categorías (opcional, selección múltiple)", itiExport: "Exportar guía en PDF", itiSave: "Guardar en Mis Viajes",
         noTripsFound: "No se encontraron viajes.", selectTripToView: "Selecciona un viaje para ver", locationsWord: "lugar", locationsWordPlural: "lugares",
         addAnotherVisit: "Añadir otra visita",
         tabExplore: "Explorar", tabMyItinerary: "Mi Itinerario", yourRating: "Tu valoración", whenDidYouVisit: "¿Cuándo visitaste este lugar?", saveMemory: "Guardar recuerdo", myVisitTab: "Mi Visita",
@@ -836,7 +837,7 @@ const translations = {
         allGroups: "Tutti i gruppi", allMembers: "Tutti i membri", allAreas: "Tutte le zone", allYears: "Tutti gli anni", allCategories: "Tutte le categorie",
         checkVisited: "Ho visitato questo posto", checkWishlist: "Aggiungi alla wishlist", tripWhich: "Per quale viaggio è questo?",
         tripName: "Nome del viaggio", tripWhen: "Quando pensi di andarci?", tripFrom: "Da", tripTo: "A", tripCreate: "Crea viaggio", tripCancel: "Annulla",
-        itiTitle: "Generatore di Itinerari", itiDesc: "Seleziona un gruppo, un paese e quanti giorni resti.", itiCreateBtn: "Crea la mia guida", itiExport: "Esporta guida in PDF", itiSave: "Salva nei Miei Viaggi",
+        itiTitle: "Generatore di Itinerari", itiDesc: "Seleziona un gruppo, un paese e quanti giorni resti.", itiCreateBtn: "Crea la mia guida", itiCatLabel: "Categorie (opzionale, selezione multipla)", itiExport: "Esporta guida in PDF", itiSave: "Salva nei Miei Viaggi",
         noTripsFound: "Nessun viaggio trovato.", selectTripToView: "Seleziona un viaggio da vedere", locationsWord: "luogo", locationsWordPlural: "luoghi",
         addAnotherVisit: "Aggiungi un'altra visita",
         tabExplore: "Esplora", tabMyItinerary: "Il Mio Itinerario", yourRating: "La tua valutazione", whenDidYouVisit: "Quando hai visitato questo posto?", saveMemory: "Salva ricordo", myVisitTab: "La Mia Visita",
@@ -880,7 +881,7 @@ const translations = {
         allGroups: "Todos os grupos", allMembers: "Todos os membros", allAreas: "Todas as regiões", allYears: "Todos os anos", allCategories: "Todas as categorias",
         checkVisited: "Eu visitei este lugar", checkWishlist: "Adicionar à wishlist", tripWhich: "Para qual viagem é isso?",
         tripName: "Nome da viagem", tripWhen: "Quando você planeja ir?", tripFrom: "De", tripTo: "Até", tripCreate: "Criar viagem", tripCancel: "Cancelar",
-        itiTitle: "Gerador de Roteiros", itiDesc: "Selecione um grupo, um país e quantos dias você fica.", itiCreateBtn: "Criar meu guia", itiExport: "Exportar guia em PDF", itiSave: "Salvar em Minhas Viagens",
+        itiTitle: "Gerador de Roteiros", itiDesc: "Selecione um grupo, um país e quantos dias você fica.", itiCreateBtn: "Criar meu guia", itiCatLabel: "Categorias (opcional, seleção múltipla)", itiExport: "Exportar guia em PDF", itiSave: "Salvar em Minhas Viagens",
         noTripsFound: "Nenhuma viagem encontrada.", selectTripToView: "Selecione uma viagem para ver", locationsWord: "local", locationsWordPlural: "locais",
         addAnotherVisit: "Adicionar outra visita",
         tabExplore: "Explorar", tabMyItinerary: "Meu Itinerário", yourRating: "Sua avaliação", whenDidYouVisit: "Quando você visitou este lugar?", saveMemory: "Salvar lembrança", myVisitTab: "Minha Visita",
@@ -924,7 +925,7 @@ const translations = {
         allGroups: "모든 그룹", allMembers: "모든 멤버", allAreas: "모든 지역", allYears: "모든 연도", allCategories: "모든 카테고리",
         checkVisited: "이 장소를 방문했어요", checkWishlist: "위시리스트에 추가", tripWhich: "어떤 여행을 위한 건가요?",
         tripName: "여행 이름", tripWhen: "언제 갈 계획인가요?", tripFrom: "부터", tripTo: "까지", tripCreate: "여행 만들기", tripCancel: "취소",
-        itiTitle: "자동 일정 생성기", itiDesc: "그룹, 국가, 체류 일수를 선택하세요.", itiCreateBtn: "가이드 만들기", itiExport: "가이드 PDF로 내보내기", itiSave: "내 여행에 저장",
+        itiTitle: "자동 일정 생성기", itiDesc: "그룹, 국가, 체류 일수를 선택하세요.", itiCreateBtn: "가이드 만들기", itiCatLabel: "카테고리 (선택 사항, 다중 선택 가능)", itiExport: "가이드 PDF로 내보내기", itiSave: "내 여행에 저장",
         noTripsFound: "여행을 찾을 수 없습니다.", selectTripToView: "볼 여행을 선택하세요", locationsWord: "장소", locationsWordPlural: "장소",
         addAnotherVisit: "다른 방문 추가",
         tabExplore: "탐색", tabMyItinerary: "내 일정", yourRating: "평점", whenDidYouVisit: "언제 방문하셨나요?", saveMemory: "추억 저장", myVisitTab: "내 방문",
@@ -968,7 +969,7 @@ const translations = {
         allGroups: "すべてのグループ", allMembers: "すべてのメンバー", allAreas: "すべてのエリア", allYears: "すべての年", allCategories: "すべてのカテゴリー",
         checkVisited: "この場所を訪れました", checkWishlist: "ウィッシュリストに追加", tripWhich: "どの旅行のためですか？",
         tripName: "旅行の名前", tripWhen: "いつ行く予定ですか？", tripFrom: "開始", tripTo: "終了", tripCreate: "旅行を作成", tripCancel: "キャンセル",
-        itiTitle: "自動旅程ジェネレーター", itiDesc: "グループ、国、滞在日数を選択してください。", itiCreateBtn: "ガイドを作成", itiExport: "ガイドをPDFで出力", itiSave: "マイトリップに保存",
+        itiTitle: "自動旅程ジェネレーター", itiDesc: "グループ、国、滞在日数を選択してください。", itiCreateBtn: "ガイドを作成", itiCatLabel: "カテゴリー（任意、複数選択可）", itiExport: "ガイドをPDFで出力", itiSave: "マイトリップに保存",
         noTripsFound: "旅行が見つかりません。", selectTripToView: "表示する旅行を選択", locationsWord: "スポット", locationsWordPlural: "スポット",
         addAnotherVisit: "別の訪問を追加",
         tabExplore: "探索", tabMyItinerary: "マイ旅程", yourRating: "評価", whenDidYouVisit: "いつ訪れましたか？", saveMemory: "思い出を保存", myVisitTab: "マイビジット",
@@ -1012,7 +1013,7 @@ const translations = {
         allGroups: "所有团体", allMembers: "所有成员", allAreas: "所有地区", allYears: "所有年份", allCategories: "所有分类",
         checkVisited: "我去过这个地方", checkWishlist: "添加到收藏清单", tripWhich: "这是为哪次行程添加的？",
         tripName: "行程名称", tripWhen: "您计划什么时候出发？", tripFrom: "开始日期", tripTo: "结束日期", tripCreate: "创建行程", tripCancel: "取消",
-        itiTitle: "自动行程生成器", itiDesc: "选择一个团体、一个国家，以及停留天数。", itiCreateBtn: "生成我的指南", itiExport: "导出指南为 PDF", itiSave: "保存到我的行程",
+        itiTitle: "自动行程生成器", itiDesc: "选择一个团体、一个国家，以及停留天数。", itiCreateBtn: "生成我的指南", itiCatLabel: "类别（可选，可多选）", itiExport: "导出指南为 PDF", itiSave: "保存到我的行程",
         noTripsFound: "未找到任何行程。", selectTripToView: "选择要查看的行程", locationsWord: "个地点", locationsWordPlural: "个地点",
         addAnotherVisit: "添加另一次访问",
         tabExplore: "探索", tabMyItinerary: "我的行程", yourRating: "你的评分", whenDidYouVisit: "你什么时候去的？", saveMemory: "保存回忆", myVisitTab: "我的到访",
@@ -1146,24 +1147,32 @@ window.openItineraryModal = function() {
 window.initItineraryGenerator = function() {
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
-    
+
     const gSelectIti = document.getElementById('iti-group');
     const cSelectIti = document.getElementById('iti-country');
     const citySelectIti = document.getElementById('iti-city');
-    
+
     if(gSelectIti && gSelectIti.options.length === 0) {
         const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
         availableGroups.forEach(g => gSelectIti.innerHTML += `<option value="${g}">${g}</option>`);
         [...new Set(availableLocs.map(l => l.country))].sort().forEach(c => cSelectIti.innerHTML += `<option value="${c}">${c}</option>`);
         if(citySelectIti) window.updateItiCity();
+
+        if(!gSelectIti._hasCatListener) {
+            gSelectIti._hasCatListener = true;
+            // Les catégories dépendent uniquement du groupe sélectionné (BTS et Blackpink n'ont
+            // pas les mêmes catégories) : on les régénère à chaque changement de groupe.
+            gSelectIti.addEventListener('change', window.updateItiCategories);
+        }
     }
+    window.updateItiCategories();
 };
 
 window.updateItiCity = function() {
     const country = document.getElementById('iti-country').value;
     const citySel = document.getElementById('iti-city');
     if(!citySel) return;
-    
+
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
@@ -1174,6 +1183,37 @@ window.updateItiCity = function() {
     const cities = [...new Set(locs.map(l => l.city))].filter(Boolean).sort();
     cities.forEach(c => citySel.innerHTML += `<option value="${c}">${c}</option>`);
 }
+
+// Multi-select des catégories de lieux pour l'Auto-Itinerary Generator : les options
+// affichées dépendent du groupe choisi (ex : seules les catégories propres à BTS si BTS est
+// sélectionné), pour ne jamais proposer un filtre qui ne donnerait aucun résultat.
+window.updateItiCategories = function() {
+    const group = document.getElementById('iti-group')?.value;
+    const catContainer = document.getElementById('iti-categories');
+    if(!catContainer || !group) return;
+
+    const cats = (filterData[group] && filterData[group].categories) ? filterData[group].categories : filterData["General"].categories;
+    // Une sélection existante qui ne fait plus partie des catégories du (nouveau) groupe est
+    // abandonnée ; celle qui reste valable (ex: simple rafraîchissement de langue) est conservée.
+    itiSelectedCategories = itiSelectedCategories.filter(c => cats.includes(c));
+
+    catContainer.innerHTML = cats.map(cat =>
+        `<div class="cat-card iti-cat-pill${itiSelectedCategories.includes(cat) ? ' active' : ''}" data-cat="${cat}">${getCatName(cat)}</div>`
+    ).join('');
+
+    catContainer.querySelectorAll('.iti-cat-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            const cat = this.getAttribute('data-cat');
+            if(itiSelectedCategories.includes(cat)) {
+                itiSelectedCategories = itiSelectedCategories.filter(c => c !== cat);
+                this.classList.remove('active');
+            } else {
+                itiSelectedCategories.push(cat);
+                this.classList.add('active');
+            }
+        });
+    });
+};
 
 // ==========================================
 // 4. AFFICHAGE DES LIEUX ET FILTRES (MAP.HTML)
@@ -2280,18 +2320,45 @@ window.closeLocModal = function() {
 // ==========================================
 // 8. AUTO-ITINERARY GENERATOR LOGIC
 // ==========================================
+// Distance à vol d'oiseau entre deux lieux (formule de Haversine), utilisée pour estimer
+// un temps de trajet plausible entre deux étapes consécutives de l'itinéraire généré.
+function haversineKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// On n'a pas d'API d'itinéraire en temps réel (pas de clé, réseau restreint) : plutôt que
+// d'inventer un temps de trajet dans le vide, on combine deux informations réelles —
+// la distance à vol d'oiseau entre les deux lieux (pour choisir un mode de transport
+// plausible et estimer une durée) et le champ "directions" déjà rédigé pour le lieu
+// d'arrivée (ligne de métro/bus réelle, nom de station, temps de marche) quand il existe.
+function estimateTransitLeg(fromLoc, toLoc) {
+    const distKm = haversineKm(fromLoc.lat, fromLoc.lng, toLoc.lat, toLoc.lng);
+    const isFr = currentLang === 'fr';
+    let mode, speedKmh;
+    if (distKm < 0.9) { mode = isFr ? 'À pied' : 'On foot'; speedKmh = 4.5; }
+    else if (distKm < 5) { mode = isFr ? 'Métro / bus' : 'Subway / bus'; speedKmh = 20; }
+    else { mode = isFr ? 'Taxi ou métro' : 'Taxi or subway'; speedKmh = 28; }
+    const minutes = Math.max(5, Math.round((distKm / speedKmh) * 60 / 5) * 5);
+    return { mode, minutes, distKm };
+}
+
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
     const country = document.getElementById('iti-country').value;
     const city = document.getElementById('iti-city') ? document.getElementById('iti-city').value : "";
     const days = parseInt(document.getElementById('iti-days').value);
-    
+
     const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let validLocs = availableLocs.filter(l => l.group === group && l.country === country);
     if(city) validLocs = validLocs.filter(l => l.city === city);
-    
+    if(itiSelectedCategories.length > 0) validLocs = validLocs.filter(l => itiSelectedCategories.includes(l.category));
+
     if(validLocs.length === 0) { alert('No locations found for this selection.'); return; }
 
     let route = [validLocs.shift()]; 
@@ -2313,10 +2380,10 @@ window.generateItinerary = function() {
     const locsPerDay = Math.ceil(validLocs.length / days);
     let coordsForMap = [];
     currentGeneratedItinerary = [];
-    
+
     const txt = {
-        en: { day: "Day", transit: "Transit to next location", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site", cancel: "Cancel", add: "Add Selected Days", export: "Export Guide as PDF", save: "Save to My Trips" },
-        fr: { day: "Jour", transit: "Trajet vers le prochain lieu", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu", cancel: "Annuler", add: "Ajouter la sélection", export: "Exporter en PDF", save: "Sauvegarder dans My Trips" }
+        en: { day: "Day", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site", cancel: "Cancel", add: "Add Selected Days", export: "Export PDF", save: "Save Trip" },
+        fr: { day: "Jour", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu", cancel: "Annuler", add: "Ajouter la sélection", export: "Exporter en PDF", save: "Sauvegarder" }
     }[currentLang];
 
     const isTripsPage = !!document.getElementById('edit-trip-name');
@@ -2330,11 +2397,11 @@ window.generateItinerary = function() {
         let mapLink = "";
         if(dayLocs.length === 1) {
             mapLink = `https://www.google.com/maps/search/?api=1&query=${dayLocs[0].lat},${dayLocs[0].lng}`;
-            coordsForMap.push([dayLocs[0].lat, dayLocs[0].lng]);
+            coordsForMap.push({ dayIdx: i, locIdx: 0, lat: dayLocs[0].lat, lng: dayLocs[0].lng });
         } else {
             let waypoints = dayLocs.map(l => `${l.lat},${l.lng}`).join('|');
             mapLink = `https://www.google.com/maps/dir/?api=1&origin=${dayLocs[0].lat},${dayLocs[0].lng}&destination=${dayLocs[dayLocs.length-1].lat},${dayLocs[dayLocs.length-1].lng}&waypoints=${waypoints}&travelmode=driving`;
-            dayLocs.forEach(l => coordsForMap.push([l.lat, l.lng]));
+            dayLocs.forEach((l, locIdx) => coordsForMap.push({ dayIdx: i, locIdx, lat: l.lat, lng: l.lng }));
         }
         
         let html = `<div class="iti-day-card" style="padding: 18px 16px;">
@@ -2363,8 +2430,17 @@ window.generateItinerary = function() {
             html += `</div>`;
 
             if (idx < dayLocs.length - 1) {
-                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b;">${txt.transit}</span></div>`;
-                currentTime.setMinutes(currentTime.getMinutes() + 30);
+                // Pas d'API d'itinéraire disponible : le mode de transport et la durée sont
+                // estimés à partir de la distance réelle entre les deux lieux (voir
+                // estimateTransitLeg), et on réutilise le champ "directions" déjà rédigé pour
+                // le lieu d'arrivée (ligne de métro/bus réelle) quand il en a un, plutôt que
+                // le texte générique "Transit to next location" affiché jusqu'ici.
+                const nextLoc = dayLocs[idx + 1];
+                const leg = estimateTransitLeg(l, nextLoc);
+                const nextDirections = getLocText(nextLoc.directions);
+                const legLabel = `${leg.mode} · ~${leg.minutes} min${nextDirections ? ' — ' + nextDirections : ''}`;
+                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="display:inline-block; background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b; line-height:1.5;">${legLabel}</span></div>`;
+                currentTime.setMinutes(currentTime.getMinutes() + leg.minutes);
             }
         });
         
@@ -2413,16 +2489,29 @@ window.generateItinerary = function() {
             L.tileLayer(OSM_TILE_URL).addTo(itiLeafletMap);
             itiLayerGroup = L.featureGroup().addTo(itiLeafletMap);
 
-            coordsForMap.forEach((c, idx) => {
-                L.circleMarker(c, { color: '#D42759', radius: 6, fillOpacity: 1 }).addTo(itiLayerGroup)
-                 .bindTooltip((idx+1).toString(), {permanent: true, direction: 'center', className: 'iti-map-label'});
+            // Un tracé par jour, dans la couleur de ce jour (mêmes couleurs que la carte
+            // globale de My Trips) : plus lisible qu'une seule ligne continue qui mélangeait
+            // tous les jours ensemble sans distinction visuelle.
+            const allLatLngs = [];
+            const byDay = {};
+            coordsForMap.forEach(c => { (byDay[c.dayIdx] = byDay[c.dayIdx] || []).push(c); allLatLngs.push([c.lat, c.lng]); });
+
+            Object.keys(byDay).forEach(dayIdx => {
+                const color = TRIP_DAY_COLORS[dayIdx % TRIP_DAY_COLORS.length];
+                const pts = byDay[dayIdx];
+                pts.forEach(c => {
+                    L.circleMarker([c.lat, c.lng], { color: color, weight: 2, radius: 8, fillColor: color, fillOpacity: 1 }).addTo(itiLayerGroup)
+                     .bindTooltip(`${Number(dayIdx)+1}.${c.locIdx+1}`, {permanent: true, direction: 'center', className: 'iti-map-label'});
+                });
+                if(pts.length > 1) {
+                    L.polyline(pts.map(c => [c.lat, c.lng]), { color: color, weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
+                }
             });
-            
-            if(coordsForMap.length > 1) {
-                L.polyline(coordsForMap, { color: '#D42759', weight: 3, dashArray: '5, 5' }).addTo(itiLayerGroup);
-                itiLeafletMap.fitBounds(itiLayerGroup.getBounds(), { padding: [20, 20], maxZoom: 15 });
-            } else if (coordsForMap.length === 1) {
-                itiLeafletMap.setView(coordsForMap[0], 12);
+
+            if(allLatLngs.length > 1) {
+                itiLeafletMap.fitBounds(L.polyline(allLatLngs).getBounds(), { padding: [20, 20], maxZoom: 15 });
+            } else if (allLatLngs.length === 1) {
+                itiLeafletMap.setView(allLatLngs[0], 12);
             }
 
             itiLeafletMap.invalidateSize();
@@ -2517,12 +2606,47 @@ window.exportItineraryPDF = function() {
     const btn = document.getElementById('export-pdf-btn');
     const saveBtn = document.getElementById('save-trip-btn');
     if(!el) return;
-    if(btn) btn.style.display = 'none'; 
+    if(typeof html2pdf === 'undefined') {
+        alert(currentLang === 'fr' ? "L'export PDF n'a pas pu se charger. Vérifiez votre connexion et réessayez." : 'The PDF export library failed to load. Check your connection and try again.');
+        return;
+    }
+    if(btn) btn.style.display = 'none';
     if(saveBtn) saveBtn.style.display = 'none';
-    html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' } }).from(el).save().then(() => { 
-        if(btn) btn.style.display = 'block'; 
-        if(saveBtn) saveBtn.style.display = 'block'; 
-    });
+
+    // Le bouton "Export as PDF" ne faisait jusqu'ici rien du tout, sans aucune erreur visible :
+    // #iti-result contient la carte Leaflet en direct (#iti-map-container), dont les tuiles
+    // OpenStreetMap sont chargées cross-origin sans que Leaflet ne les marque comme lisibles par
+    // canvas (crossOrigin). html2canvas (utilisé en interne par html2pdf) se retrouve alors avec
+    // un canvas "tainted" et lève une SecurityError silencieuse dès qu'il tente de le lire, ce qui
+    // annule tout le PDF sans jamais déclencher le .then(). On exporte donc un clone du contenu
+    // sans la carte (peu utile de toute façon dans un PDF imprimé : chaque jour garde son propre
+    // lien "Open Route in Google Maps"), avec en renfort useCORS/allowTaint pour les cas où
+    // d'autres images cross-origin s'ajouteraient plus tard.
+    const clone = el.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.classList.remove('hidden');
+    const mapCard = clone.querySelector('#iti-map-container');
+    if(mapCard && mapCard.parentElement) mapCard.parentElement.remove();
+    clone.style.position = 'fixed';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.width = el.offsetWidth + 'px';
+    clone.style.background = '#fff';
+    document.body.appendChild(clone);
+
+    const restore = () => {
+        if(btn) btn.style.display = 'block';
+        if(saveBtn) saveBtn.style.display = 'block';
+        clone.remove();
+    };
+
+    html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' }, html2canvas: { useCORS: true, allowTaint: true } }).from(clone).save()
+        .then(restore)
+        .catch((err) => {
+            console.error('Export PDF failed:', err);
+            restore();
+            alert(currentLang === 'fr' ? "L'export PDF a échoué. Réessayez." : 'PDF export failed. Please try again.');
+        });
 };
 
 // ==========================================

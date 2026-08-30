@@ -473,7 +473,11 @@
             <select id="iti-country" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none;" onchange="updateItiCity()"></select>
             <!-- NOUVEAU SELECT VILLE -->
             <select id="iti-city" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none;"><option value="">All Cities (Optional)</option></select>
-            
+            <div>
+                <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;" data-i18n="itiCatLabel">Categories (optional, select multiple)</div>
+                <div id="iti-categories" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+            </div>
+
             <input type="number" id="iti-days" min="1" max="7" value="3" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none;">
             <button class="gen-btn" onclick="generateItinerary()" style="padding:14px; font-size:14px; justify-content:center;" data-i18n="itiCreateBtn">Create My Guide</button>
         </div>

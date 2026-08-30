@@ -459,6 +459,10 @@
         <div id="iti-form" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
             <select id="iti-group" class="filter-select" style="padding:12px;"></select>
             <select id="iti-country" class="filter-select" style="padding:12px;"></select>
+            <div>
+                <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;" data-i18n="itiCatLabel">Categories (optional, select multiple)</div>
+                <div id="iti-categories" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+            </div>
             <input type="number" id="iti-days" min="1" max="7" value="3" class="filter-select" style="padding:12px;">
             <button class="gen-btn" onclick="generateItinerary()" style="padding:14px; font-size:14px; justify-content:center;" data-i18n="itiCreateBtn">Create My Guide</button>
         </div>

@@ -305,6 +305,13 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
     .stat-pill { top: 14px; left: 14px; padding: 6px 10px; font-size: 11px; gap: 8px; }
     .stat-pill-text { display: none; }
 
+    /* "Export PDF" / "Save Trip" (Auto-Itinerary Generator) : côte à côte en flex:1 sur un
+       modal ~90% de largeur, le texte du bouton PDF n'avait pas la place de tenir sur une
+       seule ligne et "PDF" retombait seul sur une deuxième ligne. On les empile pleine
+       largeur sur mobile pour que chaque libellé tienne sur une ligne. */
+    #iti-actions-container { flex-direction: column; }
+    #iti-actions-container .gen-btn { width: 100%; white-space: nowrap; }
+
     .itinerary-box { padding: 16px; }
     .day-card { padding: 14px 16px; }
     .trip-detail-wrapper { padding: 22px 18px; }
