@@ -19,6 +19,16 @@ let currentLocationIdForMemory = null;
 let currentGeneratedItinerary = [];
 let currentLang = localStorage.getItem('lang') || 'en';
 
+// En mode démo (map.html?demo=1, voir map-tour.js), la carte doit rester consultable
+// sans compte réel et montrer de vraies données pour la présentation — sans jamais
+// écrire dans le localStorage réel de l'utilisateur (qui pourrait déjà avoir un compte
+// avec d'autres groupes débloqués). window.__demoMode est posé tout en haut de
+// map.html, avant même le chargement de ce fichier.
+function getUnlockedGroups() {
+    if (window.__demoMode) return ['BTS'];
+    return JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+}
+
 let currentTrip = null;
 let draggedEl = null;
 let dragType = null; 
@@ -59,6 +69,26 @@ function normalizeVisitEntry(entry) {
     return { id: entry.id, visits: [] };
 }
 window.normalizeVisitEntry = normalizeVisitEntry;
+
+// Note affichée dans la fiche détail, à côté de "I visited this place" / "Add to
+// Wishlist" : la moyenne des notes que CET utilisateur a lui-même attribuées lors de
+// ses visites enregistrées pour ce lieu. Le site n'a pas de note communautaire
+// partagée entre utilisateurs (pas de backend d'agrégation cross-users), donc on
+// n'affiche jamais une moyenne globale inventée — seulement les vraies notes de la
+// personne connectée, ou rien si elle n'en a encore attribué aucune.
+window.refreshLocationRating = function(visits) {
+    const ratingEl = document.getElementById('details-rating');
+    const ratingValEl = document.getElementById('details-rating-value');
+    if (!ratingEl || !ratingValEl) return;
+    const ratings = (visits || []).map(v => v.rating).filter(r => r > 0);
+    if (ratings.length === 0) {
+        ratingEl.classList.add('hidden');
+        return;
+    }
+    const mean = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+    ratingValEl.textContent = mean.toFixed(1);
+    ratingEl.classList.remove('hidden');
+};
 
 function syncVisited(vList) {
     if (typeof window.syncUserData === 'function') {
@@ -1325,7 +1355,7 @@ window.openItineraryModal = function() {
 }
 
 window.initItineraryGenerator = function() {
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     const gSelectIti = document.getElementById('iti-group');
@@ -1353,7 +1383,7 @@ window.updateItiCity = function() {
     const citySel = document.getElementById('iti-city');
     if(!citySel) return;
 
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let locs = availableLocs;
@@ -1405,7 +1435,7 @@ function initializeFilters() {
     const categoryButtonsContainer = document.getElementById('category-buttons');
     if(!groupSelect) return;
     
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
@@ -1462,7 +1492,7 @@ function renderLocations() {
     if(!locationListElement) return;
     locationListElement.innerHTML = '';
 
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     const fGroup = groupSelect.value, fMember = memberSelect.value, fYear = yearSelect.value, fCountry = countrySelect.value, searchTerm = searchInput.value.toLowerCase();
@@ -2183,6 +2213,8 @@ window.openDetailsPanel = function(id) {
             memoryDropdown.classList.remove('open');
         }
 
+        window.refreshLocationRating(memoryData ? memoryData.visits : []);
+
         vCheck.onchange = function() {
             let list = JSON.parse(localStorage.getItem('visitedLocs') || '[]');
             if(this.checked) { 
@@ -2207,8 +2239,9 @@ window.openDetailsPanel = function(id) {
 
                 localStorage.setItem('visitedLocs', JSON.stringify(list));
                 syncVisited(list);
+                window.refreshLocationRating([]);
             }
-            if(map) renderLocations(); 
+            if(map) renderLocations();
         };
     }
 
@@ -2325,6 +2358,7 @@ if(saveMemoryBtn) {
             document.getElementById('tab-btn-visit').classList.remove('hidden');
             
             window.renderVisitsList(list[idx].visits);
+            window.refreshLocationRating(list[idx].visits);
             document.getElementById('tab-btn-visit').click();
         }
     });
@@ -2515,15 +2549,32 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 // la distance à vol d'oiseau entre les deux lieux (pour choisir un mode de transport
 // plausible et estimer une durée) et le champ "directions" déjà rédigé pour le lieu
 // d'arrivée (ligne de métro/bus réelle, nom de station, temps de marche) quand il existe.
+//
+// Un premier essai ne calculait que le temps "en mouvement" (distance / vitesse de
+// croisière), ce qui affichait presque toujours "5 min" même pour deux lieux à 2-3 km
+// l'un de l'autre — un trajet en transport en commun réel inclut aussi la marche
+// jusqu'à l'arrêt/la station, l'attente, puis la marche de sortie, largement plus long
+// que le seul temps "sur le véhicule". On ajoute donc un temps d'accès fixe réaliste, et
+// on renvoie une fourchette plutôt qu'un chiffre unique faussement précis puisqu'on ne
+// connaît pas le trajet réel.
 function estimateTransitLeg(fromLoc, toLoc) {
     const distKm = haversineKm(fromLoc.lat, fromLoc.lng, toLoc.lat, toLoc.lng);
     const isFr = currentLang === 'fr';
-    let mode, speedKmh;
-    if (distKm < 0.9) { mode = isFr ? 'À pied' : 'On foot'; speedKmh = 4.5; }
-    else if (distKm < 5) { mode = isFr ? 'Métro / bus' : 'Subway / bus'; speedKmh = 20; }
-    else { mode = isFr ? 'Taxi ou métro' : 'Taxi or subway'; speedKmh = 28; }
-    const minutes = Math.max(5, Math.round((distKm / speedKmh) * 60 / 5) * 5);
-    return { mode, minutes, distKm };
+    let mode, minMinutes, maxMinutes;
+    if (distKm < 1) {
+        mode = isFr ? 'À pied' : 'On foot';
+        minMinutes = Math.max(3, Math.round(distKm / 5.5 * 60));
+        maxMinutes = Math.max(minMinutes + 5, Math.round(distKm / 3.5 * 60));
+    } else if (distKm < 8) {
+        mode = isFr ? 'Métro / bus' : 'Subway / bus';
+        minMinutes = 12 + Math.round(distKm / 25 * 60);
+        maxMinutes = 18 + Math.round(distKm / 15 * 60);
+    } else {
+        mode = isFr ? 'Taxi ou métro' : 'Taxi or subway';
+        minMinutes = 15 + Math.round(distKm / 35 * 60);
+        maxMinutes = 25 + Math.round(distKm / 20 * 60);
+    }
+    return { mode, minMinutes, maxMinutes, distKm };
 }
 
 window.generateItinerary = function() {
@@ -2532,7 +2583,7 @@ window.generateItinerary = function() {
     const city = document.getElementById('iti-city') ? document.getElementById('iti-city').value : "";
     const days = parseInt(document.getElementById('iti-days').value);
 
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let validLocs = availableLocs.filter(l => l.group === group && l.country === country);
@@ -2618,9 +2669,9 @@ window.generateItinerary = function() {
                 const nextLoc = dayLocs[idx + 1];
                 const leg = estimateTransitLeg(l, nextLoc);
                 const nextDirections = getLocText(nextLoc.directions);
-                const legLabel = `${leg.mode} · ~${leg.minutes} min${nextDirections ? ' — ' + nextDirections : ''}`;
+                const legLabel = `${leg.mode} · ~${leg.minMinutes}-${leg.maxMinutes} min${nextDirections ? ' — ' + nextDirections : ''}`;
                 html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="display:inline-block; background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b; line-height:1.5;">${legLabel}</span></div>`;
-                currentTime.setMinutes(currentTime.getMinutes() + leg.minutes);
+                currentTime.setMinutes(currentTime.getMinutes() + Math.round((leg.minMinutes + leg.maxMinutes) / 2));
             }
         });
         
@@ -2836,7 +2887,7 @@ window.openCartModal = function() {
     const modal = document.getElementById('cart-modal');
     if(!modal) return;
     modal.classList.remove('hidden');
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     document.querySelectorAll('.cart-checkbox').forEach(cb => {
         cb.checked = false; 
         const span = cb.nextElementSibling;
@@ -2870,7 +2921,7 @@ const cartForm = document.getElementById('cart-form');
 if(cartForm) {
     cartForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        let existingGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        let existingGroups = getUnlockedGroups();
         document.querySelectorAll('.cart-checkbox:not(:disabled):checked').forEach(cb => { if(!existingGroups.includes(cb.value)) existingGroups.push(cb.value); });
         localStorage.setItem('unlockedGroups', JSON.stringify(existingGroups));
         if (typeof window.syncUserData === 'function') window.syncUserData({ unlockedGroups: existingGroups });
@@ -3055,7 +3106,7 @@ window.populateEditTripFilters = function() {
     const citySel = document.getElementById('edit-trip-city');
     if(!groupSel) return;
 
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let baseLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     if(groupSel.options.length <= 1) {
@@ -3158,7 +3209,7 @@ window.renderTrip = function() {
         document.getElementById('date-end').value = currentTrip.endDate || '';
     }
     
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let baseLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let filteredLocs = baseLocs.filter(loc => {
@@ -3536,7 +3587,7 @@ window.filterAddModal = function() {
     const list = document.getElementById('add-modal-list');
     list.innerHTML = '';
     
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let baseLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let filteredLocs = baseLocs.filter(loc => {
@@ -3569,7 +3620,7 @@ window.openNewTripModal = function() {
     document.getElementById('add-trip-modal').classList.remove('hidden');
     const gSelect = document.getElementById('create-trip-group');
     if(gSelect && gSelect.options.length <= 1) {
-        const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+        const unlockedGroups = getUnlockedGroups();
         let availableLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
         const availableGroups = [...new Set(availableLocs.map(l => l.group))].sort();
         availableGroups.forEach(g => gSelect.innerHTML += `<option value="${g}">${g}</option>`);
@@ -3582,7 +3633,7 @@ window.updateCreateTripOptions = function() {
     const countrySelect = document.getElementById('create-trip-country');
     const citySelect = document.getElementById('create-trip-city');
 
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let baseLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let locs = baseLocs;
@@ -3674,7 +3725,7 @@ window.createNewTripAdvanced = function() {
     let daysArray = [];
     for(let i=0; i<numDays; i++) daysArray.push([]);
 
-    const unlockedGroups = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
+    const unlockedGroups = getUnlockedGroups();
     let baseLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let validLocs = baseLocs.filter(l => {

@@ -122,6 +122,16 @@
     if (localStorage.getItem('userEmail')) {
         document.body.classList.remove('auth-gate-active');
     }
+
+    // Mode démo (bouton "See Demo" de index.html) : la carte doit rester consultable
+    // sans compte, avec de vraies données (voir getUnlockedGroups() dans script.js et
+    // le listener "firebase-ready" plus bas) pour présenter le site tel qu'il est
+    // réellement, plutôt que de bloquer un visiteur anonyme derrière la fenêtre de
+    // connexion habituelle.
+    if (new URLSearchParams(location.search).get('demo') === '1') {
+        window.__demoMode = true;
+        document.body.classList.remove('auth-gate-active');
+    }
 </script>
 
 <div class="app-container">
@@ -227,7 +237,7 @@
                     </div>
 
                     <!-- BOUTON AUTO-ITINERARY GENERATOR -->
-                    <button class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:25px;">
+                    <button id="iti-generator-btn" class="gen-btn" onclick="openItineraryModal()" style="width:100%; justify-content:center; margin-bottom:25px;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 2v6h6"></path></svg>
                         Auto-Itinerary Generator
                     </button>
@@ -259,9 +269,17 @@
                 </div>
 
                 <div class="check-row" style="flex-direction:column; gap:0;">
-                    <div style="display:flex; gap:16px; width:100%;">
+                    <div style="display:flex; gap:16px; width:100%; align-items:center; flex-wrap:wrap;">
                         <label class="check-item"><input type="checkbox" id="details-visited" class="custom-checkbox"> <span data-i18n="checkVisited">I visited this place</span></label>
                         <label class="check-item"><input type="checkbox" id="details-wishlist" class="custom-checkbox" onchange="toggleWishlist()"> <span data-i18n="checkWishlist">Add to Wishlist</span></label>
+                        <!-- Note du lieu : moyenne des notes que CET utilisateur a attribuées lors de
+                             ses visites ("I visited this place" -> formulaire de souvenir). Le site
+                             n'a pas de note communautaire partagée entre utilisateurs (pas de backend
+                             d'agrégation), donc pas de fausse moyenne globale inventée ici. -->
+                        <div id="details-rating" class="location-rating hidden" style="margin-left:auto; display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; color:#f59e0b;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+                            <span id="details-rating-value">4.5</span><span style="color:#94a3b8; font-weight:600;">/5</span>
+                        </div>
                     </div>
 
                     <div class="trip-box" id="trip-box">
@@ -550,6 +568,7 @@
 <script src="countries.js"></script>
 <script type="module" src="firebase-init.js"></script>
 <script src="script.js"></script>
+<script src="map-tour.js"></script>
 <script>
     // ==========================================
     // VÉRIFICATION D'ACCÈS À LA CARTE
@@ -574,6 +593,16 @@
     }
 
     window.addEventListener('firebase-ready', async (e) => {
+        if (window.__demoMode) {
+            // Mode démo : la carte reste débloquée quel que soit l'état de connexion réel
+            // (voir getUnlockedGroups() dans script.js pour les données BTS de démo).
+            document.body.classList.remove('auth-gate-active');
+            if (typeof initializeFilters === 'function') initializeFilters();
+            if (typeof renderLocations === 'function') renderLocations();
+            if (typeof window.startMapTour === 'function') window.startMapTour();
+            return;
+        }
+
         const user = e.detail && e.detail.user;
 
         if (!user) {
