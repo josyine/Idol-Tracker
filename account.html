@@ -180,6 +180,10 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
           <input type="text" id="user-name-input" class="field-value" style="margin-bottom:16px; outline:none;" readonly value="User">
           <span class="field-label" data-i18n="accEmailLabel">Email address</span>
           <div class="field-value" id="user-email-input">email@example.com</div>
+          <span class="field-label" style="margin-top:16px;" data-i18n="accCountryLabel">Country you're interested in</span>
+          <select id="user-country-input" class="field-value" disabled>
+            <option value="" data-i18n="accCountryPlaceholder">Select a country (optional)</option>
+          </select>
         </div>
       </div>
 
@@ -258,6 +262,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 </div>
 
 <script type="module" src="firebase-init.js"></script>
+<script src="countries.js"></script>
 <script src="script.js"></script>
 <script>
     // NOTE : l'ouverture/fermeture des menus (langue, compte) est gérée uniquement par
@@ -285,6 +290,13 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     if(savedName) document.getElementById('user-name-input').value = savedName;
     const savedEmail = localStorage.getItem('userEmail');
     if(savedEmail) document.getElementById('user-email-input').textContent = savedEmail;
+
+    // Pays d'intérêt : rempli à l'inscription (index.html), modifiable ici. Utilisé par
+    // map.html pour centrer la carte au premier chargement (voir getMapCenterForCountry
+    // dans countries.js et l'initialisation de la carte dans script.js).
+    if (typeof window.populateCountrySelect === 'function') window.populateCountrySelect('user-country-input');
+    const countrySelect = document.getElementById('user-country-input');
+    if (countrySelect) countrySelect.value = localStorage.getItem('userCountry') || '';
     const profilePreview = document.getElementById('profile-preview');
     if(savedPic) {
         profilePreview.innerHTML = `<img src="${savedPic}" style="width:100%;height:100%;object-fit:cover;">`;
@@ -323,18 +335,27 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     let isEditing = false;
     function toggleEditMode() {
         const nameInput = document.getElementById('user-name-input');
+        const countrySelect = document.getElementById('user-country-input');
         const actionBtn = document.getElementById('toggle-action-btn');
         if(!isEditing) {
             isEditing = true;
             nameInput.removeAttribute('readonly');
             nameInput.style.borderColor = '#D42759';
             nameInput.focus();
+            if (countrySelect) { countrySelect.disabled = false; countrySelect.style.borderColor = '#D42759'; }
             actionBtn.textContent = t('accSaveBtn');
         } else {
             isEditing = false;
             nameInput.setAttribute('readonly', true);
             nameInput.style.borderColor = '#e2e8f0';
             localStorage.setItem('userName', nameInput.value);
+            if (countrySelect) {
+                countrySelect.disabled = true;
+                countrySelect.style.borderColor = '#e2e8f0';
+                if (countrySelect.value) localStorage.setItem('userCountry', countrySelect.value);
+                else localStorage.removeItem('userCountry');
+                if (typeof window.syncUserData === 'function') window.syncUserData({ interestCountry: countrySelect.value || null });
+            }
             actionBtn.style.background = '#10b981';
             actionBtn.textContent = t('accSaved');
             setTimeout(() => { actionBtn.style.background = '#D42759'; actionBtn.textContent = t('accEditBtn'); }, 2000);

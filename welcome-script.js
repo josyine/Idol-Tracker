@@ -306,6 +306,11 @@ async function loadExistingProfileAndRedirect(user) {
             if (data.username) localStorage.setItem('userName', data.username);
             if (data.firstName) localStorage.setItem('userFirstName', data.firstName);
             if (Array.isArray(data.unlockedGroups)) localStorage.setItem('unlockedGroups', JSON.stringify(data.unlockedGroups));
+            // Pays d'intérêt : sans ça, une connexion sur un appareil qui n'a jamais vu ce
+            // compte localement (nouvel appareil, cache navigateur vidé) retombait sur le
+            // centrage par défaut de la carte au lieu du pays choisi à l'inscription.
+            const loginInterestCountry = data.interestCountry || data.residenceCountry;
+            if (loginInterestCountry) localStorage.setItem('userCountry', loginInterestCountry);
         }
     } catch (e) {
         // Si la lecture échoue (règles de sécurité en cours d'ajustement, etc.),
