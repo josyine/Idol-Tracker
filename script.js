@@ -29,7 +29,9 @@ function attachOSMFallback(tileLayer, map) {
     tileLayer.on('tileerror', () => {
         if (switched) return;
         failCount++;
-        if (failCount > 5) {
+        // Seuil abaissé (était 5) : sur une connexion mobile faible, attendre 5 échecs
+        // avant de basculer laissait la carte grise trop longtemps avant le repli.
+        if (failCount > 2) {
             switched = true;
             tileLayer.setUrl(OSM_TILE_FALLBACK_URL);
         }
@@ -571,8 +573,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const initialCenter = window.getMapCenterForCountry ? window.getMapCenterForCountry(localStorage.getItem('userCountry')) : [37.541, 127.025, 7];
         map = L.map('map', { zoomControl: false }).setView([initialCenter[0], initialCenter[1]], initialCenter[2]);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-        createOSMTileLayer(map).addTo(map);
+        const mainTileLayer = createOSMTileLayer(map).addTo(map);
         markerGroup = L.layerGroup().addTo(map);
+
+        // Voile de chargement (voir .map-loading-overlay, style.css) : masqué dès que
+        // les tuiles de la vue actuelle ont fini de charger (succès ou échec — à ce
+        // stade attachOSMFallback() a eu la main pour basculer sur le repli), avec un
+        // filet de sécurité à 6s pour ne jamais rester bloqué affiché indéfiniment si
+        // l'évènement ne se déclenche pas pour une raison quelconque.
+        const mapLoadingOverlay = document.getElementById('map-loading-overlay');
+        if (mapLoadingOverlay) {
+            mapLoadingOverlay.classList.remove('hidden');
+            const hideMapLoadingOverlay = () => mapLoadingOverlay.classList.add('hidden');
+            mainTileLayer.on('load', hideMapLoadingOverlay);
+            setTimeout(hideMapLoadingOverlay, 6000);
+        }
 
         // Si Leaflet s'initialise avec un conteneur qui n'a pas encore sa taille finale
         // (fréquent sur mobile : barre d'adresse qui se rétracte après le premier rendu,
@@ -1482,6 +1497,74 @@ let celebLocations = [
     {"id":155,"name":"King Fahd International Stadium","group":"BTS","member":"All","country":"Saudi Arabia","city":"Riyadh","category":"Concerts","year":"2019","episode":"Love Yourself: Speak Yourself","address":"","lat":24.7136,"lng":46.7208,"img":"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600","fullDescription":{"en":"<p>King Fahd International Stadium in Riyadh hosted BTS during the \"Love Yourself: Speak Yourself\" (2019) — one of dozens of stops on a run that took the group across five continents and cemented just how far their live audience had grown.</p><p>Details on the exact staging and setlist for this stop are limited compared to the group's more recent, heavily documented tours — but the show itself is a matter of public record, part of the official tour schedule of the era.</p>","fr":"<p>King Fahd International Stadium à Riyadh a accueilli BTS lors de la tournée « Love Yourself: Speak Yourself » (2019) — l'une des dizaines d'étapes d'une tournée qui a mené le groupe sur cinq continents et confirmé l'ampleur déjà considérable de son public en concert.</p><p>Les détails précis sur la mise en scène et la setlist de cette étape sont plus limités que pour les tournées plus récentes du groupe, bien mieux documentées — mais la date elle-même est un fait de notoriété publique, inscrite au calendrier officiel de la tournée de l'époque.</p>"},"tip":{"en":"This stop is from an earlier BTS world tour — check the venue's own website for current opening hours or public tours, as they can change independently of the concert date shown here.","fr":"Cette étape provient d'une tournée mondiale précédente de BTS — vérifiez le site officiel du lieu pour les horaires d'ouverture ou visites publiques actuelles, qui peuvent avoir changé depuis la date de concert indiquée ici."},"directions":{"en":"Check the venue's official website or a map app for the best way to reach it from where you're staying — public transit access varies a lot by city.","fr":"Consultez le site officiel du lieu ou une application de cartes pour le meilleur moyen de vous y rendre depuis votre logement — l'accès en transport en commun varie beaucoup selon la ville."}},
 ];
 
+// ==========================================
+// Messages éphémères "nouveau lieu ajouté"
+// ==========================================
+// Annonce, au lancement du site (une seule fois par session de navigation — voir
+// sessionStorage plus bas), quelques lieux tirés au sort parmi ceux ajoutés récemment.
+// NEW_LOCATION_IDS liste les ids concernés : actuellement les 43 lieux de concert des
+// tournées historiques (ids 113–155, voir plus haut) — à mettre à jour avec les ids des
+// prochains lieux ajoutés le jour où on en ajoutera de nouveaux.
+const NEW_LOCATION_IDS = Array.from({ length: 43 }, (_, i) => 113 + i);
+const NEW_LOCATION_TOAST_MAX = 4;
+const NEW_LOCATION_TOAST_LIFESPAN_MS = 6000;
+const NEW_LOCATION_TOAST_GAP_MS = 4500;
+
+function renderOneNewLocationToast(loc) {
+    const container = document.getElementById('new-location-toast-container');
+    if (!container) return;
+    const title = (loc.member && loc.member !== 'All') ? `${loc.member} (${loc.group}) — ${loc.name}` : `${loc.group} — ${loc.name}`;
+    const subParts = [];
+    const place = [loc.city, loc.country].filter(Boolean).join(', ');
+    if (place) subParts.push(place);
+    if (loc.year) subParts.push(loc.year);
+    let sub = subParts.join(' · ');
+    if (loc.episode) sub += (sub ? ' — ' : '') + loc.episode;
+
+    const el = document.createElement('div');
+    el.className = 'new-location-toast';
+    el.innerHTML = `
+        <div class="new-location-toast-icon">📍</div>
+        <div class="new-location-toast-body">
+            <div class="new-location-toast-label">${t('newLocationToastLabel')}</div>
+            <div class="new-location-toast-title"></div>
+            <div class="new-location-toast-sub"></div>
+        </div>
+        <button class="new-location-toast-close" type="button" aria-label="Close">&times;</button>
+    `;
+    el.querySelector('.new-location-toast-title').textContent = title;
+    el.querySelector('.new-location-toast-sub').textContent = sub;
+    container.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+
+    const dismiss = () => {
+        el.classList.remove('show');
+        setTimeout(() => el.remove(), 350);
+    };
+    el.querySelector('.new-location-toast-close').addEventListener('click', dismiss);
+    setTimeout(dismiss, NEW_LOCATION_TOAST_LIFESPAN_MS);
+}
+
+// Purement informatif/public (comme le Mode Tournée) : ne dépend d'aucune donnée de
+// compte, affiché à l'identique pour un visiteur en mode démo ou un compte réel.
+window.showNewLocationToasts = function () {
+    if (sessionStorage.getItem('newLocationToastsShown')) return;
+    const container = document.getElementById('new-location-toast-container');
+    if (!container) return;
+    const pool = NEW_LOCATION_IDS.map(id => celebLocations.find(l => l.id === id)).filter(Boolean);
+    if (!pool.length) return;
+    sessionStorage.setItem('newLocationToastsShown', '1');
+
+    const picks = [];
+    const poolCopy = pool.slice();
+    const count = Math.min(NEW_LOCATION_TOAST_MAX, poolCopy.length);
+    for (let i = 0; i < count; i++) {
+        const idx = Math.floor(Math.random() * poolCopy.length);
+        picks.push(poolCopy.splice(idx, 1)[0]);
+    }
+    picks.forEach((loc, i) => setTimeout(() => renderOneNewLocationToast(loc), i * NEW_LOCATION_TOAST_GAP_MS + 1200));
+};
+
 
 // ==========================================
 // 3. LOGIQUE UI ET TRADUCTIONS
@@ -1535,7 +1618,9 @@ const translations = {
         tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel.",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} is live now — {event} in {city}",
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
-        tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet."
+        tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
+        mapLoading: "Loading map…",
+        newLocationToastLabel: "New location added"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -1585,7 +1670,9 @@ const translations = {
         tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage.",
         tourModeGenericLabel: "Tournée", tourModeMemberLiveIn: "{member} est en direct — {event} à {city}",
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
-        tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée."
+        tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
+        mapLoading: "Chargement de la carte…",
+        newLocationToastLabel: "Nouveau lieu ajouté"
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -1635,7 +1722,9 @@ const translations = {
         tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje.",
         tourModeGenericLabel: "Gira", tourModeMemberLiveIn: "{member} está en directo — {event} en {city}",
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
-        tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada."
+        tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
+        mapLoading: "Cargando el mapa…",
+        newLocationToastLabel: "Nuevo lugar añadido"
     },
     it: {
         btnGenerateIti: "Generatore di Itinerari", filterGroup: "GRUPPO", filterMember: "MEMBRO", filterArea: "ZONA", filterYear: "ANNO", filterCategories: "CATEGORIE",
@@ -1685,7 +1774,9 @@ const translations = {
         tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio.",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} è in diretta — {event} a {city}",
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
-        tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata."
+        tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
+        mapLoading: "Caricamento della mappa…",
+        newLocationToastLabel: "Nuovo luogo aggiunto"
     },
     pt: {
         btnGenerateIti: "Gerador de Roteiros", filterGroup: "GRUPO", filterMember: "MEMBRO", filterArea: "REGIÃO", filterYear: "ANO", filterCategories: "CATEGORIAS",
@@ -1735,7 +1826,9 @@ const translations = {
         tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem.",
         tourModeGenericLabel: "Turnê", tourModeMemberLiveIn: "{member} está ao vivo agora — {event} em {city}",
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
-        tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada."
+        tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
+        mapLoading: "Carregando o mapa…",
+        newLocationToastLabel: "Novo local adicionado"
     },
     ko: {
         btnGenerateIti: "자동 일정 생성기", filterGroup: "그룹", filterMember: "멤버", filterArea: "지역", filterYear: "연도", filterCategories: "카테고리",
@@ -1785,7 +1878,9 @@ const translations = {
         tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요.",
         tourModeGenericLabel: "투어", tourModeMemberLiveIn: "{member} 라이브 중 — {city}에서 {event}",
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
-        tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다."
+        tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
+        mapLoading: "지도를 불러오는 중…",
+        newLocationToastLabel: "새로운 장소 추가됨"
     },
     ja: {
         btnGenerateIti: "自動旅程ジェネレーター", filterGroup: "グループ", filterMember: "メンバー", filterArea: "エリア", filterYear: "年", filterCategories: "カテゴリー",
@@ -1835,7 +1930,9 @@ const translations = {
         tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。",
         tourModeGenericLabel: "ツアー", tourModeMemberLiveIn: "{member}がライブ配信中 — {city}で{event}",
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
-        tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。"
+        tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
+        mapLoading: "地図を読み込み中…",
+        newLocationToastLabel: "新しい場所が追加されました"
     },
     zh: {
         btnGenerateIti: "自动行程生成器", filterGroup: "团体", filterMember: "成员", filterArea: "地区", filterYear: "年份", filterCategories: "分类",
@@ -1885,7 +1982,9 @@ const translations = {
         tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。",
         tourModeGenericLabel: "巡演", tourModeMemberLiveIn: "{member} 直播中 — 于{city}参加{event}",
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
-        tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。"
+        tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
+        mapLoading: "地图加载中…",
+        newLocationToastLabel: "新增地点"
     }
 };
 
