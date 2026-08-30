@@ -77,7 +77,9 @@ const dict = {
         
         step3Title: "Passes", passDesc: "Select the groups you want to unlock. (14.99€ per group)",
         step3TitleGuide: "Unlock the full guide?", step3DescGuide: "Optional — you can also explore the map for free first (3 locations) and decide later.",
-        skipPassesLink: "Continue without a pass — explore for free →",
+        skipPassesLink: "Continue with the free version",
+        skipConfirmTitle: "Are you sure?", skipConfirmBody: "With the free version, you'll only have access to 3 locations. Unlock the full guide (500+ addresses) with a Travel or VIP pass instead.",
+        skipConfirmBack: "See the passes again", skipConfirmProceed: "No thanks, continue for free",
         paywallMonthlyName: "🎟️ TRAVEL PASS (1 Month)", paywallMonthlyPrice: "€9.99 / month",
         paywallVipName: "👑 VIP PASS (Lifetime Access)", paywallVipPrice: "€19.99 (one-time payment)",
         subtotalLabel: "Subtotal:", payBtnEmpty: "Select a pass", btnToPayment: "Continue to Payment",
@@ -129,7 +131,9 @@ const dict = {
         
         step3Title: "Pass", passDesc: "Sélectionnez les groupes à débloquer. (14.99€ par groupe)",
         step3TitleGuide: "Débloquer le guide complet ?", step3DescGuide: "Facultatif — vous pouvez aussi explorer la carte gratuitement d'abord (3 lieux) et décider plus tard.",
-        skipPassesLink: "Continuer sans pass — explorer gratuitement →",
+        skipPassesLink: "Continuer avec la version gratuite",
+        skipConfirmTitle: "Êtes-vous sûr(e) ?", skipConfirmBody: "Avec la version gratuite, vous n'aurez accès qu'à 3 lieux. Débloquez le guide complet (500+ adresses) avec un Pass Voyage ou VIP.",
+        skipConfirmBack: "Revoir les pass", skipConfirmProceed: "Non merci, continuer gratuitement",
         paywallMonthlyName: "🎟️ PASS VOYAGE (1 Mois)", paywallMonthlyPrice: "9,99 € / mois",
         paywallVipName: "👑 PASS VIP (Accès à vie)", paywallVipPrice: "19,99 € (paiement unique)",
         subtotalLabel: "Sous-total :", payBtnEmpty: "Sélectionnez un pass", btnToPayment: "Passer au paiement",
@@ -563,12 +567,20 @@ if(btnToStep4) {
     });
 }
 
-// Continuer sans pass : va directement à la carte, avec 3 fiches lieu consultables
-// gratuitement (voir hasGuidePass()/FREE_LOCATION_VIEW_LIMIT dans script.js) — c'est
-// le chemin normal désormais, pas une exception.
+// Continuer sans pass : un petit popup de confirmation dissuasif s'affiche d'abord
+// ("vous n'aurez accès qu'à 3 lieux...") avant de vraiment aller à la carte — voir
+// hasGuidePass()/FREE_LOCATION_VIEW_LIMIT dans script.js pour la limite elle-même.
 const btnSkipPasses = document.getElementById('btn-skip-passes');
-if (btnSkipPasses) {
+const skipConfirmModal = document.getElementById('skip-passes-confirm-modal');
+if (btnSkipPasses && skipConfirmModal) {
     btnSkipPasses.addEventListener('click', (e) => {
+        e.preventDefault();
+        skipConfirmModal.classList.remove('hidden');
+    });
+    const closeSkipConfirm = () => skipConfirmModal.classList.add('hidden');
+    document.getElementById('skip-passes-confirm-close').addEventListener('click', closeSkipConfirm);
+    document.getElementById('skip-passes-confirm-back').addEventListener('click', closeSkipConfirm);
+    document.getElementById('skip-passes-confirm-proceed').addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = 'map.html';
     });

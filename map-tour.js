@@ -19,23 +19,44 @@
     // transition. On attend ce délai (couvrant large la transition la plus longue du
     // site) avant de mesurer quoi que ce soit.
     const SETTLE_DELAY = 480;
+
+    // Sur mobile, la sidebar (#app-sidebar) est hors-écran par défaut (left:-100%) et ne
+    // devient visible qu'avec la classe "open" (voir style.css, @media max-width:800px).
+    // Le contenu de la carte proprement dite (#search-input, #category-buttons,
+    // #iti-generator-btn...) vit à l'intérieur de cette sidebar : chaque étape du guide qui
+    // cible un de ces éléments doit donc explicitement rouvrir la sidebar sur mobile, et
+    // chaque étape qui cible autre chose (la carte elle-même, le menu profil) doit
+    // explicitement la refermer — sans quoi elle reste bloquée en plein écran par-dessus le
+    // reste (ex : par-dessus le menu profil des dernières étapes) selon la dernière action
+    // effectuée. Desktop n'est pas affecté : ces classes n'ont aucun effet en dehors de
+    // cette media query.
+    function setMobileSidebar(open) {
+        const sidebar = document.getElementById('app-sidebar');
+        if (!sidebar) return;
+        if (open) sidebar.classList.add('open');
+        else { sidebar.classList.remove('open'); sidebar.classList.remove('expanded'); }
+    }
+
     const TOUR_STEPS = [
         { selector: '#map', onEnter: () => {
             if (window.closeDetailsPanel) window.closeDetailsPanel();
             if (window.switchMainTab) window.switchMainTab('explore');
             const m = document.getElementById('profile-menu'); if (m) m.classList.add('hidden');
+            setMobileSidebar(false);
         }, settleDelay: SETTLE_DELAY },
-        { selector: '#search-input', onEnter: null },
-        { selector: '#category-buttons', onEnter: null },
+        { selector: '#search-input', onEnter: () => setMobileSidebar(true), settleDelay: SETTLE_DELAY },
+        { selector: '#category-buttons', onEnter: () => setMobileSidebar(true), settleDelay: SETTLE_DELAY },
         { selector: '#sidebar-details', onEnter: () => { if (window.openDetailsPanel) window.openDetailsPanel(1); }, settleDelay: SETTLE_DELAY },
         { selector: '#iti-generator-btn', onEnter: () => {
             if (window.closeDetailsPanel) window.closeDetailsPanel();
             if (window.switchMainTab) window.switchMainTab('itinerary');
+            setMobileSidebar(true);
         }, settleDelay: SETTLE_DELAY },
         { selector: '#profile-menu a[href="map-destinations.html"]', onEnter: () => {
             if (window.closeDetailsPanel) window.closeDetailsPanel();
             if (window.switchMainTab) window.switchMainTab('explore');
             const m = document.getElementById('profile-menu'); if (m) m.classList.remove('hidden');
+            setMobileSidebar(false);
         }, settleDelay: SETTLE_DELAY },
         { selector: '#profile-menu a[href="map-artists.html"]', onEnter: null },
         { selector: '#profile-menu a[href="settings.html"]', onEnter: null },
@@ -271,8 +292,9 @@
         }));
     }
 
+    // Pas de garde "started" : le bouton "Tour" (voir map.html) doit pouvoir relancer le
+    // guide depuis le début à tout moment, même après l'avoir déjà suivi ou passé.
     window.startMapTour = function() {
-        if (started) return;
         started = true;
         if (!overlay) buildTourDOM();
         tourIndex = 0;
@@ -285,6 +307,7 @@
         overlay.classList.remove('open');
         const m = document.getElementById('profile-menu');
         if (m) m.classList.add('hidden');
+        setMobileSidebar(false);
     }
 
     // Fin de la visite : au lieu de rediriger vers index.html, on referme le guide et on

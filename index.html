@@ -204,19 +204,19 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
                     <label class="pass-card" data-plan="monthly" onclick="window.selectSignupPlan('monthly')">
                         <span class="card-content" style="display:block; text-align:left; padding:4px 2px;">
-                            <b data-i18n="paywallMonthlyName" style="display:block; font-size:13px;">🎟️ TRAVEL PASS (1 Month)</b>
+                            <b data-i18n="paywallMonthlyName" style="display:block; font-size:13px;">TRAVEL PASS (1 Month)</b>
                             <span data-i18n="paywallMonthlyPrice" style="display:block; color:var(--primary-magenta); font-weight:700; margin-top:4px;">€9.99 / month</span>
                         </span>
                     </label>
                     <label class="pass-card" data-plan="lifetime" onclick="window.selectSignupPlan('lifetime')">
                         <span class="card-content" style="display:block; text-align:left; padding:4px 2px;">
-                            <b data-i18n="paywallVipName" style="display:block; font-size:13px;">👑 VIP PASS (Lifetime Access)</b>
+                            <b data-i18n="paywallVipName" style="display:block; font-size:13px;">VIP PASS (Lifetime Access)</b>
                             <span data-i18n="paywallVipPrice" style="display:block; color:var(--primary-magenta); font-weight:700; margin-top:4px;">€19.99 (one-time payment)</span>
                         </span>
                     </label>
                 </div>
                 <button class="pay-btn" id="btn-to-step4" disabled data-i18n="payBtnEmpty">Select a pass</button>
-                <a href="#" id="btn-skip-passes" style="display:block; text-align:center; margin-top:14px; font-size:12.5px; color:#64748b; font-weight:600;" data-i18n="skipPassesLink">Continue without a pass — explore for free →</a>
+                <a href="#" id="btn-skip-passes" style="display:block; text-align:center; margin-top:16px; font-size:11px; color:#cbd5e1; font-weight:500;" data-i18n="skipPassesLink">Continue with the free version</a>
             </div>
 
             <div id="auth-step-4" class="auth-step hidden">
@@ -251,6 +251,19 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Confirmation avant de continuer en version gratuite (dissuasive, comme demandé) -->
+<div id="skip-passes-confirm-modal" class="auth-modal hidden" style="z-index:10001;">
+    <div class="auth-modal-content" style="max-width:420px; grid-template-columns:1fr;">
+        <button class="close-auth-btn" id="skip-passes-confirm-close">&times;</button>
+        <div class="auth-left" style="padding:40px 36px;">
+            <h2 style="font-size:20px; margin-bottom:10px;" data-i18n="skipConfirmTitle">Are you sure?</h2>
+            <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:24px;" data-i18n="skipConfirmBody">With the free version, you'll only have access to 3 locations. Unlock the full guide (500+ addresses) with a Travel or VIP pass instead.</p>
+            <button class="pay-btn" id="skip-passes-confirm-back" data-i18n="skipConfirmBack">See the passes again</button>
+            <a href="#" id="skip-passes-confirm-proceed" style="display:block; text-align:center; margin-top:14px; font-size:11px; color:#cbd5e1; font-weight:500;" data-i18n="skipConfirmProceed">No thanks, continue for free</a>
+        </div>
     </div>
 </div>
 

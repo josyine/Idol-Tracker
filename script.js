@@ -372,6 +372,19 @@ function hasGuidePass() {
 }
 window.hasGuidePass = hasGuidePass;
 
+// Affiche/masque et met à jour le compteur "X/3 lieux gratuits restants" (voir
+// #free-views-counter dans map.html) — masqué dès qu'un pass est actif, sinon reflète
+// le nombre de fiches lieu DIFFÉRENTES déjà consultées gratuitement.
+function updateFreeViewsCounter() {
+    const el = document.getElementById('free-views-counter');
+    if (!el) return;
+    if (hasGuidePass()) { el.classList.add('hidden'); return; }
+    const remaining = Math.max(0, FREE_LOCATION_VIEW_LIMIT - getViewedLocationIds().length);
+    el.textContent = t('freeViewsCounter').replace('{remaining}', remaining);
+    el.classList.remove('hidden');
+}
+window.updateFreeViewsCounter = updateFreeViewsCounter;
+
 // Achat toujours simulé pour l'instant (aucun vrai système de paiement branché, voir
 // buyGuidePass ci-dessous et le texte du popup du paywall) : enregistre le pass dans
 // Firestore + localStorage, ferme le paywall, puis rouvre automatiquement la fiche lieu
@@ -388,6 +401,7 @@ window.buyGuidePass = async function (type) {
         fields.guidePassExpiresAt = null;
     }
     if (typeof window.syncUserData === 'function') await window.syncUserData(fields);
+    updateFreeViewsCounter();
 
     closeModal('cart-modal');
     const pendingId = window.__pendingPaywallLocId;
@@ -400,6 +414,25 @@ window.buyGuidePass = async function (type) {
 window.openGuidePaywallModal = function () {
     const modal = document.getElementById('cart-modal');
     if (!modal) return;
+    const active = hasGuidePass();
+    const limitBlock = document.getElementById('paywall-limit-block');
+    const activeBlock = document.getElementById('paywall-active-block');
+    const cards = document.getElementById('paywall-cards');
+    if (limitBlock) limitBlock.classList.toggle('hidden', active);
+    if (activeBlock) activeBlock.classList.toggle('hidden', !active);
+    if (cards) cards.classList.toggle('hidden', active);
+    if (active && activeBlock) {
+        const type = localStorage.getItem('guidePassType');
+        const descEl = document.getElementById('paywall-active-desc');
+        if (descEl) {
+            if (type === 'lifetime') {
+                descEl.textContent = t('paywallActiveDescVip');
+            } else {
+                const expiresAt = parseInt(localStorage.getItem('guidePassExpiresAt') || '0', 10);
+                descEl.textContent = t('paywallActiveDescMonthly').replace('{date}', new Date(expiresAt).toLocaleDateString(currentLang));
+            }
+        }
+    }
     modal.classList.remove('hidden');
 };
 // Alias conservé : le bouton "Unlock Passes" du header (toutes les pages) appelle encore
@@ -1703,10 +1736,16 @@ const translations = {
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
         tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
         mapLoading: "Loading map…",
+        demoTourBtn: "Tour",
         newLocationToastLabel: "New location added",
-        paywallTitle: "🔒 You've reached your free limit (3/3)", paywallBody: "Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.",
-        paywallMonthlyName: "🎟️ TRAVEL PASS (1 Month)", paywallMonthlyDesc: "Perfect for planning a short trip.", paywallFeatureFullAccess: "Full access to 500+ addresses", paywallFeatureGPS: "Exact GPS coordinates", paywallMonthlyPrice: "€9.99 / month", paywallMonthlyTerms: "No commitment", paywallBuyMonthly: "Get the Travel Pass",
-        paywallVipName: "👑 VIP PASS (Lifetime Access)", paywallVipBadge: "⭐️ BEST VALUE", paywallVipDesc: "For true fans. Pay once, enjoy forever.", paywallFeatureUpdates: "Updates included (new locations added monthly)", paywallFeatureOffline: "Offline mode (coming soon)", paywallVipPrice: "€19.99 (one-time payment)", paywallBuyVip: "Get the VIP Pass"
+        paywallTitle: "You've reached your free limit (3/3)", paywallBody: "Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.",
+        paywallMonthlyName: "TRAVEL PASS (1 Month)", paywallMonthlyDesc: "Perfect for planning a short trip.", paywallFeatureFullAccess: "Full access to 500+ addresses", paywallFeatureGPS: "Exact GPS coordinates", paywallMonthlyPrice: "€9.99 / month", paywallMonthlyTerms: "No commitment", paywallBuyMonthly: "Get the Travel Pass",
+        paywallVipName: "VIP PASS (Lifetime Access)", paywallVipBadge: "⭐️ BEST VALUE", paywallVipDesc: "For true fans. Pay once, enjoy forever.", paywallFeatureUpdates: "Updates included (new locations added monthly)", paywallFeatureOffline: "Offline mode (coming soon)", paywallVipPrice: "€19.99 (one-time payment)", paywallBuyVip: "Get the VIP Pass",
+        paywallActiveTitle: "You already have an active pass",
+        paywallActiveDescMonthly: "Your Travel Pass is active until {date}. Thanks for supporting Screen To Street!", paywallActiveDescVip: "Your VIP Pass gives you lifetime access. Thanks for supporting Screen To Street!",
+        freeViewsCounter: "{remaining}/3 free locations left",
+        paymentTitle: "Complete your purchase", paymentDesc: "Enter your payment details to unlock the full guide.", paymentSummaryLabel: "Selected pass:", paymentTotalLabel: "Total due:",
+        cardNum: "Card Number", expiry: "Expiry Date", cvc: "CVC", paySecurely: "Pay securely", processing: "Processing securely…", paymentBackLink: "← Back to map"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -1758,10 +1797,16 @@ const translations = {
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
         tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
         mapLoading: "Chargement de la carte…",
+        demoTourBtn: "Visite",
         newLocationToastLabel: "Nouveau lieu ajouté",
-        paywallTitle: "🔒 Vous avez atteint votre limite gratuite (3/3)", paywallBody: "La carte secrète vous plaît ? Il reste encore plus de 500 adresses à découvrir ! Débloquez l'intégralité des lieux de tournages, restaurants iconiques et adresses fréquentées par vos idoles pour préparer le voyage de vos rêves.",
-        paywallMonthlyName: "🎟️ PASS VOYAGE (1 Mois)", paywallMonthlyDesc: "Parfait pour planifier un séjour court.", paywallFeatureFullAccess: "Accès total aux 500+ adresses", paywallFeatureGPS: "Coordonnées GPS exactes", paywallMonthlyPrice: "9,99 € / mois", paywallMonthlyTerms: "Sans engagement", paywallBuyMonthly: "Obtenir le Pass Voyage",
-        paywallVipName: "👑 PASS VIP (Accès à vie)", paywallVipBadge: "⭐️ MEILLEUR CHOIX", paywallVipDesc: "Pour les vrais passionnés. Payez une fois, profitez-en pour toujours.", paywallFeatureUpdates: "Mises à jour incluses (nouveaux lieux ajoutés chaque mois)", paywallFeatureOffline: "Mode Hors-Ligne (bientôt disponible)", paywallVipPrice: "19,99 € (paiement unique)", paywallBuyVip: "Obtenir le Pass VIP"
+        paywallTitle: "Vous avez atteint votre limite gratuite (3/3)", paywallBody: "La carte secrète vous plaît ? Il reste encore plus de 500 adresses à découvrir ! Débloquez l'intégralité des lieux de tournages, restaurants iconiques et adresses fréquentées par vos idoles pour préparer le voyage de vos rêves.",
+        paywallMonthlyName: "PASS VOYAGE (1 Mois)", paywallMonthlyDesc: "Parfait pour planifier un séjour court.", paywallFeatureFullAccess: "Accès total aux 500+ adresses", paywallFeatureGPS: "Coordonnées GPS exactes", paywallMonthlyPrice: "9,99 € / mois", paywallMonthlyTerms: "Sans engagement", paywallBuyMonthly: "Obtenir le Pass Voyage",
+        paywallVipName: "PASS VIP (Accès à vie)", paywallVipBadge: "⭐️ MEILLEUR CHOIX", paywallVipDesc: "Pour les vrais passionnés. Payez une fois, profitez-en pour toujours.", paywallFeatureUpdates: "Mises à jour incluses (nouveaux lieux ajoutés chaque mois)", paywallFeatureOffline: "Mode Hors-Ligne (bientôt disponible)", paywallVipPrice: "19,99 € (paiement unique)", paywallBuyVip: "Obtenir le Pass VIP",
+        paywallActiveTitle: "Vous avez déjà un pass actif",
+        paywallActiveDescMonthly: "Votre Pass Voyage est actif jusqu'au {date}. Merci de soutenir Screen To Street !", paywallActiveDescVip: "Votre Pass VIP vous donne un accès à vie. Merci de soutenir Screen To Street !",
+        freeViewsCounter: "{remaining}/3 lieux gratuits restants",
+        paymentTitle: "Finaliser votre achat", paymentDesc: "Renseignez vos informations de paiement pour débloquer le guide complet.", paymentSummaryLabel: "Pass sélectionné :", paymentTotalLabel: "Total dû :",
+        cardNum: "Numéro de carte", expiry: "Date d'expiration", cvc: "CVC", paySecurely: "Payer en toute sécurité", processing: "Traitement sécurisé en cours…", paymentBackLink: "← Retour à la carte"
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -1813,10 +1858,16 @@ const translations = {
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
         mapLoading: "Cargando el mapa…",
+        demoTourBtn: "Recorrido",
         newLocationToastLabel: "Nuevo lugar añadido",
-        paywallTitle: "🔒 Has alcanzado tu límite gratuito (3/3)", paywallBody: "¿Te gusta el mapa secreto? ¡Todavía quedan más de 500 direcciones por descubrir! Desbloquea todos los lugares de rodaje, restaurantes icónicos y direcciones que frecuentan tus ídolos para preparar el viaje de tus sueños.",
-        paywallMonthlyName: "🎟️ PASE VIAJE (1 Mes)", paywallMonthlyDesc: "Perfecto para planificar una estancia corta.", paywallFeatureFullAccess: "Acceso total a más de 500 direcciones", paywallFeatureGPS: "Coordenadas GPS exactas", paywallMonthlyPrice: "9,99 € / mes", paywallMonthlyTerms: "Sin compromiso", paywallBuyMonthly: "Obtener el Pase Viaje",
-        paywallVipName: "👑 PASE VIP (Acceso de por vida)", paywallVipBadge: "⭐️ MEJOR OPCIÓN", paywallVipDesc: "Para los verdaderos fans. Paga una vez, disfruta para siempre.", paywallFeatureUpdates: "Actualizaciones incluidas (nuevos lugares cada mes)", paywallFeatureOffline: "Modo sin conexión (próximamente)", paywallVipPrice: "19,99 € (pago único)", paywallBuyVip: "Obtener el Pase VIP"
+        paywallTitle: "Has alcanzado tu límite gratuito (3/3)", paywallBody: "¿Te gusta el mapa secreto? ¡Todavía quedan más de 500 direcciones por descubrir! Desbloquea todos los lugares de rodaje, restaurantes icónicos y direcciones que frecuentan tus ídolos para preparar el viaje de tus sueños.",
+        paywallMonthlyName: "PASE VIAJE (1 Mes)", paywallMonthlyDesc: "Perfecto para planificar una estancia corta.", paywallFeatureFullAccess: "Acceso total a más de 500 direcciones", paywallFeatureGPS: "Coordenadas GPS exactas", paywallMonthlyPrice: "9,99 € / mes", paywallMonthlyTerms: "Sin compromiso", paywallBuyMonthly: "Obtener el Pase Viaje",
+        paywallVipName: "PASE VIP (Acceso de por vida)", paywallVipBadge: "⭐️ MEJOR OPCIÓN", paywallVipDesc: "Para los verdaderos fans. Paga una vez, disfruta para siempre.", paywallFeatureUpdates: "Actualizaciones incluidas (nuevos lugares cada mes)", paywallFeatureOffline: "Modo sin conexión (próximamente)", paywallVipPrice: "19,99 € (pago único)", paywallBuyVip: "Obtener el Pase VIP",
+        paywallActiveTitle: "Ya tienes un pase activo",
+        paywallActiveDescMonthly: "Tu Pase Viaje está activo hasta el {date}. ¡Gracias por apoyar a Screen To Street!", paywallActiveDescVip: "Tu Pase VIP te da acceso de por vida. ¡Gracias por apoyar a Screen To Street!",
+        freeViewsCounter: "{remaining}/3 lugares gratuitos restantes",
+        paymentTitle: "Finaliza tu compra", paymentDesc: "Introduce tus datos de pago para desbloquear la guía completa.", paymentSummaryLabel: "Pase seleccionado:", paymentTotalLabel: "Total a pagar:",
+        cardNum: "Número de tarjeta", expiry: "Fecha de caducidad", cvc: "CVC", paySecurely: "Pagar de forma segura", processing: "Procesando de forma segura…", paymentBackLink: "← Volver al mapa"
     },
     it: {
         btnGenerateIti: "Generatore di Itinerari", filterGroup: "GRUPPO", filterMember: "MEMBRO", filterArea: "ZONA", filterYear: "ANNO", filterCategories: "CATEGORIE",
@@ -1868,10 +1919,16 @@ const translations = {
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
         tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
         mapLoading: "Caricamento della mappa…",
+        demoTourBtn: "Tour",
         newLocationToastLabel: "Nuovo luogo aggiunto",
-        paywallTitle: "🔒 Hai raggiunto il tuo limite gratuito (3/3)", paywallBody: "Ti piace la mappa segreta? Ci sono ancora più di 500 indirizzi da scoprire! Sblocca tutti i luoghi delle riprese, i ristoranti iconici e gli indirizzi frequentati dai tuoi idoli per preparare il viaggio dei tuoi sogni.",
-        paywallMonthlyName: "🎟️ PASS VIAGGIO (1 Mese)", paywallMonthlyDesc: "Perfetto per pianificare un soggiorno breve.", paywallFeatureFullAccess: "Accesso completo a oltre 500 indirizzi", paywallFeatureGPS: "Coordinate GPS esatte", paywallMonthlyPrice: "9,99 € / mese", paywallMonthlyTerms: "Senza vincoli", paywallBuyMonthly: "Ottieni il Pass Viaggio",
-        paywallVipName: "👑 PASS VIP (Accesso a vita)", paywallVipBadge: "⭐️ SCELTA MIGLIORE", paywallVipDesc: "Per i veri appassionati. Paga una volta, goditelo per sempre.", paywallFeatureUpdates: "Aggiornamenti inclusi (nuovi luoghi ogni mese)", paywallFeatureOffline: "Modalità offline (presto disponibile)", paywallVipPrice: "19,99 € (pagamento unico)", paywallBuyVip: "Ottieni il Pass VIP"
+        paywallTitle: "Hai raggiunto il tuo limite gratuito (3/3)", paywallBody: "Ti piace la mappa segreta? Ci sono ancora più di 500 indirizzi da scoprire! Sblocca tutti i luoghi delle riprese, i ristoranti iconici e gli indirizzi frequentati dai tuoi idoli per preparare il viaggio dei tuoi sogni.",
+        paywallMonthlyName: "PASS VIAGGIO (1 Mese)", paywallMonthlyDesc: "Perfetto per pianificare un soggiorno breve.", paywallFeatureFullAccess: "Accesso completo a oltre 500 indirizzi", paywallFeatureGPS: "Coordinate GPS esatte", paywallMonthlyPrice: "9,99 € / mese", paywallMonthlyTerms: "Senza vincoli", paywallBuyMonthly: "Ottieni il Pass Viaggio",
+        paywallVipName: "PASS VIP (Accesso a vita)", paywallVipBadge: "⭐️ SCELTA MIGLIORE", paywallVipDesc: "Per i veri appassionati. Paga una volta, goditelo per sempre.", paywallFeatureUpdates: "Aggiornamenti inclusi (nuovi luoghi ogni mese)", paywallFeatureOffline: "Modalità offline (presto disponibile)", paywallVipPrice: "19,99 € (pagamento unico)", paywallBuyVip: "Ottieni il Pass VIP",
+        paywallActiveTitle: "Hai già un pass attivo",
+        paywallActiveDescMonthly: "Il tuo Pass Viaggio è attivo fino al {date}. Grazie per sostenere Screen To Street!", paywallActiveDescVip: "Il tuo Pass VIP ti dà accesso a vita. Grazie per sostenere Screen To Street!",
+        freeViewsCounter: "{remaining}/3 luoghi gratuiti rimasti",
+        paymentTitle: "Completa il tuo acquisto", paymentDesc: "Inserisci i tuoi dati di pagamento per sbloccare la guida completa.", paymentSummaryLabel: "Pass selezionato:", paymentTotalLabel: "Totale dovuto:",
+        cardNum: "Numero carta", expiry: "Data di scadenza", cvc: "CVC", paySecurely: "Paga in sicurezza", processing: "Elaborazione sicura in corso…", paymentBackLink: "← Torna alla mappa"
     },
     pt: {
         btnGenerateIti: "Gerador de Roteiros", filterGroup: "GRUPO", filterMember: "MEMBRO", filterArea: "REGIÃO", filterYear: "ANO", filterCategories: "CATEGORIAS",
@@ -1923,10 +1980,16 @@ const translations = {
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
         mapLoading: "Carregando o mapa…",
+        demoTourBtn: "Tour guiado",
         newLocationToastLabel: "Novo local adicionado",
-        paywallTitle: "🔒 Você atingiu seu limite gratuito (3/3)", paywallBody: "Está gostando do mapa secreto? Ainda há mais de 500 endereços para descobrir! Desbloqueie todos os locais de filmagem, restaurantes icônicos e endereços frequentados pelos seus ídolos para planejar a viagem dos seus sonhos.",
-        paywallMonthlyName: "🎟️ PASSE VIAGEM (1 Mês)", paywallMonthlyDesc: "Perfeito para planejar uma estadia curta.", paywallFeatureFullAccess: "Acesso total a mais de 500 endereços", paywallFeatureGPS: "Coordenadas GPS exatas", paywallMonthlyPrice: "€9,99 / mês", paywallMonthlyTerms: "Sem compromisso", paywallBuyMonthly: "Obter o Passe Viagem",
-        paywallVipName: "👑 PASSE VIP (Acesso vitalício)", paywallVipBadge: "⭐️ MELHOR ESCOLHA", paywallVipDesc: "Para os verdadeiros fãs. Pague uma vez, aproveite para sempre.", paywallFeatureUpdates: "Atualizações incluídas (novos locais todo mês)", paywallFeatureOffline: "Modo offline (em breve)", paywallVipPrice: "€19,99 (pagamento único)", paywallBuyVip: "Obter o Passe VIP"
+        paywallTitle: "Você atingiu seu limite gratuito (3/3)", paywallBody: "Está gostando do mapa secreto? Ainda há mais de 500 endereços para descobrir! Desbloqueie todos os locais de filmagem, restaurantes icônicos e endereços frequentados pelos seus ídolos para planejar a viagem dos seus sonhos.",
+        paywallMonthlyName: "PASSE VIAGEM (1 Mês)", paywallMonthlyDesc: "Perfeito para planejar uma estadia curta.", paywallFeatureFullAccess: "Acesso total a mais de 500 endereços", paywallFeatureGPS: "Coordenadas GPS exatas", paywallMonthlyPrice: "€9,99 / mês", paywallMonthlyTerms: "Sem compromisso", paywallBuyMonthly: "Obter o Passe Viagem",
+        paywallVipName: "PASSE VIP (Acesso vitalício)", paywallVipBadge: "⭐️ MELHOR ESCOLHA", paywallVipDesc: "Para os verdadeiros fãs. Pague uma vez, aproveite para sempre.", paywallFeatureUpdates: "Atualizações incluídas (novos locais todo mês)", paywallFeatureOffline: "Modo offline (em breve)", paywallVipPrice: "€19,99 (pagamento único)", paywallBuyVip: "Obter o Passe VIP",
+        paywallActiveTitle: "Você já tem um passe ativo",
+        paywallActiveDescMonthly: "Seu Passe Viagem está ativo até {date}. Obrigado por apoiar o Screen To Street!", paywallActiveDescVip: "Seu Passe VIP te dá acesso vitalício. Obrigado por apoiar o Screen To Street!",
+        freeViewsCounter: "{remaining}/3 locais gratuitos restantes",
+        paymentTitle: "Finalize sua compra", paymentDesc: "Insira seus dados de pagamento para desbloquear o guia completo.", paymentSummaryLabel: "Passe selecionado:", paymentTotalLabel: "Total devido:",
+        cardNum: "Número do cartão", expiry: "Data de validade", cvc: "CVC", paySecurely: "Pagar com segurança", processing: "Processando com segurança…", paymentBackLink: "← Voltar ao mapa"
     },
     ko: {
         btnGenerateIti: "자동 일정 생성기", filterGroup: "그룹", filterMember: "멤버", filterArea: "지역", filterYear: "연도", filterCategories: "카테고리",
@@ -1978,10 +2041,16 @@ const translations = {
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
         tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
         mapLoading: "지도를 불러오는 중…",
+        demoTourBtn: "투어",
         newLocationToastLabel: "새로운 장소 추가됨",
-        paywallTitle: "🔒 무료 열람 한도에 도달했습니다 (3/3)", paywallBody: "비밀 지도가 마음에 드시나요? 아직 500개 이상의 주소가 더 남아있어요! 촬영지, 인기 맛집, 그리고 아이돌이 자주 찾는 장소까지 모두 잠금 해제하고 꿈꾸던 여행을 준비해 보세요.",
-        paywallMonthlyName: "🎟️ 트래블 패스 (1개월)", paywallMonthlyDesc: "짧은 여행 계획에 딱이에요.", paywallFeatureFullAccess: "500개 이상 주소 전체 이용 가능", paywallFeatureGPS: "정확한 GPS 좌표", paywallMonthlyPrice: "월 9.99€", paywallMonthlyTerms: "약정 없음", paywallBuyMonthly: "트래블 패스 구매",
-        paywallVipName: "👑 VIP 패스 (평생 이용)", paywallVipBadge: "⭐️ 최고의 선택", paywallVipDesc: "진짜 팬을 위한 패스. 한 번 결제로 평생 이용하세요.", paywallFeatureUpdates: "업데이트 포함 (매달 새로운 장소 추가)", paywallFeatureOffline: "오프라인 모드 (출시 예정)", paywallVipPrice: "19.99€ (일회성 결제)", paywallBuyVip: "VIP 패스 구매"
+        paywallTitle: "무료 열람 한도에 도달했습니다 (3/3)", paywallBody: "비밀 지도가 마음에 드시나요? 아직 500개 이상의 주소가 더 남아있어요! 촬영지, 인기 맛집, 그리고 아이돌이 자주 찾는 장소까지 모두 잠금 해제하고 꿈꾸던 여행을 준비해 보세요.",
+        paywallMonthlyName: "트래블 패스 (1개월)", paywallMonthlyDesc: "짧은 여행 계획에 딱이에요.", paywallFeatureFullAccess: "500개 이상 주소 전체 이용 가능", paywallFeatureGPS: "정확한 GPS 좌표", paywallMonthlyPrice: "월 9.99€", paywallMonthlyTerms: "약정 없음", paywallBuyMonthly: "트래블 패스 구매",
+        paywallVipName: "VIP 패스 (평생 이용)", paywallVipBadge: "⭐️ 최고의 선택", paywallVipDesc: "진짜 팬을 위한 패스. 한 번 결제로 평생 이용하세요.", paywallFeatureUpdates: "업데이트 포함 (매달 새로운 장소 추가)", paywallFeatureOffline: "오프라인 모드 (출시 예정)", paywallVipPrice: "19.99€ (일회성 결제)", paywallBuyVip: "VIP 패스 구매",
+        paywallActiveTitle: "이미 이용 중인 패스가 있습니다",
+        paywallActiveDescMonthly: "트래블 패스가 {date}까지 활성화되어 있습니다. Screen To Street를 응원해 주셔서 감사합니다!", paywallActiveDescVip: "VIP 패스로 평생 이용이 가능합니다. Screen To Street를 응원해 주셔서 감사합니다!",
+        freeViewsCounter: "무료 열람 {remaining}/3곳 남음",
+        paymentTitle: "결제 완료하기", paymentDesc: "전체 가이드를 이용하려면 결제 정보를 입력하세요.", paymentSummaryLabel: "선택한 패스:", paymentTotalLabel: "결제 금액:",
+        cardNum: "카드 번호", expiry: "유효 기간", cvc: "CVC", paySecurely: "안전하게 결제하기", processing: "안전하게 처리 중…", paymentBackLink: "← 지도로 돌아가기"
     },
     ja: {
         btnGenerateIti: "自動旅程ジェネレーター", filterGroup: "グループ", filterMember: "メンバー", filterArea: "エリア", filterYear: "年", filterCategories: "カテゴリー",
@@ -2033,10 +2102,16 @@ const translations = {
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
         tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
         mapLoading: "地図を読み込み中…",
+        demoTourBtn: "ツアー",
         newLocationToastLabel: "新しい場所が追加されました",
-        paywallTitle: "🔒 無料閲覧の上限に達しました (3/3)", paywallBody: "シークレットマップは気に入りましたか？まだ500件以上の住所が残っています！ロケ地、人気レストラン、推しがよく訪れる場所をすべて解放して、夢の旅行を計画しましょう。",
-        paywallMonthlyName: "🎟️ トラベルパス（1ヶ月）", paywallMonthlyDesc: "短期旅行の計画にぴったり。", paywallFeatureFullAccess: "500件以上の住所に完全アクセス", paywallFeatureGPS: "正確なGPS座標", paywallMonthlyPrice: "月額 9.99€", paywallMonthlyTerms: "契約縛りなし", paywallBuyMonthly: "トラベルパスを購入",
-        paywallVipName: "👑 VIPパス（生涯アクセス）", paywallVipBadge: "⭐️ ベストチョイス", paywallVipDesc: "本気のファンのために。一度の支払いでずっと利用できます。", paywallFeatureUpdates: "アップデート込み（毎月新しい場所を追加）", paywallFeatureOffline: "オフラインモード（近日公開）", paywallVipPrice: "19.99€（一括払い）", paywallBuyVip: "VIPパスを購入"
+        paywallTitle: "無料閲覧の上限に達しました (3/3)", paywallBody: "シークレットマップは気に入りましたか？まだ500件以上の住所が残っています！ロケ地、人気レストラン、推しがよく訪れる場所をすべて解放して、夢の旅行を計画しましょう。",
+        paywallMonthlyName: "トラベルパス（1ヶ月）", paywallMonthlyDesc: "短期旅行の計画にぴったり。", paywallFeatureFullAccess: "500件以上の住所に完全アクセス", paywallFeatureGPS: "正確なGPS座標", paywallMonthlyPrice: "月額 9.99€", paywallMonthlyTerms: "契約縛りなし", paywallBuyMonthly: "トラベルパスを購入",
+        paywallVipName: "VIPパス（生涯アクセス）", paywallVipBadge: "⭐️ ベストチョイス", paywallVipDesc: "本気のファンのために。一度の支払いでずっと利用できます。", paywallFeatureUpdates: "アップデート込み（毎月新しい場所を追加）", paywallFeatureOffline: "オフラインモード（近日公開）", paywallVipPrice: "19.99€（一括払い）", paywallBuyVip: "VIPパスを購入",
+        paywallActiveTitle: "すでに有効なパスをお持ちです",
+        paywallActiveDescMonthly: "トラベルパスは{date}まで有効です。Screen To Streetを応援いただきありがとうございます！", paywallActiveDescVip: "VIPパスで生涯アクセスが可能です。Screen To Streetを応援いただきありがとうございます！",
+        freeViewsCounter: "無料閲覧 残り{remaining}/3件",
+        paymentTitle: "お支払いを完了する", paymentDesc: "ガイド全体を利用するにはお支払い情報を入力してください。", paymentSummaryLabel: "選択したパス：", paymentTotalLabel: "お支払い金額：",
+        cardNum: "カード番号", expiry: "有効期限", cvc: "CVC", paySecurely: "安全に支払う", processing: "安全に処理中…", paymentBackLink: "← 地図に戻る"
     },
     zh: {
         btnGenerateIti: "自动行程生成器", filterGroup: "团体", filterMember: "成员", filterArea: "地区", filterYear: "年份", filterCategories: "分类",
@@ -2088,10 +2163,16 @@ const translations = {
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
         tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
         mapLoading: "地图加载中…",
+        demoTourBtn: "导览",
         newLocationToastLabel: "新增地点",
-        paywallTitle: "🔒 已达到免费浏览上限 (3/3)", paywallBody: "喜欢这份秘密地图吗？还有500多个地址等你发现！解锁全部取景地、人气餐厅和爱豆常去的地方，规划你的梦想之旅。",
-        paywallMonthlyName: "🎟️ 旅行通行证（1个月）", paywallMonthlyDesc: "适合规划短途旅行。", paywallFeatureFullAccess: "解锁全部500+地址", paywallFeatureGPS: "精确GPS坐标", paywallMonthlyPrice: "€9.99 / 月", paywallMonthlyTerms: "随时可取消", paywallBuyMonthly: "获取旅行通行证",
-        paywallVipName: "👑 VIP通行证（终身访问）", paywallVipBadge: "⭐️ 最超值", paywallVipDesc: "为真正的粉丝打造。一次付款，永久使用。", paywallFeatureUpdates: "包含更新（每月新增地点）", paywallFeatureOffline: "离线模式（即将推出）", paywallVipPrice: "€19.99（一次性付款）", paywallBuyVip: "获取VIP通行证"
+        paywallTitle: "已达到免费浏览上限 (3/3)", paywallBody: "喜欢这份秘密地图吗？还有500多个地址等你发现！解锁全部取景地、人气餐厅和爱豆常去的地方，规划你的梦想之旅。",
+        paywallMonthlyName: "旅行通行证（1个月）", paywallMonthlyDesc: "适合规划短途旅行。", paywallFeatureFullAccess: "解锁全部500+地址", paywallFeatureGPS: "精确GPS坐标", paywallMonthlyPrice: "€9.99 / 月", paywallMonthlyTerms: "随时可取消", paywallBuyMonthly: "获取旅行通行证",
+        paywallVipName: "VIP通行证（终身访问）", paywallVipBadge: "⭐️ 最超值", paywallVipDesc: "为真正的粉丝打造。一次付款，永久使用。", paywallFeatureUpdates: "包含更新（每月新增地点）", paywallFeatureOffline: "离线模式（即将推出）", paywallVipPrice: "€19.99（一次性付款）", paywallBuyVip: "获取VIP通行证",
+        paywallActiveTitle: "您已拥有有效的通行证",
+        paywallActiveDescMonthly: "您的旅行通行证有效期至{date}。感谢您支持 Screen To Street！", paywallActiveDescVip: "您的VIP通行证享有终身访问权限。感谢您支持 Screen To Street！",
+        freeViewsCounter: "剩余免费地点 {remaining}/3",
+        paymentTitle: "完成购买", paymentDesc: "输入您的支付信息以解锁完整指南。", paymentSummaryLabel: "已选通行证：", paymentTotalLabel: "应付总额：",
+        cardNum: "卡号", expiry: "有效期", cvc: "CVC", paySecurely: "安全支付", processing: "正在安全处理…", paymentBackLink: "← 返回地图"
     }
 };
 
@@ -2185,6 +2266,7 @@ function updateUI() {
 
     if (typeof window.initTourModeBadge === 'function') window.initTourModeBadge();
     if (typeof window.refreshTourModeLanguage === 'function') window.refreshTourModeLanguage();
+    if (typeof window.updateFreeViewsCounter === 'function') window.updateFreeViewsCounter();
 }
 
 window.openItineraryModal = function() {
@@ -2346,7 +2428,14 @@ function initializeFilters() {
     }
 }
 
-function renderLocations() {
+// `skipFitBounds` : au tout premier rendu après connexion (voir map.html), on ne veut
+// SURTOUT PAS que la carte se recadre sur l'étendue de TOUS les lieux affichés (Corée,
+// Japon, USA, Europe...) — ça écrasait immédiatement le centrage sur le pays choisi à
+// l'inscription par une vue dézoomée sur le monde entier, ce qui était la vraie cause du
+// "la carte ne zoome pas sur mon pays" / "grandes zones grises" remontés plusieurs fois.
+// Tous les autres appels (changement de filtre, recherche...) gardent le comportement
+// habituel : recadrer sur ce qui est maintenant affiché.
+function renderLocations(skipFitBounds) {
     const groupSelect = document.getElementById('group-select');
     const memberSelect = document.getElementById('member-select');
     const yearSelect = document.getElementById('year-select');
@@ -2411,7 +2500,7 @@ function renderLocations() {
         locationListElement.appendChild(card);
     });
 
-    renderMapMarkers(filteredLocations, { fitBounds: true });
+    renderMapMarkers(filteredLocations, { fitBounds: !skipFitBounds });
 }
 
 // ==========================================
@@ -2972,11 +3061,13 @@ window.openDetailsPanel = function(id) {
             if (viewed.length >= FREE_LOCATION_VIEW_LIMIT) {
                 window.__pendingPaywallLocId = id;
                 window.openGuidePaywallModal();
+                updateFreeViewsCounter();
                 return;
             }
             viewed.push(id);
             localStorage.setItem('viewedLocationIds', JSON.stringify(viewed));
             if (typeof window.syncUserData === 'function') window.syncUserData({ viewedLocationIds: viewed });
+            updateFreeViewsCounter();
         }
     }
 
@@ -3337,9 +3428,13 @@ window.closeDetailsPanel = function() {
     const topTabs = document.querySelector('.sidebar-top-tabs');
     if(topTabs) topTabs.style.display = 'flex';
 
+    // On retire aussi "open" (pas seulement "expanded") : sur mobile, ouvrir la fiche d'un
+    // lieu force la sidebar en plein écran (voir openDetailsPanel plus haut) — sans ce
+    // retrait, fermer la fiche laissait la sidebar bloquée en plein écran par-dessus la
+    // carte (et, dans le guide de démo, par-dessus le menu profil des étapes suivantes).
     const sidebar = document.getElementById('app-sidebar');
-    if(sidebar) sidebar.classList.remove('expanded'); 
-    
+    if(sidebar) { sidebar.classList.remove('expanded'); sidebar.classList.remove('open'); }
+
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     
@@ -3588,6 +3683,23 @@ const ITI_CATEGORY_PROFILE = {
 const ITI_DEFAULT_PROFILE = { openHour: 9, closeHour: 19, visitMinutes: 45 };
 function getCategoryProfile(cat) { return ITI_CATEGORY_PROFILE[cat] || ITI_DEFAULT_PROFILE; }
 
+// La catégorie seule ne suffit pas : certains lieux ne sont pas de simples arrêts de
+// quelques dizaines de minutes mais des destinations à part entière où l'on passe
+// naturellement une demi-journée, voire la journée complète (un parc à thème classé "Run
+// BTS" au même titre qu'un café de quartier, par exemple). On les repère par mots-clés
+// dans leur nom plutôt que d'exiger un champ dédié sur chacune des dizaines de lieux —
+// et un lieu peut toujours définir son propre "visitMinutes" pour un cas particulier.
+const ITI_FULL_DAY_KEYWORDS = ['lotte world', 'everland', 'caribbean bay', 'universal studios', 'disneyland', 'disney world', 'ocean park', 'seoul land', 'e-world', 'wolmi'];
+const ITI_HALF_DAY_KEYWORDS = ['folk village', 'hanok village', 'zoo', 'aquarium', 'theme park', 'amusement park', 'national park', 'botanical garden', 'water park', 'safari'];
+function getLocationVisitProfile(loc) {
+    const base = getCategoryProfile(loc.category);
+    if (typeof loc.visitMinutes === 'number') return Object.assign({}, base, { visitMinutes: loc.visitMinutes });
+    const name = (loc.name || '').toLowerCase();
+    if (ITI_FULL_DAY_KEYWORDS.some(k => name.includes(k))) return Object.assign({}, base, { visitMinutes: 480 });
+    if (ITI_HALF_DAY_KEYWORDS.some(k => name.includes(k))) return Object.assign({}, base, { visitMinutes: 180 });
+    return base;
+}
+
 // Constantes de planification partagées par l'Auto-Itinerary Generator ET par My Trips
 // (voir computeDayTimeline / buildDayPlans juste en dessous) : la journée démarre à
 // 9h30, ne dépasse jamais 20h, et une pause déjeuner d'1h s'insère automatiquement la
@@ -3611,7 +3723,7 @@ function computeDayTimeline(dayLocs, homeBase) {
     let lunchTaken = false;
     let prevPoint = homeBase || null;
     dayLocs.forEach(loc => {
-        const profile = getCategoryProfile(loc.category);
+        const profile = getLocationVisitProfile(loc);
         let arrival = curTime;
         let leg = null;
         if (prevPoint) {

@@ -528,11 +528,23 @@
                 </div>
                 <span style="color: #cbd5e1;">|</span>
                 <div id="btn-show-countries" class="stat-pill-btn" onclick="openFilteredListModal('countries')">
-                    <span id="stat-countries" class="stat-pill-num">0</span> 
+                    <span id="stat-countries" class="stat-pill-num">0</span>
                     <span class="stat-pill-text" data-i18n="statsCountries">COUNTRIES</span>
                 </div>
             </div>
         </div>
+
+        <!-- Compteur de fiches lieu gratuites restantes (voir openDetailsPanel()/
+             updateFreeViewsCounter() dans script.js) : masqué dès qu'un pass est actif. -->
+        <div id="free-views-counter" class="free-views-counter hidden"></div>
+
+        <!-- Bouton pour (re)lancer le guide de démo à tout moment (voir map-tour.js) :
+             visible uniquement en mode démo (map.html?demo=1), affiché/masqué dans le
+             bloc firebase-ready plus bas selon window.__demoMode. -->
+        <button id="demo-tour-btn" class="demo-tour-btn hidden" type="button" onclick="if(window.startMapTour) window.startMapTour();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+            <span data-i18n="demoTourBtn">Tour</span>
+        </button>
 
         <div class="top-nav">
             <!-- Mode Tournée compact (mobile) : mêmes infos que le badge pilule desktop,
@@ -683,15 +695,27 @@
      deux pass ci-dessous débloquent le GUIDE dans son ensemble. Déclenché soit
      manuellement (bouton "Unlock Passes" du header), soit automatiquement après la 3e
      fiche lieu consultée gratuitement (voir openDetailsPanel() dans script.js). -->
+<!-- Paywall "Pass Guide" (30/08/2026) : plus jamais "débloquer un groupe/artiste" — les
+     deux pass ci-dessous débloquent le GUIDE dans son ensemble. Déclenché soit
+     manuellement (bouton "Unlock Passes" du header), soit automatiquement après la 3e
+     fiche lieu consultée gratuitement (voir openDetailsPanel() dans script.js). Le
+     contenu change si la personne a déjà un pass actif (voir openGuidePaywallModal()) :
+     plus de message "limite atteinte" ni d'offres, juste une confirmation. -->
 <div id="cart-modal" class="modal hidden">
     <div class="modal-content paywall-modal-content">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 class="paywall-title" data-i18n="paywallTitle">🔒 You've reached your free limit (3/3)</h2>
-        <p class="paywall-body" data-i18n="paywallBody">Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.</p>
+        <div id="paywall-limit-block">
+            <h2 class="paywall-title" data-i18n="paywallTitle">You've reached your free limit (3/3)</h2>
+            <p class="paywall-body" data-i18n="paywallBody">Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.</p>
+        </div>
+        <div id="paywall-active-block" class="hidden">
+            <h2 class="paywall-title" data-i18n="paywallActiveTitle">You already have an active pass</h2>
+            <p class="paywall-body" id="paywall-active-desc"></p>
+        </div>
 
-        <div class="paywall-cards">
+        <div class="paywall-cards" id="paywall-cards">
             <div class="paywall-card">
-                <div class="paywall-card-name" data-i18n="paywallMonthlyName">🎟️ TRAVEL PASS (1 Month)</div>
+                <div class="paywall-card-name" data-i18n="paywallMonthlyName">TRAVEL PASS (1 Month)</div>
                 <div class="paywall-card-desc" data-i18n="paywallMonthlyDesc">Perfect for planning a short trip.</div>
                 <ul class="paywall-features">
                     <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
@@ -699,11 +723,11 @@
                 </ul>
                 <div class="paywall-price" data-i18n="paywallMonthlyPrice">€9.99 / month</div>
                 <div class="paywall-terms" data-i18n="paywallMonthlyTerms">No commitment</div>
-                <button type="button" class="paywall-buy-btn" onclick="buyGuidePass('monthly')" data-i18n="paywallBuyMonthly">Get the Travel Pass</button>
+                <button type="button" class="paywall-buy-btn" onclick="window.location.href='payment.html?plan=monthly'" data-i18n="paywallBuyMonthly">Get the Travel Pass</button>
             </div>
             <div class="paywall-card paywall-card-vip">
                 <div class="paywall-vip-badge" data-i18n="paywallVipBadge">⭐️ BEST VALUE</div>
-                <div class="paywall-card-name" data-i18n="paywallVipName">👑 VIP PASS (Lifetime Access)</div>
+                <div class="paywall-card-name" data-i18n="paywallVipName">VIP PASS (Lifetime Access)</div>
                 <div class="paywall-card-desc" data-i18n="paywallVipDesc">For true fans. Pay once, enjoy forever.</div>
                 <ul class="paywall-features">
                     <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
@@ -712,7 +736,7 @@
                     <li>✔️ <span data-i18n="paywallFeatureOffline">Offline mode (coming soon)</span></li>
                 </ul>
                 <div class="paywall-price" data-i18n="paywallVipPrice">€19.99 (one-time payment)</div>
-                <button type="button" class="paywall-buy-btn paywall-buy-btn-vip" onclick="buyGuidePass('lifetime')" data-i18n="paywallBuyVip">Get the VIP Pass</button>
+                <button type="button" class="paywall-buy-btn paywall-buy-btn-vip" onclick="window.location.href='payment.html?plan=lifetime'" data-i18n="paywallBuyVip">Get the VIP Pass</button>
             </div>
         </div>
     </div>
@@ -799,9 +823,14 @@
             // (voir getUnlockedGroups() dans script.js pour les données BTS de démo).
             document.body.classList.remove('auth-gate-active');
             if (typeof initializeFilters === 'function') initializeFilters();
-            if (typeof renderLocations === 'function') renderLocations();
+            // true = ne pas recadrer sur l'étendue de tous les lieux, garder le centrage
+            // pays initial (voir la note sur skipFitBounds dans renderLocations()).
+            if (typeof renderLocations === 'function') renderLocations(true);
+            const demoTourBtn = document.getElementById('demo-tour-btn');
+            if (demoTourBtn) demoTourBtn.classList.remove('hidden');
             if (typeof window.startMapTour === 'function') window.startMapTour();
             if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
+            if (typeof window.updateFreeViewsCounter === 'function') window.updateFreeViewsCounter();
             return;
         }
 
@@ -820,8 +849,11 @@
         // 4e fiche lieu, jamais en bloquant l'accès à la carte elle-même.
         document.body.classList.remove('auth-gate-active');
         if (typeof initializeFilters === 'function') initializeFilters();
-        if (typeof renderLocations === 'function') renderLocations();
+        // true = ne pas recadrer sur l'étendue de tous les lieux, garder le centrage
+        // pays initial (voir la note sur skipFitBounds dans renderLocations()).
+        if (typeof renderLocations === 'function') renderLocations(true);
         if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
+        if (typeof window.updateFreeViewsCounter === 'function') window.updateFreeViewsCounter();
     });
 
     const gateLoginBtn = document.getElementById('gate-login-btn');
