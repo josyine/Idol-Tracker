@@ -378,7 +378,10 @@
 
         <div id="create-trip-categories" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"></div>
 
-        <input type="text" id="create-trip-hotel" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:20px; outline:none;" placeholder="Hotel or neighborhood (optional)">
+        <div style="position:relative; margin-bottom:20px;">
+            <input type="text" id="create-trip-hotel" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none;" placeholder="Hotel or neighborhood (optional)" autocomplete="off" oninput="onCreateTripHotelInput()">
+            <div id="create-trip-hotel-suggestions" class="hidden" style="position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.12); max-height:220px; overflow-y:auto; z-index:20;"></div>
+        </div>
 
         <div class="date-tabs">
             <div class="date-tab active" data-tab="create-specific" onclick="switchCreateDateTab('specific')">Specific dates</div>

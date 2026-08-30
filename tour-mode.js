@@ -17,6 +17,7 @@
     let currentStopIndex = 0;
     let tourModeLeafletMap = null;
     let tourModeMarkers = [];
+    let liveMapMarker = null;
 
     function fmtShowDates(showDates) {
         const locale = currentLang || 'en';
@@ -143,8 +144,8 @@
         if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 
-    function refresh() {
-        renderMap();
+    function refresh(fitAll) {
+        renderMap(fitAll);
         renderRailList();
         renderStopInfo(currentStopIndex);
         scrollActiveNodeIntoView();
@@ -173,18 +174,33 @@
         `;
     }
 
-    // Sélecteur "Choisir une tournée" : une seule tournée dans les données pour
-    // l'instant, mais la liste est déjà générée dynamiquement pour ne rien avoir à
-    // changer ici le jour où une deuxième tournée (ou celle d'un autre groupe) sera
-    // ajoutée à TOUR_MODE_DATA.
+    // Sélecteur "Choisir une tournée" : liste toutes les tournées disponibles
+    // (ALL_TOURS, définies dans script.js) — la tournée en cours (Arirang) en tête,
+    // puis les tournées historiques par ordre chronologique inverse. En choisir une
+    // change simplement la tournée AFFICHÉE dans ce panneau ; le badge "en direct" sur
+    // la carte continue, lui, de ne regarder que la tournée réellement en cours (voir
+    // getLiveTour() / LIVE_TOUR_ID côté script.js) — les tournées historiques restent
+    // toujours "Terminé", ce qui est honnête.
     function renderTourSelect() {
         const label = document.getElementById('tour-mode-select-label');
         const menu = document.getElementById('tour-mode-select-menu');
         if (label) label.textContent = TOUR_MODE_DATA.tourName;
         if (menu) {
-            menu.innerHTML = `<div class="tour-mode-select-option active">${TOUR_MODE_DATA.tourName} <span>✓</span></div>`;
+            menu.innerHTML = ALL_TOURS.map(tour => `
+                <div class="tour-mode-select-option${tour.id === selectedTourId ? ' active' : ''}" onclick="tourModeSelectTour('${tour.id}')">
+                    ${tour.tourName}${tour.id === selectedTourId ? ' <span>✓</span>' : ''}
+                </div>
+            `).join('');
         }
     }
+    window.tourModeSelectTour = function (tourId) {
+        selectedTourId = tourId;
+        currentStopIndex = getDefaultStopIndex();
+        renderTourSelect();
+        refresh(true);
+        const menu = document.getElementById('tour-mode-select-menu');
+        if (menu) menu.classList.add('hidden');
+    };
     window.tourModeToggleSelect = function (e) {
         e.stopPropagation();
         const menu = document.getElementById('tour-mode-select-menu');
@@ -198,6 +214,7 @@
     window.openTourModePanel = function () {
         const panel = document.getElementById('tour-mode-panel');
         if (!panel) return;
+        selectedTourId = LIVE_TOUR_ID; // toujours repartir de la tournée en cours à l'ouverture
         const memberEvent = getCurrentMemberEvent();
         currentStopIndex = getDefaultStopIndex();
 
@@ -245,7 +262,60 @@
             badge.classList.remove('tour-mode-badge-live');
             if (textEl) textEl.textContent = t('tourModeGenericLabel');
         }
+
+        renderLiveMapMarker(memberEvent || groupStop);
     };
 
-    document.addEventListener('DOMContentLoaded', window.initTourModeBadge);
+    // Marqueur animé (pulsation) sur la VRAIE carte principale (pas seulement dans le
+    // panneau Mode Tournée) à l'emplacement réel de ce qui est en cours — la tournée du
+    // groupe, ou l'événement d'un membre seul s'il y en a un. `map` est la carte Leaflet
+    // globale créée par script.js ; comme ce fichier se charge après, mais qu'une
+    // condition d'affichage précoce (avant connexion, etc.) peut retarder sa création, on
+    // retente une fois après un court délai si elle n'existe pas encore.
+    let liveMarkerRetried = false;
+    function renderLiveMapMarker(live) {
+        if (typeof map === 'undefined' || !map) {
+            if (!liveMarkerRetried) { liveMarkerRetried = true; setTimeout(() => renderLiveMapMarker(live), 800); }
+            return;
+        }
+        if (liveMapMarker) { map.removeLayer(liveMapMarker); liveMapMarker = null; }
+        if (!live) return;
+        const icon = L.divIcon({
+            className: '',
+            html: `<div style="width:16px;height:16px;border-radius:50%;background:#ef4444;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35); animation: tourModePulse 1.6s infinite;"></div>`,
+            iconSize: [16, 16], iconAnchor: [8, 8]
+        });
+        liveMapMarker = L.marker([live.lat, live.lng], { icon, zIndexOffset: 2000 }).addTo(map);
+        const label = live.member ? `${live.member} — ${live.eventName}<br>${live.city}, ${live.country}` : `🔴 ${TOUR_MODE_DATA.tourName}<br>${live.city}, ${live.country}`;
+        liveMapMarker.bindTooltip(label, { direction: 'top', offset: [0, -8] });
+    }
+
+    // Balayage tactile (mobile) pour naviguer entre les étapes, en plus des boutons
+    // Précédent/Suivant et du clic sur une étape — sans gêner le défilement vertical
+    // normal de la liste du rail (on n'agit que si le geste est clairement horizontal).
+    function attachSwipeNavigation(el) {
+        if (!el) return;
+        let startX = 0, startY = 0, tracking = false;
+        el.addEventListener('touchstart', (e) => {
+            if (e.touches.length !== 1) return;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            tracking = true;
+        }, { passive: true });
+        el.addEventListener('touchend', (e) => {
+            if (!tracking) return;
+            tracking = false;
+            const dx = e.changedTouches[0].clientX - startX;
+            const dy = e.changedTouches[0].clientY - startY;
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                tourModeNavigate(dx < 0 ? 1 : -1);
+            }
+        }, { passive: true });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        window.initTourModeBadge();
+        attachSwipeNavigation(document.getElementById('tour-mode-mapwrap') || document.querySelector('.tour-mode-mapwrap'));
+        attachSwipeNavigation(document.getElementById('tour-mode-rail-list'));
+        attachSwipeNavigation(document.querySelector('.tour-mode-stop-info'));
+    });
 })();
