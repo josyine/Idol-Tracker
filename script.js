@@ -53,27 +53,63 @@ function createOSMTileLayer(map, opts) {
 // pour un site comme celui-ci est donc une liste de dates tenue à jour manuellement —
 // exactement comme le fait n'importe quel site d'actus de tournée.
 //
-// Dates ci-dessous recherchées le 30/08/2026 et recoupées entre plusieurs sources, mais
-// à prendre avec précaution : plusieurs sites consultés se contredisaient légèrement sur
-// certaines dates (ex : villes nord-américaines), et Wikipedia (source la plus fiable
-// pour ce sujet) était bloqué dans cet environnement de développement, donc impossible à
-// recouper directement ici. LISTE À VÉRIFIER ET AJUSTER dès que HYBE/BigHit publie le
-// calendrier officiel complet — c'est un tableau simple, une ville se modifie en une ligne.
+// Calendrier ci-dessous transmis directement par toi (visuel officiel de l'Arirang World
+// Tour) le 30/08/2026 — remplace la version précédente basée sur des recherches web
+// incertaines. Les dates des dernières villes (Singapour, Jakarta, Melbourne, Sydney,
+// Hong Kong) viennent de la lecture du visuel et sont un peu moins nettes que les autres
+// (texte compact) : à recontrôler si un doute apparaît. Le lieu ("venue") des étapes
+// asiatiques/océaniennes de fin de tournée n'était pas précisé dans ce que tu as fourni —
+// laissé vide plutôt que d'inventer un nom de salle. D'autres villes doivent encore être
+// annoncées (2027 : Japon, Moyen-Orient et plus) — à ajouter ici dès qu'elles le seront.
 const TOUR_MODE_DATA = {
     tourName: "Arirang World Tour",
     group: "BTS",
     stops: [
-        { id: 'goyang',     city: 'Goyang',     country: 'South Korea', venue: 'Goyang Stadium',           lat: 37.6584, lng: 126.7828,  dateStart: '2026-04-09', dateEnd: '2026-04-12' },
-        { id: 'vegas',      city: 'Las Vegas',  country: 'USA',         venue: 'Allegiant Stadium',         lat: 36.0908, lng: -115.1833, dateStart: '2026-05-20', dateEnd: '2026-05-31' },
-        { id: 'busan',      city: 'Busan',      country: 'South Korea', venue: 'Busan Asiad Main Stadium',  lat: 35.1907, lng: 129.0587,  dateStart: '2026-06-05', dateEnd: '2026-06-21' },
-        { id: 'london',     city: 'London',     country: 'UK',          venue: 'Wembley Stadium',           lat: 51.5560, lng: -0.2795,   dateStart: '2026-07-04', dateEnd: '2026-07-10' },
-        { id: 'newyork',    city: 'New York',   country: 'USA',         venue: 'MetLife Stadium',           lat: 40.8135, lng: -74.0745,  dateStart: '2026-07-24', dateEnd: '2026-08-03' },
-        { id: 'toronto',    city: 'Toronto',    country: 'Canada',      venue: 'Rogers Stadium',            lat: 43.6532, lng: -79.3832,  dateStart: '2026-08-22', dateEnd: '2026-08-23' },
-        { id: 'la',         city: 'Inglewood (Los Angeles)', country: 'USA', venue: 'SoFi Stadium',         lat: 33.9535, lng: -118.3392, dateStart: '2026-09-01', dateEnd: '2026-09-06' },
-        { id: 'kaohsiung',  city: 'Kaohsiung',  country: 'Taiwan',      venue: 'Kaohsiung National Stadium', lat: 22.7469, lng: 120.2966, dateStart: '2026-11-21', dateEnd: '2026-11-22' },
-        { id: 'manila',     city: 'Manila',     country: 'Philippines', venue: 'Philippine Arena',          lat: 14.6939, lng: 120.9483,  dateStart: '2027-03-13', dateEnd: '2027-03-14' }
-    ]
+        { id: 'goyang',      city: 'Goyang',        country: 'South Korea', venue: 'Goyang Stadium',            lat: 37.6584,  lng: 126.7828,  showDates: ['2026-04-09', '2026-04-11', '2026-04-12'] },
+        { id: 'tokyo',       city: 'Tokyo',         country: 'Japan',       venue: 'Tokyo Dome',                 lat: 35.7056,  lng: 139.7519,  showDates: ['2026-04-17', '2026-04-18'] },
+        { id: 'tampa',       city: 'Tampa',         country: 'USA',         venue: 'Raymond James Stadium',      lat: 27.9759,  lng: -82.5033,  showDates: ['2026-04-25', '2026-04-26', '2026-04-28'] },
+        { id: 'elpaso',      city: 'El Paso',       country: 'USA',         venue: 'Sun Bowl Stadium',           lat: 31.7757,  lng: -106.5004, showDates: ['2026-05-02', '2026-05-03'] },
+        { id: 'mexicocity',  city: 'Mexico City',   country: 'Mexico',      venue: 'Estadio GNP Seguros',        lat: 19.3046,  lng: -99.1505,  showDates: ['2026-05-07', '2026-05-09', '2026-05-10'] },
+        { id: 'stanford',    city: 'Stanford',      country: 'USA',         venue: 'Stanford Stadium',           lat: 37.4342,  lng: -122.1610, showDates: ['2026-05-16', '2026-05-17', '2026-05-19'] },
+        { id: 'vegas',       city: 'Las Vegas',     country: 'USA',         venue: 'Allegiant Stadium',          lat: 36.0908,  lng: -115.1833, showDates: ['2026-05-23', '2026-05-24', '2026-05-27', '2026-05-28'] },
+        { id: 'busan',       city: 'Busan',         country: 'South Korea', venue: 'Busan Asiad Main Stadium',   lat: 35.1907,  lng: 129.0587,  showDates: ['2026-06-12', '2026-06-13'] },
+        { id: 'madrid',      city: 'Madrid',        country: 'Spain',       venue: 'Riyadh Air Metropolitano',   lat: 40.4362,  lng: -3.5995,   showDates: ['2026-06-26', '2026-06-27'] },
+        { id: 'brussels',    city: 'Brussels',      country: 'Belgium',     venue: 'Stade Roi Baudouin',         lat: 50.8951,  lng: 4.3411,    showDates: ['2026-07-01', '2026-07-02'] },
+        { id: 'london',      city: 'London',        country: 'UK',          venue: 'Tottenham Hotspur Stadium',  lat: 51.6043,  lng: -0.0668,   showDates: ['2026-07-06', '2026-07-07'] },
+        { id: 'munich',      city: 'Munich',        country: 'Germany',     venue: 'Allianz Arena',              lat: 48.2188,  lng: 11.6247,   showDates: ['2026-07-11', '2026-07-12'] },
+        { id: 'paris',       city: 'Paris',         country: 'France',      venue: 'Stade de France',            lat: 48.9244,  lng: 2.3601,    showDates: ['2026-07-17', '2026-07-18'] },
+        { id: 'newyork',     city: 'East Rutherford (New York)', country: 'USA', venue: 'MetLife Stadium',       lat: 40.8135,  lng: -74.0745,  showDates: ['2026-08-01', '2026-08-02'] },
+        { id: 'foxborough',  city: 'Foxborough (Boston)', country: 'USA',   venue: 'Gillette Stadium',           lat: 42.0909,  lng: -71.2643,  showDates: ['2026-08-05', '2026-08-06'] },
+        { id: 'baltimore',   city: 'Baltimore',     country: 'USA',         venue: 'M&T Bank Stadium',           lat: 39.2780,  lng: -76.6227,  showDates: ['2026-08-10', '2026-08-11'] },
+        { id: 'arlington',   city: 'Arlington (Dallas)', country: 'USA',    venue: 'AT&T Stadium',               lat: 32.7473,  lng: -97.0945,  showDates: ['2026-08-15', '2026-08-16'] },
+        { id: 'toronto',     city: 'Toronto',       country: 'Canada',      venue: 'Rogers Stadium',             lat: 43.6532,  lng: -79.3832,  showDates: ['2026-08-22', '2026-08-23'] },
+        { id: 'chicago',     city: 'Chicago',       country: 'USA',         venue: 'Soldier Field',              lat: 41.8623,  lng: -87.6167,  showDates: ['2026-08-27', '2026-08-28'] },
+        { id: 'la',          city: 'Los Angeles',   country: 'USA',         venue: 'SoFi Stadium',               lat: 33.9535,  lng: -118.3392, showDates: ['2026-09-01', '2026-09-02', '2026-09-05', '2026-09-06'] },
+        { id: 'bogota',      city: 'Bogota',        country: 'Colombia',    venue: 'Estadio El Campín',          lat: 4.6486,   lng: -74.0925,  showDates: ['2026-10-02', '2026-10-03'] },
+        { id: 'lima',        city: 'Lima',          country: 'Peru',        venue: 'Estadio San Marcos',         lat: -12.0578, lng: -77.0839,  showDates: ['2026-10-07', '2026-10-09', '2026-10-10'] },
+        { id: 'santiago',    city: 'Santiago',      country: 'Chile',       venue: 'Estadio Nacional',           lat: -33.4642, lng: -70.6072,  showDates: ['2026-10-14', '2026-10-16', '2026-10-17'] },
+        { id: 'buenosaires', city: 'Buenos Aires',  country: 'Argentina',   venue: 'Estadio Único de La Plata',  lat: -34.9432, lng: -57.9598,  showDates: ['2026-10-21', '2026-10-23', '2026-10-24'] },
+        { id: 'saopaulo',    city: 'São Paulo',     country: 'Brazil',      venue: 'Estádio do Morumbis',        lat: -23.6000, lng: -46.7167,  showDates: ['2026-10-28', '2026-10-30', '2026-10-31'] },
+        { id: 'kaohsiung',   city: 'Kaohsiung',     country: 'Taiwan',      venue: 'Kaohsiung National Stadium', lat: 22.7469,  lng: 120.2966,  showDates: ['2026-11-19', '2026-11-21', '2026-11-22'] },
+        { id: 'bangkok',     city: 'Bangkok',       country: 'Thailand',    venue: '',                           lat: 13.7563,  lng: 100.5018,  showDates: ['2026-12-03', '2026-12-05', '2026-12-06'] },
+        { id: 'kualalumpur', city: 'Kuala Lumpur',  country: 'Malaysia',    venue: '',                           lat: 3.1390,   lng: 101.6869,  showDates: ['2026-12-12', '2026-12-13'] },
+        { id: 'singapore',   city: 'Singapore',     country: 'Singapore',   venue: '',                           lat: 1.3521,   lng: 103.8198,  showDates: ['2026-12-19', '2026-12-20'] },
+        { id: 'jakarta',     city: 'Jakarta',       country: 'Indonesia',   venue: '',                           lat: -6.2088,  lng: 106.8456,  showDates: ['2026-12-26', '2026-12-27'] },
+        { id: 'melbourne',   city: 'Melbourne',     country: 'Australia',   venue: '',                           lat: -37.8136, lng: 144.9631,  showDates: ['2027-02-12', '2027-02-13'] },
+        { id: 'sydney',      city: 'Sydney',        country: 'Australia',   venue: '',                           lat: -33.8688, lng: 151.2093,  showDates: ['2027-02-20', '2027-02-21'] },
+        { id: 'hongkong',    city: 'Hong Kong',     country: 'Hong Kong',   venue: '',                           lat: 22.3193,  lng: 114.1694,  showDates: ['2027-03-06', '2027-03-07'] },
+        { id: 'manila',      city: 'Manila',        country: 'Philippines', venue: 'Philippine Arena',           lat: 14.6939,  lng: 120.9483,  showDates: ['2027-03-13', '2027-03-14'] }
+    ].map(s => Object.assign(s, { dateStart: s.showDates[0], dateEnd: s.showDates[s.showDates.length - 1] }))
 };
+
+// Certains "live" ne sont pas liés à la tournée du groupe : un membre seul peut être en
+// déplacement pour un événement (fashion week, festival, etc.) pendant que les autres ne
+// le sont pas. Tableau volontairement VIDE : je n'ai aucune date réelle sourcée pour un
+// événement solo en ce moment, et le site ne doit jamais afficher une actualité inventée.
+// À compléter par toi au fil de l'actualité, même format que TOUR_MODE_DATA.stops mais
+// avec un champ "member" et "eventName" à la place de "venue" :
+// { id: 'ex', member: 'Jimin', eventName: 'Paris Fashion Week', city: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522, showDates: ['2026-XX-XX'] }
+const MEMBER_EVENTS_DATA = [];
 
 // window.__tourModeNowOverride (chaîne ISO, ex: '2026-09-03') permet aux tests
 // automatisés de simuler une autre date sans jamais toucher à Date() global ni aux
@@ -92,6 +128,10 @@ function getTourStopStatus(stop, nowDate) {
 function getCurrentTourStop() {
     const now = getTourNow();
     return TOUR_MODE_DATA.stops.find(s => getTourStopStatus(s, now) === 'current') || null;
+}
+function getCurrentMemberEvent() {
+    const now = getTourNow();
+    return MEMBER_EVENTS_DATA.find(s => getTourStopStatus(Object.assign({}, s, { dateStart: s.showDates[0], dateEnd: s.showDates[s.showDates.length - 1] }), now) === 'current') || null;
 }
 
 // ==========================================
@@ -1223,7 +1263,8 @@ const translations = {
         gateErrorInvalid: "Incorrect email or password.", gateErrorGeneric: "Something went wrong. Please try again.",
         gateResetSent: "Password reset email sent — check your inbox.", gateEnterEmailFirst: "Please enter your email address first.",
         tourModeLiveIn: "Live now — BTS is live in {city}", tourModeSchedule: "Tour Schedule", tourModeLive: "Live", tourModeDone: "Done", tourModeUpcoming: "Upcoming", tourModePrev: "Previous", tourModeNext: "Next",
-        tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel."
+        tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel.",
+        tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} is live now — {event} in {city}"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -1269,7 +1310,8 @@ const translations = {
         gateErrorInvalid: "E-mail ou mot de passe incorrect.", gateErrorGeneric: "Une erreur est survenue. Réessayez.",
         gateResetSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.", gateEnterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail.",
         tourModeLiveIn: "En direct — BTS est en concert à {city}", tourModeSchedule: "Calendrier de la tournée", tourModeLive: "En direct", tourModeDone: "Terminé", tourModeUpcoming: "À venir", tourModePrev: "Précédent", tourModeNext: "Suivant",
-        tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage."
+        tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage.",
+        tourModeGenericLabel: "Tournée", tourModeMemberLiveIn: "{member} est en direct — {event} à {city}"
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -1315,7 +1357,8 @@ const translations = {
         gateErrorInvalid: "Correo o contraseña incorrectos.", gateErrorGeneric: "Algo salió mal. Inténtalo de nuevo.",
         gateResetSent: "Correo de restablecimiento enviado — revisa tu bandeja de entrada.", gateEnterEmailFirst: "Indica primero tu correo electrónico.",
         tourModeLiveIn: "En directo — BTS está actuando en {city}", tourModeSchedule: "Calendario de la gira", tourModeLive: "En directo", tourModeDone: "Finalizado", tourModeUpcoming: "Próximamente", tourModePrev: "Anterior", tourModeNext: "Siguiente",
-        tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje."
+        tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje.",
+        tourModeGenericLabel: "Gira", tourModeMemberLiveIn: "{member} está en directo — {event} en {city}"
     },
     it: {
         btnGenerateIti: "Generatore di Itinerari", filterGroup: "GRUPPO", filterMember: "MEMBRO", filterArea: "ZONA", filterYear: "ANNO", filterCategories: "CATEGORIE",
@@ -1361,7 +1404,8 @@ const translations = {
         gateErrorInvalid: "Email o password errati.", gateErrorGeneric: "Qualcosa è andato storto. Riprova.",
         gateResetSent: "Email di reimpostazione inviata — controlla la posta in arrivo.", gateEnterEmailFirst: "Inserisci prima il tuo indirizzo email.",
         tourModeLiveIn: "In diretta — I BTS si esibiscono a {city}", tourModeSchedule: "Calendario del tour", tourModeLive: "In diretta", tourModeDone: "Concluso", tourModeUpcoming: "In arrivo", tourModePrev: "Precedente", tourModeNext: "Successivo",
-        tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio."
+        tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio.",
+        tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} è in diretta — {event} a {city}"
     },
     pt: {
         btnGenerateIti: "Gerador de Roteiros", filterGroup: "GRUPO", filterMember: "MEMBRO", filterArea: "REGIÃO", filterYear: "ANO", filterCategories: "CATEGORIAS",
@@ -1407,7 +1451,8 @@ const translations = {
         gateErrorInvalid: "E-mail ou senha incorretos.", gateErrorGeneric: "Algo deu errado. Tente novamente.",
         gateResetSent: "E-mail de redefinição enviado — verifique sua caixa de entrada.", gateEnterEmailFirst: "Informe primeiro seu endereço de e-mail.",
         tourModeLiveIn: "Ao vivo — BTS está se apresentando em {city}", tourModeSchedule: "Calendário da turnê", tourModeLive: "Ao vivo", tourModeDone: "Concluído", tourModeUpcoming: "Em breve", tourModePrev: "Anterior", tourModeNext: "Próximo",
-        tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem."
+        tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem.",
+        tourModeGenericLabel: "Turnê", tourModeMemberLiveIn: "{member} está ao vivo agora — {event} em {city}"
     },
     ko: {
         btnGenerateIti: "자동 일정 생성기", filterGroup: "그룹", filterMember: "멤버", filterArea: "지역", filterYear: "연도", filterCategories: "카테고리",
@@ -1453,7 +1498,8 @@ const translations = {
         gateErrorInvalid: "이메일 또는 비밀번호가 올바르지 않습니다.", gateErrorGeneric: "문제가 발생했습니다. 다시 시도해주세요.",
         gateResetSent: "비밀번호 재설정 이메일을 보냈습니다 — 받은편지함을 확인해주세요.", gateEnterEmailFirst: "먼저 이메일 주소를 입력해주세요.",
         tourModeLiveIn: "라이브 중 — BTS가 {city}에서 공연 중입니다", tourModeSchedule: "투어 일정", tourModeLive: "라이브", tourModeDone: "종료", tourModeUpcoming: "예정", tourModePrev: "이전", tourModeNext: "다음",
-        tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요."
+        tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요.",
+        tourModeGenericLabel: "투어", tourModeMemberLiveIn: "{member} 라이브 중 — {city}에서 {event}"
     },
     ja: {
         btnGenerateIti: "自動旅程ジェネレーター", filterGroup: "グループ", filterMember: "メンバー", filterArea: "エリア", filterYear: "年", filterCategories: "カテゴリー",
@@ -1499,7 +1545,8 @@ const translations = {
         gateErrorInvalid: "メールアドレスまたはパスワードが正しくありません。", gateErrorGeneric: "問題が発生しました。もう一度お試しください。",
         gateResetSent: "パスワード再設定メールを送信しました — 受信トレイをご確認ください。", gateEnterEmailFirst: "先にメールアドレスを入力してください。",
         tourModeLiveIn: "ライブ配信中 — BTSは{city}で公演中です", tourModeSchedule: "ツアースケジュール", tourModeLive: "ライブ", tourModeDone: "終了", tourModeUpcoming: "開催予定", tourModePrev: "前へ", tourModeNext: "次へ",
-        tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。"
+        tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。",
+        tourModeGenericLabel: "ツアー", tourModeMemberLiveIn: "{member}がライブ配信中 — {city}で{event}"
     },
     zh: {
         btnGenerateIti: "自动行程生成器", filterGroup: "团体", filterMember: "成员", filterArea: "地区", filterYear: "年份", filterCategories: "分类",
@@ -1545,7 +1592,8 @@ const translations = {
         gateErrorInvalid: "邮箱或密码不正确。", gateErrorGeneric: "出现了一些问题，请重试。",
         gateResetSent: "密码重置邮件已发送——请查收您的收件箱。", gateEnterEmailFirst: "请先输入您的电子邮箱。",
         tourModeLiveIn: "直播中 — BTS 正在{city}演出", tourModeSchedule: "巡演日程", tourModeLive: "直播中", tourModeDone: "已结束", tourModeUpcoming: "即将开始", tourModePrev: "上一个", tourModeNext: "下一个",
-        tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。"
+        tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。",
+        tourModeGenericLabel: "巡演", tourModeMemberLiveIn: "{member} 直播中 — 于{city}参加{event}"
     }
 };
 
