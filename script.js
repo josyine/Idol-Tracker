@@ -2954,6 +2954,27 @@ function estimateTransitLeg(fromLoc, toLoc) {
     return { mode, minMinutes, maxMinutes, distKm };
 }
 
+// Pas de données d'horaires d'ouverture réelles par lieu dans celebLocations — plutôt
+// que d'inventer des horaires précis pour tel ou tel endroit précis, on utilise des
+// horaires TYPIQUES par catégorie (mêmes catégories que les filtres du site) : une
+// estimation générale assumée comme telle, pas les vraies heures d'ouverture. Sert aussi
+// à donner une durée de visite réaliste par type de lieu (un musée prend plus de temps
+// qu'un café) plutôt qu'un créneau fixe unique pour tous, comme c'était le cas avant.
+const ITI_CATEGORY_PROFILE = {
+    'Cafe':         { openHour: 8,  closeHour: 20, visitMinutes: 45 },
+    'Restaurants':  { openHour: 11, closeHour: 22, visitMinutes: 75 },
+    'Museums':      { openHour: 10, closeHour: 18, visitMinutes: 100 },
+    'Pop-up Store': { openHour: 10, closeHour: 20, visitMinutes: 45 },
+    'Fashion':      { openHour: 10, closeHour: 20, visitMinutes: 40 },
+    'Concerts':     { openHour: 9,  closeHour: 19, visitMinutes: 30 },
+    'Run BTS':      { openHour: 9,  closeHour: 19, visitMinutes: 30 },
+    'Bon Voyage':   { openHour: 9,  closeHour: 19, visitMinutes: 30 },
+    'MV Location':  { openHour: 9,  closeHour: 19, visitMinutes: 30 },
+    'Landmarks':    { openHour: 9,  closeHour: 19, visitMinutes: 40 }
+};
+const ITI_DEFAULT_PROFILE = { openHour: 9, closeHour: 19, visitMinutes: 45 };
+function getCategoryProfile(cat) { return ITI_CATEGORY_PROFILE[cat] || ITI_DEFAULT_PROFILE; }
+
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
     const country = document.getElementById('iti-country').value;
@@ -2969,7 +2990,7 @@ window.generateItinerary = function() {
 
     if(validLocs.length === 0) { alert('No locations found for this selection.'); return; }
 
-    let route = [validLocs.shift()]; 
+    let route = [validLocs.shift()];
     while(validLocs.length > 0) {
         let lastLoc = route[route.length - 1], nearestIdx = 0, minDist = Infinity;
         for(let i=0; i<validLocs.length; i++) {
@@ -2978,30 +2999,84 @@ window.generateItinerary = function() {
         }
         route.push(validLocs.splice(nearestIdx, 1)[0]);
     }
-    validLocs = route;
+
+    // Répartition réaliste des lieux sur les jours demandés : la journée démarre à 9h30,
+    // se termine au plus tard à 20h (dès qu'une visite dépasserait cette heure, elle
+    // bascule au lendemain), une pause déjeuner d'1h s'insère automatiquement la première
+    // fois que l'horaire tombe entre 12h et 14h, et un lieu n'est placé que si l'heure
+    // d'arrivée tombe dans sa plage horaire typique (voir ITI_CATEGORY_PROFILE). Si tous
+    // les lieux ne tiennent pas dans le nombre de jours choisi, on ne force rien : le
+    // surplus reste simplement hors de l'itinéraire (voir le message affiché en bas).
+    const DAY_START_MIN = 9 * 60 + 30;
+    const DAY_HARD_END_MIN = 20 * 60;
+    const LUNCH_WINDOW_START = 12 * 60, LUNCH_WINDOW_END = 14 * 60, LUNCH_DURATION_MIN = 60;
+
+    let pool = route;
+    const dayPlans = []; // [{ items: [{loc, arrival, departure, leg, lunchBefore}] }]
+    for (let d = 0; d < days && pool.length > 0; d++) {
+        const items = [];
+        let curTime = DAY_START_MIN;
+        let lunchTaken = false;
+        let prevLoc = null;
+
+        while (pool.length > 0) {
+            const candidate = pool[0];
+            const profile = getCategoryProfile(candidate.category);
+            let arrival = curTime;
+            let leg = null;
+            if (prevLoc) {
+                leg = estimateTransitLeg(prevLoc, candidate);
+                arrival = curTime + Math.round((leg.minMinutes + leg.maxMinutes) / 2);
+            }
+            let lunchBefore = false;
+            if (!lunchTaken && arrival >= LUNCH_WINDOW_START && arrival <= LUNCH_WINDOW_END) {
+                arrival += LUNCH_DURATION_MIN;
+                lunchTaken = true;
+                lunchBefore = true;
+            }
+            if (arrival < profile.openHour * 60) arrival = profile.openHour * 60;
+            const departure = arrival + profile.visitMinutes;
+
+            // Ce lieu ne tient plus dans la journée (fermé à cette heure, ou la visite
+            // dépasserait 20h) : on s'arrête là pour aujourd'hui, il sera retenté demain.
+            if (arrival >= profile.closeHour * 60 || departure > DAY_HARD_END_MIN) break;
+
+            items.push({ loc: candidate, arrival, departure, leg, lunchBefore });
+            pool.shift();
+            curTime = departure;
+            prevLoc = candidate;
+        }
+
+        if (items.length === 0) break; // rien n'a pu être placé même en tout début de journée : inutile de continuer
+        dayPlans.push(items);
+    }
+    const unplacedCount = pool.length;
 
     const resultDiv = document.getElementById('iti-days-list');
     if(!resultDiv) return;
-    
+
     resultDiv.innerHTML = "";
-    
-    const locsPerDay = Math.ceil(validLocs.length / days);
+
     let coordsForMap = [];
     currentGeneratedItinerary = [];
 
-    const txt = {
-        en: { day: "Day", lunch: "Lunch recommendation near", coffee: "Coffee & explore the neighborhood", mapBtn: "Open Route in Google Maps", free: "Take your time to enjoy the site", cancel: "Cancel", add: "Add Selected Days", export: "Export PDF", save: "Save Trip" },
-        fr: { day: "Jour", lunch: "Déjeuner recommandé près de", coffee: "Café & exploration du quartier", mapBtn: "Ouvrir l'itinéraire sur Google Maps", free: "Prenez le temps d'apprécier le lieu", cancel: "Annuler", add: "Ajouter la sélection", export: "Exporter en PDF", save: "Sauvegarder" }
-    }[currentLang];
+    const ITI_TXT_DICT = {
+        en: { day: "Day", lunchBreak: "Lunch break (~1h)", mapBtn: "Open Route in Google Maps", cancel: "Cancel", add: "Add Selected Days", export: "Export PDF", save: "Save Trip", notAllFit: "location(s) couldn't fit in this schedule (opening hours / time) and were left out — this is just an example itinerary, feel free to adjust it." },
+        fr: { day: "Jour", lunchBreak: "Pause déjeuner (~1h)", mapBtn: "Ouvrir l'itinéraire sur Google Maps", cancel: "Annuler", add: "Ajouter la sélection", export: "Exporter en PDF", save: "Sauvegarder", notAllFit: "lieu(x) n'ont pas pu tenir dans ce planning (horaires d'ouverture / temps) et ont été laissés de côté — ceci reste un exemple d'itinéraire, libre à vous de l'ajuster." }
+    };
+    const txt = ITI_TXT_DICT[currentLang] || ITI_TXT_DICT.en;
 
     const isTripsPage = !!document.getElementById('edit-trip-name');
+    const formatMin = (mins) => {
+        const d = new Date();
+        d.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
 
-    for(let i = 0; i < days; i++) {
-        const dayLocs = validLocs.slice(i * locsPerDay, (i + 1) * locsPerDay);
-        if(dayLocs.length === 0) continue;
-        
+    dayPlans.forEach((items, i) => {
+        const dayLocs = items.map(it => it.loc);
         currentGeneratedItinerary.push(dayLocs);
-        
+
         let mapLink = "";
         if(dayLocs.length === 1) {
             mapLink = `https://www.google.com/maps/search/?api=1&query=${dayLocs[0].lat},${dayLocs[0].lng}`;
@@ -3011,54 +3086,51 @@ window.generateItinerary = function() {
             mapLink = `https://www.google.com/maps/dir/?api=1&origin=${dayLocs[0].lat},${dayLocs[0].lng}&destination=${dayLocs[dayLocs.length-1].lat},${dayLocs[dayLocs.length-1].lng}&waypoints=${waypoints}&travelmode=driving`;
             dayLocs.forEach((l, locIdx) => coordsForMap.push({ dayIdx: i, locIdx, lat: l.lat, lng: l.lng }));
         }
-        
+
         let html = `<div class="iti-day-card" style="padding: 18px 16px;">
             <div class="iti-day-title" style="display:flex; justify-content:space-between; align-items:center; font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
                 <span>${txt.day} ${i + 1}</span>
                 ${isTripsPage ? `<input type="checkbox" class="iti-day-checkbox" value="${i}" checked style="width:18px; height:18px; cursor:pointer; accent-color:#D42759;">` : ''}
             </div>`;
-        
-        let currentTime = new Date();
-        currentTime.setHours(10, 0, 0);
-        const formatTime = (d) => d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-        dayLocs.forEach((l, idx) => {
-            let startTime = formatTime(currentTime);
-            currentTime.setHours(currentTime.getHours() + 1);
-            currentTime.setMinutes(currentTime.getMinutes() + 30);
-            let endTime = formatTime(currentTime);
+        items.forEach((it, idx) => {
+            const l = it.loc;
 
-            html += `
-                <div style="padding-left:18px; border-left: 2px solid #D42759; position:relative; margin-bottom:15px;">
-                    <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
-                    <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${startTime} - ${endTime}</div>
-                    <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
-                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)}</div>
-            `;
-            html += `</div>`;
-
-            if (idx < dayLocs.length - 1) {
+            if (idx > 0) {
                 // Pas d'API d'itinéraire disponible : le mode de transport et la durée sont
                 // estimés à partir de la distance réelle entre les deux lieux (voir
                 // estimateTransitLeg), et on réutilise le champ "directions" déjà rédigé pour
                 // le lieu d'arrivée (ligne de métro/bus réelle) quand il en a un, plutôt que
                 // le texte générique "Transit to next location" affiché jusqu'ici.
-                const nextLoc = dayLocs[idx + 1];
-                const leg = estimateTransitLeg(l, nextLoc);
-                const nextDirections = getLocText(nextLoc.directions);
-                const legLabel = `${leg.mode} · ~${leg.minMinutes}-${leg.maxMinutes} min${nextDirections ? ' — ' + nextDirections : ''}`;
+                const nextDirections = getLocText(l.directions);
+                const legLabel = `${it.leg.mode} · ~${it.leg.minMinutes}-${it.leg.maxMinutes} min${nextDirections ? ' — ' + nextDirections : ''}`;
                 html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="display:inline-block; background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#64748b; line-height:1.5;">${legLabel}</span></div>`;
-                currentTime.setMinutes(currentTime.getMinutes() + Math.round((leg.minMinutes + leg.maxMinutes) / 2));
             }
+
+            if (it.lunchBefore) {
+                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="display:inline-block; background:#FFF7F8; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#D42759; line-height:1.5;">🍽️ ${txt.lunchBreak}</span></div>`;
+            }
+
+            html += `
+                <div style="padding-left:18px; border-left: 2px solid #D42759; position:relative; margin-bottom:15px;">
+                    <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
+                    <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${formatMin(it.arrival)} - ${formatMin(it.departure)}</div>
+                    <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
+                    <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)}</div>
+                </div>`;
         });
-        
+
         html += `<a href="${mapLink}" target="_blank" style="display:inline-flex; align-items:center; gap:6px; padding:10px 16px; margin-top:5px; font-size:12px; color:#2E3644; border:1px solid #cbd5e1; border-radius:100px; background:white; font-weight:600; text-decoration:none; transition:0.2s;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
             ${txt.mapBtn}
         </a></div>`;
         resultDiv.innerHTML += html;
+    });
+
+    if (unplacedCount > 0) {
+        resultDiv.innerHTML += `<div style="text-align:center; font-size:11.5px; color:#94a3b8; padding:6px 16px 4px; line-height:1.5;">⚠️ ${unplacedCount} ${txt.notAllFit}</div>`;
     }
-    
+
     document.getElementById('iti-result').classList.remove('hidden');
 
     let actionsContainer = document.getElementById('iti-actions-container');
