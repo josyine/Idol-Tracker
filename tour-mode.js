@@ -7,6 +7,13 @@
 // fichier). Purement informatif et public : aucune donnée liée à un compte, donc affiché
 // à l'identique en mode démo et pour un compte réel.
 //
+// Le panneau affiche une fenêtre glissante de 5 étapes maximum (2 avant, l'étape
+// affichée, 2 après) plutôt que les 34 arrêts d'un coup — la tournée réelle est bien trop
+// longue pour tenir sur une seule route lisible. Naviguer précédent/suivant fait glisser
+// cette fenêtre. Le sélecteur "Choisir une tournée" liste les tournées disponibles dans
+// TOUR_MODE_DATA (une seule pour l'instant) — prêt à en accueillir d'autres plus tard sans
+// changement de structure.
+//
 // Priorité d'affichage du badge : un événement solo d'un membre (ex: Jimin en fashion
 // week) prime sur la tournée du groupe, car c'est l'info la plus spécifique du moment.
 // Si rien n'est en cours, le badge reste visible mais affiche un libellé générique
@@ -32,102 +39,101 @@
         return `${joined}, ${groups[groups.length - 1].year}`;
     }
 
-    function stopWidth() {
-        return Math.max(900, TOUR_MODE_DATA.stops.length * 30);
+    // Fenêtre de 5 arrêts maximum centrée sur `current`, bornée aux limites du tableau.
+    function windowIndices(current, total) {
+        const size = Math.min(5, total);
+        let start = current - Math.floor((size - 1) / 2);
+        start = Math.max(0, Math.min(start, total - size));
+        return Array.from({ length: size }, (_, i) => start + i);
     }
 
     function routePoints() {
         const stops = TOUR_MODE_DATA.stops;
-        const n = stops.length;
         const now = getTourNow();
-        const padX = 40, y = 55, w = stopWidth() - padX * 2;
-        return stops.map((s, i) => ({
-            x: padX + (n === 1 ? w / 2 : (w * i) / (n - 1)),
-            y,
-            status: getTourStopStatus(s, now)
+        const idxs = windowIndices(currentStopIndex, stops.length);
+        const padX = 70, w = 700 - padX * 2, baseY = 95, amp = 30;
+        return idxs.map((stopIdx, j) => ({
+            stopIdx,
+            x: idxs.length === 1 ? 350 : padX + (w * j) / (idxs.length - 1),
+            y: baseY + amp * Math.sin(j * 2.4),
+            status: getTourStopStatus(stops[stopIdx], now)
         }));
     }
 
     function renderRoute() {
         const svg = document.getElementById('tour-mode-route-svg');
         if (!svg) return;
-        const totalW = stopWidth();
-        svg.setAttribute('viewBox', `0 0 ${totalW} 70`);
-        svg.style.minWidth = totalW + 'px';
         const points = routePoints();
-        const y = points[0].y;
-        let html = `<line x1="${points[0].x}" y1="${y}" x2="${points[points.length - 1].x}" y2="${y}" stroke="#e2e8f0" stroke-width="3"/>`;
 
-        let lastDoneIdx = -1;
-        points.forEach((p, i) => { if (p.status === 'done' || p.status === 'current') lastDoneIdx = i; });
-        if (lastDoneIdx >= 0) {
-            html += `<line x1="${points[0].x}" y1="${y}" x2="${points[lastDoneIdx].x}" y2="${y}" stroke="#D42759" stroke-width="3"/>`;
+        let d = `M ${points[0].x} ${points[0].y}`;
+        for (let k = 1; k < points.length; k++) {
+            const p0 = points[k - 1], p1 = points[k];
+            const midX = (p0.x + p1.x) / 2;
+            d += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`;
         }
+        let html = `<path d="${d}" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="1 8" stroke-linecap="round"/>`;
 
-        points.forEach((p, i) => {
-            const r = p.status === 'current' ? 9 : 6;
-            const fill = p.status === 'upcoming' ? '#fff' : '#D42759';
-            const stroke = p.status === 'upcoming' ? '#cbd5e1' : '#D42759';
-            html += `<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="2.5" style="cursor:pointer;" onclick="tourModeGoToIndex(${i})"></circle>`;
-            if (p.status === 'current') {
-                html += `<circle cx="${p.x}" cy="${p.y}" r="9" fill="none" stroke="#D42759" stroke-width="2" opacity="0.55">
-                    <animate attributeName="r" values="9;17;9" dur="1.8s" repeatCount="indefinite"/>
-                    <animate attributeName="opacity" values="0.55;0;0.55" dur="1.8s" repeatCount="indefinite"/>
-                </circle>`;
+        points.forEach(p => {
+            const stop = TOUR_MODE_DATA.stops[p.stopIdx];
+            const isCurrent = p.stopIdx === currentStopIndex;
+            const r = isCurrent ? 9 : 6;
+            const fill = isCurrent ? '#211C2E' : p.status === 'upcoming' ? '#fff' : '#D42759';
+            const stroke = p.status === 'upcoming' && !isCurrent ? '#cbd5e1' : isCurrent ? '#211C2E' : '#D42759';
+            const labelBelow = p.y < 95;
+            const labelY = labelBelow ? p.y + 22 : p.y - 16;
+            const labelClass = isCurrent ? 'tour-mode-route-label tour-mode-route-label-current' : 'tour-mode-route-label';
+
+            html += `<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="2.5" style="cursor:pointer;" onclick="tourModeGoToIndex(${p.stopIdx})"></circle>`;
+            html += `<text x="${p.x}" y="${labelY}" text-anchor="middle" class="${labelClass}" style="cursor:pointer;" onclick="tourModeGoToIndex(${p.stopIdx})">${stop.city}</text>`;
+
+            if (isCurrent) {
+                html += `<g id="tour-mode-plane" class="tour-mode-plane-pin" transform="translate(${p.x + 16}, ${p.y - 34})">
+                    <circle r="13" fill="#ef4444"></circle>
+                    <circle r="9" fill="none" stroke="#ef4444" stroke-width="2" opacity="0.55">
+                        <animate attributeName="r" values="9;17;9" dur="1.8s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.55;0;0.55" dur="1.8s" repeatCount="indefinite"/>
+                    </circle>
+                    <text y="5" text-anchor="middle" font-size="13">✈️</text>
+                </g>`;
             }
         });
 
-        html += `<g id="tour-mode-plane" class="tour-mode-plane"><text x="0" y="0" text-anchor="middle" font-size="20">✈️</text></g>`;
         svg.innerHTML = html;
     }
 
-    function updatePlanePosition() {
-        const plane = document.getElementById('tour-mode-plane');
-        if (!plane) return;
-        const points = routePoints();
-        const p = points[currentStopIndex];
-        if (!p) return;
-        plane.setAttribute('transform', `translate(${p.x}, ${p.y - 22})`);
-        const wrap = document.querySelector('.tour-mode-route-wrap');
-        if (wrap) {
-            const target = p.x - wrap.clientWidth / 2;
-            wrap.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
-        }
-    }
-
-    function renderStopCard(idx) {
+    function renderStopInfo(idx) {
         const stop = TOUR_MODE_DATA.stops[idx];
-        const card = document.getElementById('tour-mode-stop-card');
-        if (!stop || !card) return;
+        if (!stop) return;
         const status = getTourStopStatus(stop, getTourNow());
-        const tagClass = status === 'current' ? 'tour-mode-tag-live' : status === 'done' ? 'tour-mode-tag-done' : 'tour-mode-tag-upcoming';
-        const tagLabel = status === 'current' ? t('tourModeLive') : status === 'done' ? t('tourModeDone') : t('tourModeUpcoming');
-        const venueLine = stop.venue ? `<div class="tour-mode-stop-venue">${stop.venue}</div>` : '';
-        card.innerHTML = `
-            <div class="tour-mode-stop-card-top">
-                <span class="tour-mode-stop-tag ${tagClass}">${tagLabel}</span>
-                <span class="tour-mode-stop-dates">${fmtShowDates(stop.showDates)}</span>
-            </div>
-            <div class="tour-mode-stop-city">${stop.city}, ${stop.country}</div>
-            ${venueLine}
-        `;
-        const idxEl = document.getElementById('tour-mode-stop-index');
-        if (idxEl) idxEl.textContent = `${idx + 1} / ${TOUR_MODE_DATA.stops.length}`;
+        const tagRow = document.getElementById('tour-mode-stop-tag-row');
+        const tagText = document.getElementById('tour-mode-stop-tag-text');
+        const titleEl = document.getElementById('tour-mode-stop-title');
+        const subEl = document.getElementById('tour-mode-stop-sub');
+        if (!tagRow || !tagText || !titleEl || !subEl) return;
+
+        tagRow.className = 'tour-mode-stop-tag-row ' + (status === 'current' ? 'tour-mode-tag-live' : status === 'done' ? 'tour-mode-tag-done' : 'tour-mode-tag-upcoming');
+        tagText.textContent = status === 'current' ? t('tourModeLive') : status === 'done' ? t('tourModeDone') : t('tourModeUpcoming');
+        titleEl.textContent = stop.venue ? `${stop.venue} — ${stop.city}` : `${stop.city}, ${stop.country}`;
+        subEl.textContent = `${fmtShowDates(stop.showDates)} · ${t('tourModeStep').replace('{n}', idx + 1).replace('{total}', TOUR_MODE_DATA.stops.length)}`;
+
         const prevBtn = document.getElementById('tour-mode-prev');
         const nextBtn = document.getElementById('tour-mode-next');
         if (prevBtn) prevBtn.disabled = idx === 0;
         if (nextBtn) nextBtn.disabled = idx === TOUR_MODE_DATA.stops.length - 1;
     }
 
+    function refresh() {
+        renderRoute();
+        renderStopInfo(currentStopIndex);
+    }
+
     window.tourModeNavigate = function (delta) {
         currentStopIndex = Math.max(0, Math.min(TOUR_MODE_DATA.stops.length - 1, currentStopIndex + delta));
-        renderStopCard(currentStopIndex);
-        updatePlanePosition();
+        refresh();
     };
     window.tourModeGoToIndex = function (idx) {
         currentStopIndex = Math.max(0, Math.min(TOUR_MODE_DATA.stops.length - 1, idx));
-        renderStopCard(currentStopIndex);
-        updatePlanePosition();
+        refresh();
     };
 
     function renderMemberCard(memberEvent) {
@@ -144,6 +150,30 @@
         `;
     }
 
+    // Sélecteur "Choisir une tournée" : une seule tournée dans les données pour
+    // l'instant, mais la liste est déjà générée dynamiquement pour ne rien avoir à
+    // changer ici le jour où une deuxième tournée (ou celle d'un autre groupe) sera
+    // ajoutée à TOUR_MODE_DATA.
+    function renderTourSelect() {
+        const label = document.getElementById('tour-mode-select-label');
+        const menu = document.getElementById('tour-mode-select-menu');
+        const titleEl = document.getElementById('tour-mode-panel-title');
+        if (label) label.textContent = TOUR_MODE_DATA.tourName;
+        if (titleEl) titleEl.textContent = TOUR_MODE_DATA.tourName;
+        if (menu) {
+            menu.innerHTML = `<div class="tour-mode-select-option active">${TOUR_MODE_DATA.tourName} <span>✓</span></div>`;
+        }
+    }
+    window.tourModeToggleSelect = function (e) {
+        e.stopPropagation();
+        const menu = document.getElementById('tour-mode-select-menu');
+        if (menu) menu.classList.toggle('hidden');
+    };
+    document.addEventListener('click', () => {
+        const menu = document.getElementById('tour-mode-select-menu');
+        if (menu) menu.classList.add('hidden');
+    });
+
     window.openTourModePanel = function () {
         const panel = document.getElementById('tour-mode-panel');
         if (!panel) return;
@@ -151,15 +181,9 @@
         const groupStop = getCurrentTourStop();
         currentStopIndex = groupStop ? TOUR_MODE_DATA.stops.indexOf(groupStop) : 0;
 
-        const titleEl = document.getElementById('tour-mode-panel-title');
-        if (titleEl) titleEl.textContent = TOUR_MODE_DATA.tourName;
-        const liveTagEl = document.getElementById('tour-mode-panel-livetag');
-        if (liveTagEl) liveTagEl.textContent = groupStop ? `\u{1F534} ${t('tourModeLiveIn').replace('{city}', groupStop.city)}` : t('tourModeSchedule');
-
+        renderTourSelect();
         renderMemberCard(memberEvent);
-        renderRoute();
-        renderStopCard(currentStopIndex);
-        updatePlanePosition();
+        refresh();
 
         panel.classList.remove('hidden');
         requestAnimationFrame(() => panel.classList.add('open'));

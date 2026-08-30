@@ -124,36 +124,56 @@
   .tour-mode-panel.hidden { display: none; }
   .tour-mode-panel-backdrop { position: absolute; inset: 0; background: rgba(20,16,30,0.55); opacity: 0; transition: opacity .3s ease; }
   .tour-mode-panel.open .tour-mode-panel-backdrop { opacity: 1; }
-  .tour-mode-panel-sheet { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 100%); width: min(640px, 92vw); max-height: 82vh; overflow-y: auto; background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.3); padding: 26px 26px 22px; transition: transform .35s cubic-bezier(0.25,1,0.5,1); font-family: 'Poppins', sans-serif; }
+  .tour-mode-panel-sheet { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 100%); width: min(640px, 92vw); max-height: 86vh; overflow-y: auto; background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.3); transition: transform .35s cubic-bezier(0.25,1,0.5,1); font-family: 'Poppins', sans-serif; }
   .tour-mode-panel.open .tour-mode-panel-sheet { transform: translate(-50%, 0); }
-  .tour-mode-panel-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; gap: 12px; }
-  .tour-mode-panel-livetag { font-size: 11px; font-weight: 800; color: #D42759; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 4px; }
-  .tour-mode-panel-title { font-size: 19px; font-weight: 800; color: var(--text-main); }
-  .tour-mode-close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; color: #64748b; cursor: pointer; line-height: 1; flex-shrink: 0; }
-  .tour-mode-close-btn:hover { background: #e2e8f0; }
-  .tour-mode-member-card { display: flex; align-items: center; gap: 12px; background: var(--accent-pink); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; }
+
+  .tour-mode-panel-header { position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; background: #211C2E; border-radius: 24px 24px 0 0; padding: 18px 20px; }
+  .tour-mode-panel-header-left { display: flex; align-items: flex-start; gap: 12px; }
+  .tour-mode-close-btn { background: rgba(255,255,255,0.14); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; color: #fff; cursor: pointer; line-height: 1; flex-shrink: 0; }
+  .tour-mode-close-btn:hover { background: rgba(255,255,255,0.24); }
+  .tour-mode-panel-eyebrow { font-size: 10.5px; font-weight: 800; color: #f472a4; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 3px; }
+  .tour-mode-panel-title { font-size: 18px; font-weight: 800; color: #fff; }
+  .tour-mode-select-wrap { position: relative; flex-shrink: 0; }
+  .tour-mode-select-btn { background: rgba(255,255,255,0.14); border: none; border-radius: 100px; padding: 8px 14px; font-size: 11.5px; font-weight: 700; color: #fff; cursor: pointer; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .tour-mode-select-btn:hover { background: rgba(255,255,255,0.24); }
+  .tour-mode-select-menu { position: absolute; top: calc(100% + 8px); right: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.25); min-width: 200px; padding: 6px; z-index: 10; }
+  .tour-mode-select-menu.hidden { display: none; }
+  .tour-mode-select-option { padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+  .tour-mode-select-option:hover { background: #f1f5f9; }
+  .tour-mode-select-option.active { color: var(--primary-magenta); }
+
+  .tour-mode-member-card { display: flex; align-items: center; gap: 12px; background: var(--accent-pink); margin: 16px 20px 0; border-radius: 14px; padding: 12px 16px; }
   .tour-mode-member-card.hidden { display: none; }
   .tour-mode-member-dot { width: 9px; height: 9px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: tourModePulse 1.6s infinite; }
   .tour-mode-member-name { font-size: 13.5px; font-weight: 800; color: var(--primary-magenta); }
   .tour-mode-member-place { font-size: 11.5px; color: #64748b; margin-top: 1px; }
-  .tour-mode-route-wrap { width: 100%; overflow-x: auto; margin-bottom: 18px; }
-  .tour-mode-route-wrap svg { width: 100%; min-width: 560px; height: 70px; display: block; }
-  .tour-mode-plane { transition: transform .4s cubic-bezier(0.25,1,0.5,1); }
-  .tour-mode-stop-card { background: var(--sidebar-bg); border-radius: 16px; padding: 18px 20px; margin-bottom: 16px; }
-  .tour-mode-stop-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
-  .tour-mode-stop-tag { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: .3px; flex-shrink: 0; }
-  .tour-mode-tag-live { background: #D42759; color: #fff; }
-  .tour-mode-tag-done { background: #e2e8f0; color: #64748b; }
-  .tour-mode-tag-upcoming { background: var(--accent-pink); color: #D42759; }
-  .tour-mode-stop-dates { font-size: 11.5px; font-weight: 700; color: #64748b; text-align: right; }
-  .tour-mode-stop-city { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
-  .tour-mode-stop-venue { font-size: 13px; color: #64748b; }
-  .tour-mode-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .tour-mode-nav-btn { background: #fff; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 9px 16px; font-size: 12.5px; font-weight: 700; color: var(--text-main); cursor: pointer; font-family: 'Poppins', sans-serif; }
-  .tour-mode-nav-btn:hover:not(:disabled) { border-color: var(--primary-magenta); color: var(--primary-magenta); }
-  .tour-mode-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .tour-mode-stop-index { font-size: 12px; font-weight: 700; color: #94a3b8; }
-  .tour-mode-footer { font-size: 11px; color: #94a3b8; text-align: center; padding-top: 14px; border-top: 1px solid #f1f5f9; line-height: 1.5; }
+
+  .tour-mode-route-wrap { width: 100%; margin-top: 16px; background: var(--sidebar-bg); }
+  .tour-mode-route-wrap svg { width: 100%; height: 190px; display: block; }
+  .tour-mode-route-label { font-size: 11px; font-weight: 700; fill: #64748b; }
+  .tour-mode-route-label.tour-mode-route-label-current { font-size: 12.5px; font-weight: 800; fill: #1e293b; }
+  .tour-mode-plane-pin { transition: transform .4s cubic-bezier(0.25,1,0.5,1); }
+
+  .tour-mode-stop-info { padding: 20px 20px 4px; }
+  .tour-mode-stop-tag-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .tour-mode-stop-tag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .tour-mode-stop-tag-text { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
+  .tour-mode-tag-live .tour-mode-stop-tag-dot { background: #ef4444; animation: tourModePulse 1.6s infinite; }
+  .tour-mode-tag-live .tour-mode-stop-tag-text { color: #ef4444; }
+  .tour-mode-tag-done .tour-mode-stop-tag-dot { background: #94a3b8; }
+  .tour-mode-tag-done .tour-mode-stop-tag-text { color: #94a3b8; }
+  .tour-mode-tag-upcoming .tour-mode-stop-tag-dot { background: var(--primary-magenta); border: 2px solid var(--accent-pink); box-sizing: content-box; }
+  .tour-mode-tag-upcoming .tour-mode-stop-tag-text { color: var(--primary-magenta); }
+  .tour-mode-stop-title { font-size: 19px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; line-height: 1.3; }
+  .tour-mode-stop-sub { font-size: 12.5px; color: #64748b; }
+
+  .tour-mode-nav { display: flex; align-items: center; gap: 10px; padding: 20px; }
+  .tour-mode-nav-btn { flex: 1; border: none; border-radius: 100px; padding: 14px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; text-align: center; transition: transform 0.15s ease; }
+  .tour-mode-nav-btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .tour-mode-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  #tour-mode-prev { background: #f1f5f9; color: var(--text-main); }
+  #tour-mode-next { background: var(--primary-magenta); color: #fff; }
+  .tour-mode-footer { font-size: 11px; color: #94a3b8; text-align: center; padding: 0 20px 18px; line-height: 1.5; }
   @media (max-width: 800px) {
       .tour-mode-badge { top: 60px; left: 14px; right: 14px; transform: none; width: auto; max-width: none; padding: 8px 14px 8px 12px; font-size: 11.5px; z-index: 3400; justify-content: center; }
       .tour-mode-badge:hover { transform: translateY(-2px); }
@@ -520,21 +540,35 @@
     <div class="tour-mode-panel-backdrop" onclick="closeTourModePanel()"></div>
     <div class="tour-mode-panel-sheet">
         <div class="tour-mode-panel-header">
-            <div>
-                <div class="tour-mode-panel-livetag" id="tour-mode-panel-livetag"></div>
-                <div class="tour-mode-panel-title" id="tour-mode-panel-title"></div>
+            <div class="tour-mode-panel-header-left">
+                <button class="tour-mode-close-btn" onclick="closeTourModePanel()" type="button">&times;</button>
+                <div>
+                    <div class="tour-mode-panel-eyebrow" data-i18n="tourModeEyebrow">Tour Mode</div>
+                    <div class="tour-mode-panel-title" id="tour-mode-panel-title"></div>
+                </div>
             </div>
-            <button class="tour-mode-close-btn" onclick="closeTourModePanel()" type="button">&times;</button>
+            <div class="tour-mode-select-wrap">
+                <button class="tour-mode-select-btn" type="button" onclick="tourModeToggleSelect(event)">
+                    <span id="tour-mode-select-label" data-i18n="tourModeChooseTour">Choose a tour</span> ▾
+                </button>
+                <div id="tour-mode-select-menu" class="tour-mode-select-menu hidden"></div>
+            </div>
         </div>
         <div id="tour-mode-member-card" class="tour-mode-member-card hidden"></div>
         <div class="tour-mode-route-wrap">
-            <svg id="tour-mode-route-svg" viewBox="0 0 900 70" preserveAspectRatio="xMidYMid meet"></svg>
+            <svg id="tour-mode-route-svg" viewBox="0 0 700 190" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
-        <div class="tour-mode-stop-card" id="tour-mode-stop-card"></div>
+        <div class="tour-mode-stop-info">
+            <div class="tour-mode-stop-tag-row" id="tour-mode-stop-tag-row">
+                <span class="tour-mode-stop-tag-dot"></span>
+                <span class="tour-mode-stop-tag-text" id="tour-mode-stop-tag-text"></span>
+            </div>
+            <div class="tour-mode-stop-title" id="tour-mode-stop-title"></div>
+            <div class="tour-mode-stop-sub" id="tour-mode-stop-sub"></div>
+        </div>
         <div class="tour-mode-nav">
-            <button id="tour-mode-prev" class="tour-mode-nav-btn" onclick="tourModeNavigate(-1)" type="button">‹ <span data-i18n="tourModePrev">Previous</span></button>
-            <span id="tour-mode-stop-index" class="tour-mode-stop-index"></span>
-            <button id="tour-mode-next" class="tour-mode-nav-btn" onclick="tourModeNavigate(1)" type="button"><span data-i18n="tourModeNext">Next</span> ›</button>
+            <button id="tour-mode-prev" class="tour-mode-nav-btn" onclick="tourModeNavigate(-1)" type="button">← <span data-i18n="tourModePrev">Previous</span></button>
+            <button id="tour-mode-next" class="tour-mode-nav-btn" onclick="tourModeNavigate(1)" type="button"><span data-i18n="tourModeNext">Next</span> →</button>
         </div>
         <div class="tour-mode-footer" data-i18n="tourModeFooterNote">Dates as announced by the tour — always double-check official ticketing sites before booking travel.</div>
     </div>
