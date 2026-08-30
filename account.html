@@ -172,7 +172,10 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
       <div class="box-container" style="text-align:center;">
         <div style="width:90px;height:90px;border-radius:50%;background:#FCE7F0;border:3px solid #D42759;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#D42759;margin:0 auto; overflow:hidden;" id="profile-preview">V</div>
-        <a style="font-size:12px;font-weight:700;color:#D42759;display:block;margin:12px 0 6px 0; cursor:pointer;" onclick="document.getElementById('upload-pic').click()" data-i18n="accChangePhoto">Change Profile Picture</a>
+        <div style="display:flex; gap:14px; justify-content:center; margin:12px 0 6px 0;">
+            <a style="font-size:12px;font-weight:700;color:#D42759; cursor:pointer;" onclick="document.getElementById('upload-pic').click()" data-i18n="accChangePhoto">Change Profile Picture</a>
+            <a id="reset-photo-link" style="font-size:12px;font-weight:700;color:#94a3b8; cursor:pointer;" onclick="resetProfilePicture()" data-i18n="accResetPhoto">Reset profile picture</a>
+        </div>
         <input type="file" id="upload-pic" accept="image/*" style="display:none;">
         <div style="font-size:11.5px;color:#94a3b8;margin-bottom:24px;" id="member-since-line"></div>
         <div style="text-align:left;">
@@ -304,6 +307,24 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         profilePreview.textContent = avatarInitial;
     }
 
+    // Le lien "Reset profile picture" n'a de sens que s'il y a réellement une photo
+    // personnalisée à retirer (sinon il n'y a rien à réinitialiser).
+    function updateResetPhotoLinkVisibility() {
+        const link = document.getElementById('reset-photo-link');
+        if (link) link.style.display = localStorage.getItem('userPhoto') ? 'inline' : 'none';
+    }
+    updateResetPhotoLinkVisibility();
+
+    window.resetProfilePicture = function() {
+        localStorage.removeItem('userPhoto');
+        const firstName = (localStorage.getItem('userFirstName') || '').trim();
+        const nameNow = (localStorage.getItem('userName') || 'User').trim();
+        const initial = (firstName || nameNow || 'U').charAt(0).toUpperCase();
+        profilePreview.textContent = initial;
+        document.querySelectorAll('.user-avatar-btn').forEach(btn => { btn.innerHTML = ''; btn.textContent = initial; });
+        updateResetPhotoLinkVisibility();
+    };
+
     const unlocked = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
     if(unlocked.length > 0) {
         document.getElementById('unlocked-passes').innerHTML = '';
@@ -327,6 +348,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
                 document.querySelectorAll('.user-avatar-btn').forEach(btn => {
                     btn.innerHTML = `<img src="${event.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
                 });
+                updateResetPhotoLinkVisibility();
             }
             reader.readAsDataURL(file);
         }

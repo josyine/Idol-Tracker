@@ -127,20 +127,15 @@
   .tour-mode-panel.open { opacity: 1; }
 
   .tour-mode-mapwrap { flex: 1; position: relative; background: #efe9dc; overflow: hidden; }
-  .tour-mode-map-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .tour-mode-map-road { stroke: #dcd3bd; stroke-width: 1.4; fill: none; }
-  .tour-mode-route-path { fill: none; stroke: var(--primary-magenta); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; opacity: .8; }
-  .tour-mode-route-path-glow { fill: none; stroke: var(--primary-magenta); stroke-width: 5; opacity: .08; }
-  .tour-mode-marker-num { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-weight: 700; font-size: 9px; fill: #fff; text-anchor: middle; dominant-baseline: middle; }
-  .tour-mode-marker-label { font-size: 9.5px; font-weight: 700; fill: var(--text-main); }
-  .tour-mode-pulse-ring { fill: none; stroke: var(--primary-magenta); stroke-width: 2; animation: tourModeRing 2.2s ease-out infinite; }
-  .tour-mode-pulse-ring2 { animation-delay: .7s; }
-  @keyframes tourModeRing { 0% { r: 9; opacity: .9; stroke-width: 2.4; } 100% { r: 24; opacity: 0; stroke-width: .4; } }
-  .tour-mode-marker-active { animation: tourModeBob 1.8s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
-  @keyframes tourModeBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
-  .tour-mode-close-btn { position: absolute; top: 16px; left: 16px; z-index: 6; background: rgba(23,19,49,0.68); backdrop-filter: blur(6px); border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; color: #fff; cursor: pointer; line-height: 1; }
+  .tour-mode-mapwrap .leaflet-container { background: #efe9dc; font-family: 'Poppins', sans-serif; }
+  .tour-mode-marker { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 9.5px; font-weight: 700; color: #fff; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); cursor: pointer; }
+  .tour-mode-marker-done { background: var(--primary-magenta); }
+  .tour-mode-marker-upcoming { background: #b3a8d6; }
+  .tour-mode-marker-active { background: #171331; width: 28px; height: 28px; font-size: 11px; animation: tourModePulse 1.6s infinite; }
+  .tour-mode-marker-label { position: absolute; top: 26px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 9.5px; font-weight: 700; color: var(--text-main); background: rgba(255,255,255,.85); padding: 1px 5px; border-radius: 4px; }
+  .tour-mode-close-btn { position: absolute; top: 16px; left: 16px; z-index: 500; background: rgba(23,19,49,0.68); backdrop-filter: blur(6px); border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; color: #fff; cursor: pointer; line-height: 1; }
   .tour-mode-close-btn:hover { background: rgba(23,19,49,0.85); }
-  .tour-mode-map-pill { position: absolute; top: 16px; left: 60px; z-index: 6; background: rgba(255,255,255,.88); backdrop-filter: blur(4px); border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 700; color: var(--text-main); }
+  .tour-mode-map-pill { position: absolute; top: 16px; left: 60px; z-index: 500; background: rgba(255,255,255,.88); backdrop-filter: blur(4px); border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 700; color: var(--text-main); }
 
   .tour-mode-rail { width: 300px; flex-shrink: 0; background: #fff; border-left: 1px solid #eee; display: flex; flex-direction: column; box-shadow: -12px 0 30px rgba(0,0,0,0.08); }
 
@@ -558,7 +553,7 @@
     <div class="tour-mode-mapwrap">
         <button class="tour-mode-close-btn" onclick="closeTourModePanel()" type="button">&times;</button>
         <span class="tour-mode-map-pill" id="tour-mode-map-pill"></span>
-        <svg class="tour-mode-map-svg" id="tour-mode-map-svg" viewBox="0 0 760 620" preserveAspectRatio="xMidYMid slice"></svg>
+        <div id="tour-mode-map-container" style="position:absolute; inset:0;"></div>
     </div>
     <div class="tour-mode-rail">
         <div class="tour-mode-select-wrap">

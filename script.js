@@ -181,6 +181,7 @@ let tripPageLayer = null;
 let tripMainLayerGroup = null;
 let dayMiniMaps = []; // instances Leaflet des mini-cartes par jour (une par .day-card), à détruire avant chaque re-render puisque box.innerHTML='' supprime leur conteneur DOM sans les libérer
 let itiSelectedCategories = []; // catégories cochées dans le multi-select de l'Auto-Itinerary Generator ; tableau vide = toutes les catégories
+let createTripSelectedCategories = []; // même principe pour la modale "Create New Trip" (My Trips)
 
 // ==========================================
 // 0bis. SYNCHRONISATION CLOUD DE LA WISHLIST (Firestore)
@@ -1234,7 +1235,7 @@ const translations = {
         addAnotherVisit: "Add another visit",
         tabExplore: "Explore", tabMyItinerary: "My Itinerary", yourRating: "Your rating", whenDidYouVisit: "When did you visit?", saveMemory: "Save memory", myVisitTab: "My Visit",
         backToMap: "← Back to Map", moreDetails: "More details", openInMaps: "Open in Google Maps", detailsLabel: "Details", aboutPlaceLabel: "About this place",
-        accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accNameLabel: "Name", accEmailLabel: "Email address",
+        accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accResetPhoto: "Reset profile picture", accNameLabel: "Name", accEmailLabel: "Email address",
         accCountryLabel: "Country you're interested in", accCountryPlaceholder: "Select a country (optional)",
         accActivityTitle: "Your activity", accTrips: "Trips", accVisited: "Visited", accWishlist: "Wishlist", accPasses: "Passes & billing",
         accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes",
@@ -1283,7 +1284,7 @@ const translations = {
         addAnotherVisit: "Ajouter une autre visite",
         tabExplore: "Explorer", tabMyItinerary: "Mon Itinéraire", yourRating: "Votre note", whenDidYouVisit: "Quand avez-vous visité ce lieu ?", saveMemory: "Enregistrer le souvenir", myVisitTab: "Ma Visite",
         backToMap: "← Retour à la carte", moreDetails: "Plus de détails", openInMaps: "Ouvrir dans Google Maps", detailsLabel: "Détails", aboutPlaceLabel: "À propos de ce lieu",
-        accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accNameLabel: "Nom", accEmailLabel: "Adresse e-mail",
+        accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accResetPhoto: "Réinitialiser la photo de profil", accNameLabel: "Nom", accEmailLabel: "Adresse e-mail",
         accCountryLabel: "Pays qui vous intéresse", accCountryPlaceholder: "Choisir un pays (optionnel)",
         accActivityTitle: "Votre activité", accTrips: "Voyages", accVisited: "Visités", accWishlist: "Wishlist", accPasses: "Pass et facturation",
         accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif",
@@ -1332,7 +1333,7 @@ const translations = {
         addAnotherVisit: "Añadir otra visita",
         tabExplore: "Explorar", tabMyItinerary: "Mi Itinerario", yourRating: "Tu valoración", whenDidYouVisit: "¿Cuándo visitaste este lugar?", saveMemory: "Guardar recuerdo", myVisitTab: "Mi Visita",
         backToMap: "← Volver al mapa", moreDetails: "Más detalles", openInMaps: "Abrir en Google Maps", detailsLabel: "Detalles", aboutPlaceLabel: "Sobre este lugar",
-        accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accNameLabel: "Nombre", accEmailLabel: "Correo electrónico",
+        accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accResetPhoto: "Restablecer foto de perfil", accNameLabel: "Nombre", accEmailLabel: "Correo electrónico",
         accCountryLabel: "País que te interesa", accCountryPlaceholder: "Elige un país (opcional)",
         accActivityTitle: "Tu actividad", accTrips: "Viajes", accVisited: "Visitados", accWishlist: "Lista de deseos", accPasses: "Pases y facturación",
         accEditBtn: "Editar perfil", accSaveBtn: "Guardar cambios", accSaved: "✓ Guardado con éxito", accNoPasses: "Sin pases activos",
@@ -1381,7 +1382,7 @@ const translations = {
         addAnotherVisit: "Aggiungi un'altra visita",
         tabExplore: "Esplora", tabMyItinerary: "Il Mio Itinerario", yourRating: "La tua valutazione", whenDidYouVisit: "Quando hai visitato questo posto?", saveMemory: "Salva ricordo", myVisitTab: "La Mia Visita",
         backToMap: "← Torna alla mappa", moreDetails: "Maggiori dettagli", openInMaps: "Apri in Google Maps", detailsLabel: "Dettagli", aboutPlaceLabel: "Informazioni su questo luogo",
-        accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accNameLabel: "Nome", accEmailLabel: "Indirizzo email",
+        accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accResetPhoto: "Ripristina foto profilo", accNameLabel: "Nome", accEmailLabel: "Indirizzo email",
         accCountryLabel: "Paese che ti interessa", accCountryPlaceholder: "Scegli un paese (opzionale)",
         accActivityTitle: "La tua attività", accTrips: "Viaggi", accVisited: "Visitati", accWishlist: "Wishlist", accPasses: "Pass e fatturazione",
         accEditBtn: "Modifica profilo", accSaveBtn: "Salva modifiche", accSaved: "✓ Salvato con successo", accNoPasses: "Nessun pass attivo",
@@ -1430,7 +1431,7 @@ const translations = {
         addAnotherVisit: "Adicionar outra visita",
         tabExplore: "Explorar", tabMyItinerary: "Meu Itinerário", yourRating: "Sua avaliação", whenDidYouVisit: "Quando você visitou este lugar?", saveMemory: "Salvar lembrança", myVisitTab: "Minha Visita",
         backToMap: "← Voltar ao mapa", moreDetails: "Mais detalhes", openInMaps: "Abrir no Google Maps", detailsLabel: "Detalhes", aboutPlaceLabel: "Sobre este local",
-        accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accNameLabel: "Nome", accEmailLabel: "Endereço de e-mail",
+        accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accResetPhoto: "Redefinir foto de perfil", accNameLabel: "Nome", accEmailLabel: "Endereço de e-mail",
         accCountryLabel: "País de interesse", accCountryPlaceholder: "Escolha um país (opcional)",
         accActivityTitle: "Sua atividade", accTrips: "Viagens", accVisited: "Visitados", accWishlist: "Wishlist", accPasses: "Passes e faturamento",
         accEditBtn: "Editar perfil", accSaveBtn: "Salvar alterações", accSaved: "✓ Salvo com sucesso", accNoPasses: "Nenhum passe ativo",
@@ -1479,7 +1480,7 @@ const translations = {
         addAnotherVisit: "다른 방문 추가",
         tabExplore: "탐색", tabMyItinerary: "내 일정", yourRating: "평점", whenDidYouVisit: "언제 방문하셨나요?", saveMemory: "추억 저장", myVisitTab: "내 방문",
         backToMap: "← 지도로 돌아가기", moreDetails: "자세히 보기", openInMaps: "구글 지도에서 열기", detailsLabel: "상세 정보", aboutPlaceLabel: "이 장소에 대해",
-        accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accNameLabel: "이름", accEmailLabel: "이메일 주소",
+        accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accResetPhoto: "프로필 사진 재설정", accNameLabel: "이름", accEmailLabel: "이메일 주소",
         accCountryLabel: "관심 있는 국가", accCountryPlaceholder: "국가 선택 (선택 사항)",
         accActivityTitle: "내 활동", accTrips: "여행", accVisited: "방문함", accWishlist: "위시리스트", accPasses: "이용권 및 결제",
         accEditBtn: "프로필 수정", accSaveBtn: "변경사항 저장", accSaved: "✓ 저장되었습니다", accNoPasses: "활성화된 이용권 없음",
@@ -1528,7 +1529,7 @@ const translations = {
         addAnotherVisit: "別の訪問を追加",
         tabExplore: "探索", tabMyItinerary: "マイ旅程", yourRating: "評価", whenDidYouVisit: "いつ訪れましたか？", saveMemory: "思い出を保存", myVisitTab: "マイビジット",
         backToMap: "← 地図に戻る", moreDetails: "詳細を見る", openInMaps: "Googleマップで開く", detailsLabel: "詳細", aboutPlaceLabel: "この場所について",
-        accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accNameLabel: "名前", accEmailLabel: "メールアドレス",
+        accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accResetPhoto: "プロフィール写真をリセット", accNameLabel: "名前", accEmailLabel: "メールアドレス",
         accCountryLabel: "興味のある国", accCountryPlaceholder: "国を選択（任意）",
         accActivityTitle: "アクティビティ", accTrips: "旅行", accVisited: "訪問済み", accWishlist: "ウィッシュリスト", accPasses: "パスとお支払い",
         accEditBtn: "プロフィールを編集", accSaveBtn: "変更を保存", accSaved: "✓ 保存しました", accNoPasses: "有効なパスはありません",
@@ -1577,7 +1578,7 @@ const translations = {
         addAnotherVisit: "添加另一次访问",
         tabExplore: "探索", tabMyItinerary: "我的行程", yourRating: "你的评分", whenDidYouVisit: "你什么时候去的？", saveMemory: "保存回忆", myVisitTab: "我的到访",
         backToMap: "← 返回地图", moreDetails: "更多详情", openInMaps: "在 Google 地图中打开", detailsLabel: "详情", aboutPlaceLabel: "关于这个地方",
-        accTitle: "我的账户", accChangePhoto: "更换头像", accNameLabel: "姓名", accEmailLabel: "电子邮箱",
+        accTitle: "我的账户", accChangePhoto: "更换头像", accResetPhoto: "重置头像", accNameLabel: "姓名", accEmailLabel: "电子邮箱",
         accCountryLabel: "感兴趣的国家", accCountryPlaceholder: "选择国家（可选）",
         accActivityTitle: "我的动态", accTrips: "行程", accVisited: "已访问", accWishlist: "收藏清单", accPasses: "通行证与账单",
         accEditBtn: "编辑资料", accSaveBtn: "保存更改", accSaved: "✓ 保存成功", accNoPasses: "暂无有效通行证",
@@ -1775,6 +1776,34 @@ window.updateItiCategories = function() {
                 this.classList.remove('active');
             } else {
                 itiSelectedCategories.push(cat);
+                this.classList.add('active');
+            }
+        });
+    });
+};
+
+// Même principe que updateItiCategories, pour la modale "Create New Trip" (My Trips) —
+// voir createNewTripAdvanced().
+window.updateCreateTripCategories = function() {
+    const group = document.getElementById('create-trip-group')?.value;
+    const catContainer = document.getElementById('create-trip-categories');
+    if(!catContainer || !group) { if (catContainer) catContainer.innerHTML = ''; return; }
+
+    const cats = (filterData[group] && filterData[group].categories) ? filterData[group].categories : filterData["General"].categories;
+    createTripSelectedCategories = createTripSelectedCategories.filter(c => cats.includes(c));
+
+    catContainer.innerHTML = cats.map(cat =>
+        `<div class="cat-card create-trip-cat-pill${createTripSelectedCategories.includes(cat) ? ' active' : ''}" data-cat="${cat}">${getCatName(cat)}</div>`
+    ).join('');
+
+    catContainer.querySelectorAll('.create-trip-cat-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            const cat = this.getAttribute('data-cat');
+            if(createTripSelectedCategories.includes(cat)) {
+                createTripSelectedCategories = createTripSelectedCategories.filter(c => c !== cat);
+                this.classList.remove('active');
+            } else {
+                createTripSelectedCategories.push(cat);
                 this.classList.add('active');
             }
         });
@@ -2921,6 +2950,29 @@ function haversineKm(lat1, lng1, lat2, lng2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
+// Convertit une adresse/quartier tapé en clair (ex: "Myeongdong, Seoul") en coordonnées
+// réelles, via l'API Nominatim d'OpenStreetMap (gratuite, sans clé). Utilisée pour le
+// champ optionnel "hôtel / quartier d'hébergement" de My Trips, afin que le premier
+// trajet de chaque journée parte réellement de là plutôt que du premier lieu de la liste.
+// Ce n'est PAS testable dans le sandbox de développement (réseau restreint) — retourne
+// null en cas d'échec (adresse introuvable, réseau bloqué...) plutôt que d'inventer des
+// coordonnées, et l'appelant doit alors continuer sans point de départ.
+async function geocodeAddress(query) {
+    if (!query || !query.trim()) return null;
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query.trim())}`, {
+            headers: { 'Accept-Language': currentLang || 'en' }
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) return null;
+        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    } catch (e) {
+        console.warn('Géocodage de l\'adresse échoué :', e);
+        return null;
+    }
+}
+
 // On n'a pas d'API d'itinéraire en temps réel (pas de clé, réseau restreint) : plutôt que
 // d'inventer un temps de trajet dans le vide, on combine deux informations réelles —
 // la distance à vol d'oiseau entre les deux lieux (pour choisir un mode de transport
@@ -2975,6 +3027,78 @@ const ITI_CATEGORY_PROFILE = {
 const ITI_DEFAULT_PROFILE = { openHour: 9, closeHour: 19, visitMinutes: 45 };
 function getCategoryProfile(cat) { return ITI_CATEGORY_PROFILE[cat] || ITI_DEFAULT_PROFILE; }
 
+// Constantes de planification partagées par l'Auto-Itinerary Generator ET par My Trips
+// (voir computeDayTimeline / buildDayPlans juste en dessous) : la journée démarre à
+// 9h30, ne dépasse jamais 20h, et une pause déjeuner d'1h s'insère automatiquement la
+// première fois que l'horaire tombe entre midi et 14h.
+const ITI_DAY_START_MIN = 9 * 60 + 30;
+const ITI_DAY_HARD_END_MIN = 20 * 60;
+const ITI_LUNCH_WINDOW_START = 12 * 60, ITI_LUNCH_WINDOW_END = 14 * 60, ITI_LUNCH_DURATION_MIN = 60;
+
+// Calcule les horaires réalistes (arrivée/départ, trajet, pause déjeuner) d'UNE journée à
+// partir d'une liste de lieux DÉJÀ DANS L'ORDRE souhaité — ne décide pas quels lieux vont
+// ensemble ni dans quel ordre (voir buildDayPlans pour la répartition automatique). Sert
+// aussi à recalculer les horaires d'un jour de My Trips après une réorganisation manuelle
+// par glisser-déposer, en respectant l'ordre choisi par la personne : les lieux qui ne
+// tiennent plus dans la journée ne sont jamais retirés ici (ce serait surprenant pour un
+// jour édité à la main), juste signalés via pastClose/pastHardEnd. homeBase (optionnel,
+// {lat,lng}) sert de point de départ du premier trajet de la journée — hôtel ou quartier
+// d'hébergement renseigné pour le voyage.
+function computeDayTimeline(dayLocs, homeBase) {
+    const items = [];
+    let curTime = ITI_DAY_START_MIN;
+    let lunchTaken = false;
+    let prevPoint = homeBase || null;
+    dayLocs.forEach(loc => {
+        const profile = getCategoryProfile(loc.category);
+        let arrival = curTime;
+        let leg = null;
+        if (prevPoint) {
+            leg = estimateTransitLeg(prevPoint, loc);
+            arrival = curTime + Math.round((leg.minMinutes + leg.maxMinutes) / 2);
+        }
+        let lunchBefore = false;
+        if (!lunchTaken && arrival >= ITI_LUNCH_WINDOW_START && arrival <= ITI_LUNCH_WINDOW_END) {
+            arrival += ITI_LUNCH_DURATION_MIN;
+            lunchTaken = true;
+            lunchBefore = true;
+        }
+        if (arrival < profile.openHour * 60) arrival = profile.openHour * 60;
+        const departure = arrival + profile.visitMinutes;
+        items.push({
+            loc, arrival, departure, leg, lunchBefore,
+            pastClose: arrival >= profile.closeHour * 60,
+            pastHardEnd: departure > ITI_DAY_HARD_END_MIN
+        });
+        curTime = departure;
+        prevPoint = loc;
+    });
+    return items;
+}
+
+// Répartit une liste de lieux (déjà ordonnée, ex: itinéraire du plus proche voisin) sur
+// le nombre de jours demandé, en ne plaçant un lieu que si la journée en cours peut
+// vraiment l'accueillir (voir computeDayTimeline). Si tous les lieux ne tiennent pas dans
+// le nombre de jours choisi, le surplus est retourné dans `unplaced` plutôt que forcé —
+// ce générateur reste un exemple d'itinéraire, pas une promesse de tout faire tenir.
+function buildDayPlans(orderedLocs, days, homeBase) {
+    let pool = orderedLocs.slice();
+    const dayPlans = [];
+    for (let d = 0; d < days && pool.length > 0; d++) {
+        const dayLocs = [];
+        while (pool.length > 0) {
+            const trial = dayLocs.concat([pool[0]]);
+            const timeline = computeDayTimeline(trial, homeBase);
+            const lastItem = timeline[timeline.length - 1];
+            if (lastItem.pastClose || lastItem.pastHardEnd) break;
+            dayLocs.push(pool.shift());
+        }
+        if (dayLocs.length === 0) break; // rien n'a pu être placé même en tout début de journée : inutile de continuer
+        dayPlans.push(dayLocs);
+    }
+    return { dayPlans, unplaced: pool };
+}
+
 window.generateItinerary = function() {
     const group = document.getElementById('iti-group').value;
     const country = document.getElementById('iti-country').value;
@@ -3000,57 +3124,11 @@ window.generateItinerary = function() {
         route.push(validLocs.splice(nearestIdx, 1)[0]);
     }
 
-    // Répartition réaliste des lieux sur les jours demandés : la journée démarre à 9h30,
-    // se termine au plus tard à 20h (dès qu'une visite dépasserait cette heure, elle
-    // bascule au lendemain), une pause déjeuner d'1h s'insère automatiquement la première
-    // fois que l'horaire tombe entre 12h et 14h, et un lieu n'est placé que si l'heure
-    // d'arrivée tombe dans sa plage horaire typique (voir ITI_CATEGORY_PROFILE). Si tous
-    // les lieux ne tiennent pas dans le nombre de jours choisi, on ne force rien : le
-    // surplus reste simplement hors de l'itinéraire (voir le message affiché en bas).
-    const DAY_START_MIN = 9 * 60 + 30;
-    const DAY_HARD_END_MIN = 20 * 60;
-    const LUNCH_WINDOW_START = 12 * 60, LUNCH_WINDOW_END = 14 * 60, LUNCH_DURATION_MIN = 60;
-
-    let pool = route;
-    const dayPlans = []; // [{ items: [{loc, arrival, departure, leg, lunchBefore}] }]
-    for (let d = 0; d < days && pool.length > 0; d++) {
-        const items = [];
-        let curTime = DAY_START_MIN;
-        let lunchTaken = false;
-        let prevLoc = null;
-
-        while (pool.length > 0) {
-            const candidate = pool[0];
-            const profile = getCategoryProfile(candidate.category);
-            let arrival = curTime;
-            let leg = null;
-            if (prevLoc) {
-                leg = estimateTransitLeg(prevLoc, candidate);
-                arrival = curTime + Math.round((leg.minMinutes + leg.maxMinutes) / 2);
-            }
-            let lunchBefore = false;
-            if (!lunchTaken && arrival >= LUNCH_WINDOW_START && arrival <= LUNCH_WINDOW_END) {
-                arrival += LUNCH_DURATION_MIN;
-                lunchTaken = true;
-                lunchBefore = true;
-            }
-            if (arrival < profile.openHour * 60) arrival = profile.openHour * 60;
-            const departure = arrival + profile.visitMinutes;
-
-            // Ce lieu ne tient plus dans la journée (fermé à cette heure, ou la visite
-            // dépasserait 20h) : on s'arrête là pour aujourd'hui, il sera retenté demain.
-            if (arrival >= profile.closeHour * 60 || departure > DAY_HARD_END_MIN) break;
-
-            items.push({ loc: candidate, arrival, departure, leg, lunchBefore });
-            pool.shift();
-            curTime = departure;
-            prevLoc = candidate;
-        }
-
-        if (items.length === 0) break; // rien n'a pu être placé même en tout début de journée : inutile de continuer
-        dayPlans.push(items);
-    }
-    const unplacedCount = pool.length;
+    // Répartition réaliste des lieux sur les jours demandés (voir buildDayPlans /
+    // computeDayTimeline ci-dessus, partagées avec My Trips).
+    const { dayPlans: dayLocGroups, unplaced } = buildDayPlans(route, days, null);
+    const dayPlans = dayLocGroups.map(dayLocs => computeDayTimeline(dayLocs, null));
+    const unplacedCount = unplaced.length;
 
     const resultDiv = document.getElementById('iti-days-list');
     if(!resultDiv) return;
@@ -3610,6 +3688,62 @@ window.updateEditTripOptions = function(fieldChanged) {
     window.renderTrip();
 }
 
+// Aperçu en lecture seule des horaires réalistes d'un jour (arrivée/départ, trajet,
+// pause déjeuner) — voir computeDayTimeline. Toujours recalculé à partir de l'ordre
+// ACTUEL des lieux du jour (y compris après un glisser-déposer manuel), donc jamais
+// périmé. Un lieu qui ne tient plus dans la journée n'est jamais retiré ici (ce serait
+// surprenant pour un jour édité à la main) : juste signalé par une pastille ⚠.
+const TRIPS_TXT_DICT = {
+    en: { lunchBreak: "Lunch break (~1h)", fromHotel: "From your accommodation" },
+    fr: { lunchBreak: "Pause déjeuner (~1h)", fromHotel: "Depuis votre hébergement" }
+};
+// `isFirstOfDay` est passé explicitement (plutôt que déduit de la position dans un
+// tableau) car cette fonction est appelée une fois par lieu dans refreshDayTimelines(),
+// pour ne mettre à jour que la pastille de CE lieu sans reconstruire toute la liste.
+function renderDayTimelineHTML(it, isFirstOfDay) {
+    const txt = TRIPS_TXT_DICT[currentLang] || TRIPS_TXT_DICT.en;
+    const formatMin = (mins) => {
+        const d = new Date();
+        d.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+    let html = '';
+    if (it.leg) {
+        const legLabel = `${it.leg.mode} · ~${it.leg.minMinutes}-${it.leg.maxMinutes} min`;
+        html += `<div style="font-size:10.5px; font-weight:600; color:#64748b; padding:3px 0 3px 4px;">${isFirstOfDay ? '📍 ' + txt.fromHotel + ' · ' : ''}${legLabel}</div>`;
+    }
+    if (it.lunchBefore) {
+        html += `<div style="font-size:10.5px; font-weight:600; color:#D42759; padding:3px 0 3px 4px;">🍽️ ${txt.lunchBreak}</div>`;
+    }
+    const warn = (it.pastClose || it.pastHardEnd) ? ' <span style="color:#ef4444;" title="Hors des horaires réalistes de la journée">⚠</span>' : '';
+    html += `<div style="font-size:10.5px; font-weight:700; color:#D42759; padding-left:4px;">${formatMin(it.arrival)} - ${formatMin(it.departure)}${warn}</div>`;
+    return html;
+}
+
+// Recalcule et réinjecte l'aperçu horaire de chaque jour à partir des .day-loc
+// actuellement présents dans le DOM (sans reconstruire les lignes de lieux elles-mêmes,
+// pour ne jamais perturber un glisser-déposer en cours ou en cours d'affichage).
+window.refreshDayTimelines = function() {
+    if (!currentTrip) return;
+    document.querySelectorAll('.day-card').forEach(card => {
+        const rows = Array.from(card.querySelectorAll('.day-loc'));
+        if (rows.length === 0) return;
+        const locs = rows.map(el => celebLocations.find(l => l.id === parseInt(el.dataset.id))).filter(Boolean);
+        const items = computeDayTimeline(locs, currentTrip.homeBase);
+        items.forEach((it, idx) => {
+            const rowEl = rows[idx];
+            if (!rowEl) return;
+            let badge = rowEl.querySelector('.day-loc-timing');
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'day-loc-timing';
+                rowEl.appendChild(badge);
+            }
+            badge.innerHTML = renderDayTimelineHTML(it, idx === 0);
+        });
+    });
+}
+
 window.renderTrip = function() {
     if (!currentTrip) return;
 
@@ -3748,6 +3882,7 @@ window.renderTrip = function() {
         setTimeout(() => { tripPageMap.invalidateSize(); drawTripOnMap(currentTrip, tripPageMap, tripPageLayer); }, 200);
     }
     renderDayMiniMaps(currentTrip);
+    window.refreshDayTimelines();
 }
 
 window.switchEditDateTab = function(tab) {
@@ -4025,6 +4160,7 @@ window.saveTrip = function() {
         }
     });
     renderDayMiniMaps(currentTrip);
+    window.refreshDayTimelines();
 }
 
 window.openAddModal = function() { document.getElementById('add-modal').classList.remove('hidden'); window.filterAddModal(); }
@@ -4110,6 +4246,8 @@ window.updateCreateTripOptions = function() {
     const cities = [...new Set(cityLocs.map(l => l.city))].filter(Boolean).sort();
     cities.forEach(c => citySelect.innerHTML += `<option value="${c}">${c}</option>`);
     if(cities.includes(currentCity)) citySelect.value = currentCity;
+
+    window.updateCreateTripCategories();
 }
 
 window.switchCreateDateTab = function(tab) {
@@ -4130,34 +4268,48 @@ window.selectCreatePill = function(btn, type) {
     btn.classList.add('active');
 }
 
-window.createNewTripAdvanced = function() {
+window.createNewTripAdvanced = async function() {
     const nameInput = document.getElementById('create-trip-name');
     let name = nameInput.value.trim();
-    
+
     const country = document.getElementById('create-trip-country').value;
     const group = document.getElementById('create-trip-group').value;
     const member = document.getElementById('create-trip-member').value;
     const city = document.getElementById('create-trip-city').value;
-    
+    const hotelQuery = (document.getElementById('create-trip-hotel')?.value || '').trim();
+
+    const errorEl = document.getElementById('create-trip-error');
+    // Un groupe et un pays sont indispensables pour proposer le moindre lieu : les
+    // exiger explicitement plutôt que de créer silencieusement un voyage entièrement
+    // vide (c'était le cas avant, et donnait l'impression que "ça n'enregistre rien").
+    if (!group || !country) {
+        if (errorEl) {
+            errorEl.textContent = currentLang === 'fr'
+                ? 'Choisissez un groupe et un pays pour générer un itinéraire.'
+                : 'Choose a group and a country to generate an itinerary.';
+            errorEl.classList.remove('hidden');
+        }
+        return;
+    }
+    if (errorEl) errorEl.classList.add('hidden');
+
     if (!name) {
-        if(country && group) name = `${group} Trip in ${country}`;
-        else if (country) name = `Trip to ${country}`;
-        else name = "My New Trip";
+        name = `${group} Trip in ${country}`;
     }
 
     const isFlexible = document.querySelector('#add-trip-modal .date-tab[data-tab="create-flexible"]').classList.contains('active');
-    
+
     let dateType = isFlexible ? 'duration' : 'specific';
     let duration = "";
     let startDate = "";
     let endDate = "";
-    let numDays = 3; 
+    let numDays = 3;
 
     if (isFlexible) {
         const month = document.querySelector('#add-trip-modal .pill-btn[data-type="create-month"].active')?.textContent || '';
         const length = document.querySelector('#add-trip-modal .pill-btn[data-type="create-duration"].active')?.textContent || '';
         duration = `${length} in ${month}`;
-        
+
         if(length.includes('Weekend')) numDays = 2;
         else if(length.includes('1 week') || length.includes('1 semaine')) numDays = 7;
         else if(length.includes('2 weeks') || length.includes('2 semaines')) numDays = 14;
@@ -4171,43 +4323,99 @@ window.createNewTripAdvanced = function() {
         }
     }
 
-    let daysArray = [];
-    for(let i=0; i<numDays; i++) daysArray.push([]);
+    const createBtn = document.getElementById('i18n-btn-create');
+    const originalBtnLabel = createBtn ? createBtn.textContent : '';
+    if (createBtn) { createBtn.disabled = true; createBtn.textContent = '...'; }
+
+    // Hôtel / quartier d'hébergement (optionnel) : géocodé via l'API Nominatim
+    // (OpenStreetMap, gratuite, sans clé) pour servir de point de départ réel du premier
+    // trajet de chaque journée. Si le géocodage échoue (adresse introuvable, réseau
+    // indisponible), on continue simplement sans point de départ plutôt que de bloquer
+    // la création du voyage — ce n'est qu'un raffinement optionnel.
+    let homeBase = null;
+    if (hotelQuery) {
+        homeBase = await geocodeAddress(hotelQuery);
+        if (!homeBase && errorEl) {
+            errorEl.textContent = currentLang === 'fr'
+                ? "Adresse de l'hôtel introuvable — le voyage sera créé sans point de départ fixe."
+                : "Couldn't find that address — the trip will be created without a fixed starting point.";
+            errorEl.classList.remove('hidden');
+        }
+    }
 
     const unlockedGroups = getUnlockedGroups();
     let baseLocs = celebLocations.filter(loc => unlockedGroups.includes(loc.group));
 
     let validLocs = baseLocs.filter(l => {
-        if(group && l.group !== group) return false;
-        if(country && l.country !== country) return false;
+        if(l.group !== group) return false;
+        if(l.country !== country) return false;
         if(city && l.city !== city) return false;
+        if(member && member !== 'All' && l.member !== member && l.member !== 'All') return false;
+        if(createTripSelectedCategories.length > 0 && !createTripSelectedCategories.includes(l.category)) return false;
         return true;
     });
 
-    if(group && country && validLocs.length > 0) {
-        let locsPerDay = Math.ceil(validLocs.length / numDays);
-        for(let i=0; i<numDays; i++) {
-            let chunk = validLocs.slice(i*locsPerDay, (i+1)*locsPerDay);
-            daysArray[i] = chunk.map(l => l.id);
+    let daysArray = [];
+    for(let i=0; i<numDays; i++) daysArray.push([]);
+
+    if (validLocs.length > 0) {
+        // Itinéraire du plus proche voisin, en partant de l'hôtel s'il a pu être
+        // géocodé (sinon du premier lieu, comme pour l'Auto-Itinerary Generator) —
+        // ne force jamais tous les lieux dans le nombre de jours choisi (voir
+        // buildDayPlans) : le surplus reste simplement non assigné, à ajouter
+        // manuellement ensuite si la personne le souhaite.
+        let pool = validLocs.slice();
+        let route = [];
+        let anchor = homeBase;
+        if (!anchor) { anchor = pool.shift(); route.push(anchor); }
+        while (pool.length > 0) {
+            let nearestIdx = 0, minDist = Infinity;
+            for (let i = 0; i < pool.length; i++) {
+                const d = Math.hypot(anchor.lat - pool[i].lat, anchor.lng - pool[i].lng);
+                if (d < minDist) { minDist = d; nearestIdx = i; }
+            }
+            const next = pool.splice(nearestIdx, 1)[0];
+            route.push(next);
+            anchor = next;
         }
+
+        const { dayPlans } = buildDayPlans(route, numDays, homeBase);
+        dayPlans.forEach((dayLocs, i) => { if (i < daysArray.length) daysArray[i] = dayLocs.map(l => l.id); });
     }
 
     const newTripId = 'trip-' + Date.now();
-    let newTrip = { 
+    let newTrip = {
         id: newTripId, name: name, dateType: dateType, duration: duration, startDate: startDate, endDate: endDate, days: daysArray,
-        group: group, member: member, country: country, city: city
+        group: group, member: member, country: country, city: city,
+        categories: createTripSelectedCategories.slice(),
+        homeBase: homeBase, homeBaseLabel: homeBase ? hotelQuery : ''
     };
-    
+
+    // Comme pour l'Auto-Itinerary Generator (saveItineraryToTrips) : les lieux assignés
+    // à un jour sont aussi ajoutés à la wishlist liée à ce voyage, pour rester cohérent
+    // avec le reste du site (stats, page Wishlist).
+    let wList = getWishlistLocs();
+    daysArray.flat().forEach(id => {
+        if (!wList.some(w => Number(w.id) === Number(id) && w.tripId === newTripId)) {
+            wList.push({ id, dateAdded: new Date().toLocaleDateString(), tripId: newTripId });
+        }
+    });
+    localStorage.setItem('wishlistLocs', JSON.stringify(wList));
+    syncWishlist(wList);
+
     let trips = getMyTripsList();
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
     syncTrips(trips);
 
     localStorage.setItem('activeTripId', newTripId);
-    
+
+    if (createBtn) { createBtn.disabled = false; createBtn.textContent = originalBtnLabel; }
     document.getElementById('add-trip-modal').classList.add('hidden');
     nameInput.value = '';
-    
+    if (document.getElementById('create-trip-hotel')) document.getElementById('create-trip-hotel').value = '';
+    createTripSelectedCategories = [];
+
     if(typeof window.initTrips === 'function') window.initTrips();
     else if(document.getElementById('tab-itinerary-btn')) loadItineraryTabOptions();
 }

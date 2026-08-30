@@ -104,10 +104,11 @@
   .day-title {font-size:14.5px;font-weight:700;color:#D42759; display: flex; align-items: center; gap: 8px;}
   .day-items {min-height:25px;}
 
-  .day-loc { display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;color:#334155;padding:14px 16px;border-radius:8px; background:#fff;border:1px solid #e2e8f0;margin-bottom:8px;cursor:grab; position: relative;}
+  .day-loc { display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:13px;font-weight:600;color:#334155;padding:14px 16px;border-radius:8px; background:#fff;border:1px solid #e2e8f0;margin-bottom:8px;cursor:grab; position: relative;}
   .day-loc:last-child {margin-bottom:0;}
   .day-loc:active {cursor:grabbing;}
   .day-loc.dragging {opacity:.4; background: #f8fafc;}
+  .day-loc-timing { flex-basis: 100%; padding-left: 30px; line-height: 1.5; cursor: default; }
   .drag-over-top { border-top: 3px solid #D42759 !important; }
   .drag-over-bottom { border-bottom: 3px solid #D42759 !important; }
   
@@ -375,6 +376,10 @@
              </select>
         </div>
 
+        <div id="create-trip-categories" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"></div>
+
+        <input type="text" id="create-trip-hotel" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:20px; outline:none;" placeholder="Hotel or neighborhood (optional)">
+
         <div class="date-tabs">
             <div class="date-tab active" data-tab="create-specific" onclick="switchCreateDateTab('specific')">Specific dates</div>
             <div class="date-tab" data-tab="create-flexible" onclick="switchCreateDateTab('flexible')">Flexible dates</div>
@@ -399,6 +404,8 @@
                  <div class="pill-btn" data-type="create-month" onclick="selectCreatePill(this, 'create-month')">Next 6 months</div>
             </div>
         </div>
+
+        <div id="create-trip-error" class="hidden" style="background:#FFF1F3; border:1px solid #FBD5DC; color:#D42759; font-size:12px; font-weight:600; padding:10px 14px; border-radius:8px; margin-bottom:14px;"></div>
 
         <button class="gen-btn" style="width: 100%; justify-content: center;" onclick="createNewTripAdvanced()" id="i18n-btn-create">Create Trip</button>
     </div>

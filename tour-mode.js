@@ -2,7 +2,8 @@
 // MODE TOURNÉE EN DIRECT (Tour Mode)
 // ==========================================
 // Gère le badge (toujours visible sur la carte) et le panneau plein écran qu'il ouvre :
-// une carte décorative à gauche (route + étapes numérotées) et un rail clair à droite
+// une vraie carte Leaflet à gauche (même fond de carte que le reste du site, avec toutes
+// les étapes et l'itinéraire de la tournée affichés par-dessus) et un rail clair à droite
 // (sélecteur de tournée, liste complète des étapes, détail de l'étape sélectionnée,
 // navigation précédent/suivant). S'appuie sur TOUR_MODE_DATA / MEMBER_EVENTS_DATA /
 // getCurrentTourStop() / getCurrentMemberEvent() / getTourStopStatus() définis dans
@@ -14,6 +15,8 @@
 // tournée est entièrement terminée, on retombe sur sa toute première étape.
 (function () {
     let currentStopIndex = 0;
+    let tourModeLeafletMap = null;
+    let tourModeMarkers = [];
 
     function fmtShowDates(showDates) {
         const locale = currentLang || 'en';
@@ -42,75 +45,59 @@
         return idx === -1 ? 0 : idx;
     }
 
-    // Dispose tous les arrêts en "serpentin" (lignes successives, sens alterné) sur le
-    // canevas de la carte — purement décoratif, pas une projection géographique réelle
-    // (avec 34 étapes sur 5 continents, une vraie projection serait illisible).
-    function routeLayout() {
-        const stops = TOUR_MODE_DATA.stops;
-        const n = stops.length;
-        const w = 760, h = 620, marginX = 60, marginY = 70;
-        const perRow = Math.min(n, 6);
-        const rows = Math.ceil(n / perRow);
-        const colGap = perRow > 1 ? (w - marginX * 2) / (perRow - 1) : 0;
-        const rowGap = rows > 1 ? (h - marginY * 2) / (rows - 1) : 0;
-        return stops.map((stop, i) => {
-            const row = Math.floor(i / perRow);
-            let col = i % perRow;
-            if (row % 2 === 1) col = perRow - 1 - col;
-            return { x: marginX + col * colGap, y: marginY + row * rowGap, status: getTourStopStatus(stop, getTourNow()) };
-        });
+    // Vraie carte Leaflet (mêmes tuiles que le reste du site, voir createOSMTileLayer
+    // dans script.js) avec l'itinéraire de la tournée affiché par-dessus : un marqueur
+    // numéroté par étape (magenta = passée, mauve clair = à venir, grand marqueur sombre
+    // qui pulse = étape sélectionnée) relié par un tracé en pointillés dans l'ordre réel
+    // de la tournée. Recréée à chaque ouverture du panneau (comme itiLeafletMap pour
+    // l'Auto-Itinerary Generator) car son conteneur est à taille nulle tant que le
+    // panneau est masqué.
+    function ensureMap() {
+        const container = document.getElementById('tour-mode-map-container');
+        if (!container || typeof L === 'undefined') return null;
+        if (tourModeLeafletMap) { tourModeLeafletMap.remove(); tourModeLeafletMap = null; }
+        tourModeLeafletMap = L.map('tour-mode-map-container', { zoomControl: false }).setView([20, 0], 2);
+        createOSMTileLayer(tourModeLeafletMap).addTo(tourModeLeafletMap);
+        L.control.zoom({ position: 'bottomright' }).addTo(tourModeLeafletMap);
+        return tourModeLeafletMap;
     }
 
-    function pathD(pts) {
-        if (pts.length < 2) return '';
-        let d = `M ${pts[0].x} ${pts[0].y}`;
-        for (let k = 1; k < pts.length; k++) {
-            const p0 = pts[k - 1], p1 = pts[k];
-            const midX = (p0.x + p1.x) / 2;
-            d += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`;
-        }
-        return d;
-    }
+    function renderMap(fitAll) {
+        const map = tourModeLeafletMap;
+        if (!map) return;
 
-    function drawDecorativeRoads(svg, w, h) {
-        let s = '';
-        for (let i = 0; i < 6; i++) {
-            const y = (h / 7) * (i + 1) + (i % 2 ? 14 : -10);
-            s += `<path class="tour-mode-map-road" d="M0 ${y} Q ${w * 0.3} ${y - 40} ${w * 0.55} ${y + 10} T ${w} ${y - 20}"/>`;
-        }
-        for (let i = 0; i < 4; i++) {
-            const x = (w / 5) * (i + 1);
-            s += `<path class="tour-mode-map-road" d="M${x} 0 Q ${x + 30} ${h * 0.4} ${x - 20} ${h}"/>`;
-        }
-        svg.insertAdjacentHTML('beforeend', s);
-    }
+        tourModeMarkers.forEach(m => map.removeLayer(m));
+        tourModeMarkers = [];
 
-    function renderMap() {
-        const svg = document.getElementById('tour-mode-map-svg');
-        if (!svg) return;
-        const w = 760, h = 620;
-        svg.innerHTML = '';
-        drawDecorativeRoads(svg, w, h);
+        const latlngs = TOUR_MODE_DATA.stops.map(s => [s.lat, s.lng]);
+        const routeLine = L.polyline(latlngs, { color: '#D42759', weight: 2, dashArray: '4 8', opacity: 0.85 }).addTo(map);
+        tourModeMarkers.push(routeLine);
 
-        const points = routeLayout();
-        const d = pathD(points);
-        svg.insertAdjacentHTML('beforeend', `<path class="tour-mode-route-path-glow" d="${d}"/><path class="tour-mode-route-path" d="${d}"/>`);
-
+        const now = getTourNow();
+        let activeLatLng = null;
         TOUR_MODE_DATA.stops.forEach((stop, i) => {
-            const p = points[i];
             const isActive = i === currentStopIndex;
-            const fill = p.status === 'done' ? '#171331' : (isActive ? 'var(--primary-magenta)' : '#c9bfe0');
-            let html = '';
-            if (isActive) {
-                html += `<circle class="tour-mode-pulse-ring" cx="${p.x}" cy="${p.y}" r="9"/><circle class="tour-mode-pulse-ring tour-mode-pulse-ring2" cx="${p.x}" cy="${p.y}" r="9"/>`;
-            }
-            html += `<g class="${isActive ? 'tour-mode-marker-active' : ''}" style="cursor:pointer;" onclick="tourModeGoToIndex(${i})">
-                <circle cx="${p.x}" cy="${p.y}" r="9" fill="${fill}" stroke="#fff" stroke-width="2"/>
-                <text class="tour-mode-marker-num" x="${p.x}" y="${p.y + 0.5}">${i + 1}</text>
-            </g>`;
-            html += `<text class="tour-mode-marker-label" x="${p.x + 13}" y="${p.y + 3}" style="cursor:pointer;" onclick="tourModeGoToIndex(${i})">${stop.city}</text>`;
-            svg.insertAdjacentHTML('beforeend', html);
+            if (isActive) activeLatLng = [stop.lat, stop.lng];
+            const status = getTourStopStatus(stop, now);
+            const cls = isActive ? 'tour-mode-marker-active' : (status === 'upcoming' ? 'tour-mode-marker-upcoming' : 'tour-mode-marker-done');
+            const size = isActive ? 28 : 22;
+            const icon = L.divIcon({
+                className: '',
+                html: `<div style="position:relative;"><div class="tour-mode-marker ${cls}">${i + 1}</div>${isActive ? `<div class="tour-mode-marker-label">${stop.city}</div>` : ''}</div>`,
+                iconSize: [size, size],
+                iconAnchor: [size / 2, size / 2]
+            });
+            const marker = L.marker([stop.lat, stop.lng], { icon }).addTo(map);
+            marker.on('click', () => tourModeGoToIndex(i));
+            tourModeMarkers.push(marker);
         });
+
+        if (fitAll) {
+            map.fitBounds(routeLine.getBounds(), { padding: [40, 40], maxZoom: 5 });
+            setTimeout(() => map.invalidateSize(), 50);
+        } else if (activeLatLng) {
+            map.panTo(activeLatLng, { animate: true });
+        }
 
         const pillEl = document.getElementById('tour-mode-map-pill');
         if (pillEl) pillEl.textContent = t('tourModeStep').replace('{n}', currentStopIndex + 1).replace('{total}', TOUR_MODE_DATA.stops.length);
@@ -216,17 +203,28 @@
 
         renderTourSelect();
         renderMemberCard(memberEvent);
-        refresh();
+        renderRailList();
+        renderStopInfo(currentStopIndex);
+        scrollActiveNodeIntoView();
 
         panel.classList.remove('hidden');
         requestAnimationFrame(() => panel.classList.add('open'));
+
+        // Le conteneur de la carte est à taille nulle tant que le panneau est masqué —
+        // on attend la fin de la transition d'ouverture avant de créer la carte Leaflet,
+        // sinon elle se dessinerait avec de mauvaises dimensions.
+        setTimeout(() => { ensureMap(); renderMap(true); }, 320);
     };
 
     window.closeTourModePanel = function () {
         const panel = document.getElementById('tour-mode-panel');
         if (!panel) return;
         panel.classList.remove('open');
-        setTimeout(() => panel.classList.add('hidden'), 300);
+        setTimeout(() => {
+            panel.classList.add('hidden');
+            if (tourModeLeafletMap) { tourModeLeafletMap.remove(); tourModeLeafletMap = null; }
+            tourModeMarkers = [];
+        }, 300);
     };
 
     window.initTourModeBadge = function () {
