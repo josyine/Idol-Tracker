@@ -19,6 +19,8 @@
     let tourModeMarkers = [];
     let liveMapMarker = null;
     let tourModeTipIndex = null;
+    let tourModeMapResizeObserver = null;
+    let tourModeMapUserInteracted = false;
 
     function fmtShowDates(showDates) {
         const locale = currentLang || 'en';
@@ -58,11 +60,27 @@
         const container = document.getElementById('tour-mode-map-container');
         if (!container || typeof L === 'undefined') return null;
         if (tourModeLeafletMap) { tourModeLeafletMap.remove(); tourModeLeafletMap = null; }
+        if (tourModeMapResizeObserver) { tourModeMapResizeObserver.disconnect(); tourModeMapResizeObserver = null; }
+        tourModeMapUserInteracted = false;
         tourModeLeafletMap = L.map('tour-mode-map-container', { zoomControl: false }).setView([20, 0], 2);
         createOSMTileLayer(tourModeLeafletMap).addTo(tourModeLeafletMap);
         L.control.zoom({ position: 'bottomright' }).addTo(tourModeLeafletMap);
         tourModeLeafletMap.on('click', () => window.closeTourModeTip());
         tourModeLeafletMap.on('movestart zoomstart', () => window.closeTourModeTip());
+        tourModeLeafletMap.on('dragstart zoomstart', () => { tourModeMapUserInteracted = true; });
+
+        // Le conteneur de la carte est ouvert pendant que le panneau termine sa
+        // transition CSS (voir openTourModePanel) et peut, sur mobile, être mesuré une
+        // première fois avec une largeur incorrecte (barre d'adresse qui se rétracte,
+        // transition pas totalement finie...) — Leaflet fige alors cette mauvaise taille
+        // et la carte reste visuellement confinée à une bande étroite avec du gris
+        // autour, jusqu'à interaction manuelle. Un ResizeObserver sur .tour-mode-mapwrap
+        // corrige ça en continu, quelle que soit la cause du changement de taille.
+        const mapwrapEl = document.getElementById('tour-mode-mapwrap') || document.querySelector('.tour-mode-mapwrap');
+        if (typeof ResizeObserver !== 'undefined' && mapwrapEl) {
+            tourModeMapResizeObserver = new ResizeObserver(() => { if (tourModeLeafletMap) tourModeLeafletMap.invalidateSize(); });
+            tourModeMapResizeObserver.observe(mapwrapEl);
+        }
         return tourModeLeafletMap;
     }
 
@@ -97,8 +115,17 @@
         });
 
         if (fitAll) {
-            map.fitBounds(routeLine.getBounds(), { padding: [40, 40], maxZoom: 5 });
-            setTimeout(() => map.invalidateSize(), 50);
+            // Plusieurs passages différés (comme resettleMap pour la carte principale,
+            // script.js) : tant que la personne n'a pas interagi avec CETTE carte
+            // (glissé/zoomé/navigué), on invalide la taille puis on refait le cadrage —
+            // au cas où la toute première mesure du conteneur était encore incorrecte.
+            const doFit = () => {
+                if (!tourModeLeafletMap || tourModeMapUserInteracted) return;
+                tourModeLeafletMap.invalidateSize();
+                tourModeLeafletMap.fitBounds(routeLine.getBounds(), { padding: [40, 40], maxZoom: 5 });
+            };
+            doFit();
+            [150, 400, 900].forEach(delay => setTimeout(doFit, delay));
         } else if (activeLatLng) {
             map.panTo(activeLatLng, { animate: true });
         }
@@ -156,10 +183,12 @@
 
     window.tourModeNavigate = function (delta) {
         window.closeTourModeTip();
+        tourModeMapUserInteracted = true;
         currentStopIndex = Math.max(0, Math.min(TOUR_MODE_DATA.stops.length - 1, currentStopIndex + delta));
         refresh();
     };
     window.tourModeGoToIndex = function (idx) {
+        tourModeMapUserInteracted = true;
         currentStopIndex = Math.max(0, Math.min(TOUR_MODE_DATA.stops.length - 1, idx));
         refresh();
     };
@@ -199,6 +228,7 @@
     }
     window.tourModeSelectTour = function (tourId) {
         window.closeTourModeTip();
+        tourModeMapUserInteracted = false;
         selectedTourId = tourId;
         currentStopIndex = getDefaultStopIndex();
         renderTourSelect();
@@ -246,6 +276,7 @@
         panel.classList.remove('open');
         setTimeout(() => {
             panel.classList.add('hidden');
+            if (tourModeMapResizeObserver) { tourModeMapResizeObserver.disconnect(); tourModeMapResizeObserver = null; }
             if (tourModeLeafletMap) { tourModeLeafletMap.remove(); tourModeLeafletMap = null; }
             tourModeMarkers = [];
         }, 300);
@@ -253,22 +284,31 @@
 
     window.initTourModeBadge = function () {
         const badge = document.getElementById('tour-mode-badge');
-        if (!badge) return;
+        const badgeMobile = document.getElementById('tour-mode-badge-mobile');
+        if (!badge && !badgeMobile) return;
         const textEl = document.getElementById('tour-mode-badge-text');
         const memberEvent = getCurrentMemberEvent();
         const groupStop = getCurrentTourStop();
 
-        badge.classList.remove('hidden');
+        let label;
+        let live = false;
         if (memberEvent) {
-            badge.classList.add('tour-mode-badge-live');
-            if (textEl) textEl.textContent = t('tourModeMemberLiveIn').replace('{member}', memberEvent.member).replace('{event}', memberEvent.eventName).replace('{city}', memberEvent.city);
+            live = true;
+            label = t('tourModeMemberLiveIn').replace('{member}', memberEvent.member).replace('{event}', memberEvent.eventName).replace('{city}', memberEvent.city);
         } else if (groupStop) {
-            badge.classList.add('tour-mode-badge-live');
-            if (textEl) textEl.textContent = t('tourModeLiveIn').replace('{city}', groupStop.city);
+            live = true;
+            label = t('tourModeLiveIn').replace('{city}', groupStop.city);
         } else {
-            badge.classList.remove('tour-mode-badge-live');
-            if (textEl) textEl.textContent = t('tourModeGenericLabel');
+            label = t('tourModeGenericLabel');
         }
+
+        [badge, badgeMobile].forEach(el => {
+            if (!el) return;
+            el.classList.remove('hidden');
+            el.classList.toggle('tour-mode-badge-live', live);
+        });
+        if (textEl) textEl.textContent = label;
+        if (badgeMobile) badgeMobile.title = label;
 
         renderLiveMapMarker(memberEvent || groupStop);
     };
@@ -303,6 +343,28 @@
     // champs optionnels (`stop.highlights` / `stop.surpriseSong`) sur chaque étape dans
     // script.js ; tant qu'ils ne sont pas renseignés avec de vraies infos, on affiche un
     // message honnête plutôt que d'inventer des anecdotes.
+    // Un "stop" (une ville/salle) peut regrouper plusieurs soirs, chacun avec ses propres
+    // temps forts et/ou surprise songs (ex: Las Vegas a 4 dates, chacune différente) — voir
+    // `stop.nights` dans ARIRANG_TOUR (script.js). Tant qu'aucune vraie info n'a été
+    // transmise pour une étape, on affiche un message honnête plutôt que d'inventer.
+    function renderNightsHTML(stop) {
+        if (!stop.nights || !stop.nights.length) {
+            return `<div class="tour-mode-tip-empty-msg">${t('tourModeNoHighlightsYet')}</div>`;
+        }
+        const blocks = stop.nights.map(night => {
+            let inner = '';
+            if (night.highlights && night.highlights.length) {
+                inner += `<ul class="tour-mode-tip-hl">${night.highlights.map(h => `<li class="tour-mode-tip-hl-item">${h}</li>`).join('')}</ul>`;
+            }
+            if (night.surpriseSongs && night.surpriseSongs.length) {
+                inner += `<div class="tour-mode-tip-ss"><span class="tour-mode-tip-ss-label">${t('tourModeSurpriseSong')}</span>${night.surpriseSongs.join(' · ')}</div>`;
+            }
+            if (!inner) return '';
+            return `<div class="tour-mode-tip-night"><div class="tour-mode-tip-night-date">${fmtShowDates(night.dates)}</div>${inner}</div>`;
+        }).filter(Boolean).join('');
+        return blocks || `<div class="tour-mode-tip-empty-msg">${t('tourModeNoHighlightsYet')}</div>`;
+    }
+
     function renderTipContent(idx) {
         const stop = TOUR_MODE_DATA.stops[idx];
         if (!stop) return;
@@ -311,54 +373,54 @@
         const tagText = document.getElementById('tour-mode-tip-tag-text');
         const titleEl = document.getElementById('tour-mode-tip-title');
         const dateEl = document.getElementById('tour-mode-tip-date');
-        const hlList = document.getElementById('tour-mode-tip-hl');
-        const ssEl = document.getElementById('tour-mode-tip-ss');
-        if (!tagRow || !tagText || !titleEl || !dateEl || !hlList || !ssEl) return;
+        const nightsEl = document.getElementById('tour-mode-tip-nights');
+        if (!tagRow || !tagText || !titleEl || !dateEl || !nightsEl) return;
 
         tagRow.className = 'tour-mode-stop-tag-row ' + (status === 'current' ? 'tour-mode-tag-live' : status === 'done' ? 'tour-mode-tag-done' : 'tour-mode-tag-upcoming');
         tagText.textContent = status === 'current' ? t('tourModeLive') : status === 'done' ? t('tourModeDone') : t('tourModeUpcoming');
         titleEl.textContent = stop.venue ? `${stop.venue} — ${stop.city}` : `${stop.city}, ${stop.country}`;
         dateEl.textContent = fmtShowDates(stop.showDates);
-
-        if (stop.highlights && stop.highlights.length) {
-            hlList.innerHTML = stop.highlights.map(h => `<li class="tour-mode-tip-hl-item"><div class="tour-mode-tip-av">${h.who}</div><div class="tour-mode-tip-tx">${h.text}</div></li>`).join('');
-        } else {
-            hlList.innerHTML = `<li class="tour-mode-tip-empty">${t('tourModeNoHighlightsYet')}</li>`;
-        }
-
-        if (stop.surpriseSong) {
-            ssEl.classList.remove('empty');
-            ssEl.innerHTML = `<div class="tour-mode-tip-ss-title">${stop.surpriseSong.title}</div><div class="tour-mode-tip-ss-by">${stop.surpriseSong.by}</div>`;
-        } else {
-            ssEl.classList.add('empty');
-            ssEl.textContent = t('tourModeNoSurpriseSongYet');
-        }
+        nightsEl.innerHTML = renderNightsHTML(stop);
     }
 
+    // `.tour-mode-tip` est en position:fixed (voir map.html) : on calcule donc ses
+    // coordonnées par rapport à la FENÊTRE, pas au conteneur de la carte — d'où l'ajout
+    // du décalage du conteneur (mapRect.left/top) à la position du pin dans la carte, et
+    // le bornage contre window.innerWidth/innerHeight plutôt que la taille de la carte
+    // elle-même (sur mobile, .tour-mode-mapwrap ne fait que 38vh et une bulle plus haute
+    // doit pouvoir s'étendre par-dessus le rail en dessous sans être coupée).
     function positionTip(idx) {
         const map = tourModeLeafletMap;
         const stop = TOUR_MODE_DATA.stops[idx];
         const tip = document.getElementById('tour-mode-tip');
-        const wrap = document.getElementById('tour-mode-mapwrap') || document.querySelector('.tour-mode-mapwrap');
+        const mapContainerEl = document.getElementById('tour-mode-map-container');
         const arrow = document.getElementById('tour-mode-tip-arrow');
-        if (!map || !stop || !tip || !wrap) return;
+        if (!map || !stop || !tip || !mapContainerEl) return;
 
-        const pt = map.latLngToContainerPoint([stop.lat, stop.lng]);
-        const wrapRect = wrap.getBoundingClientRect();
+        const localPt = map.latLngToContainerPoint([stop.lat, stop.lng]);
+        const mapRect = mapContainerEl.getBoundingClientRect();
+        const px = mapRect.left + localPt.x;
+        const py = mapRect.top + localPt.y;
         const tipW = tip.offsetWidth || 270;
         const tipH = tip.offsetHeight || 260;
-        let left = Math.max(8, Math.min(pt.x - 30, wrapRect.width - tipW - 8));
-        let top = pt.y - 16 - tipH;
+        let left = Math.max(8, Math.min(px - 30, window.innerWidth - tipW - 8));
+        let top = py - 16 - tipH;
         let flipped = false;
-        if (top < 8) { top = pt.y + 20; flipped = true; }
+        if (top < 8) { top = Math.min(py + 20, window.innerHeight - tipH - 8); flipped = true; }
         tip.style.left = left + 'px';
         tip.style.top = top + 'px';
         if (arrow) {
             arrow.classList.toggle('flip', flipped);
-            arrow.style.left = Math.max(14, Math.min(pt.x - left - 8, tipW - 30)) + 'px';
+            arrow.style.left = Math.max(14, Math.min(px - left - 8, tipW - 30)) + 'px';
         }
     }
 
+    // Zoom sur l'étape sélectionnée en plus du recentrage, pour qu'elle soit clairement
+    // visible même quand la carte était encore cadrée sur toute la tournée (vue monde) —
+    // et seulement ici (pas dans tourModeNavigate/tourModeGoToIndex en général), pour ne
+    // pas changer le comportement habituel du Précédent/Suivant qui garde le contexte de
+    // toute la tournée.
+    const TOUR_MODE_TIP_ZOOM = 9;
     window.openTourModeTip = function (idx) {
         if (!TOUR_MODE_DATA.stops[idx]) return;
         tourModeTipIndex = idx;
@@ -367,6 +429,9 @@
         if (tip) tip.classList.add('open');
         const map = tourModeLeafletMap;
         if (map) {
+            const stop = TOUR_MODE_DATA.stops[idx];
+            tourModeMapUserInteracted = true;
+            map.setView([stop.lat, stop.lng], Math.max(map.getZoom(), TOUR_MODE_TIP_ZOOM), { animate: true });
             positionTip(idx);
             map.once('moveend', () => { if (tourModeTipIndex === idx) positionTip(idx); });
         }

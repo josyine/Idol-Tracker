@@ -150,6 +150,29 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .map-container { flex: 1; position: relative; background: #E7E9EC; overflow: hidden; z-index: 1; height: 100%; }
 #map { width: 100%; height: 100%; background: transparent; z-index: 1; }
 
+/* Retour visuel pendant le chargement des tuiles (surtout utile sur connexion mobile
+   faible, où la carte peut rester grise plusieurs secondes le temps du premier
+   chargement/repli — voir attachOSMFallback() dans script.js) : sans ça, une carte grise
+   sans indication ressemble à une carte cassée plutôt qu'à une carte qui charge. */
+.map-loading-overlay { position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #E7E9EC; color: var(--muted-text); font-size: 12.5px; font-weight: 600; pointer-events: none; transition: opacity 0.3s ease; }
+.map-loading-overlay.hidden { display: none; }
+.map-loading-spinner { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--border-color); border-top-color: var(--primary-magenta); animation: mapLoadingSpin 0.8s linear infinite; }
+@keyframes mapLoadingSpin { to { transform: rotate(360deg); } }
+
+/* Messages éphémères "nouveau lieu ajouté" — voir showNewLocationToasts() dans script.js */
+.new-location-toast-container { position: fixed; left: 20px; bottom: 20px; z-index: 5000; display: flex; flex-direction: column-reverse; gap: 10px; pointer-events: none; max-width: min(320px, calc(100vw - 40px)); }
+.new-location-toast { background: #fff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.18); display: flex; gap: 10px; align-items: flex-start; pointer-events: auto; opacity: 0; transform: translateY(12px); transition: opacity 0.35s ease, transform 0.35s ease; }
+.new-location-toast.show { opacity: 1; transform: translateY(0); }
+.new-location-toast-icon { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-pink); color: var(--primary-magenta); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.new-location-toast-body { min-width: 0; }
+.new-location-toast-label { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--primary-magenta); margin-bottom: 2px; }
+.new-location-toast-title { font-size: 12.5px; font-weight: 700; color: var(--text-main); line-height: 1.3; }
+.new-location-toast-sub { font-size: 11px; color: var(--muted-text); margin-top: 2px; line-height: 1.4; }
+.new-location-toast-close { background: none; border: none; color: var(--muted-text); font-size: 13px; cursor: pointer; line-height: 1; padding: 2px; flex-shrink: 0; }
+@media (max-width: 800px) {
+    .new-location-toast-container { left: 14px; right: 14px; bottom: 14px; max-width: none; }
+}
+
 /* L'océan des tuiles CartoDB est teinté d'un violet doux, cohérent avec la charte
    graphique du site, au lieu du bleu par défaut. Le filtre est appliqué au pane des
    tuiles (pas image par image) pour éviter tout artefact de raccord entre tuiles. */

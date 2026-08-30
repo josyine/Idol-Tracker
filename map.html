@@ -120,6 +120,16 @@
   .tour-mode-badge-live .tour-mode-live-dot { background: #ef4444; animation: tourModePulse 1.6s infinite; }
   @keyframes tourModePulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow: 0 0 0 8px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
 
+  /* Version compacte (icône seule) du badge, insérée DANS la même rangée que les
+     autres icônes du header (.top-nav) sur mobile — seule façon de garantir qu'elle
+     tienne sur la même ligne, plutôt que la version pilule pleine largeur (desktop)
+     qui, sur petit écran, retombait sur sa propre deuxième ligne sous les icônes. */
+  .tour-mode-badge-mobile { display: none; position: relative; width: 42px; height: 42px; border-radius: 50%; background: #fff; color: var(--text-main); border: 1.5px solid var(--border-color); align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .tour-mode-badge-mobile.hidden { display: none !important; }
+  .tour-mode-badge-mobile.tour-mode-badge-live { background: #211C2E; color: #fff; border-color: #211C2E; }
+  .tour-mode-badge-mobile .tour-mode-badge-mobile-dot { position: absolute; top: 4px; right: 4px; width: 9px; height: 9px; border-radius: 50%; background: #ef4444; border: 1.5px solid #fff; animation: tourModePulse 1.6s infinite; display: none; }
+  .tour-mode-badge-mobile.tour-mode-badge-live .tour-mode-badge-mobile-dot { display: block; }
+
   /* Panneau plein écran : carte à gauche (décorative, route + étapes) + rail clair à
      droite (sélecteur de tournée, liste des étapes, détail de l'étape + navigation). */
   .tour-mode-panel { position: fixed; inset: 0; z-index: 9500; display: flex; opacity: 0; transition: opacity .3s ease; }
@@ -186,30 +196,35 @@
   .tour-mode-footer { font-size: 10px; color: #94a3b8; text-align: center; padding: 0 14px 14px; line-height: 1.5; flex-shrink: 0; }
 
   /* Bulle infos concert : apparaît au clic sur un pin de la carte (ou sur une étape du
-     rail, qui pointe alors la même bulle vers son pin) — voir tour-mode.js. */
-  .tour-mode-tip { position: absolute; z-index: 600; width: 270px; display: none; }
+     rail, qui pointe alors la même bulle vers son pin) — voir tour-mode.js.
+     position:fixed (positionnée en JS par rapport à la fenêtre, pas au conteneur de la
+     carte) plutôt qu'absolute : .tour-mode-mapwrap a overflow:hidden et, sur mobile, ne
+     fait que 38vh de haut — une bulle positionnée par rapport à elle se retrouvait
+     tronquée dès qu'elle dépassait cette bande, même repositionnée correctement. */
+  .tour-mode-tip { position: fixed; z-index: 3600; width: 270px; display: none; }
   .tour-mode-tip.open { display: block; }
   .tour-mode-tip-card { background: #fff; border-radius: 14px; padding: 15px; box-shadow: 0 20px 44px rgba(0,0,0,.32); position: relative; }
   .tour-mode-tip-arrow { position: absolute; width: 15px; height: 15px; background: #fff; transform: rotate(45deg); bottom: -6px; left: 26px; box-shadow: 3px 3px 6px rgba(0,0,0,.05); }
   .tour-mode-tip-arrow.flip { bottom: auto; top: -6px; box-shadow: -3px -3px 6px rgba(0,0,0,.05); }
   .tour-mode-tip-close { position: absolute; top: 9px; right: 9px; background: var(--sidebar-bg); border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 12px; line-height: 1; color: var(--text-main); }
   .tour-mode-tip-title { font-size: 13.5px; font-weight: 800; color: var(--text-main); margin: 3px 0 2px; line-height: 1.3; padding-right: 20px; }
-  .tour-mode-tip-date { font-size: 10.5px; color: var(--muted-text); margin-bottom: 10px; }
-  .tour-mode-tip-section-label { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted-text); margin: 10px 0 7px; }
-  .tour-mode-tip-hl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .tour-mode-tip-hl-item { display: flex; gap: 8px; align-items: flex-start; }
-  .tour-mode-tip-av { width: 22px; height: 22px; border-radius: 50%; background: var(--accent-pink); color: var(--primary-magenta); font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .tour-mode-tip-tx { font-size: 11px; line-height: 1.45; color: var(--text-main); }
-  .tour-mode-tip-empty { font-size: 11px; line-height: 1.5; color: var(--muted-text); list-style: none; }
-  .tour-mode-tip-ss { border-radius: 10px; padding: 9px 11px; background: var(--primary-magenta); color: #fff; font-size: 10.5px; }
-  .tour-mode-tip-ss.empty { background: var(--sidebar-bg); color: var(--muted-text); }
-  .tour-mode-tip-ss-title { font-size: 11px; font-weight: 800; }
-  .tour-mode-tip-ss-by { font-size: 9.5px; opacity: .9; margin-top: 1px; }
+  .tour-mode-tip-date { font-size: 10.5px; color: var(--muted-text); margin-bottom: 4px; }
+  .tour-mode-tip-nights { max-height: 260px; overflow-y: auto; margin-top: 8px; }
+  .tour-mode-tip-night { padding-top: 9px; margin-top: 9px; border-top: 1px solid #f1f5f9; }
+  .tour-mode-tip-night:first-child { border-top: none; margin-top: 0; }
+  .tour-mode-tip-night-date { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--primary-magenta); margin-bottom: 6px; }
+  .tour-mode-tip-hl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .tour-mode-tip-hl-item { font-size: 11px; line-height: 1.45; color: var(--text-main); padding-left: 12px; position: relative; }
+  .tour-mode-tip-hl-item::before { content: "•"; position: absolute; left: 0; color: var(--primary-magenta); }
+  .tour-mode-tip-ss { font-size: 10.5px; line-height: 1.5; color: var(--text-main); margin-top: 6px; }
+  .tour-mode-tip-ss-label { font-weight: 800; color: var(--primary-magenta); margin-right: 4px; }
+  .tour-mode-tip-empty-msg { font-size: 11px; line-height: 1.5; color: var(--muted-text); }
   @media (max-width: 800px) {
       .tour-mode-tip { width: 240px; }
-      .tour-mode-badge { top: 60px; left: 14px; right: 14px; transform: none; width: auto; max-width: none; padding: 8px 14px 8px 12px; font-size: 11.5px; z-index: 3400; justify-content: center; }
-      .tour-mode-badge:hover { transform: translateY(-2px); }
-      .tour-mode-badge span#tour-mode-badge-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      /* La pilule pleine largeur (desktop) laisse place, sur mobile, à l'icône
+         compacte insérée dans .top-nav — voir .tour-mode-badge-mobile ci-dessous. */
+      .tour-mode-badge { display: none; }
+      .tour-mode-badge-mobile { display: flex; width: 38px; height: 38px; }
       .tour-mode-panel { flex-direction: column; }
       .tour-mode-mapwrap { flex: none; height: 38vh; }
       .tour-mode-rail { width: auto; flex: 1; box-shadow: none; border-left: none; border-top: 1px solid #eee; }
@@ -520,6 +535,13 @@
         </div>
 
         <div class="top-nav">
+            <!-- Mode Tournée compact (mobile) : mêmes infos que le badge pilule desktop,
+                 mais assez petit pour tenir sur la même ligne que les autres icônes du
+                 header au lieu de retomber sur sa propre rangée pleine largeur. -->
+            <button id="tour-mode-badge-mobile" class="tour-mode-badge-mobile hidden" onclick="openTourModePanel()" type="button" title="">
+                <span class="tour-mode-badge-mobile-dot"></span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            </button>
             <button id="mobile-menu-btn" class="header-icon-btn hamburger-btn" style="display: none;" onclick="toggleMobileMenu()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
@@ -567,6 +589,10 @@
         </button>
 
         <div id="map"></div>
+        <div id="map-loading-overlay" class="map-loading-overlay hidden">
+            <div class="map-loading-spinner"></div>
+            <span data-i18n="mapLoading">Loading map…</span>
+        </div>
     </main>
 </div>
 
@@ -586,10 +612,7 @@
                 </div>
                 <div class="tour-mode-tip-title" id="tour-mode-tip-title"></div>
                 <div class="tour-mode-tip-date" id="tour-mode-tip-date"></div>
-                <div class="tour-mode-tip-section-label" data-i18n="tourModeHighlights">Highlights</div>
-                <ul class="tour-mode-tip-hl" id="tour-mode-tip-hl"></ul>
-                <div class="tour-mode-tip-section-label" id="tour-mode-tip-ss-label" data-i18n="tourModeSurpriseSong">Surprise song 🎤</div>
-                <div class="tour-mode-tip-ss" id="tour-mode-tip-ss"></div>
+                <div class="tour-mode-tip-nights" id="tour-mode-tip-nights"></div>
             </div>
         </div>
     </div>
@@ -769,6 +792,7 @@
             if (typeof initializeFilters === 'function') initializeFilters();
             if (typeof renderLocations === 'function') renderLocations();
             if (typeof window.startMapTour === 'function') window.startMapTour();
+            if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
             return;
         }
 
@@ -800,6 +824,7 @@
             document.body.classList.remove('auth-gate-active');
             if (typeof initializeFilters === 'function') initializeFilters();
             if (typeof renderLocations === 'function') renderLocations();
+            if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
         }
     });
 
@@ -851,5 +876,9 @@
         });
     }
 </script>
+
+<!-- Messages éphémères annonçant les nouveaux lieux ajoutés (voir showNewLocationToasts()
+     dans script.js) : empilés en bas à gauche, disparaissent seuls après quelques secondes. -->
+<div id="new-location-toast-container" class="new-location-toast-container"></div>
 </body>
 </html>

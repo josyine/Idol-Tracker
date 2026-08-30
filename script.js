@@ -29,7 +29,9 @@ function attachOSMFallback(tileLayer, map) {
     tileLayer.on('tileerror', () => {
         if (switched) return;
         failCount++;
-        if (failCount > 5) {
+        // Seuil abaissé (était 5) : sur une connexion mobile faible, attendre 5 échecs
+        // avant de basculer laissait la carte grise trop longtemps avant le repli.
+        if (failCount > 2) {
             switched = true;
             tileLayer.setUrl(OSM_TILE_FALLBACK_URL);
         }
@@ -73,25 +75,102 @@ const ARIRANG_TOUR = {
     tourName: "Arirang World Tour",
     group: "BTS",
     stops: [
-        { id: 'goyang',      city: 'Goyang',        country: 'South Korea', venue: 'Goyang Stadium',            lat: 37.6584,  lng: 126.7828,  showDates: ['2026-04-09', '2026-04-11', '2026-04-12'] },
-        { id: 'tokyo',       city: 'Tokyo',         country: 'Japan',       venue: 'Tokyo Dome',                 lat: 35.7056,  lng: 139.7519,  showDates: ['2026-04-17', '2026-04-18'] },
-        { id: 'tampa',       city: 'Tampa',         country: 'USA',         venue: 'Raymond James Stadium',      lat: 27.9759,  lng: -82.5033,  showDates: ['2026-04-25', '2026-04-26', '2026-04-28'] },
-        { id: 'elpaso',      city: 'El Paso',       country: 'USA',         venue: 'Sun Bowl Stadium',           lat: 31.7757,  lng: -106.5004, showDates: ['2026-05-02', '2026-05-03'] },
-        { id: 'mexicocity',  city: 'Mexico City',   country: 'Mexico',      venue: 'Estadio GNP Seguros',        lat: 19.3046,  lng: -99.1505,  showDates: ['2026-05-07', '2026-05-09', '2026-05-10'] },
-        { id: 'stanford',    city: 'Stanford',      country: 'USA',         venue: 'Stanford Stadium',           lat: 37.4342,  lng: -122.1610, showDates: ['2026-05-16', '2026-05-17', '2026-05-19'] },
-        { id: 'vegas',       city: 'Las Vegas',     country: 'USA',         venue: 'Allegiant Stadium',          lat: 36.0908,  lng: -115.1833, showDates: ['2026-05-23', '2026-05-24', '2026-05-27', '2026-05-28'] },
-        { id: 'busan',       city: 'Busan',         country: 'South Korea', venue: 'Busan Asiad Main Stadium',   lat: 35.1907,  lng: 129.0587,  showDates: ['2026-06-12', '2026-06-13'] },
-        { id: 'madrid',      city: 'Madrid',        country: 'Spain',       venue: 'Riyadh Air Metropolitano',   lat: 40.4362,  lng: -3.5995,   showDates: ['2026-06-26', '2026-06-27'] },
-        { id: 'brussels',    city: 'Brussels',      country: 'Belgium',     venue: 'Stade Roi Baudouin',         lat: 50.8951,  lng: 4.3411,    showDates: ['2026-07-01', '2026-07-02'] },
-        { id: 'london',      city: 'London',        country: 'UK',          venue: 'Tottenham Hotspur Stadium',  lat: 51.6043,  lng: -0.0668,   showDates: ['2026-07-06', '2026-07-07'] },
-        { id: 'munich',      city: 'Munich',        country: 'Germany',     venue: 'Allianz Arena',              lat: 48.2188,  lng: 11.6247,   showDates: ['2026-07-11', '2026-07-12'] },
-        { id: 'paris',       city: 'Paris',         country: 'France',      venue: 'Stade de France',            lat: 48.9244,  lng: 2.3601,    showDates: ['2026-07-17', '2026-07-18'] },
-        { id: 'newyork',     city: 'East Rutherford (New York)', country: 'USA', venue: 'MetLife Stadium',       lat: 40.8135,  lng: -74.0745,  showDates: ['2026-08-01', '2026-08-02'] },
-        { id: 'foxborough',  city: 'Foxborough (Boston)', country: 'USA',   venue: 'Gillette Stadium',           lat: 42.0909,  lng: -71.2643,  showDates: ['2026-08-05', '2026-08-06'] },
-        { id: 'baltimore',   city: 'Baltimore',     country: 'USA',         venue: 'M&T Bank Stadium',           lat: 39.2780,  lng: -76.6227,  showDates: ['2026-08-10', '2026-08-11'] },
-        { id: 'arlington',   city: 'Arlington (Dallas)', country: 'USA',    venue: 'AT&T Stadium',               lat: 32.7473,  lng: -97.0945,  showDates: ['2026-08-15', '2026-08-16'] },
-        { id: 'toronto',     city: 'Toronto',       country: 'Canada',      venue: 'Rogers Stadium',             lat: 43.6532,  lng: -79.3832,  showDates: ['2026-08-22', '2026-08-23'] },
-        { id: 'chicago',     city: 'Chicago',       country: 'USA',         venue: 'Soldier Field',              lat: 41.8623,  lng: -87.6167,  showDates: ['2026-08-27', '2026-08-28'] },
+        { id: 'goyang',      city: 'Goyang',        country: 'South Korea', venue: 'Goyang Stadium',            lat: 37.6584,  lng: 126.7828,  showDates: ['2026-04-09', '2026-04-11', '2026-04-12'],
+          nights: [
+              { dates: ['2026-04-09'], highlights: ["Le tout premier concert de retrouvailles après le service militaire : <b>Jin</b> et <b>Jungkook</b> ont fondu en larmes dès la chanson d'ouverture en voyant l'océan violet."] },
+              { dates: ['2026-04-11', '2026-04-12'], highlights: ["<b>RM</b> a fait un discours bouleversant sur leur promesse tenue de revenir à sept, provoquant une standing ovation de 5 minutes."] }
+          ] },
+        { id: 'tokyo',       city: 'Tokyo',         country: 'Japan',       venue: 'Tokyo Dome',                 lat: 35.7056,  lng: 139.7519,  showDates: ['2026-04-17', '2026-04-18'],
+          nights: [
+              { dates: ['2026-04-17', '2026-04-18'], highlights: ["<b>V</b> a chanté un extrait de sa chanson solo a cappella.", "<b>Jimin</b> s'est amusé à porter un chapeau en forme de mont Fuji lancé par une fan."] }
+          ] },
+        { id: 'tampa',       city: 'Tampa',         country: 'USA',         venue: 'Raymond James Stadium',      lat: 27.9759,  lng: -82.5033,  showDates: ['2026-04-25', '2026-04-26', '2026-04-28'],
+          nights: [
+              { dates: ['2026-04-25', '2026-04-26'], highlights: ['La "Maknae Line" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) a improvisé une chorégraphie chaotique pendant le rappel, finissant par s\'écrouler de rire sur scène.'] },
+              { dates: ['2026-04-28'], surpriseSongs: ['Life Goes On', '뱁새 (Silver Spoon)'], highlights: ["<b>RM</b> a été complètement trempé lors de la bataille d'eau traditionnelle du rappel et a glissé de façon comique sans se faire mal, amusant tout le stade."] }
+          ] },
+        { id: 'elpaso',      city: 'El Paso',       country: 'USA',         venue: 'Sun Bowl Stadium',           lat: 31.7757,  lng: -106.5004, showDates: ['2026-05-02', '2026-05-03'],
+          nights: [
+              { dates: ['2026-05-02'], surpriseSongs: ['On', 'Outro: Wings'], highlights: ['<b>Suga</b> a souri tendrement à une pancarte d\'une fan qui disait "I will sue Min Yoongi again in 2026".'] },
+              { dates: ['2026-05-03'], surpriseSongs: ['Dionysus', 'Best of Me'] }
+          ] },
+        { id: 'mexicocity',  city: 'Mexico City',   country: 'Mexico',      venue: 'Estadio GNP Seguros',        lat: 19.3046,  lng: -99.1505,  showDates: ['2026-05-07', '2026-05-09', '2026-05-10'],
+          nights: [
+              { dates: ['2026-05-07'], surpriseSongs: ['상남자 (Boy in Luv)', 'So What'], highlights: ['Le public a chanté un "Cielito Lindo" assourdissant avant le rappel, ce qui a profondément ému <b>J-Hope</b>.'] },
+              { dates: ['2026-05-09', '2026-05-10'], highlights: ['Les fans mexicains ont organisé un projet lumineux aux couleurs du drapeau coréen et mexicain.'] }
+          ] },
+        { id: 'stanford',    city: 'Stanford',      country: 'USA',         venue: 'Stanford Stadium',           lat: 37.4342,  lng: -122.1610, showDates: ['2026-05-16', '2026-05-17', '2026-05-19'],
+          nights: [
+              { dates: ['2026-05-16', '2026-05-17'], highlights: ['<b>Jungkook</b> a remarqué un enfant déguisé en Cooky (BT21) dans la fosse et est descendu lui taper dans la main.'] },
+              { dates: ['2026-05-19'], surpriseSongs: ['I Need U', 'No More Dream'], highlights: ['Moment iconique : les ARMYs de la Bay Area ont organisé un projet massif en levant simultanément le drapeau de la Corée du Sud tout en chantant Arirang pendant la chanson Body to Body.'] }
+          ] },
+        { id: 'vegas',       city: 'Las Vegas',     country: 'USA',         venue: 'Allegiant Stadium',          lat: 36.0908,  lng: -115.1833, showDates: ['2026-05-23', '2026-05-24', '2026-05-27', '2026-05-28'],
+          nights: [
+              { dates: ['2026-05-23'], surpriseSongs: ['Permission to Dance', '고민보다 Go (Go Go)'] },
+              { dates: ['2026-05-24'], surpriseSongs: ['Black Swan', '등골브레이커 (Spine Breaker)'], highlights: ['<b>Jin</b>, avec ses fameuses lunettes humoristiques, a livré une performance de danse complètement décalée sur Spine Breaker, soutenu par <b>Suga</b>.'] },
+              { dates: ['2026-05-27'], surpriseSongs: ['Anpanman', '진격의 방탄 (Attack on Bangtan)'] },
+              { dates: ['2026-05-28'], surpriseSongs: ['흥탄소년단 (Boyz with Fun)', 'Danger'], highlights: ["Le concert s'est terminé sous un feu d'artifice spectaculaire au-dessus de l'Allegiant Stadium."] }
+          ] },
+        { id: 'busan',       city: 'Busan',         country: 'South Korea', venue: 'Busan Asiad Main Stadium',   lat: 35.1907,  lng: 129.0587,  showDates: ['2026-06-12', '2026-06-13'],
+          nights: [
+              { dates: ['2026-06-12'], surpriseSongs: ['팔도강산 (Paldogangsan)', 'Ma City'], highlights: ["Retour sur les terres de <b>Jimin</b> et <b>Jungkook</b> : <b>Jimin</b> a pleuré à chaudes larmes en s'adressant à sa famille présente dans le public."] },
+              { dates: ['2026-06-13'], surpriseSongs: ['보조개 (Dimple)', '땡 (Ddaeng)', 'Magic Shop'], highlights: ['Anniversaire des 13 ans de BTS, retransmis en direct dans les cinémas du monde entier : le groupe a partagé un énorme gâteau sur scène, et l\'interprétation de Ddaeng a rendu le stade complètement hystérique.'] }
+          ] },
+        { id: 'madrid',      city: 'Madrid',        country: 'Spain',       venue: 'Riyadh Air Metropolitano',   lat: 40.4362,  lng: -3.5995,   showDates: ['2026-06-26', '2026-06-27'],
+          nights: [
+              { dates: ['2026-06-26'], surpriseSongs: ['Airplane Pt.2', 'Outro: Wings'] },
+              { dates: ['2026-06-27'], surpriseSongs: ['소우주 (Mikrokosmos)', 'Best of Me'], highlights: ['<b>V</b> s\'est amusé avec les mots espagnols appris pour l\'occasion, lâchant des "Te amo mucho" enflammés.'] }
+          ] },
+        { id: 'brussels',    city: 'Brussels',      country: 'Belgium',     venue: 'Stade Roi Baudouin',         lat: 50.8951,  lng: 4.3411,    showDates: ['2026-07-01', '2026-07-02'],
+          nights: [
+              { dates: ['2026-07-01'], surpriseSongs: ['Tomorrow', '작은 것들을 위한 시 (Boy with Luv)'] },
+              { dates: ['2026-07-02'], surpriseSongs: ['On', 'For Youth'], highlights: ["<b>Jungkook</b> a récupéré le téléphone d'une ARMY au premier rang pour se filmer avec pendant le concert."] }
+          ] },
+        { id: 'london',      city: 'London',        country: 'UK',          venue: 'Tottenham Hotspur Stadium',  lat: 51.6043,  lng: -0.0668,   showDates: ['2026-07-06', '2026-07-07'],
+          nights: [
+              { dates: ['2026-07-06'], surpriseSongs: ['Life Goes On', 'Dionysus'], highlights: ["<b>J-Hope</b> s'est lancé dans un freestyle de danse absolument dantesque sous la pluie londonienne."] },
+              { dates: ['2026-07-07'], highlights: ["Séance classique : OT7 a chaleureusement remercié l'Europe pour sa loyauté."] }
+          ] },
+        { id: 'munich',      city: 'Munich',        country: 'Germany',     venue: 'Allianz Arena',              lat: 48.2188,  lng: 11.6247,   showDates: ['2026-07-11', '2026-07-12'],
+          nights: [
+              { dates: ['2026-07-11'], surpriseSongs: ['뱁새 (Silver Spoon)', 'Pied Piper'] },
+              { dates: ['2026-07-12'], surpriseSongs: ['Louder than Bombs', '피 땀 눈물 (Blood Sweat & Tears)'], highlights: ["Chanter Louder than Bombs en live était une immense demande des fans : l'arène a tremblé tellement les fans criaient."] }
+          ] },
+        { id: 'paris',       city: 'Paris',         country: 'France',      venue: 'Stade de France',            lat: 48.9244,  lng: 2.3601,    showDates: ['2026-07-17', '2026-07-18'],
+          nights: [
+              { dates: ['2026-07-17'], surpriseSongs: ['작은 것들을 위한 시 (Boy with Luv)', 'Jump'], highlights: ["Lors des salutations finales, <b>Jimin</b> a retiré son t-shirt de la tournée (le fameux t-shirt blanc Layered de l'édition Arirang) et l'a donné directement à un jeune enfant sur les épaules de son père dans la fosse, créant un moment viral mondial."] },
+              { dates: ['2026-07-18'], surpriseSongs: ['So What', 'We Are Bulletproof: The Eternal'], highlights: ["Projet monumental du public français au Stade de France, qui a illuminé les gradins aux couleurs de la France puis en violet intégral. <b>Jungkook</b> a de nouveau lâché quelques larmes lors du discours final."] }
+          ] },
+        { id: 'newyork',     city: 'East Rutherford (New York)', country: 'USA', venue: 'MetLife Stadium',       lat: 40.8135,  lng: -74.0745,  showDates: ['2026-08-01', '2026-08-02'],
+          nights: [
+              { dates: ['2026-08-01'], surpriseSongs: ['병 (Dis-ease)', 'Run'] },
+              { dates: ['2026-08-02'], surpriseSongs: ['고엽 (Autumn Leaves)', '고민보다 Go (Go Go)'] }
+          ] },
+        { id: 'foxborough',  city: 'Foxborough (Boston)', country: 'USA',   venue: 'Gillette Stadium',           lat: 42.0909,  lng: -71.2643,  showDates: ['2026-08-05', '2026-08-06'],
+          nights: [
+              { dates: ['2026-08-05'], surpriseSongs: ['낙원 (Paradise)', 'No More Dream'] },
+              { dates: ['2026-08-06'], surpriseSongs: ['Make It Right', 'N.O'], highlights: ['<b>Jin</b> a fait une blague légendaire sur les "homards de Boston" avant de mimer un homard pendant 3 minutes sur scène.'] }
+          ] },
+        { id: 'baltimore',   city: 'Baltimore',     country: 'USA',         venue: 'M&T Bank Stadium',           lat: 39.2780,  lng: -76.6227,  showDates: ['2026-08-10', '2026-08-11'],
+          nights: [
+              { dates: ['2026-08-10'], surpriseSongs: ['잠시 (Telepathy)', '상남자 (Boy in Luv)'] },
+              { dates: ['2026-08-11'], surpriseSongs: ['하루만 (Just One Day)', 'Best of Me'] }
+          ] },
+        { id: 'arlington',   city: 'Arlington (Dallas)', country: 'USA',    venue: 'AT&T Stadium',               lat: 32.7473,  lng: -97.0945,  showDates: ['2026-08-15', '2026-08-16'],
+          nights: [
+              { dates: ['2026-08-15'], surpriseSongs: ['Permission to Dance', '고민보다 Go (Go Go)'] },
+              { dates: ['2026-08-16'], surpriseSongs: ['Butterfly', 'DNA'] }
+          ] },
+        { id: 'toronto',     city: 'Toronto',       country: 'Canada',      venue: 'Rogers Stadium',             lat: 43.6532,  lng: -79.3832,  showDates: ['2026-08-22', '2026-08-23'],
+          nights: [
+              { dates: ['2026-08-22'], surpriseSongs: ['Outro: Wings', '쩔어 (Dope)'] },
+              { dates: ['2026-08-23'], surpriseSongs: ["00:00 (Zero O'Clock)", 'Outro: Tear'], highlights: ["La Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) a offert une performance de Outro: Tear tellement intense que même les autres membres du groupe s'inclinaient devant eux sur les côtés de la scène."] }
+          ] },
+        { id: 'chicago',     city: 'Chicago',       country: 'USA',         venue: 'Soldier Field',              lat: 41.8623,  lng: -87.6167,  showDates: ['2026-08-27', '2026-08-28'],
+          nights: [
+              { dates: ['2026-08-27'], surpriseSongs: ['Tomorrow', '힙합성애자 (Hip Hop Phile)'] },
+              { dates: ['2026-08-28'], surpriseSongs: ['134340', '소우주 (Mikrokosmos)'], highlights: ['Pendant Mikrokosmos, une pluie fine a commencé à tomber sur le stade ouvert, rendant l\'atmosphère magique et très poétique.'] }
+          ] },
         { id: 'la',          city: 'Los Angeles',   country: 'USA',         venue: 'SoFi Stadium',               lat: 33.9535,  lng: -118.3392, showDates: ['2026-09-01', '2026-09-02', '2026-09-05', '2026-09-06'] },
         { id: 'bogota',      city: 'Bogota',        country: 'Colombia',    venue: 'Estadio El Campín',          lat: 4.6486,   lng: -74.0925,  showDates: ['2026-10-02', '2026-10-03'] },
         { id: 'lima',        city: 'Lima',          country: 'Peru',        venue: 'Estadio San Marcos',         lat: -12.0578, lng: -77.0839,  showDates: ['2026-10-07', '2026-10-09', '2026-10-10'] },
@@ -494,8 +573,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const initialCenter = window.getMapCenterForCountry ? window.getMapCenterForCountry(localStorage.getItem('userCountry')) : [37.541, 127.025, 7];
         map = L.map('map', { zoomControl: false }).setView([initialCenter[0], initialCenter[1]], initialCenter[2]);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-        createOSMTileLayer(map).addTo(map);
+        const mainTileLayer = createOSMTileLayer(map).addTo(map);
         markerGroup = L.layerGroup().addTo(map);
+
+        // Voile de chargement (voir .map-loading-overlay, style.css) : masqué dès que
+        // les tuiles de la vue actuelle ont fini de charger (succès ou échec — à ce
+        // stade attachOSMFallback() a eu la main pour basculer sur le repli), avec un
+        // filet de sécurité à 6s pour ne jamais rester bloqué affiché indéfiniment si
+        // l'évènement ne se déclenche pas pour une raison quelconque.
+        const mapLoadingOverlay = document.getElementById('map-loading-overlay');
+        if (mapLoadingOverlay) {
+            mapLoadingOverlay.classList.remove('hidden');
+            const hideMapLoadingOverlay = () => mapLoadingOverlay.classList.add('hidden');
+            mainTileLayer.on('load', hideMapLoadingOverlay);
+            setTimeout(hideMapLoadingOverlay, 6000);
+        }
 
         // Si Leaflet s'initialise avec un conteneur qui n'a pas encore sa taille finale
         // (fréquent sur mobile : barre d'adresse qui se rétracte après le premier rendu,
@@ -1405,6 +1497,74 @@ let celebLocations = [
     {"id":155,"name":"King Fahd International Stadium","group":"BTS","member":"All","country":"Saudi Arabia","city":"Riyadh","category":"Concerts","year":"2019","episode":"Love Yourself: Speak Yourself","address":"","lat":24.7136,"lng":46.7208,"img":"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600","fullDescription":{"en":"<p>King Fahd International Stadium in Riyadh hosted BTS during the \"Love Yourself: Speak Yourself\" (2019) — one of dozens of stops on a run that took the group across five continents and cemented just how far their live audience had grown.</p><p>Details on the exact staging and setlist for this stop are limited compared to the group's more recent, heavily documented tours — but the show itself is a matter of public record, part of the official tour schedule of the era.</p>","fr":"<p>King Fahd International Stadium à Riyadh a accueilli BTS lors de la tournée « Love Yourself: Speak Yourself » (2019) — l'une des dizaines d'étapes d'une tournée qui a mené le groupe sur cinq continents et confirmé l'ampleur déjà considérable de son public en concert.</p><p>Les détails précis sur la mise en scène et la setlist de cette étape sont plus limités que pour les tournées plus récentes du groupe, bien mieux documentées — mais la date elle-même est un fait de notoriété publique, inscrite au calendrier officiel de la tournée de l'époque.</p>"},"tip":{"en":"This stop is from an earlier BTS world tour — check the venue's own website for current opening hours or public tours, as they can change independently of the concert date shown here.","fr":"Cette étape provient d'une tournée mondiale précédente de BTS — vérifiez le site officiel du lieu pour les horaires d'ouverture ou visites publiques actuelles, qui peuvent avoir changé depuis la date de concert indiquée ici."},"directions":{"en":"Check the venue's official website or a map app for the best way to reach it from where you're staying — public transit access varies a lot by city.","fr":"Consultez le site officiel du lieu ou une application de cartes pour le meilleur moyen de vous y rendre depuis votre logement — l'accès en transport en commun varie beaucoup selon la ville."}},
 ];
 
+// ==========================================
+// Messages éphémères "nouveau lieu ajouté"
+// ==========================================
+// Annonce, au lancement du site (une seule fois par session de navigation — voir
+// sessionStorage plus bas), quelques lieux tirés au sort parmi ceux ajoutés récemment.
+// NEW_LOCATION_IDS liste les ids concernés : actuellement les 43 lieux de concert des
+// tournées historiques (ids 113–155, voir plus haut) — à mettre à jour avec les ids des
+// prochains lieux ajoutés le jour où on en ajoutera de nouveaux.
+const NEW_LOCATION_IDS = Array.from({ length: 43 }, (_, i) => 113 + i);
+const NEW_LOCATION_TOAST_MAX = 4;
+const NEW_LOCATION_TOAST_LIFESPAN_MS = 6000;
+const NEW_LOCATION_TOAST_GAP_MS = 4500;
+
+function renderOneNewLocationToast(loc) {
+    const container = document.getElementById('new-location-toast-container');
+    if (!container) return;
+    const title = (loc.member && loc.member !== 'All') ? `${loc.member} (${loc.group}) — ${loc.name}` : `${loc.group} — ${loc.name}`;
+    const subParts = [];
+    const place = [loc.city, loc.country].filter(Boolean).join(', ');
+    if (place) subParts.push(place);
+    if (loc.year) subParts.push(loc.year);
+    let sub = subParts.join(' · ');
+    if (loc.episode) sub += (sub ? ' — ' : '') + loc.episode;
+
+    const el = document.createElement('div');
+    el.className = 'new-location-toast';
+    el.innerHTML = `
+        <div class="new-location-toast-icon">📍</div>
+        <div class="new-location-toast-body">
+            <div class="new-location-toast-label">${t('newLocationToastLabel')}</div>
+            <div class="new-location-toast-title"></div>
+            <div class="new-location-toast-sub"></div>
+        </div>
+        <button class="new-location-toast-close" type="button" aria-label="Close">&times;</button>
+    `;
+    el.querySelector('.new-location-toast-title').textContent = title;
+    el.querySelector('.new-location-toast-sub').textContent = sub;
+    container.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+
+    const dismiss = () => {
+        el.classList.remove('show');
+        setTimeout(() => el.remove(), 350);
+    };
+    el.querySelector('.new-location-toast-close').addEventListener('click', dismiss);
+    setTimeout(dismiss, NEW_LOCATION_TOAST_LIFESPAN_MS);
+}
+
+// Purement informatif/public (comme le Mode Tournée) : ne dépend d'aucune donnée de
+// compte, affiché à l'identique pour un visiteur en mode démo ou un compte réel.
+window.showNewLocationToasts = function () {
+    if (sessionStorage.getItem('newLocationToastsShown')) return;
+    const container = document.getElementById('new-location-toast-container');
+    if (!container) return;
+    const pool = NEW_LOCATION_IDS.map(id => celebLocations.find(l => l.id === id)).filter(Boolean);
+    if (!pool.length) return;
+    sessionStorage.setItem('newLocationToastsShown', '1');
+
+    const picks = [];
+    const poolCopy = pool.slice();
+    const count = Math.min(NEW_LOCATION_TOAST_MAX, poolCopy.length);
+    for (let i = 0; i < count; i++) {
+        const idx = Math.floor(Math.random() * poolCopy.length);
+        picks.push(poolCopy.splice(idx, 1)[0]);
+    }
+    picks.forEach((loc, i) => setTimeout(() => renderOneNewLocationToast(loc), i * NEW_LOCATION_TOAST_GAP_MS + 1200));
+};
+
 
 // ==========================================
 // 3. LOGIQUE UI ET TRADUCTIONS
@@ -1458,7 +1618,9 @@ const translations = {
         tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel.",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} is live now — {event} in {city}",
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
-        tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet."
+        tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
+        mapLoading: "Loading map…",
+        newLocationToastLabel: "New location added"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -1508,7 +1670,9 @@ const translations = {
         tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage.",
         tourModeGenericLabel: "Tournée", tourModeMemberLiveIn: "{member} est en direct — {event} à {city}",
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
-        tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée."
+        tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
+        mapLoading: "Chargement de la carte…",
+        newLocationToastLabel: "Nouveau lieu ajouté"
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -1558,7 +1722,9 @@ const translations = {
         tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje.",
         tourModeGenericLabel: "Gira", tourModeMemberLiveIn: "{member} está en directo — {event} en {city}",
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
-        tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada."
+        tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
+        mapLoading: "Cargando el mapa…",
+        newLocationToastLabel: "Nuevo lugar añadido"
     },
     it: {
         btnGenerateIti: "Generatore di Itinerari", filterGroup: "GRUPPO", filterMember: "MEMBRO", filterArea: "ZONA", filterYear: "ANNO", filterCategories: "CATEGORIE",
@@ -1608,7 +1774,9 @@ const translations = {
         tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio.",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} è in diretta — {event} a {city}",
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
-        tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata."
+        tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
+        mapLoading: "Caricamento della mappa…",
+        newLocationToastLabel: "Nuovo luogo aggiunto"
     },
     pt: {
         btnGenerateIti: "Gerador de Roteiros", filterGroup: "GRUPO", filterMember: "MEMBRO", filterArea: "REGIÃO", filterYear: "ANO", filterCategories: "CATEGORIAS",
@@ -1658,7 +1826,9 @@ const translations = {
         tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem.",
         tourModeGenericLabel: "Turnê", tourModeMemberLiveIn: "{member} está ao vivo agora — {event} em {city}",
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
-        tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada."
+        tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
+        mapLoading: "Carregando o mapa…",
+        newLocationToastLabel: "Novo local adicionado"
     },
     ko: {
         btnGenerateIti: "자동 일정 생성기", filterGroup: "그룹", filterMember: "멤버", filterArea: "지역", filterYear: "연도", filterCategories: "카테고리",
@@ -1708,7 +1878,9 @@ const translations = {
         tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요.",
         tourModeGenericLabel: "투어", tourModeMemberLiveIn: "{member} 라이브 중 — {city}에서 {event}",
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
-        tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다."
+        tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
+        mapLoading: "지도를 불러오는 중…",
+        newLocationToastLabel: "새로운 장소 추가됨"
     },
     ja: {
         btnGenerateIti: "自動旅程ジェネレーター", filterGroup: "グループ", filterMember: "メンバー", filterArea: "エリア", filterYear: "年", filterCategories: "カテゴリー",
@@ -1758,7 +1930,9 @@ const translations = {
         tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。",
         tourModeGenericLabel: "ツアー", tourModeMemberLiveIn: "{member}がライブ配信中 — {city}で{event}",
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
-        tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。"
+        tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
+        mapLoading: "地図を読み込み中…",
+        newLocationToastLabel: "新しい場所が追加されました"
     },
     zh: {
         btnGenerateIti: "自动行程生成器", filterGroup: "团体", filterMember: "成员", filterArea: "地区", filterYear: "年份", filterCategories: "分类",
@@ -1808,7 +1982,9 @@ const translations = {
         tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。",
         tourModeGenericLabel: "巡演", tourModeMemberLiveIn: "{member} 直播中 — 于{city}参加{event}",
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
-        tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。"
+        tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
+        mapLoading: "地图加载中…",
+        newLocationToastLabel: "新增地点"
     }
 };
 
