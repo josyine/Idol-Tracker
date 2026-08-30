@@ -313,6 +313,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         const link = document.getElementById('reset-photo-link');
         if (link) link.style.display = localStorage.getItem('userPhoto') ? 'inline' : 'none';
     }
+    window.updateResetPhotoLinkVisibility = updateResetPhotoLinkVisibility;
     updateResetPhotoLinkVisibility();
 
     window.resetProfilePicture = function() {
@@ -323,6 +324,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         profilePreview.textContent = initial;
         document.querySelectorAll('.user-avatar-btn').forEach(btn => { btn.innerHTML = ''; btn.textContent = initial; });
         updateResetPhotoLinkVisibility();
+        if (typeof window.syncUserData === 'function') window.syncUserData({ photo: null });
     };
 
     const unlocked = JSON.parse(localStorage.getItem('unlockedGroups') || '[]');
@@ -338,20 +340,44 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#f1f5f9;color:#64748b;">${t('accNoPasses')}</span>`;
     }
 
-    document.getElementById('upload-pic').addEventListener('change', function(e) {
+    // Redimensionne/compresse la photo (via canvas) avant de l'enregistrer : une photo de
+    // téléphone à pleine résolution dépasserait largement la limite de 1 Mo par champ
+    // Firestore. 300px de côté et une compression JPEG suffisent largement pour un avatar.
+    function resizeImageDataUrl(dataUrl, maxSize) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = function() {
+                const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.75));
+            };
+            img.onerror = () => resolve(dataUrl);
+            img.src = dataUrl;
+        });
+    }
+
+    document.getElementById('upload-pic').addEventListener('change', async function(e) {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                profilePreview.innerHTML = `<img src="${event.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
-                localStorage.setItem('userPhoto', event.target.result);
-                document.querySelectorAll('.user-avatar-btn').forEach(btn => {
-                    btn.innerHTML = `<img src="${event.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-                });
-                updateResetPhotoLinkVisibility();
-            }
-            reader.readAsDataURL(file);
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async function(event) {
+            const resized = await resizeImageDataUrl(event.target.result, 300);
+            profilePreview.innerHTML = `<img src="${resized}" style="width:100%; height:100%; object-fit:cover;">`;
+            localStorage.setItem('userPhoto', resized);
+            document.querySelectorAll('.user-avatar-btn').forEach(btn => {
+                btn.innerHTML = `<img src="${resized}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            });
+            updateResetPhotoLinkVisibility();
+            // Enregistrée sur LE COMPTE (Firestore), pas seulement sur cet appareil : sans
+            // ça, un autre compte utilisé sur le même navigateur récupérait la photo laissée
+            // dans le localStorage partagé de l'appareil au lieu de la sienne.
+            if (typeof window.syncUserData === 'function') window.syncUserData({ photo: resized });
         }
+        reader.readAsDataURL(file);
     });
 
     let isEditing = false;

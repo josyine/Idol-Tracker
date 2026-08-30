@@ -311,6 +311,12 @@ async function loadExistingProfileAndRedirect(user) {
             // centrage par défaut de la carte au lieu du pays choisi à l'inscription.
             const loginInterestCountry = data.interestCountry || data.residenceCountry;
             if (loginInterestCountry) localStorage.setItem('userCountry', loginInterestCountry);
+            // Photo de profil : toujours alignée sur ce que CE compte a en base, dans un
+            // sens comme dans l'autre — sinon, sur un appareil déjà utilisé par un autre
+            // compte, la photo laissée dans le localStorage partagé de l'appareil restait
+            // affichée comme si elle appartenait au nouveau compte connecté.
+            if (data.photo) localStorage.setItem('userPhoto', data.photo);
+            else localStorage.removeItem('userPhoto');
         }
     } catch (e) {
         // Si la lecture échoue (règles de sécurité en cours d'ajustement, etc.),
