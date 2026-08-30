@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen To Street — Payment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20260830">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+a{text-decoration:none;}
+body{background:#E7E9EC;padding:0; min-height:100vh; overflow-x:hidden;}
+.hidden { display: none !important; }
+
+.hero-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; background: linear-gradient(135deg, #F5F3FC, #E3DEF5, #D8CFF0, #E3DEF5); background-size: 200% 200%; animation: gradientShift 10s ease infinite; }
+@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; animation: float 12s infinite ease-in-out alternate; }
+.blob-1 { top: -10%; left: -10%; width: 40vw; height: 40vw; background: #e3d5f8; }
+.blob-2 { bottom: -10%; right: -10%; width: 35vw; height: 35vw; background: #fce7f0; animation-delay: -4s; }
+@keyframes float { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(30px) scale(1.05); } }
+
+.universal-logo { position: fixed; top: 25px; left: 20px; z-index: 1000; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
+.brand-text { font-size: 19px; font-weight: 700; color: #2E3644; line-height: 1.2; }
+.tagline { font-size: 12px; color: #5B6472; margin-top: 3px; line-height: 1.3;}
+
+.page { position: relative; z-index: 2000; width: 100vw; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 110px 20px 60px; }
+.card { background: #fff; border-radius: 20px; padding: 40px; width: 100%; max-width: 460px; box-shadow: 0 15px 40px rgba(80,60,120,.08); }
+.back-link { color: #D42759; font-weight: 700; font-size: 13.5px; display: inline-block; margin-bottom: 20px;}
+.back-link:hover { text-decoration: underline; }
+h1.pg-title { font-size: 22px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+.pg-desc { font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
+
+.summary-box { background:#f8fafc; border-radius:10px; padding:14px; font-size:13px; color:#334155; margin-bottom:18px; border:1px solid #e2e8f0; }
+.summary-row { display:flex; justify-content:space-between; align-items:center; }
+.summary-row + .summary-row { margin-top:6px; }
+.summary-label { color:#64748b; font-weight:600; }
+.summary-value { font-weight:700; }
+.summary-price { color:#D42759; font-weight:800; font-size:15px; }
+
+.input-group { margin-bottom: 14px; }
+.input-group label { font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 6px; display: block; }
+.input-row { display: flex; gap: 12px; }
+.input-row .input-group { flex: 1; }
+.field-input { width: 100%; border: 1.5px solid #cbd5e1; border-radius: 9px; padding: 11px 14px; font-size: 13.5px; color: #1e293b; outline: none; font-family: 'Poppins', sans-serif; }
+.field-input:focus { border-color: #D42759; }
+
+.pay-btn { width: 100%; background: #D42759; color: #fff; border: none; border-radius: 100px; padding: 14px; font-size: 14px; font-weight: 700; font-family: 'Poppins', sans-serif; box-shadow: 0 10px 22px rgba(212,39,89,.22); cursor: pointer; transition: 0.2s; margin-top: 6px; }
+.pay-btn:hover { transform: translateY(-2px); }
+
+.spinner { width: 22px; height: 22px; border: 3px solid #FBD5DC; border-top-color: #D42759; border-radius: 50%; margin: 0 auto; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 500px) {
+    .universal-logo { top: 14px; left: 14px; gap: 8px; }
+    .universal-logo svg { width: 32px; height: 32px; }
+    .universal-logo .tagline { display: none; }
+    .universal-logo .brand-text { font-size: 15px; }
+    .page { padding: 90px 14px 40px; align-items: flex-start; }
+    .card { padding: 26px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero-background">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+</div>
+
+<a href="map.html" class="universal-logo">
+    <svg width="38" height="38" viewBox="0 0 400 400"><path d="M200,50 C148,50 106,92 106,146 C106,220 200,340 200,340 C200,340 294,220 294,146 C294,92 252,50 200,50 Z" fill="#2E3644"/><circle cx="200" cy="150" r="26" fill="#D42759"/></svg>
+    <div>
+        <div class="brand-text">Screen To <b style="color:#D42759;">Street</b></div>
+        <div class="tagline">Following the footsteps of your favorite artists</div>
+    </div>
+</a>
+
+<div class="page">
+    <div class="card">
+        <a href="map.html" class="back-link" data-i18n="paymentBackLink">← Back to map</a>
+        <h1 class="pg-title" data-i18n="paymentTitle">Complete your purchase</h1>
+        <p class="pg-desc" data-i18n="paymentDesc">Enter your payment details to unlock the full guide.</p>
+
+        <div class="summary-box">
+            <div class="summary-row">
+                <span class="summary-label" data-i18n="paymentSummaryLabel">Selected pass:</span>
+                <span class="summary-value" id="payment-pass-name">—</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label" data-i18n="paymentTotalLabel">Total due:</span>
+                <span class="summary-price" id="payment-pass-price">—</span>
+            </div>
+        </div>
+
+        <form id="payment-form">
+            <div class="input-group">
+                <label><span data-i18n="cardNum">Card Number</span></label>
+                <input type="text" class="field-input" placeholder="XXXX XXXX XXXX XXXX" required>
+            </div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label><span data-i18n="expiry">Expiry Date</span></label>
+                    <input type="text" class="field-input" placeholder="MM/YY" required>
+                </div>
+                <div class="input-group">
+                    <label><span data-i18n="cvc">CVC</span></label>
+                    <input type="text" class="field-input" placeholder="123" required>
+                </div>
+            </div>
+            <button type="submit" id="payment-submit-btn" class="pay-btn" data-i18n="paySecurely">Pay securely</button>
+            <div id="payment-loader" class="hidden" style="margin-top: 15px; text-align:center;">
+                <div class="spinner"></div>
+                <p data-i18n="processing" style="color: #D42759; margin-top: 10px; font-size:13px; font-weight:600;">Processing securely…</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="module" src="firebase-init.js?v=20260830"></script>
+<script src="countries.js?v=20260830"></script>
+<script src="script.js?v=20260830"></script>
+<script>
+    // Pas de vrai système de paiement branché (comme partout ailleurs sur le site,
+    // voir buyGuidePass() dans script.js) : ce formulaire simule l'achat, mais existe
+    // comme une vraie étape de paiement séparée (au lieu d'acheter en un clic depuis le
+    // paywall) pour que la démarche d'achat soit plus explicite.
+    const params = new URLSearchParams(location.search);
+    const plan = params.get('plan') === 'lifetime' ? 'lifetime' : 'monthly';
+
+    function fillSummary() {
+        const nameEl = document.getElementById('payment-pass-name');
+        const priceEl = document.getElementById('payment-pass-price');
+        if (plan === 'lifetime') {
+            nameEl.textContent = t('paywallVipName');
+            priceEl.textContent = t('paywallVipPrice');
+        } else {
+            nameEl.textContent = t('paywallMonthlyName');
+            priceEl.textContent = t('paywallMonthlyPrice');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', fillSummary);
+    const _origChangeLang = window.changeLang;
+    window.changeLang = function(lang) { _origChangeLang(lang); fillSummary(); };
+
+    // Sans compte connecté, l'achat n'a pas de sens (rien à synchroniser) — retour à
+    // l'accueil. On se fie à l'indice local (comme le voile anti-clignotement de
+    // map.html), PAS au premier évènement "firebase-ready" : Firebase déclenche
+    // toujours une première fois avec user=null pendant que la session se restaure
+    // depuis le stockage local, avant de re-déclencher avec le vrai compte — se fier à
+    // ce premier signal aurait renvoyé vers l'accueil même une personne bien connectée.
+    if (!localStorage.getItem('userEmail')) {
+        window.location.href = 'index.html';
+    }
+
+    const paymentForm = document.getElementById('payment-form');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            document.getElementById('payment-submit-btn').style.display = 'none';
+            document.getElementById('payment-loader').classList.remove('hidden');
+            await window.buyGuidePass(plan);
+            setTimeout(() => { window.location.href = 'map.html'; }, 900);
+        });
+    }
+</script>
+</body>
+</html>

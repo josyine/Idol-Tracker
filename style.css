@@ -156,8 +156,29 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
    sans indication ressemble à une carte cassée plutôt qu'à une carte qui charge. */
 .map-loading-overlay { position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #E7E9EC; color: var(--muted-text); font-size: 12.5px; font-weight: 600; pointer-events: none; transition: opacity 0.3s ease; }
 .map-loading-overlay.hidden { display: none; }
+
+/* Compteur "fiches gratuites restantes" — voir updateFreeViewsCounter() dans script.js */
+.free-views-counter { position: absolute; top: 66px; left: 20px; z-index: 2000; background: var(--primary-magenta); color: #fff; border-radius: 100px; padding: 7px 16px; font-size: 11.5px; font-weight: 700; box-shadow: 0 4px 15px rgba(212,39,89,0.25); }
+.free-views-counter.hidden { display: none; }
+@media (max-width: 800px) {
+    .free-views-counter { top: 60px; left: 14px; font-size: 10.5px; padding: 6px 12px; }
+}
 .map-loading-spinner { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--border-color); border-top-color: var(--primary-magenta); animation: mapLoadingSpin 0.8s linear infinite; }
 @keyframes mapLoadingSpin { to { transform: rotate(360deg); } }
+
+/* Bouton "(re)lancer le guide de démo" — visible seulement sur map.html?demo=1, voir map-tour.js */
+.demo-tour-btn {
+    position: absolute; bottom: 24px; left: 20px; z-index: 2000;
+    display: flex; align-items: center; gap: 7px;
+    background: #fff; color: var(--text-main); border: 1.5px solid #e2e8f0; border-radius: 100px;
+    padding: 10px 18px; font-size: 13px; font-weight: 700; font-family: 'Poppins', sans-serif;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.2s;
+}
+.demo-tour-btn:hover { background: #FCE7F0; border-color: #fbcfe8; color: var(--primary-magenta); transform: translateY(-2px); }
+.demo-tour-btn.hidden { display: none; }
+@media (max-width: 800px) {
+    .demo-tour-btn { bottom: 90px; left: 14px; font-size: 12px; padding: 8px 14px; }
+}
 
 /* Messages éphémères "nouveau lieu ajouté" — voir showNewLocationToasts() dans script.js */
 .new-location-toast-container { position: fixed; left: 20px; bottom: 20px; z-index: 5000; display: flex; flex-direction: column-reverse; gap: 10px; pointer-events: none; max-width: min(320px, calc(100vw - 40px)); }

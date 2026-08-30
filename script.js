@@ -372,6 +372,19 @@ function hasGuidePass() {
 }
 window.hasGuidePass = hasGuidePass;
 
+// Affiche/masque et met à jour le compteur "X/3 lieux gratuits restants" (voir
+// #free-views-counter dans map.html) — masqué dès qu'un pass est actif, sinon reflète
+// le nombre de fiches lieu DIFFÉRENTES déjà consultées gratuitement.
+function updateFreeViewsCounter() {
+    const el = document.getElementById('free-views-counter');
+    if (!el) return;
+    if (hasGuidePass()) { el.classList.add('hidden'); return; }
+    const remaining = Math.max(0, FREE_LOCATION_VIEW_LIMIT - getViewedLocationIds().length);
+    el.textContent = t('freeViewsCounter').replace('{remaining}', remaining);
+    el.classList.remove('hidden');
+}
+window.updateFreeViewsCounter = updateFreeViewsCounter;
+
 // Achat toujours simulé pour l'instant (aucun vrai système de paiement branché, voir
 // buyGuidePass ci-dessous et le texte du popup du paywall) : enregistre le pass dans
 // Firestore + localStorage, ferme le paywall, puis rouvre automatiquement la fiche lieu
@@ -388,6 +401,7 @@ window.buyGuidePass = async function (type) {
         fields.guidePassExpiresAt = null;
     }
     if (typeof window.syncUserData === 'function') await window.syncUserData(fields);
+    updateFreeViewsCounter();
 
     closeModal('cart-modal');
     const pendingId = window.__pendingPaywallLocId;
@@ -400,6 +414,25 @@ window.buyGuidePass = async function (type) {
 window.openGuidePaywallModal = function () {
     const modal = document.getElementById('cart-modal');
     if (!modal) return;
+    const active = hasGuidePass();
+    const limitBlock = document.getElementById('paywall-limit-block');
+    const activeBlock = document.getElementById('paywall-active-block');
+    const cards = document.getElementById('paywall-cards');
+    if (limitBlock) limitBlock.classList.toggle('hidden', active);
+    if (activeBlock) activeBlock.classList.toggle('hidden', !active);
+    if (cards) cards.classList.toggle('hidden', active);
+    if (active && activeBlock) {
+        const type = localStorage.getItem('guidePassType');
+        const descEl = document.getElementById('paywall-active-desc');
+        if (descEl) {
+            if (type === 'lifetime') {
+                descEl.textContent = t('paywallActiveDescVip');
+            } else {
+                const expiresAt = parseInt(localStorage.getItem('guidePassExpiresAt') || '0', 10);
+                descEl.textContent = t('paywallActiveDescMonthly').replace('{date}', new Date(expiresAt).toLocaleDateString(currentLang));
+            }
+        }
+    }
     modal.classList.remove('hidden');
 };
 // Alias conservé : le bouton "Unlock Passes" du header (toutes les pages) appelle encore
@@ -849,7 +882,7 @@ const CLUSTER_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="
 const groupColors = { "BTS": "#8b5cf6", "Blackpink": "#ec4899", "Twice": "#f43f5e", "Seventeen": "#3b82f6", "Katseye": "#10b981", "TXT": "#f59e0b" };
 
 const filterData = {
-    "BTS": { members: ["Namjoon", "Jin", "Suga", "JHope", "Jimin", "V", "Jungkook"], categories: ["Run BTS", "Bon Voyage", "Museums", "Restaurants", "Cafe", "MV Location", "Concerts", "Fashion", "Landmarks"] },
+    "BTS": { members: ["Namjoon", "Jin", "Suga", "JHope", "Jimin", "V", "Jungkook"], categories: ["Run BTS", "Bon Voyage", "Museums", "Restaurants", "Cafe", "MV Location", "Concerts", "Fashion", "Landmarks", "Pop-up Store"] },
     "Blackpink": { members: ["Jisoo", "Jennie", "Rosé", "Lisa"], categories: ["Cafe", "Restaurants", "MV Location", "Pop-up Store", "Concerts", "Fashion"] },
     "General": { categories: ["Cafe", "Concerts", "Fashion", "Landmarks", "Museums", "Restaurants", "Pop-up Store"] }
 };
@@ -1578,6 +1611,210 @@ let celebLocations = [
     {"id":153,"name":"Nagai Stadium (Yanmar Stadium)","group":"BTS","member":"All","country":"Japan","city":"Osaka","category":"Concerts","year":"2019","episode":"Love Yourself: Speak Yourself","address":"","lat":34.6117,"lng":135.5188,"img":"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600","fullDescription":{"en":"<p>Nagai Stadium (Yanmar Stadium) in Osaka hosted BTS during the \"Love Yourself: Speak Yourself\" (2019) — one of dozens of stops on a run that took the group across five continents and cemented just how far their live audience had grown.</p><p>Details on the exact staging and setlist for this stop are limited compared to the group's more recent, heavily documented tours — but the show itself is a matter of public record, part of the official tour schedule of the era.</p>","fr":"<p>Nagai Stadium (Yanmar Stadium) à Osaka a accueilli BTS lors de la tournée « Love Yourself: Speak Yourself » (2019) — l'une des dizaines d'étapes d'une tournée qui a mené le groupe sur cinq continents et confirmé l'ampleur déjà considérable de son public en concert.</p><p>Les détails précis sur la mise en scène et la setlist de cette étape sont plus limités que pour les tournées plus récentes du groupe, bien mieux documentées — mais la date elle-même est un fait de notoriété publique, inscrite au calendrier officiel de la tournée de l'époque.</p>"},"tip":{"en":"This stop is from an earlier BTS world tour — check the venue's own website for current opening hours or public tours, as they can change independently of the concert date shown here.","fr":"Cette étape provient d'une tournée mondiale précédente de BTS — vérifiez le site officiel du lieu pour les horaires d'ouverture ou visites publiques actuelles, qui peuvent avoir changé depuis la date de concert indiquée ici."},"directions":{"en":"Check the venue's official website or a map app for the best way to reach it from where you're staying — public transit access varies a lot by city.","fr":"Consultez le site officiel du lieu ou une application de cartes pour le meilleur moyen de vous y rendre depuis votre logement — l'accès en transport en commun varie beaucoup selon la ville."}},
     {"id":154,"name":"Shizuoka Stadium Ecopa","group":"BTS","member":"All","country":"Japan","city":"Shizuoka","category":"Concerts","year":"2019","episode":"Love Yourself: Speak Yourself","address":"","lat":34.8161,"lng":137.9433,"img":"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600","fullDescription":{"en":"<p>Shizuoka Stadium Ecopa in Shizuoka hosted BTS during the \"Love Yourself: Speak Yourself\" (2019) — one of dozens of stops on a run that took the group across five continents and cemented just how far their live audience had grown.</p><p>Details on the exact staging and setlist for this stop are limited compared to the group's more recent, heavily documented tours — but the show itself is a matter of public record, part of the official tour schedule of the era.</p>","fr":"<p>Shizuoka Stadium Ecopa à Shizuoka a accueilli BTS lors de la tournée « Love Yourself: Speak Yourself » (2019) — l'une des dizaines d'étapes d'une tournée qui a mené le groupe sur cinq continents et confirmé l'ampleur déjà considérable de son public en concert.</p><p>Les détails précis sur la mise en scène et la setlist de cette étape sont plus limités que pour les tournées plus récentes du groupe, bien mieux documentées — mais la date elle-même est un fait de notoriété publique, inscrite au calendrier officiel de la tournée de l'époque.</p>"},"tip":{"en":"This stop is from an earlier BTS world tour — check the venue's own website for current opening hours or public tours, as they can change independently of the concert date shown here.","fr":"Cette étape provient d'une tournée mondiale précédente de BTS — vérifiez le site officiel du lieu pour les horaires d'ouverture ou visites publiques actuelles, qui peuvent avoir changé depuis la date de concert indiquée ici."},"directions":{"en":"Check the venue's official website or a map app for the best way to reach it from where you're staying — public transit access varies a lot by city.","fr":"Consultez le site officiel du lieu ou une application de cartes pour le meilleur moyen de vous y rendre depuis votre logement — l'accès en transport en commun varie beaucoup selon la ville."}},
     {"id":155,"name":"King Fahd International Stadium","group":"BTS","member":"All","country":"Saudi Arabia","city":"Riyadh","category":"Concerts","year":"2019","episode":"Love Yourself: Speak Yourself","address":"","lat":24.7136,"lng":46.7208,"img":"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600","fullDescription":{"en":"<p>King Fahd International Stadium in Riyadh hosted BTS during the \"Love Yourself: Speak Yourself\" (2019) — one of dozens of stops on a run that took the group across five continents and cemented just how far their live audience had grown.</p><p>Details on the exact staging and setlist for this stop are limited compared to the group's more recent, heavily documented tours — but the show itself is a matter of public record, part of the official tour schedule of the era.</p>","fr":"<p>King Fahd International Stadium à Riyadh a accueilli BTS lors de la tournée « Love Yourself: Speak Yourself » (2019) — l'une des dizaines d'étapes d'une tournée qui a mené le groupe sur cinq continents et confirmé l'ampleur déjà considérable de son public en concert.</p><p>Les détails précis sur la mise en scène et la setlist de cette étape sont plus limités que pour les tournées plus récentes du groupe, bien mieux documentées — mais la date elle-même est un fait de notoriété publique, inscrite au calendrier officiel de la tournée de l'époque.</p>"},"tip":{"en":"This stop is from an earlier BTS world tour — check the venue's own website for current opening hours or public tours, as they can change independently of the concert date shown here.","fr":"Cette étape provient d'une tournée mondiale précédente de BTS — vérifiez le site officiel du lieu pour les horaires d'ouverture ou visites publiques actuelles, qui peuvent avoir changé depuis la date de concert indiquée ici."},"directions":{"en":"Check the venue's official website or a map app for the best way to reach it from where you're staying — public transit access varies a lot by city.","fr":"Consultez le site officiel du lieu ou une application de cartes pour le meilleur moyen de vous y rendre depuis votre logement — l'accès en transport en commun varie beaucoup selon la ville."}},
+
+    // Import du fichier BTS_Visited_Locations_V10.xlsx fourni par l'utilisateur (40 lieux
+    // vérifiés, BTS-1 à BTS-40) — BTS-13 "Lotte World" est omis ici car doublon exact de
+    // l'entrée id:3 "Lotte World Adventure" déjà présente ci-dessus. Coordonnées estimées
+    // à partir des adresses et lieux réels connus (pas d'accès à un service de géocodage
+    // dans cet environnement) : à vérifier avant une utilisation nécessitant une précision
+    // GPS exacte. BTS-18, BTS-19 et BTS-24 : narration réécrite pour rester cohérente avec
+    // le lieu réellement vérifié (le fichier source gardait encore l'ancien texte associé à
+    // une adresse déjà corrigée par ailleurs — voir sa colonne "Lieux vérifiés").
+    { id: 156, name: "Yoojung Sikdang", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2013-2015", address: "14 Dosan-daero 28-gil, Gangnam-gu", lat: 37.5265, lng: 127.041, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+      fullDescription: { en: `<p>During their trainee years, BTS practically lived in this modest restaurant. Located a short walk from their old dorm and practice studio, Yoojung Sikdang served as their unofficial mess hall.</p><p>Eating the signature Heukdwaeji Dolsot Bibimbap at the exact table where the members used to sit is a mandatory rite of passage for every ARMY visiting Seoul.</p>`,
+        fr: `<p>Pendant leurs années de trainees, BTS vivait pratiquement dans ce restaurant modeste. Situé à quelques pas de leur ancien dortoir et de leur studio de répétition, Yoojung Sikdang servait de cantine officieuse au groupe.</p><p>Manger le fameux Heukdwaeji Dolsot Bibimbap à la table même où s'asseyaient les membres est un passage obligé pour toute ARMY visitant Séoul.</p>` },
+      tip: { en: "Order the signature dish — Ask for the \"Bangtan Bibimbap\", their favorite menu item back in the day.", fr: "Commandez le plat signature — Demandez le « Bangtan Bibimbap », leur plat préféré à l'époque." },
+      directions: { en: "Take the subway to Hakdong Station (Line 7), and walk about 10 minutes.", fr: "Prenez le métro jusqu'à la station Hakdong (ligne 7), puis marchez environ 10 minutes." } },
+    { id: 157, name: "Hakdong Park", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013", address: "83 Nonhyeon-dong, Gangnam-gu", lat: 37.5158, lng: 127.0295, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
+      fullDescription: { en: `<p>Tucked away on a steep hill, Hakdong Park holds immense emotional weight as the outdoor sanctuary where the young trainees spent countless hours resting and dreaming.</p><p>RM, Suga, and J-Hope frequently mentioned coming here to clear their heads during their hardest pre-debut years.</p>`,
+        fr: `<p>Niché sur une colline escarpée, Hakdong Park porte un poids émotionnel immense : ce fut le sanctuaire en plein air où les jeunes trainees passaient d'innombrables heures à se reposer et à rêver.</p><p>RM, Suga et J-Hope ont souvent mentionné venir ici pour se vider la tête pendant leurs années les plus difficiles avant leurs débuts.</p>` },
+      tip: { en: "The basketball court — Head to the court where the members used to shoot hoops after midnight practice.", fr: "Le terrain de basket — Direction le terrain où les membres tiraient des paniers après leurs répétitions de minuit." },
+      directions: { en: "Exit from Hakdong Station (Line 7) and walk uphill for 5 minutes.", fr: "Sortez de la station Hakdong (ligne 7) et marchez 5 minutes en montée." } },
+    { id: 158, name: "Old Big Hit Studio (Cheonggu Bldg)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013-2016", address: "10-31 Nonhyeon-dong, Gangnam-gu", lat: 37.5155, lng: 127.0305, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
+      fullDescription: { en: `<p>The basement of the Cheonggu Building is the legendary birthplace of BTS, where the seven members sweat through years of grueling choreography practice.</p><p>The exterior walls became a massive canvas where thousands of fans wrote messages in permanent marker, standing as a quiet monument to their humble beginnings.</p>`,
+        fr: `<p>Le sous-sol du bâtiment Cheonggu est le lieu de naissance légendaire de BTS, où les sept membres ont sué pendant des années sur des chorégraphies épuisantes.</p><p>Les murs extérieurs sont devenus une immense toile où des milliers de fans ont écrit des messages au marqueur indélébile, un monument discret à leurs débuts modestes.</p>` },
+      tip: { en: "Respect the neighborhood — Keep noise levels down and do not attempt to enter private property.", fr: "Respectez le quartier — Restez discret et ne tentez pas d'entrer dans une propriété privée." },
+      directions: { en: "Located just a few streets away from Hakdong Park.", fr: "Situé à quelques rues seulement de Hakdong Park." } },
+    { id: 159, name: "Ilchi Art Hall", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2013", address: "860 Seolleung-ro, Gangnam-gu", lat: 37.5257, lng: 127.0392, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>On June 12, 2013, Ilchi Art Hall hosted BTS's official debut showcase. Here they performed "No More Dream" in front of the press and their very first fans.</p><p>Visiting the exterior of this hall allows fans to stand exactly where the boys took their very first steps into the spotlight.</p>`,
+        fr: `<p>Le 12 juin 2013, Ilchi Art Hall a accueilli le showcase officiel des débuts de BTS. C'est ici qu'ils ont interprété « No More Dream » devant la presse et leurs tout premiers fans.</p><p>Se rendre devant cette salle permet aux fans de se tenir exactement là où le groupe a fait ses tout premiers pas sous les projecteurs.</p>` },
+      tip: { en: "Take a photo at the entrance — The main glass doors are exactly as they appeared in their debut documentary.", fr: "Prenez une photo à l'entrée — Les portes vitrées principales sont exactement telles qu'on les voit dans leur documentaire de débuts." },
+      directions: { en: "A short walk from Apgujeong Rodeo Station.", fr: "À quelques minutes à pied de la station Apgujeong Rodeo." } },
+    { id: 160, name: "First BTS Dormitory", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013-2015", address: "9-8 Nonhyeon-dong, Gangnam-gu", lat: 37.515, lng: 127.0215, img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600",
+      fullDescription: { en: `<p>This infamous small, cramped 3rd-floor apartment was where all 7 members shared a single bedroom, sleeping on bunk beds, surrounded by shoes and clothes.</p><p>The dorm was heavily featured in their debut anniversary broadcasts and Rookie King, representing the ultimate symbol of their shared struggles.</p>`,
+        fr: `<p>Ce petit appartement exigu du 3e étage, tristement célèbre, est celui où les 7 membres partageaient une seule chambre, dormant sur des lits superposés entourés de chaussures et de vêtements.</p><p>Ce dortoir est apparu abondamment dans les diffusions anniversaire de leurs débuts et dans Rookie King, symbole ultime de leurs galères partagées.</p>` },
+      tip: { en: "Keep your distance — View it respectfully from the street.", fr: "Gardez vos distances — Observez-le respectueusement depuis la rue." },
+      directions: { en: "Near Sinsa Station (Line 3), exit 1.", fr: "Près de la station Sinsa (ligne 3), sortie 1." } },
+    { id: 161, name: "The Min's Cafe", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Cafe", year: "2014-2015", address: "330 Apgujeong-ro, Gangnam-gu", lat: 37.5273, lng: 127.0287, img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600",
+      fullDescription: { en: `<p>During their rookie days, BTS were frequently spotted grabbing berry ades at The Min's. It was a safe space for them, owned by a trusted senior artist.</p><p>The members posted dozens of selfies from this cafe's terrace in 2014, making it one of the first true "ARMY pilgrimage" spots in Seoul.</p>`,
+        fr: `<p>Pendant leurs débuts, BTS venait souvent boire des berry ades chez The Min's. Un endroit sûr pour eux, tenu par un artiste senior de confiance.</p><p>Les membres ont posté des dizaines de selfies depuis la terrasse de ce café en 2014, en faisant l'un des tout premiers vrais lieux de « pèlerinage ARMY » à Séoul.</p>` },
+      tip: { en: "Nostalgia walk — Even though it's closed, the street itself is part of their rookie memories.", fr: "Balade nostalgique — Même fermé, la rue elle-même fait partie des souvenirs de leurs débuts." },
+      directions: { en: "Apgujeong Rodeo area.", fr: "Quartier d'Apgujeong Rodeo." } },
+    { id: 162, name: "YES24 Live Hall (AX-Korea)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "319 Gucheonmyeon-ro, Gwangjin-gu", lat: 37.5478, lng: 127.0956, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>In October 2014, BTS held their very first solo concert, "The Red Bullet," at this venue. It was a deeply emotional milestone for a group from a small agency.</p><p>Standing outside YES24 Live Hall reminds fans of the days when BTS struggled to sell out a 2,000-seat venue, long before their stadium tours.</p>`,
+        fr: `<p>En octobre 2014, BTS a donné son tout premier concert solo, « The Red Bullet », dans cette salle. Une étape profondément émouvante pour un groupe issu d'une petite agence.</p><p>Se tenir devant le YES24 Live Hall rappelle aux fans l'époque où BTS peinait à remplir une salle de 2 000 places, bien avant les tournées de stades.</p>` },
+      tip: { en: "The Entrance steps — Recreate the fan photos taken during the 2014 concert queuing.", fr: "Les marches de l'entrée — Recréez les photos de fans prises pendant la file d'attente du concert de 2014." },
+      directions: { en: "Gwangnaru Station (Line 5), exit 2.", fr: "Station Gwangnaru (ligne 5), sortie 2." } },
+    { id: 163, name: "Olympic Hall", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "424 Olympic-ro, Songpa-gu", lat: 37.5205, lng: 127.1218, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>Olympic Hall was the site of the very first "MUSTER" in March 2014, the official fan meeting that cemented the bond between BTS and the newly named ARMY.</p><p>This venue represents the birth of BTS's unique fan-culture events, filled with early inside jokes and tearful speeches.</p>`,
+        fr: `<p>Olympic Hall a accueilli le tout premier « MUSTER » en mars 2014, la fan meeting officielle qui a scellé le lien entre BTS et l'ARMY tout juste nommée.</p><p>Cette salle marque la naissance des événements fan-culture uniques de BTS, remplis de blagues internes des débuts et de discours émouvants.</p>` },
+      tip: { en: "Explore Olympic Park — The park is huge and beautiful, great for renting a bike.", fr: "Explorez Olympic Park — Le parc est immense et magnifique, idéal pour louer un vélo." },
+      directions: { en: "Olympic Park Station (Line 5 & 9).", fr: "Station Olympic Park (lignes 5 et 9)." } },
+    { id: 164, name: "SBS Prism Tower", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2015", address: "82 Sangamsan-ro, Mapo-gu", lat: 37.5817, lng: 126.8895, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
+      fullDescription: { en: `<p>On May 5, 2015, BTS won their very first music show trophy for "I Need U" on SBS MTV's The Show at the Prism Tower. It was a turning point that saved the group.</p><p>The emotional footage of the members crying backstage was filmed right in the corridors of this building, making it a sacred site.</p>`,
+        fr: `<p>Le 5 mai 2015, BTS a remporté son tout premier trophée d'émission musicale pour « I Need U » sur The Show de SBS MTV, à la Prism Tower. Un tournant qui a sauvé le groupe.</p><p>Les images émouvantes des membres en larmes en coulisses ont été filmées directement dans les couloirs de ce bâtiment, en faisant un lieu quasi sacré.</p>` },
+      tip: { en: "The front plaza — The futuristic exterior makes for great architectural photos.", fr: "L'esplanade avant — L'extérieur futuriste offre de superbes photos d'architecture." },
+      directions: { en: "Digital Media City Station (Line 6).", fr: "Station Digital Media City (ligne 6)." } },
+    { id: 165, name: "KBS Yeouido Broadcast Center", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013-2015", address: "13 Yeouigongwon-ro, Yeongdeungpo-gu", lat: 37.5237, lng: 126.9198, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
+      fullDescription: { en: `<p>During their rookie days, the walk from the vans to the KBS studio doors for Music Bank was a crucial way for BTS to get media attention, often wearing matching customized outfits.</p><p>Fans still visit the KBS steps where BTS used to greet reporters, representing the grind of their early promotion cycles.</p>`,
+        fr: `<p>Pendant leurs débuts, le trajet des vans jusqu'aux portes du studio KBS pour Music Bank était un moyen crucial pour BTS d'attirer l'attention des médias, souvent en tenues assorties personnalisées.</p><p>Les fans visitent encore les marches de KBS où BTS avait l'habitude de saluer les journalistes, symbole du travail acharné de leurs premiers cycles promotionnels.</p>` },
+      tip: { en: "The KBS Steps — Find the specific stairs leading to the entrance where press photos are taken.", fr: "Les marches de KBS — Repérez l'escalier précis menant à l'entrée où sont prises les photos de presse." },
+      directions: { en: "National Assembly Station (Line 9), exit 4.", fr: "Station National Assembly (ligne 9), sortie 4." } },
+    { id: 166, name: "Han River Park (Jamwon)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2013-2015", address: "Jamwon-dong, Seocho-gu, Seoul", lat: 37.5134, lng: 127.0138, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
+      fullDescription: { en: `<p>The Jamwon section of the Han River was just a short distance from Big Hit's old Nonhyeon dorm. The members frequently escaped here late at night to skateboard, practice, or film early video logs.</p><p>It was by the Han River that RM recorded some of his most introspective early vlogs, talking about his anxieties before debuting.</p>`,
+        fr: `<p>La section Jamwon du fleuve Han n'était qu'à quelques minutes de l'ancien dortoir de Big Hit à Nonhyeon. Les membres s'y échappaient souvent tard le soir pour faire du skate, répéter ou filmer leurs premiers vlogs.</p><p>C'est au bord du fleuve Han que RM a enregistré certains de ses tout premiers vlogs les plus introspectifs, évoquant ses angoisses avant leurs débuts.</p>` },
+      tip: { en: "Eat Riverside Ramen — Use the automatic foil-bowl machines at the convenience store.", fr: "Mangez un ramen au bord du fleuve — Utilisez les distributeurs automatiques de bols du convenience store." },
+      directions: { en: "Jamwon Station (Line 3) or Sinsa Station, then walk to the river.", fr: "Station Jamwon (ligne 3) ou Sinsa, puis marchez jusqu'au fleuve." } },
+    { id: 167, name: "Incheon Airport Terminal 1", group: "BTS", member: "All", country: "South Korea", city: "Incheon", category: "Bon Voyage", year: "2014", address: "272 Gonghang-ro, Jung-gu, Incheon", lat: 37.4602, lng: 126.4407, img: "https://images.unsplash.com/photo-1601439678777-b2b3c56fa72e?w=600",
+      fullDescription: { en: `<p>In the summer of 2014, BTS arrived at Incheon Airport to film American Hustle Life in LA. They were famously tricked into thinking it was a relaxing vacation.</p><p>Their hilariously flashy rookie airport fashion, complete with heavy eyeliner and oversized hip-hop gear, remains legendary among fans.</p>`,
+        fr: `<p>À l'été 2014, BTS s'est envolé depuis l'aéroport d'Incheon pour tourner American Hustle Life à Los Angeles. On leur avait fait croire, avec humour, qu'il s'agissait de vacances tranquilles.</p><p>Leur look aéroport de rookies, hilarant et clinquant, entre eye-liner appuyé et tenues hip-hop XXL, reste légendaire chez les fans.</p>` },
+      tip: { en: "The Departure Gates — Walk the same halls where thousands of press photos of BTS have been taken.", fr: "Les portes d'embarquement — Marchez dans les mêmes couloirs où des milliers de photos de presse de BTS ont été prises." },
+      directions: { en: "AREX Train from Seoul Station.", fr: "Train AREX depuis la gare de Séoul." } },
+    { id: 168, name: "Ilsan Lake Park", group: "BTS", member: "Namjoon", country: "South Korea", city: "Goyang", category: "Landmarks", year: "2013-2014", address: "595 Hosu-ro, Ilsandong-gu, Goyang-si", lat: 37.6584, lng: 126.7703, img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600",
+      fullDescription: { en: `<p>As RM's hometown, Ilsan shaped his childhood and early songwriting. He frequently visited this lake park to write lyrics and reflect before moving to the Gangnam dorms.</p><p>Walking around Ilsan Lake Park gives fans a deep understanding of Namjoon's roots and the quiet nature he constantly seeks out.</p>`,
+        fr: `<p>Ville natale de RM, Ilsan a façonné son enfance et ses premières compositions. Il venait souvent dans ce parc au bord du lac pour écrire des paroles et réfléchir, avant son déménagement dans les dortoirs de Gangnam.</p><p>Se promener autour d'Ilsan Lake Park permet aux fans de mieux comprendre les racines de Namjoon et la nature paisible qu'il recherche sans cesse.</p>` },
+      tip: { en: "Find the musical fountains — A popular spot mentioned in his early memories.", fr: "Trouvez les fontaines musicales — Un lieu populaire mentionné dans ses souvenirs de jeunesse." },
+      directions: { en: "Jeongbalsan Station (Line 3), exit 2.", fr: "Station Jeongbalsan (ligne 3), sortie 2." } },
+    { id: 169, name: "Second BTS Dormitory", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2015-2017", address: "Nonhyeon-dong, Gangnam-gu, Seoul", lat: 37.514, lng: 127.025, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
+      fullDescription: { en: `<p>Moving into this slightly larger dorm in 2015 marked the beginning of their most critical era. They finally had a bit more space as "I Need U" skyrocketed them to fame.</p><p>This dorm was featured in the 2015 Festa broadcasts, showing a chaotic but happier environment as they began winning awards.</p>`,
+        fr: `<p>Emménager dans ce dortoir un peu plus grand en 2015 a marqué le début de leur ère la plus décisive. Ils avaient enfin un peu plus d'espace tandis que « I Need U » les propulsait vers la célébrité.</p><p>Ce dortoir est apparu dans les diffusions Festa de 2015, montrant un environnement chaotique mais plus heureux, à l'heure de leurs premiers trophées.</p>` },
+      tip: { en: "Respect privacy — Remember this is just neighborhood history now.", fr: "Respectez la vie privée — Ce n'est aujourd'hui qu'un lieu chargé d'histoire dans un quartier résidentiel." },
+      directions: { en: "Nonhyeon area.", fr: "Quartier de Nonhyeon." } },
+    { id: 170, name: "Gwanghwamun Square", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013", address: "172 Sejong-daero, Jongno-gu, Seoul", lat: 37.5717, lng: 126.9768, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
+      fullDescription: { en: `<p>During their early promotions, BTS and their staff handed out flyers and did guerilla interviews in major public spaces like Gwanghwamun to gain public recognition.</p><p>Standing in the massive square, it's incredible to think of a young BTS trying to catch the attention of passing citizens, years before they became global ambassadors for Seoul.</p>`,
+        fr: `<p>Pendant leurs débuts promotionnels, BTS et leur équipe distribuaient des flyers et enchaînaient les interviews sauvages dans de grands espaces publics comme Gwanghwamun pour se faire connaître.</p><p>Debout sur cette immense place, difficile d'imaginer qu'un jeune BTS tentait autrefois d'attirer l'attention des passants, des années avant de devenir ambassadeurs mondiaux de Séoul.</p>` },
+      tip: { en: "King Sejong Statue — A must-visit landmark in the center of the square.", fr: "La statue du roi Sejong — Un incontournable au centre de la place." },
+      directions: { en: "Gwanghwamun Station (Line 5).", fr: "Station Gwanghwamun (ligne 5)." } },
+    { id: 171, name: "CJ ENM Center (M Countdown)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2013", address: "66 Sangamsan-ro, Mapo-gu, Seoul", lat: 37.5793, lng: 126.8888, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>On June 13, 2013, BTS stepped onto the M Countdown stage inside this very building to perform "No More Dream" for their first-ever live television broadcast. This date is officially celebrated as their debut anniversary.</p><p>While you can't easily enter the filming studios, walking into the main lobby of the CJ ENM Center allows you to trace the exact steps the nervous rookies took on their way to their very first dressing room.</p>`,
+        fr: `<p>Le 13 juin 2013, BTS est monté sur la scène de M Countdown, dans ce même bâtiment, pour interpréter « No More Dream » lors de sa toute première diffusion télévisée en direct. Cette date est officiellement célébrée comme l'anniversaire de leurs débuts.</p><p>S'il n'est pas facile d'accéder aux studios de tournage, entrer dans le hall principal du CJ ENM Center permet de suivre exactement les pas des jeunes recrues nerveuses en route vers leur toute première loge.</p>` },
+      tip: { en: "The First Floor Cafe — Grab a coffee in the lobby cafe where artists and staff frequently mingle before Thursday broadcasts.", fr: "Le café du rez-de-chaussée — Prenez un café dans le hall, là où artistes et équipes se croisent souvent avant les diffusions du jeudi." },
+      directions: { en: "Digital Media City Station (Line 6, AREX, Gyeongui-Jungang), exit 9.", fr: "Station Digital Media City (ligne 6, AREX, Gyeongui-Jungang), sortie 9." } },
+    { id: 172, name: "The Troubadour", group: "BTS", member: "All", country: "United States", city: "West Hollywood, CA", category: "Concerts", year: "2014", address: "9081 Santa Monica Blvd, West Hollywood, CA 90069", lat: 34.0809, lng: -118.39, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>On July 13, 2014, during their American Hustle Life trip to Los Angeles, BTS played a surprise showcase at The Troubadour, the legendary West Hollywood club where acts from Elton John to Guns N' Roses got their start.</p><p>For a group still selling out venues of a few thousand back home, performing on this storied stage was a rare, low-key brush with LA's live-music history — a striking contrast to the arena and stadium tours that would follow just a few years later.</p>`,
+        fr: `<p>Le 13 juillet 2014, pendant leur séjour à Los Angeles pour American Hustle Life, BTS a donné un showcase surprise au Troubadour, le club légendaire de West Hollywood où des artistes tels qu'Elton John ou Guns N' Roses ont fait leurs débuts.</p><p>Pour un groupe qui remplissait encore des salles de quelques milliers de places au pays, se produire sur cette scène chargée d'histoire fut un moment rare et discret dans l'histoire musicale live de LA — un contraste saisissant avec les tournées de stades qui suivraient à peine quelques années plus tard.</p>` },
+      tip: { en: "Legendary stage — The Troubadour still hosts regular shows; check the calendar for a chance to see it in action, not just from outside.", fr: "Scène légendaire — Le Troubadour programme encore des concerts réguliers ; consultez le calendrier pour le voir en pleine action, pas seulement de l'extérieur." },
+      directions: { en: "A few minutes' walk from West Hollywood's Santa Monica Blvd bus routes; there's no direct subway access, so a rideshare or bus from central LA is easiest.", fr: "À quelques minutes à pied des lignes de bus de Santa Monica Blvd à West Hollywood ; pas d'accès direct en métro, un VTC ou un bus depuis le centre de LA reste le plus simple." } },
+    { id: 173, name: "XGame Resort (Inje Bungee Jump)", group: "BTS", member: "All", country: "South Korea", city: "Inje-gun, Gangwon-do", category: "Run BTS", year: "2015", address: "221-12 Hapgang-ri, Inje-eup, Inje-gun, Gangwon-do", lat: 38.07, lng: 128.17, img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600",
+      fullDescription: { en: `<p>In a legendary early episode of Run BTS! (the Silmido Special), the boys traveled to XGame Resort in the mountains of Inje, Gangwon-do, to face their fears with a bungee jump. The episode is famous for J-Hope's tearful hesitation and Jungkook's fearless, smiling jump.</p><p>Far from Seoul's city center, the resort's jump tower still draws ARMYs who want to relive the members' screamed countdowns before taking the plunge themselves.</p>`,
+        fr: `<p>Dans un épisode légendaire des débuts de Run BTS ! (le Silmido Special), les garçons se sont rendus au XGame Resort, dans les montagnes d'Inje, Gangwon-do, pour affronter leur peur du saut à l'élastique. L'épisode est resté célèbre pour l'hésitation larmoyante de J-Hope et le saut sans peur, tout sourire, de Jungkook.</p><p>Loin du centre de Séoul, la tour de saut du complexe attire encore des ARMY venus revivre les décomptes hurlés des membres avant de sauter à leur tour.</p>` },
+      tip: { en: "Take the leap — XGame Resort still operates its bungee platform for visitors brave enough to follow in the members' footsteps.", fr: "Sautez le pas — Le XGame Resort exploite toujours sa plateforme de saut à l'élastique pour les visiteurs assez courageux pour suivre les traces des membres." },
+      directions: { en: "Best reached by car from Seoul (around 2 hours); public transit in this part of Gangwon-do is very limited.", fr: "Se rejoint le plus facilement en voiture depuis Séoul (environ 2 heures) ; les transports en commun sont très limités dans ce secteur du Gangwon-do." } },
+    { id: 174, name: "Old Big Hit 2nd Office (Hakdong-ro)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2016-2017", address: "5-30 Hakdong-ro 30-gil, Gangnam-gu, Seoul", lat: 37.5185, lng: 127.0405, img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600",
+      fullDescription: { en: `<p>Though slightly past the 2015 mark, this second agency building represents the direct result of their early struggles. They moved here right around the explosive success of the Wings era.</p><p>Many of their most famous chaotic V Live broadcasts (like Jin's 'Eat Jin' sessions) were filmed in the small practice rooms of this specific building before they moved to their massive Yongsan headquarters.</p>`,
+        fr: `<p>Bien qu'un peu postérieur à 2015, ce second bâtiment de l'agence est le résultat direct de leurs premières galères. Ils y ont emménagé au moment du succès explosif de l'ère Wings.</p><p>Beaucoup de leurs V Live les plus chaotiques et célèbres (comme les sessions « Eat Jin » de Jin) ont été filmés dans les petites salles de répétition de ce bâtiment précis, avant leur déménagement vers leur immense siège de Yongsan.</p>` },
+      tip: { en: "The V Live Vibe — Look at the exterior and remember the countless hours of live streams broadcasted from those windows.", fr: "L'ambiance V Live — Regardez la façade en pensant aux innombrables heures de live diffusées depuis ces fenêtres." },
+      directions: { en: "Hakdong Station (Line 7), exit 3.", fr: "Station Hakdong (ligne 7), sortie 3." } },
+    { id: 175, name: "School of Performing Arts Seoul (SOPA)", group: "BTS", member: "Jungkook", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2014-2017", address: "147-1 Gung-dong, Guro-gu, Seoul", lat: 37.4945, lng: 126.8862, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
+      fullDescription: { en: `<p>In 2014, all six older members escorted a very young Jungkook to his high school entrance ceremony at SOPA, a famous arts high school recognizable by its bright yellow uniforms.</p><p>The heartwarming tradition continued three years later when all the members returned to attend his graduation. Fans often visit the exterior to remember the Golden Maknae's youth.</p>`,
+        fr: `<p>En 2014, les six aînés ont accompagné un tout jeune Jungkook à sa cérémonie de rentrée au lycée SOPA, un célèbre lycée d'arts reconnaissable à ses uniformes jaune vif.</p><p>Cette tradition touchante s'est poursuivie trois ans plus tard, quand tous les membres sont revenus assister à sa remise de diplôme. Les fans visitent souvent l'extérieur pour se remémorer la jeunesse du Golden Maknae.</p>` },
+      tip: { en: "Respect the Students — Take a quick photo of the entrance gate from a distance and move on.", fr: "Respectez les élèves — Prenez rapidement une photo du portail d'entrée à distance, puis passez votre chemin." },
+      directions: { en: "Onsu Station (Lines 1 and 7).", fr: "Station Onsu (lignes 1 et 7)." } },
+    { id: 176, name: "Jamsil Olympic Stadium", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2015", address: "25 Olympic-ro, Songpa-gu, Seoul", lat: 37.5155, lng: 127.0731, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>In 2015, a still-growing BTS performed "I Need U" at the massive Dream Concert held at Jamsil Olympic Stadium. At the time, they were just one of many groups performing for a mixed crowd.</p><p>Years later, they would return to this exact stadium to completely sell it out for their Love Yourself and Permission to Dance solo concerts, making it the ultimate symbol of their rise to the top.</p>`,
+        fr: `<p>En 2015, un BTS encore en pleine ascension a interprété « I Need U » lors de l'immense Dream Concert au stade olympique de Jamsil. À l'époque, ils n'étaient qu'un groupe parmi d'autres devant un public mixte.</p><p>Des années plus tard, ils reviendraient remplir intégralement ce même stade pour leurs concerts solo Love Yourself et Permission to Dance, en faisant le symbole ultime de leur ascension au sommet.</p>` },
+      tip: { en: "The Olympic Rings — Take a photo in front of the giant Olympic rings at the main entrance.", fr: "Les anneaux olympiques — Prenez une photo devant les immenses anneaux olympiques à l'entrée principale." },
+      directions: { en: "Sports Complex Station (Lines 2 and 9).", fr: "Station Sports Complex (lignes 2 et 9)." } },
+    { id: 177, name: "Blue Square", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "294 Itaewon-ro, Yongsan-gu, Seoul", lat: 37.5347, lng: 126.9946, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>In August 2014, BTS held their official showcase for their first full-length album, Dark & Wild, at the Blue Square Samsung Card Hall. This marked a significant step up from their smaller debut venues.</p><p>Walking into the Blue Square complex today, fans can appreciate how much the group grew in just one year. The venue is also famous for its stunning Book Park, a great place to relax.</p>`,
+        fr: `<p>En août 2014, BTS a tenu le showcase officiel de son premier album complet, Dark & Wild, au Blue Square Samsung Card Hall. Une montée en gamme notable par rapport à leurs premières salles de débuts.</p><p>En entrant aujourd'hui dans le complexe Blue Square, les fans peuvent mesurer à quel point le groupe a grandi en seulement un an. Le lieu est aussi réputé pour son superbe Book Park, un endroit idéal pour se détendre.</p>` },
+      tip: { en: "Visit the Book Park — Don't miss the massive, multi-story bookstore inside the complex for incredible architectural photos.", fr: "Visitez le Book Park — Ne manquez pas cette immense librairie sur plusieurs étages, pour des photos d'architecture superbes." },
+      directions: { en: "Hangangjin Station (Line 6), exit 2 is directly connected to the venue.", fr: "Station Hangangjin (ligne 6), la sortie 2 est directement reliée à la salle." } },
+    { id: 178, name: "Lotte Card Art Center", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "Cheongdam-dong, Gangnam-gu, Seoul", lat: 37.5236, lng: 127.0479, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>Before Dark & Wild, BTS launched their breakthrough mini-album Skool Luv Affair (featuring "Boy In Luv") with a press and fan showcase at the Lotte Card Art Center in Cheongdam-dong, in February 2014.</p><p>The intimate size of this venue is a stark reminder of their rookie days: only a few hundred lucky fans got to witness the first-ever live performance of "Boy In Luv" in this small room.</p>`,
+        fr: `<p>Avant Dark & Wild, BTS a lancé son mini-album décisif Skool Luv Affair (avec « Boy In Luv ») lors d'un showcase presse et fans au Lotte Card Art Center, à Cheongdam-dong, en février 2014.</p><p>La taille intimiste de cette salle rappelle crûment leurs débuts : seules quelques centaines de fans chanceux ont assisté à la toute première performance live de « Boy In Luv » dans cette petite pièce.</p>` },
+      tip: { en: "The Entrance Walk — Walk up the front steps where the members gave their press greetings.", fr: "Le perron d'entrée — Montez les marches où les membres ont salué la presse." },
+      directions: { en: "Samseong Station (Line 2), exit 8.", fr: "Station Samseong (ligne 2), sortie 8." } },
+    { id: 179, name: "Korea University Hwajeong Gym", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2016", address: "145 Anam-ro, Seongbuk-gu, Seoul", lat: 37.5875, lng: 127.0323, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>Though taking place slightly later in early 2016, the 2nd MUSTER represents the culmination of their rookie era struggles. Held at Hwajeong Gymnasium, it was a deeply emotional fan meeting where they reflected on their first music show wins.</p><p>The steep walk up to the gymnasium is legendary among K-pop fans. The campus itself is beautiful and features classic, European-style university architecture.</p>`,
+        fr: `<p>Bien qu'un peu plus tardif, début 2016, le 2e MUSTER marque l'aboutissement des galères de leurs années de débuts. Tenue au gymnase Hwajeong, ce fut une fan meeting profondément émouvante où ils sont revenus sur leurs premiers trophées.</p><p>La montée abrupte jusqu'au gymnase est légendaire chez les fans de k-pop. Le campus lui-même est magnifique, avec une architecture universitaire classique de style européen.</p>` },
+      tip: { en: "The Uphill Hike — Be prepared for a genuine workout to reach the gym from the subway station.", fr: "La montée — Préparez-vous à un vrai effort physique pour rejoindre le gymnase depuis la station de métro." },
+      directions: { en: "Anam Station (Line 6), then a steep uphill walk through the campus.", fr: "Station Anam (ligne 6), puis une montée abrupte à travers le campus." } },
+    { id: 180, name: "Lotte Museum of Art", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Museums", year: "2019", address: "300 Olympic-ro, Songpa-gu, Seoul", lat: 37.5125, lng: 127.1025, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600",
+      fullDescription: { en: `<p>Both RM and V have visited exhibitions here, notably the James Jean show. The artist they saw eventually created the spectacular Seven Phases artwork based on the BTS members, later displayed at the HYBE Insight museum.</p><p>Located high up in the Lotte World Tower complex, the museum hosts vibrant, pop-culture-adjacent contemporary art — a great stop for fans who want a mix of shopping, entertainment and modern art.</p>`,
+        fr: `<p>RM et V ont tous deux visité des expositions ici, notamment celle de James Jean. Cet artiste a par la suite créé l'œuvre spectaculaire Seven Phases inspirée des membres de BTS, exposée plus tard au musée HYBE Insight.</p><p>Perché en hauteur dans le complexe Lotte World Tower, le musée présente un art contemporain vivant, proche de la pop culture — une belle étape pour les fans qui veulent mêler shopping, divertissement et art moderne.</p>` },
+      tip: { en: "James Jean Connection — Knowing that this exhibition sparked a direct collaboration with BTS makes walking through the gallery even more special.", fr: "Le lien avec James Jean — Savoir que cette exposition a donné naissance à une collaboration directe avec BTS rend la visite de la galerie encore plus spéciale." },
+      directions: { en: "Jamsil Station (Lines 2 and 8).", fr: "Station Jamsil (lignes 2 et 8)." } },
+    { id: 181, name: "Palace Theatre (Los Angeles)", group: "BTS", member: "Jimin", country: "United States", city: "Los Angeles, CA", category: "Concerts", year: "2023", address: "630 S Broadway, Los Angeles, CA", lat: 34.043, lng: -118.2519, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>The grand, sweeping performance spaces filled with marching dancers in Jimin's powerful hip-hop track "Set Me Free Pt. 2" made use of the historic theater district of downtown Los Angeles, echoing classical architecture.</p><p>The ornate detailing, balconies and majestic arches of historic Broadway theaters provide an imposing, theatrical stage that elevates Jimin's fierce choreography to an artistic masterpiece.</p>`,
+        fr: `<p>Les vastes espaces scéniques traversés par des danseurs en formation dans le puissant titre hip-hop de Jimin « Set Me Free Pt. 2 » ont été tournés dans le quartier historique des théâtres du centre-ville de Los Angeles, à l'architecture classique.</p><p>Les détails ornementés, les balcons et les arches majestueuses de ces théâtres historiques de Broadway offrent une scène théâtrale imposante, qui élève la chorégraphie féroce de Jimin au rang d'œuvre d'art.</p>` },
+      tip: { en: "Historic Broadway — Walk down South Broadway to view the magnificent historic movie palaces that line the street.", fr: "Le Broadway historique — Descendez South Broadway pour admirer les magnifiques anciens cinémas-palaces qui bordent la rue." },
+      directions: { en: "Downtown LA, near Pershing Square.", fr: "Centre-ville de Los Angeles, près de Pershing Square." } },
+    { id: 182, name: "Spain (Mallorca / Historic Streets)", group: "BTS", member: "V", country: "Spain", city: "Mallorca", category: "Bon Voyage", year: "2023", address: "Palma de Mallorca, Spain", lat: 39.5696, lng: 2.6502, img: "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=600",
+      fullDescription: { en: `<p>For his soulful R&B solo tracks "Love Me Again" and "Rainy Days", V traveled to the Mediterranean island of Mallorca in Spain. The glowing cave sequences and vintage hotel hallway scenes were shot across the island.</p><p>The warm, golden lighting of the Mallorcan caves and the nostalgic European hotel rooms created a cozy, intimate atmosphere that perfectly embodied Taehyung's distinct retro artistic vision.</p>`,
+        fr: `<p>Pour ses titres solo R&B tout en soul « Love Me Again » et « Rainy Days », V s'est rendu sur l'île méditerranéenne de Majorque, en Espagne. Les scènes de grottes lumineuses et de couloirs d'hôtel vintage ont été tournées à travers l'île.</p><p>La lumière chaude et dorée des grottes majorquines et les chambres d'hôtel européennes nostalgiques ont créé une atmosphère intime et cosy, parfaitement fidèle à la vision artistique rétro si particulière de Taehyung.</p>` },
+      tip: { en: "Historic Old Town — Explore the cobblestone streets and Gothic architecture of Palma's old town to feel the European aesthetic.", fr: "La vieille ville historique — Explorez les rues pavées et l'architecture gothique du vieux Palma pour ressentir cette esthétique européenne." },
+      directions: { en: "Flew into Palma de Mallorca Airport (PMI) from mainland Europe.", fr: "Accessible en avion via l'aéroport de Palma de Majorque (PMI) depuis l'Europe continentale." } },
+    { id: 183, name: "Mojave Desert (Palmdale / California)", group: "BTS", member: "Suga", country: "United States", city: "Palmdale, CA", category: "MV Location", year: "2020-2023", address: "Mojave Desert, California, USA", lat: 34.5794, lng: -118.1165, img: "https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=600",
+      fullDescription: { en: `<p>For the cinematic Western-meets-historical aesthetics of Agust D's solo music videos (such as the sprawling highway scenes in "Haegeum" and artistic teasers), production took place in the stark, cinematic expanses of the Mojave Desert.</p><p>The raw, isolated environment of the desert perfectly mirrors the rebellious, independent spirit of Suga's Agust D alter-ego, capturing the feeling of riding alone through the American frontier.</p>`,
+        fr: `<p>Pour l'esthétique cinématographique, entre western et fresque historique, des clips solo d'Agust D (comme les vastes scènes de route de « Haegeum » et ses teasers artistiques), le tournage s'est déroulé dans les étendues brutes et cinématographiques du désert de Mojave.</p><p>L'environnement brut et isolé du désert reflète parfaitement l'esprit rebelle et indépendant de l'alter ego Agust D de Suga, capturant cette sensation de rouler seul à travers la frontière américaine.</p>` },
+      tip: { en: "Golden Hour Photography — The lighting at sunrise and sunset across the desert flats is legendary for photography.", fr: "Photos à l'heure dorée — La lumière du lever et du coucher de soleil sur les étendues désertiques est légendaire pour la photographie." },
+      directions: { en: "Accessible via a 1.5 to 2-hour drive north from Los Angeles.", fr: "Accessible en voiture, à 1h30-2h de route au nord de Los Angeles." } },
+    { id: 184, name: "Universal Studios Backlot (Agust D Palace Set)", group: "BTS", member: "Suga", country: "United States", city: "Los Angeles, CA", category: "MV Location", year: "2020", address: "100 Universal City Plaza, Universal City, CA", lat: 34.1381, lng: -118.3534, img: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600",
+      fullDescription: { en: `<p>The breathtaking opening and closing sequences of the record-shattering "Daechwita" music video — where Agust D walks through a bustling historical marketplace and stands before a royal palace courtyard — used specialized cinematic backlots.</p><p>The fusion of traditional Korean royal garments with a modern hip-hop swagger created an iconic visual identity for Suga's solo work, blending ancient heritage with futuristic rebellion.</p>`,
+        fr: `<p>Les saisissantes séquences d'ouverture et de fermeture du clip record « Daechwita » — où Agust D traverse un marché historique animé et se dresse devant la cour d'un palais royal — ont été tournées sur des backlots de cinéma spécialisés.</p><p>La fusion des habits royaux coréens traditionnels avec une attitude hip-hop moderne a créé une identité visuelle iconique pour le travail solo de Suga, mêlant héritage ancien et rébellion futuriste.</p>` },
+      tip: { en: "Studio Tram Tour — Catch the backlot tour to see how different historic eras can be simulated on a single studio plot.", fr: "La visite en tram du studio — Profitez-en pour voir comment différentes époques historiques peuvent être recréées sur un même plateau." },
+      directions: { en: "Universal City Metro Station, Los Angeles.", fr: "Station de métro Universal City, Los Angeles." } },
+    { id: 185, name: "Vinyl & Plastic by Hyundai Card", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Fashion", year: "2020", address: "248 Itaewon-ro, Yongsan-gu, Seoul", lat: 37.5333, lng: 126.9958, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>On September 21, 2020, BTS filmed a Tiny Desk Concert for NPR at Vinyl & Plastic in Itaewon, a music space built by Hyundai Card, performing three songs backed by a live band in retro outfits.</p><p>This Hyundai-branded cultural space, more listening bar than shop, let BTS showcase the group's link to Hyundai — one of their longtime brand partners — in an intimate, music-first setting rather than a traditional ad shoot.</p>`,
+        fr: `<p>Le 21 septembre 2020, BTS a tourné un Tiny Desk Concert pour NPR chez Vinyl & Plastic, à Itaewon, un espace musical créé par Hyundai Card, interprétant trois titres accompagnés d'un groupe live en tenues rétro.</p><p>Cet espace culturel signé Hyundai, plus proche d'un listening bar que d'une boutique, a permis à BTS de mettre en avant son lien avec Hyundai — l'un de ses partenaires de longue date — dans un cadre intimiste centré sur la musique plutôt qu'un tournage publicitaire classique.</p>` },
+      tip: { en: "Browse first — The vinyl and CD stacks are organized for actual crate-digging, not just display.", fr: "Fouillez d'abord — Les bacs de vinyles et CD sont organisés pour une vraie recherche de trésors, pas juste pour l'exposition." },
+      directions: { en: "5-minute walk from Exit 3 of Hangangjin Station (Line 6).", fr: "5 minutes à pied de la sortie 3 de la station Hangangjin (ligne 6)." } },
+    { id: 186, name: "Line Friends Flagship Store Myeongdong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Fashion", year: "2017", address: "9 Myeongdong 8-na-gil, Jung-gu, Seoul 04536", lat: 37.5636, lng: 126.9834, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>BT21 — the eight characters (Koya, RJ, Shooky, Mang, Chimmy, Tata, Cooky and Van) that BTS co-designed with Line Friends in 2017 — is sold across Line Friends stores nationwide, with Myeongdong as one of the busiest flagship locations for tourists.</p><p>Each BT21 character was designed to reflect one BTS member's personality, making the store one of the few places to see the full lineup of official character goods together.</p>`,
+        fr: `<p>BT21 — les huit personnages (Koya, RJ, Shooky, Mang, Chimmy, Tata, Cooky et Van) que BTS a co-créés avec Line Friends en 2017 — est vendu dans les boutiques Line Friends à travers tout le pays, celle de Myeongdong étant l'une des plus fréquentées par les touristes.</p><p>Chaque personnage BT21 a été conçu pour refléter la personnalité d'un membre de BTS, faisant de cette boutique l'un des rares endroits où voir la collection complète des goodies officiels réunis.</p>` },
+      tip: { en: "Photo op — The giant Brown figure at the entrance is a popular photo spot; queues form on weekends.", fr: "Photo souvenir — La statue géante de Brown à l'entrée est un spot photo très prisé ; des files d'attente se forment le week-end." },
+      directions: { en: "1-minute walk from Myeongdong Station (Line 4), Exit 6.", fr: "1 minute à pied de la station Myeongdong (ligne 4), sortie 6." } },
+    { id: 187, name: "Line Friends Flagship Store Hongdae", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Fashion", year: "2018", address: "Hongdae, Mapo-gu, Seoul", lat: 37.5563, lng: 126.9236, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>Hongdae's Line Friends store is regularly cited by fans as one of the biggest BT21 collections in Seoul, alongside the Myeongdong and Itaewon locations.</p><p>The Hongdae neighborhood's youth and street-art culture makes it a natural fit for the brand's colorful, playful retail concept.</p>`,
+        fr: `<p>La boutique Line Friends de Hongdae est régulièrement citée par les fans comme l'une des plus grandes collections BT21 de Séoul, aux côtés de celles de Myeongdong et Itaewon.</p><p>La culture jeune et street-art du quartier de Hongdae en fait un cadre naturel pour le concept de vente coloré et ludique de la marque.</p>` },
+      tip: { en: "Time it right — Go on a weekday to avoid the Hongdae weekend crowds.", fr: "Choisissez le bon moment — Venez en semaine pour éviter la foule du week-end à Hongdae." },
+      directions: { en: "Short walk from Hongik University Station (Lines 2, Gyeongui-Jungang, Airport Railroad).", fr: "À courte distance à pied de la station Hongik University (lignes 2, Gyeongui-Jungang, Airport Railroad)." } },
+    { id: 188, name: "BTS POP-UP: MAP OF THE SOUL Showcase", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Pop-up Store", year: "2020-2021", address: "51 Garosu-gil, Gangnam-gu, Seoul", lat: 37.5199, lng: 127.0233, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>Big Hit IP's first Korean showcase of this kind took over a three-story building on trendy Garosu-gil, later expanding the concept to Tokyo, Singapore, Bangkok, Manila and Taipei.</p><p>Visitors entered through a signature blue door into a purple-lit terrace filled with lightstick displays, receiving a branded rubber bracelet as a souvenir of the visit.</p>`,
+        fr: `<p>Ce premier pop-up coréen de ce genre signé Big Hit IP a investi un immeuble de trois étages sur la branchée Garosu-gil, avant que le concept ne s'étende à Tokyo, Singapour, Bangkok, Manille et Taipei.</p><p>Les visiteurs entraient par une porte bleue emblématique vers une terrasse baignée de lumière violette remplie d'expositions de lightsticks, repartant avec un bracelet en caoutchouc de la marque en souvenir.</p>` },
+      tip: { en: "Fan pilgrimage — The building is a normal commercial space today; nothing on-site marks its BTS history.", fr: "Pèlerinage de fans — Le bâtiment est aujourd'hui un local commercial classique ; rien sur place ne rappelle son histoire liée à BTS." },
+      directions: { en: "The pop-up itself has since closed; the address is included for historical/fan-pilgrimage reference.", fr: "Le pop-up lui-même a fermé depuis ; l'adresse est indiquée à titre historique, pour les fans en pèlerinage." } },
+    { id: 189, name: "BTS POP-UP: SPACE OF BTS (Lotte Department Store)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Pop-up Store", year: "2021", address: "Lotte Department Store Main Branch, 81 Namdaemun-ro, Jung-gu, Seoul", lat: 37.5647, lng: 126.9812, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>"BTS POP-UP: SPACE OF BTS" was Big Hit IP's partnership with Lotte Department Store, bringing BT21/TinyTAN-adjacent lifestyle merchandise into a mainstream department store setting rather than a standalone fan pop-up.</p><p>The Lotte partnership marked one of the clearest crossovers between BTS's merchandising universe and a major Korean retail conglomerate, alongside Lotte World and Lotte Duty Free's own BTS-branded spaces.</p>`,
+        fr: `<p>« BTS POP-UP: SPACE OF BTS » était le partenariat de Big Hit IP avec le grand magasin Lotte, amenant des produits lifestyle proches de BT21/TinyTAN dans un grand magasin généraliste plutôt que dans un pop-up dédié aux fans.</p><p>Ce partenariat avec Lotte a marqué l'un des croisements les plus nets entre l'univers merchandising de BTS et un grand conglomérat coréen de la distribution, aux côtés des espaces BTS propres à Lotte World et Lotte Duty Free.</p>` },
+      tip: { en: "Shop smart — Items were basic fashion and household goods, priced closer to retail than limited-run concert merch.", fr: "Achetez malin — Les articles étaient des produits mode et maison classiques, à des prix plus proches du commerce courant que du merchandising de concert en édition limitée." },
+      directions: { en: "The same concept also ran in Lotte stores in Busan, Daegu and Gwangju.", fr: "Le même concept a aussi tourné dans des magasins Lotte à Busan, Daegu et Gwangju." } },
+    { id: 190, name: "HYBE Headquarters Pop-Up Space (2026)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Pop-up Store", year: "2026", address: "HYBE Headquarters, Yongsan-gu, Seoul", lat: 37.5334, lng: 126.99, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>HYBE opened this dedicated pop-up venue at its Yongsan headquarters in March 2026, with the launch exhibition built around BTS's album "Arirang".</p><p>The reservation system through Weverse is meant to manage the crowds of fans who already gather outside the HYBE building daily to take photos, even without an event running.</p>`,
+        fr: `<p>HYBE a ouvert cet espace pop-up dédié au sein de son siège de Yongsan en mars 2026, avec une exposition de lancement construite autour de l'album « Arirang » de BTS.</p><p>Le système de réservation via Weverse vise à gérer les foules de fans qui se rassemblent déjà quotidiennement devant le bâtiment HYBE pour prendre des photos, même en dehors de tout événement.</p>` },
+      tip: { en: "Book ahead — Entry requires a Weverse reservation; walk-ins are not guaranteed a spot.", fr: "Réservez à l'avance — L'entrée nécessite une réservation Weverse ; les visiteurs sans réservation ne sont pas garantis d'entrer." },
+      directions: { en: "Inside HYBE's headquarters building in Yongsan, central Seoul.", fr: "À l'intérieur du siège de HYBE, à Yongsan, au centre de Séoul." } },
+    { id: 191, name: "Leeum Museum of Art", group: "BTS", member: "Namjoon", country: "South Korea", city: "Seoul", category: "Museums", year: "2019", address: "60-16 Itaewon-ro 55-gil, Yongsan-gu, Seoul", lat: 37.5384, lng: 126.9995, img: "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=600",
+      fullDescription: { en: `<p>RM's frequent visits to Leeum — including the 2019 David Hockney solo show — are credited by Korean media with sparking the "Namjoon Tour", where fans retrace the galleries and museums he posts about on social media.</p><p>Officially recognized by South Korea's tourism board: VisitKorea's "RM's Pick: Seoul Art Tour" itinerary names Leeum among the five key stops on his art trail, alongside SeMA, Gana Art Center and the National Museum of Korea.</p>`,
+        fr: `<p>Les visites fréquentes de RM au Leeum — dont l'exposition personnelle de David Hockney en 2019 — sont créditées par les médias coréens d'avoir lancé le « Namjoon Tour », où les fans refont le parcours des galeries et musées qu'il partage sur les réseaux sociaux.</p><p>Reconnu officiellement par l'office du tourisme sud-coréen : l'itinéraire « RM's Pick: Seoul Art Tour » de VisitKorea cite le Leeum parmi les cinq étapes clés de son parcours artistique, aux côtés du SeMA, du Gana Art Center et du Musée national de Corée.</p>` },
+      tip: { en: "Don't rush — The three museum buildings each have a distinct architectural identity; budget at least 2 hours.", fr: "Prenez votre temps — Les trois bâtiments du musée ont chacun une identité architecturale distincte ; prévoyez au moins 2 heures." },
+      directions: { en: "Hangangjin Station (Line 6), Exit 1, short uphill walk.", fr: "Station Hangangjin (ligne 6), sortie 1, courte montée à pied." } },
+    { id: 192, name: "San Francisco Museum of Modern Art (SFMOMA)", group: "BTS", member: "Namjoon", country: "United States", city: "San Francisco, CA", category: "Museums", year: "2026", address: "151 Third St, San Francisco, CA 94103", lat: 37.7857, lng: -122.4011, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600",
+      fullDescription: { en: `<p>"RM x SFMOMA" is the first museum exhibition RM has personally curated, bringing works from his private collection to the US for the first time.</p><p>The show cements a reputation Korean media had already given him: the Korea Art Market's 2025 report named RM one of the 20 most influential figures in the Korean art market, calling him a "passionate art collector and cultural influencer."</p>`,
+        fr: `<p>« RM x SFMOMA » est la première exposition muséale personnellement organisée par RM, qui présente pour la première fois aux États-Unis des œuvres issues de sa collection privée.</p><p>Cette exposition confirme une réputation que les médias coréens lui attribuaient déjà : le rapport 2025 du Korea Art Market a désigné RM comme l'une des 20 personnalités les plus influentes du marché de l'art coréen, le qualifiant de « collectionneur d'art passionné et d'influenceur culturel ».</p>` },
+      tip: { en: "Plan around SF — SFMOMA sits in the SoMA district, walkable from Yerba Buena Gardens and the Contemporary Jewish Museum.", fr: "Organisez votre visite de SF — Le SFMOMA se trouve dans le quartier de SoMA, à distance de marche des Yerba Buena Gardens et du Contemporary Jewish Museum." },
+      directions: { en: "RM recorded a bilingual (English/Korean) audio guide himself and curated an in-gallery music playlist to accompany the art.", fr: "RM a lui-même enregistré un audioguide bilingue (anglais/coréen) et composé une playlist musicale pour accompagner les œuvres." } },
+    { id: 193, name: "Busan Asiad Main Stadium", group: "BTS", member: "All", country: "South Korea", city: "Busan", category: "Concerts", year: "2022", address: "344 World Cup-daero, Yeonje-gu, Busan", lat: 35.1902, lng: 129.0578, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>On October 15, 2022, BTS performed a free concert here to roughly 55,000 fans in support of Busan's bid to host the World Expo 2030, streamed globally on Weverse.</p><p>It turned out to be the group's last performance together before their military enlistment was announced just two days later, giving the show lasting significance for fans; a cinematic cut was later released worldwide as "BTS: Yet to Come in Cinemas".</p>`,
+        fr: `<p>Le 15 octobre 2022, BTS y a donné un concert gratuit devant environ 55 000 fans, en soutien à la candidature de Busan pour l'Exposition universelle 2030, retransmis dans le monde entier sur Weverse.</p><p>Ce concert s'est révélé être la dernière prestation du groupe au complet avant l'annonce de leur incorporation militaire, seulement deux jours plus tard, lui conférant une portée durable aux yeux des fans ; une version cinéma en a ensuite été tirée sous le titre « BTS: Yet to Come in Cinemas ».</p>` },
+      tip: { en: "Hometown tie — Busan is the hometown of members Jimin and Jungkook, adding to the concert's emotional weight.", fr: "Un lien avec leur ville natale — Busan est la ville natale des membres Jimin et Jungkook, ce qui ajoute à la charge émotionnelle du concert." },
+      directions: { en: "Sports Complex Station (Busan Metro Line 3).", fr: "Station Sports Complex (ligne 3 du métro de Busan)." } },
+    { id: 194, name: "Gocheok Sky Dome", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2018", address: "430 Gyeongin-ro, Gocheok-dong, Guro-gu, Seoul", lat: 37.4982, lng: 126.8672, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
+      fullDescription: { en: `<p>BTS held their 4th Muster fanmeeting here on January 13-14, 2018 — at the time their last domestic fanmeeting before the group's global explosion later that year with "Fake Love" and their first Billboard 200 No.1.</p><p>The venue's dome roof makes it one of the few Seoul venues that can host a full-scale indoor stadium show regardless of weather, and it has since hosted several other major K-pop award shows and concerts.</p>`,
+        fr: `<p>BTS y a tenu son 4e Muster, sa fan meeting, les 13 et 14 janvier 2018 — à l'époque leur dernière fan meeting nationale avant l'explosion mondiale du groupe plus tard cette année-là avec « Fake Love » et son premier n°1 au Billboard 200.</p><p>Le toit en dôme de la salle en fait l'un des rares lieux de Séoul capables d'accueillir un show de stade en intérieur quelle que soit la météo, et elle a depuis accueilli plusieurs autres grandes cérémonies et concerts k-pop.</p>` },
+      tip: { en: "Weather-proof — Unlike outdoor stadiums, the retractable dome means shows here run rain or shine.", fr: "À l'abri de la météo — Contrairement aux stades à ciel ouvert, le dôme rétractable permet aux concerts de se tenir qu'il pleuve ou qu'il vente." },
+      directions: { en: "Guil Station (Line 1) or Guro-gu Office Station (Line 2), then a short walk.", fr: "Station Guil (ligne 1) ou Guro-gu Office (ligne 2), puis une courte marche." } },
 ];
 
 // ==========================================
@@ -1703,10 +1940,16 @@ const translations = {
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
         tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
         mapLoading: "Loading map…",
+        demoTourBtn: "Tour",
         newLocationToastLabel: "New location added",
-        paywallTitle: "🔒 You've reached your free limit (3/3)", paywallBody: "Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.",
-        paywallMonthlyName: "🎟️ TRAVEL PASS (1 Month)", paywallMonthlyDesc: "Perfect for planning a short trip.", paywallFeatureFullAccess: "Full access to 500+ addresses", paywallFeatureGPS: "Exact GPS coordinates", paywallMonthlyPrice: "€9.99 / month", paywallMonthlyTerms: "No commitment", paywallBuyMonthly: "Get the Travel Pass",
-        paywallVipName: "👑 VIP PASS (Lifetime Access)", paywallVipBadge: "⭐️ BEST VALUE", paywallVipDesc: "For true fans. Pay once, enjoy forever.", paywallFeatureUpdates: "Updates included (new locations added monthly)", paywallFeatureOffline: "Offline mode (coming soon)", paywallVipPrice: "€19.99 (one-time payment)", paywallBuyVip: "Get the VIP Pass"
+        paywallTitle: "You've reached your free limit (3/3)", paywallBody: "Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.",
+        paywallMonthlyName: "TRAVEL PASS (1 Month)", paywallMonthlyDesc: "Perfect for planning a short trip.", paywallFeatureFullAccess: "Full access to 500+ addresses", paywallFeatureGPS: "Exact GPS coordinates", paywallMonthlyPrice: "€9.99 / month", paywallMonthlyTerms: "No commitment", paywallBuyMonthly: "Get the Travel Pass",
+        paywallVipName: "VIP PASS (Lifetime Access)", paywallVipBadge: "⭐️ BEST VALUE", paywallVipDesc: "For true fans. Pay once, enjoy forever.", paywallFeatureUpdates: "Updates included (new locations added monthly)", paywallFeatureOffline: "Offline mode (coming soon)", paywallVipPrice: "€19.99 (one-time payment)", paywallBuyVip: "Get the VIP Pass",
+        paywallActiveTitle: "You already have an active pass",
+        paywallActiveDescMonthly: "Your Travel Pass is active until {date}. Thanks for supporting Screen To Street!", paywallActiveDescVip: "Your VIP Pass gives you lifetime access. Thanks for supporting Screen To Street!",
+        freeViewsCounter: "{remaining}/3 free locations left",
+        paymentTitle: "Complete your purchase", paymentDesc: "Enter your payment details to unlock the full guide.", paymentSummaryLabel: "Selected pass:", paymentTotalLabel: "Total due:",
+        cardNum: "Card Number", expiry: "Expiry Date", cvc: "CVC", paySecurely: "Pay securely", processing: "Processing securely…", paymentBackLink: "← Back to map"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -1758,10 +2001,16 @@ const translations = {
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
         tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
         mapLoading: "Chargement de la carte…",
+        demoTourBtn: "Visite",
         newLocationToastLabel: "Nouveau lieu ajouté",
-        paywallTitle: "🔒 Vous avez atteint votre limite gratuite (3/3)", paywallBody: "La carte secrète vous plaît ? Il reste encore plus de 500 adresses à découvrir ! Débloquez l'intégralité des lieux de tournages, restaurants iconiques et adresses fréquentées par vos idoles pour préparer le voyage de vos rêves.",
-        paywallMonthlyName: "🎟️ PASS VOYAGE (1 Mois)", paywallMonthlyDesc: "Parfait pour planifier un séjour court.", paywallFeatureFullAccess: "Accès total aux 500+ adresses", paywallFeatureGPS: "Coordonnées GPS exactes", paywallMonthlyPrice: "9,99 € / mois", paywallMonthlyTerms: "Sans engagement", paywallBuyMonthly: "Obtenir le Pass Voyage",
-        paywallVipName: "👑 PASS VIP (Accès à vie)", paywallVipBadge: "⭐️ MEILLEUR CHOIX", paywallVipDesc: "Pour les vrais passionnés. Payez une fois, profitez-en pour toujours.", paywallFeatureUpdates: "Mises à jour incluses (nouveaux lieux ajoutés chaque mois)", paywallFeatureOffline: "Mode Hors-Ligne (bientôt disponible)", paywallVipPrice: "19,99 € (paiement unique)", paywallBuyVip: "Obtenir le Pass VIP"
+        paywallTitle: "Vous avez atteint votre limite gratuite (3/3)", paywallBody: "La carte secrète vous plaît ? Il reste encore plus de 500 adresses à découvrir ! Débloquez l'intégralité des lieux de tournages, restaurants iconiques et adresses fréquentées par vos idoles pour préparer le voyage de vos rêves.",
+        paywallMonthlyName: "PASS VOYAGE (1 Mois)", paywallMonthlyDesc: "Parfait pour planifier un séjour court.", paywallFeatureFullAccess: "Accès total aux 500+ adresses", paywallFeatureGPS: "Coordonnées GPS exactes", paywallMonthlyPrice: "9,99 € / mois", paywallMonthlyTerms: "Sans engagement", paywallBuyMonthly: "Obtenir le Pass Voyage",
+        paywallVipName: "PASS VIP (Accès à vie)", paywallVipBadge: "⭐️ MEILLEUR CHOIX", paywallVipDesc: "Pour les vrais passionnés. Payez une fois, profitez-en pour toujours.", paywallFeatureUpdates: "Mises à jour incluses (nouveaux lieux ajoutés chaque mois)", paywallFeatureOffline: "Mode Hors-Ligne (bientôt disponible)", paywallVipPrice: "19,99 € (paiement unique)", paywallBuyVip: "Obtenir le Pass VIP",
+        paywallActiveTitle: "Vous avez déjà un pass actif",
+        paywallActiveDescMonthly: "Votre Pass Voyage est actif jusqu'au {date}. Merci de soutenir Screen To Street !", paywallActiveDescVip: "Votre Pass VIP vous donne un accès à vie. Merci de soutenir Screen To Street !",
+        freeViewsCounter: "{remaining}/3 lieux gratuits restants",
+        paymentTitle: "Finaliser votre achat", paymentDesc: "Renseignez vos informations de paiement pour débloquer le guide complet.", paymentSummaryLabel: "Pass sélectionné :", paymentTotalLabel: "Total dû :",
+        cardNum: "Numéro de carte", expiry: "Date d'expiration", cvc: "CVC", paySecurely: "Payer en toute sécurité", processing: "Traitement sécurisé en cours…", paymentBackLink: "← Retour à la carte"
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -1813,10 +2062,16 @@ const translations = {
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
         mapLoading: "Cargando el mapa…",
+        demoTourBtn: "Recorrido",
         newLocationToastLabel: "Nuevo lugar añadido",
-        paywallTitle: "🔒 Has alcanzado tu límite gratuito (3/3)", paywallBody: "¿Te gusta el mapa secreto? ¡Todavía quedan más de 500 direcciones por descubrir! Desbloquea todos los lugares de rodaje, restaurantes icónicos y direcciones que frecuentan tus ídolos para preparar el viaje de tus sueños.",
-        paywallMonthlyName: "🎟️ PASE VIAJE (1 Mes)", paywallMonthlyDesc: "Perfecto para planificar una estancia corta.", paywallFeatureFullAccess: "Acceso total a más de 500 direcciones", paywallFeatureGPS: "Coordenadas GPS exactas", paywallMonthlyPrice: "9,99 € / mes", paywallMonthlyTerms: "Sin compromiso", paywallBuyMonthly: "Obtener el Pase Viaje",
-        paywallVipName: "👑 PASE VIP (Acceso de por vida)", paywallVipBadge: "⭐️ MEJOR OPCIÓN", paywallVipDesc: "Para los verdaderos fans. Paga una vez, disfruta para siempre.", paywallFeatureUpdates: "Actualizaciones incluidas (nuevos lugares cada mes)", paywallFeatureOffline: "Modo sin conexión (próximamente)", paywallVipPrice: "19,99 € (pago único)", paywallBuyVip: "Obtener el Pase VIP"
+        paywallTitle: "Has alcanzado tu límite gratuito (3/3)", paywallBody: "¿Te gusta el mapa secreto? ¡Todavía quedan más de 500 direcciones por descubrir! Desbloquea todos los lugares de rodaje, restaurantes icónicos y direcciones que frecuentan tus ídolos para preparar el viaje de tus sueños.",
+        paywallMonthlyName: "PASE VIAJE (1 Mes)", paywallMonthlyDesc: "Perfecto para planificar una estancia corta.", paywallFeatureFullAccess: "Acceso total a más de 500 direcciones", paywallFeatureGPS: "Coordenadas GPS exactas", paywallMonthlyPrice: "9,99 € / mes", paywallMonthlyTerms: "Sin compromiso", paywallBuyMonthly: "Obtener el Pase Viaje",
+        paywallVipName: "PASE VIP (Acceso de por vida)", paywallVipBadge: "⭐️ MEJOR OPCIÓN", paywallVipDesc: "Para los verdaderos fans. Paga una vez, disfruta para siempre.", paywallFeatureUpdates: "Actualizaciones incluidas (nuevos lugares cada mes)", paywallFeatureOffline: "Modo sin conexión (próximamente)", paywallVipPrice: "19,99 € (pago único)", paywallBuyVip: "Obtener el Pase VIP",
+        paywallActiveTitle: "Ya tienes un pase activo",
+        paywallActiveDescMonthly: "Tu Pase Viaje está activo hasta el {date}. ¡Gracias por apoyar a Screen To Street!", paywallActiveDescVip: "Tu Pase VIP te da acceso de por vida. ¡Gracias por apoyar a Screen To Street!",
+        freeViewsCounter: "{remaining}/3 lugares gratuitos restantes",
+        paymentTitle: "Finaliza tu compra", paymentDesc: "Introduce tus datos de pago para desbloquear la guía completa.", paymentSummaryLabel: "Pase seleccionado:", paymentTotalLabel: "Total a pagar:",
+        cardNum: "Número de tarjeta", expiry: "Fecha de caducidad", cvc: "CVC", paySecurely: "Pagar de forma segura", processing: "Procesando de forma segura…", paymentBackLink: "← Volver al mapa"
     },
     it: {
         btnGenerateIti: "Generatore di Itinerari", filterGroup: "GRUPPO", filterMember: "MEMBRO", filterArea: "ZONA", filterYear: "ANNO", filterCategories: "CATEGORIE",
@@ -1868,10 +2123,16 @@ const translations = {
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
         tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
         mapLoading: "Caricamento della mappa…",
+        demoTourBtn: "Tour",
         newLocationToastLabel: "Nuovo luogo aggiunto",
-        paywallTitle: "🔒 Hai raggiunto il tuo limite gratuito (3/3)", paywallBody: "Ti piace la mappa segreta? Ci sono ancora più di 500 indirizzi da scoprire! Sblocca tutti i luoghi delle riprese, i ristoranti iconici e gli indirizzi frequentati dai tuoi idoli per preparare il viaggio dei tuoi sogni.",
-        paywallMonthlyName: "🎟️ PASS VIAGGIO (1 Mese)", paywallMonthlyDesc: "Perfetto per pianificare un soggiorno breve.", paywallFeatureFullAccess: "Accesso completo a oltre 500 indirizzi", paywallFeatureGPS: "Coordinate GPS esatte", paywallMonthlyPrice: "9,99 € / mese", paywallMonthlyTerms: "Senza vincoli", paywallBuyMonthly: "Ottieni il Pass Viaggio",
-        paywallVipName: "👑 PASS VIP (Accesso a vita)", paywallVipBadge: "⭐️ SCELTA MIGLIORE", paywallVipDesc: "Per i veri appassionati. Paga una volta, goditelo per sempre.", paywallFeatureUpdates: "Aggiornamenti inclusi (nuovi luoghi ogni mese)", paywallFeatureOffline: "Modalità offline (presto disponibile)", paywallVipPrice: "19,99 € (pagamento unico)", paywallBuyVip: "Ottieni il Pass VIP"
+        paywallTitle: "Hai raggiunto il tuo limite gratuito (3/3)", paywallBody: "Ti piace la mappa segreta? Ci sono ancora più di 500 indirizzi da scoprire! Sblocca tutti i luoghi delle riprese, i ristoranti iconici e gli indirizzi frequentati dai tuoi idoli per preparare il viaggio dei tuoi sogni.",
+        paywallMonthlyName: "PASS VIAGGIO (1 Mese)", paywallMonthlyDesc: "Perfetto per pianificare un soggiorno breve.", paywallFeatureFullAccess: "Accesso completo a oltre 500 indirizzi", paywallFeatureGPS: "Coordinate GPS esatte", paywallMonthlyPrice: "9,99 € / mese", paywallMonthlyTerms: "Senza vincoli", paywallBuyMonthly: "Ottieni il Pass Viaggio",
+        paywallVipName: "PASS VIP (Accesso a vita)", paywallVipBadge: "⭐️ SCELTA MIGLIORE", paywallVipDesc: "Per i veri appassionati. Paga una volta, goditelo per sempre.", paywallFeatureUpdates: "Aggiornamenti inclusi (nuovi luoghi ogni mese)", paywallFeatureOffline: "Modalità offline (presto disponibile)", paywallVipPrice: "19,99 € (pagamento unico)", paywallBuyVip: "Ottieni il Pass VIP",
+        paywallActiveTitle: "Hai già un pass attivo",
+        paywallActiveDescMonthly: "Il tuo Pass Viaggio è attivo fino al {date}. Grazie per sostenere Screen To Street!", paywallActiveDescVip: "Il tuo Pass VIP ti dà accesso a vita. Grazie per sostenere Screen To Street!",
+        freeViewsCounter: "{remaining}/3 luoghi gratuiti rimasti",
+        paymentTitle: "Completa il tuo acquisto", paymentDesc: "Inserisci i tuoi dati di pagamento per sbloccare la guida completa.", paymentSummaryLabel: "Pass selezionato:", paymentTotalLabel: "Totale dovuto:",
+        cardNum: "Numero carta", expiry: "Data di scadenza", cvc: "CVC", paySecurely: "Paga in sicurezza", processing: "Elaborazione sicura in corso…", paymentBackLink: "← Torna alla mappa"
     },
     pt: {
         btnGenerateIti: "Gerador de Roteiros", filterGroup: "GRUPO", filterMember: "MEMBRO", filterArea: "REGIÃO", filterYear: "ANO", filterCategories: "CATEGORIAS",
@@ -1923,10 +2184,16 @@ const translations = {
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
         mapLoading: "Carregando o mapa…",
+        demoTourBtn: "Tour guiado",
         newLocationToastLabel: "Novo local adicionado",
-        paywallTitle: "🔒 Você atingiu seu limite gratuito (3/3)", paywallBody: "Está gostando do mapa secreto? Ainda há mais de 500 endereços para descobrir! Desbloqueie todos os locais de filmagem, restaurantes icônicos e endereços frequentados pelos seus ídolos para planejar a viagem dos seus sonhos.",
-        paywallMonthlyName: "🎟️ PASSE VIAGEM (1 Mês)", paywallMonthlyDesc: "Perfeito para planejar uma estadia curta.", paywallFeatureFullAccess: "Acesso total a mais de 500 endereços", paywallFeatureGPS: "Coordenadas GPS exatas", paywallMonthlyPrice: "€9,99 / mês", paywallMonthlyTerms: "Sem compromisso", paywallBuyMonthly: "Obter o Passe Viagem",
-        paywallVipName: "👑 PASSE VIP (Acesso vitalício)", paywallVipBadge: "⭐️ MELHOR ESCOLHA", paywallVipDesc: "Para os verdadeiros fãs. Pague uma vez, aproveite para sempre.", paywallFeatureUpdates: "Atualizações incluídas (novos locais todo mês)", paywallFeatureOffline: "Modo offline (em breve)", paywallVipPrice: "€19,99 (pagamento único)", paywallBuyVip: "Obter o Passe VIP"
+        paywallTitle: "Você atingiu seu limite gratuito (3/3)", paywallBody: "Está gostando do mapa secreto? Ainda há mais de 500 endereços para descobrir! Desbloqueie todos os locais de filmagem, restaurantes icônicos e endereços frequentados pelos seus ídolos para planejar a viagem dos seus sonhos.",
+        paywallMonthlyName: "PASSE VIAGEM (1 Mês)", paywallMonthlyDesc: "Perfeito para planejar uma estadia curta.", paywallFeatureFullAccess: "Acesso total a mais de 500 endereços", paywallFeatureGPS: "Coordenadas GPS exatas", paywallMonthlyPrice: "€9,99 / mês", paywallMonthlyTerms: "Sem compromisso", paywallBuyMonthly: "Obter o Passe Viagem",
+        paywallVipName: "PASSE VIP (Acesso vitalício)", paywallVipBadge: "⭐️ MELHOR ESCOLHA", paywallVipDesc: "Para os verdadeiros fãs. Pague uma vez, aproveite para sempre.", paywallFeatureUpdates: "Atualizações incluídas (novos locais todo mês)", paywallFeatureOffline: "Modo offline (em breve)", paywallVipPrice: "€19,99 (pagamento único)", paywallBuyVip: "Obter o Passe VIP",
+        paywallActiveTitle: "Você já tem um passe ativo",
+        paywallActiveDescMonthly: "Seu Passe Viagem está ativo até {date}. Obrigado por apoiar o Screen To Street!", paywallActiveDescVip: "Seu Passe VIP te dá acesso vitalício. Obrigado por apoiar o Screen To Street!",
+        freeViewsCounter: "{remaining}/3 locais gratuitos restantes",
+        paymentTitle: "Finalize sua compra", paymentDesc: "Insira seus dados de pagamento para desbloquear o guia completo.", paymentSummaryLabel: "Passe selecionado:", paymentTotalLabel: "Total devido:",
+        cardNum: "Número do cartão", expiry: "Data de validade", cvc: "CVC", paySecurely: "Pagar com segurança", processing: "Processando com segurança…", paymentBackLink: "← Voltar ao mapa"
     },
     ko: {
         btnGenerateIti: "자동 일정 생성기", filterGroup: "그룹", filterMember: "멤버", filterArea: "지역", filterYear: "연도", filterCategories: "카테고리",
@@ -1978,10 +2245,16 @@ const translations = {
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
         tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
         mapLoading: "지도를 불러오는 중…",
+        demoTourBtn: "투어",
         newLocationToastLabel: "새로운 장소 추가됨",
-        paywallTitle: "🔒 무료 열람 한도에 도달했습니다 (3/3)", paywallBody: "비밀 지도가 마음에 드시나요? 아직 500개 이상의 주소가 더 남아있어요! 촬영지, 인기 맛집, 그리고 아이돌이 자주 찾는 장소까지 모두 잠금 해제하고 꿈꾸던 여행을 준비해 보세요.",
-        paywallMonthlyName: "🎟️ 트래블 패스 (1개월)", paywallMonthlyDesc: "짧은 여행 계획에 딱이에요.", paywallFeatureFullAccess: "500개 이상 주소 전체 이용 가능", paywallFeatureGPS: "정확한 GPS 좌표", paywallMonthlyPrice: "월 9.99€", paywallMonthlyTerms: "약정 없음", paywallBuyMonthly: "트래블 패스 구매",
-        paywallVipName: "👑 VIP 패스 (평생 이용)", paywallVipBadge: "⭐️ 최고의 선택", paywallVipDesc: "진짜 팬을 위한 패스. 한 번 결제로 평생 이용하세요.", paywallFeatureUpdates: "업데이트 포함 (매달 새로운 장소 추가)", paywallFeatureOffline: "오프라인 모드 (출시 예정)", paywallVipPrice: "19.99€ (일회성 결제)", paywallBuyVip: "VIP 패스 구매"
+        paywallTitle: "무료 열람 한도에 도달했습니다 (3/3)", paywallBody: "비밀 지도가 마음에 드시나요? 아직 500개 이상의 주소가 더 남아있어요! 촬영지, 인기 맛집, 그리고 아이돌이 자주 찾는 장소까지 모두 잠금 해제하고 꿈꾸던 여행을 준비해 보세요.",
+        paywallMonthlyName: "트래블 패스 (1개월)", paywallMonthlyDesc: "짧은 여행 계획에 딱이에요.", paywallFeatureFullAccess: "500개 이상 주소 전체 이용 가능", paywallFeatureGPS: "정확한 GPS 좌표", paywallMonthlyPrice: "월 9.99€", paywallMonthlyTerms: "약정 없음", paywallBuyMonthly: "트래블 패스 구매",
+        paywallVipName: "VIP 패스 (평생 이용)", paywallVipBadge: "⭐️ 최고의 선택", paywallVipDesc: "진짜 팬을 위한 패스. 한 번 결제로 평생 이용하세요.", paywallFeatureUpdates: "업데이트 포함 (매달 새로운 장소 추가)", paywallFeatureOffline: "오프라인 모드 (출시 예정)", paywallVipPrice: "19.99€ (일회성 결제)", paywallBuyVip: "VIP 패스 구매",
+        paywallActiveTitle: "이미 이용 중인 패스가 있습니다",
+        paywallActiveDescMonthly: "트래블 패스가 {date}까지 활성화되어 있습니다. Screen To Street를 응원해 주셔서 감사합니다!", paywallActiveDescVip: "VIP 패스로 평생 이용이 가능합니다. Screen To Street를 응원해 주셔서 감사합니다!",
+        freeViewsCounter: "무료 열람 {remaining}/3곳 남음",
+        paymentTitle: "결제 완료하기", paymentDesc: "전체 가이드를 이용하려면 결제 정보를 입력하세요.", paymentSummaryLabel: "선택한 패스:", paymentTotalLabel: "결제 금액:",
+        cardNum: "카드 번호", expiry: "유효 기간", cvc: "CVC", paySecurely: "안전하게 결제하기", processing: "안전하게 처리 중…", paymentBackLink: "← 지도로 돌아가기"
     },
     ja: {
         btnGenerateIti: "自動旅程ジェネレーター", filterGroup: "グループ", filterMember: "メンバー", filterArea: "エリア", filterYear: "年", filterCategories: "カテゴリー",
@@ -2033,10 +2306,16 @@ const translations = {
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
         tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
         mapLoading: "地図を読み込み中…",
+        demoTourBtn: "ツアー",
         newLocationToastLabel: "新しい場所が追加されました",
-        paywallTitle: "🔒 無料閲覧の上限に達しました (3/3)", paywallBody: "シークレットマップは気に入りましたか？まだ500件以上の住所が残っています！ロケ地、人気レストラン、推しがよく訪れる場所をすべて解放して、夢の旅行を計画しましょう。",
-        paywallMonthlyName: "🎟️ トラベルパス（1ヶ月）", paywallMonthlyDesc: "短期旅行の計画にぴったり。", paywallFeatureFullAccess: "500件以上の住所に完全アクセス", paywallFeatureGPS: "正確なGPS座標", paywallMonthlyPrice: "月額 9.99€", paywallMonthlyTerms: "契約縛りなし", paywallBuyMonthly: "トラベルパスを購入",
-        paywallVipName: "👑 VIPパス（生涯アクセス）", paywallVipBadge: "⭐️ ベストチョイス", paywallVipDesc: "本気のファンのために。一度の支払いでずっと利用できます。", paywallFeatureUpdates: "アップデート込み（毎月新しい場所を追加）", paywallFeatureOffline: "オフラインモード（近日公開）", paywallVipPrice: "19.99€（一括払い）", paywallBuyVip: "VIPパスを購入"
+        paywallTitle: "無料閲覧の上限に達しました (3/3)", paywallBody: "シークレットマップは気に入りましたか？まだ500件以上の住所が残っています！ロケ地、人気レストラン、推しがよく訪れる場所をすべて解放して、夢の旅行を計画しましょう。",
+        paywallMonthlyName: "トラベルパス（1ヶ月）", paywallMonthlyDesc: "短期旅行の計画にぴったり。", paywallFeatureFullAccess: "500件以上の住所に完全アクセス", paywallFeatureGPS: "正確なGPS座標", paywallMonthlyPrice: "月額 9.99€", paywallMonthlyTerms: "契約縛りなし", paywallBuyMonthly: "トラベルパスを購入",
+        paywallVipName: "VIPパス（生涯アクセス）", paywallVipBadge: "⭐️ ベストチョイス", paywallVipDesc: "本気のファンのために。一度の支払いでずっと利用できます。", paywallFeatureUpdates: "アップデート込み（毎月新しい場所を追加）", paywallFeatureOffline: "オフラインモード（近日公開）", paywallVipPrice: "19.99€（一括払い）", paywallBuyVip: "VIPパスを購入",
+        paywallActiveTitle: "すでに有効なパスをお持ちです",
+        paywallActiveDescMonthly: "トラベルパスは{date}まで有効です。Screen To Streetを応援いただきありがとうございます！", paywallActiveDescVip: "VIPパスで生涯アクセスが可能です。Screen To Streetを応援いただきありがとうございます！",
+        freeViewsCounter: "無料閲覧 残り{remaining}/3件",
+        paymentTitle: "お支払いを完了する", paymentDesc: "ガイド全体を利用するにはお支払い情報を入力してください。", paymentSummaryLabel: "選択したパス：", paymentTotalLabel: "お支払い金額：",
+        cardNum: "カード番号", expiry: "有効期限", cvc: "CVC", paySecurely: "安全に支払う", processing: "安全に処理中…", paymentBackLink: "← 地図に戻る"
     },
     zh: {
         btnGenerateIti: "自动行程生成器", filterGroup: "团体", filterMember: "成员", filterArea: "地区", filterYear: "年份", filterCategories: "分类",
@@ -2088,10 +2367,16 @@ const translations = {
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
         tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
         mapLoading: "地图加载中…",
+        demoTourBtn: "导览",
         newLocationToastLabel: "新增地点",
-        paywallTitle: "🔒 已达到免费浏览上限 (3/3)", paywallBody: "喜欢这份秘密地图吗？还有500多个地址等你发现！解锁全部取景地、人气餐厅和爱豆常去的地方，规划你的梦想之旅。",
-        paywallMonthlyName: "🎟️ 旅行通行证（1个月）", paywallMonthlyDesc: "适合规划短途旅行。", paywallFeatureFullAccess: "解锁全部500+地址", paywallFeatureGPS: "精确GPS坐标", paywallMonthlyPrice: "€9.99 / 月", paywallMonthlyTerms: "随时可取消", paywallBuyMonthly: "获取旅行通行证",
-        paywallVipName: "👑 VIP通行证（终身访问）", paywallVipBadge: "⭐️ 最超值", paywallVipDesc: "为真正的粉丝打造。一次付款，永久使用。", paywallFeatureUpdates: "包含更新（每月新增地点）", paywallFeatureOffline: "离线模式（即将推出）", paywallVipPrice: "€19.99（一次性付款）", paywallBuyVip: "获取VIP通行证"
+        paywallTitle: "已达到免费浏览上限 (3/3)", paywallBody: "喜欢这份秘密地图吗？还有500多个地址等你发现！解锁全部取景地、人气餐厅和爱豆常去的地方，规划你的梦想之旅。",
+        paywallMonthlyName: "旅行通行证（1个月）", paywallMonthlyDesc: "适合规划短途旅行。", paywallFeatureFullAccess: "解锁全部500+地址", paywallFeatureGPS: "精确GPS坐标", paywallMonthlyPrice: "€9.99 / 月", paywallMonthlyTerms: "随时可取消", paywallBuyMonthly: "获取旅行通行证",
+        paywallVipName: "VIP通行证（终身访问）", paywallVipBadge: "⭐️ 最超值", paywallVipDesc: "为真正的粉丝打造。一次付款，永久使用。", paywallFeatureUpdates: "包含更新（每月新增地点）", paywallFeatureOffline: "离线模式（即将推出）", paywallVipPrice: "€19.99（一次性付款）", paywallBuyVip: "获取VIP通行证",
+        paywallActiveTitle: "您已拥有有效的通行证",
+        paywallActiveDescMonthly: "您的旅行通行证有效期至{date}。感谢您支持 Screen To Street！", paywallActiveDescVip: "您的VIP通行证享有终身访问权限。感谢您支持 Screen To Street！",
+        freeViewsCounter: "剩余免费地点 {remaining}/3",
+        paymentTitle: "完成购买", paymentDesc: "输入您的支付信息以解锁完整指南。", paymentSummaryLabel: "已选通行证：", paymentTotalLabel: "应付总额：",
+        cardNum: "卡号", expiry: "有效期", cvc: "CVC", paySecurely: "安全支付", processing: "正在安全处理…", paymentBackLink: "← 返回地图"
     }
 };
 
@@ -2185,6 +2470,7 @@ function updateUI() {
 
     if (typeof window.initTourModeBadge === 'function') window.initTourModeBadge();
     if (typeof window.refreshTourModeLanguage === 'function') window.refreshTourModeLanguage();
+    if (typeof window.updateFreeViewsCounter === 'function') window.updateFreeViewsCounter();
 }
 
 window.openItineraryModal = function() {
@@ -2346,7 +2632,14 @@ function initializeFilters() {
     }
 }
 
-function renderLocations() {
+// `skipFitBounds` : au tout premier rendu après connexion (voir map.html), on ne veut
+// SURTOUT PAS que la carte se recadre sur l'étendue de TOUS les lieux affichés (Corée,
+// Japon, USA, Europe...) — ça écrasait immédiatement le centrage sur le pays choisi à
+// l'inscription par une vue dézoomée sur le monde entier, ce qui était la vraie cause du
+// "la carte ne zoome pas sur mon pays" / "grandes zones grises" remontés plusieurs fois.
+// Tous les autres appels (changement de filtre, recherche...) gardent le comportement
+// habituel : recadrer sur ce qui est maintenant affiché.
+function renderLocations(skipFitBounds) {
     const groupSelect = document.getElementById('group-select');
     const memberSelect = document.getElementById('member-select');
     const yearSelect = document.getElementById('year-select');
@@ -2411,7 +2704,7 @@ function renderLocations() {
         locationListElement.appendChild(card);
     });
 
-    renderMapMarkers(filteredLocations, { fitBounds: true });
+    renderMapMarkers(filteredLocations, { fitBounds: !skipFitBounds });
 }
 
 // ==========================================
@@ -2972,11 +3265,13 @@ window.openDetailsPanel = function(id) {
             if (viewed.length >= FREE_LOCATION_VIEW_LIMIT) {
                 window.__pendingPaywallLocId = id;
                 window.openGuidePaywallModal();
+                updateFreeViewsCounter();
                 return;
             }
             viewed.push(id);
             localStorage.setItem('viewedLocationIds', JSON.stringify(viewed));
             if (typeof window.syncUserData === 'function') window.syncUserData({ viewedLocationIds: viewed });
+            updateFreeViewsCounter();
         }
     }
 
@@ -3337,9 +3632,13 @@ window.closeDetailsPanel = function() {
     const topTabs = document.querySelector('.sidebar-top-tabs');
     if(topTabs) topTabs.style.display = 'flex';
 
+    // On retire aussi "open" (pas seulement "expanded") : sur mobile, ouvrir la fiche d'un
+    // lieu force la sidebar en plein écran (voir openDetailsPanel plus haut) — sans ce
+    // retrait, fermer la fiche laissait la sidebar bloquée en plein écran par-dessus la
+    // carte (et, dans le guide de démo, par-dessus le menu profil des étapes suivantes).
     const sidebar = document.getElementById('app-sidebar');
-    if(sidebar) sidebar.classList.remove('expanded'); 
-    
+    if(sidebar) { sidebar.classList.remove('expanded'); sidebar.classList.remove('open'); }
+
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     
@@ -3588,6 +3887,23 @@ const ITI_CATEGORY_PROFILE = {
 const ITI_DEFAULT_PROFILE = { openHour: 9, closeHour: 19, visitMinutes: 45 };
 function getCategoryProfile(cat) { return ITI_CATEGORY_PROFILE[cat] || ITI_DEFAULT_PROFILE; }
 
+// La catégorie seule ne suffit pas : certains lieux ne sont pas de simples arrêts de
+// quelques dizaines de minutes mais des destinations à part entière où l'on passe
+// naturellement une demi-journée, voire la journée complète (un parc à thème classé "Run
+// BTS" au même titre qu'un café de quartier, par exemple). On les repère par mots-clés
+// dans leur nom plutôt que d'exiger un champ dédié sur chacune des dizaines de lieux —
+// et un lieu peut toujours définir son propre "visitMinutes" pour un cas particulier.
+const ITI_FULL_DAY_KEYWORDS = ['lotte world', 'everland', 'caribbean bay', 'universal studios', 'disneyland', 'disney world', 'ocean park', 'seoul land', 'e-world', 'wolmi'];
+const ITI_HALF_DAY_KEYWORDS = ['folk village', 'hanok village', 'zoo', 'aquarium', 'theme park', 'amusement park', 'national park', 'botanical garden', 'water park', 'safari'];
+function getLocationVisitProfile(loc) {
+    const base = getCategoryProfile(loc.category);
+    if (typeof loc.visitMinutes === 'number') return Object.assign({}, base, { visitMinutes: loc.visitMinutes });
+    const name = (loc.name || '').toLowerCase();
+    if (ITI_FULL_DAY_KEYWORDS.some(k => name.includes(k))) return Object.assign({}, base, { visitMinutes: 480 });
+    if (ITI_HALF_DAY_KEYWORDS.some(k => name.includes(k))) return Object.assign({}, base, { visitMinutes: 180 });
+    return base;
+}
+
 // Constantes de planification partagées par l'Auto-Itinerary Generator ET par My Trips
 // (voir computeDayTimeline / buildDayPlans juste en dessous) : la journée démarre à
 // 9h30, ne dépasse jamais 20h, et une pause déjeuner d'1h s'insère automatiquement la
@@ -3611,7 +3927,7 @@ function computeDayTimeline(dayLocs, homeBase) {
     let lunchTaken = false;
     let prevPoint = homeBase || null;
     dayLocs.forEach(loc => {
-        const profile = getCategoryProfile(loc.category);
+        const profile = getLocationVisitProfile(loc);
         let arrival = curTime;
         let leg = null;
         if (prevPoint) {

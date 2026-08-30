@@ -6,7 +6,7 @@
 <title>Screen To Street — Your Account</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260830">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
 a{text-decoration:none;}
@@ -244,15 +244,27 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 <!-- Modal Panier (Cart) — identique à celui de map.html -->
 <!-- Paywall "Pass Guide" (30/08/2026) : plus jamais "débloquer un groupe/artiste" — les
      deux pass ci-dessous débloquent le GUIDE dans son ensemble. -->
+<!-- Paywall "Pass Guide" (30/08/2026) : plus jamais "débloquer un groupe/artiste" — les
+     deux pass ci-dessous débloquent le GUIDE dans son ensemble. Déclenché soit
+     manuellement (bouton "Unlock Passes" du header), soit automatiquement après la 3e
+     fiche lieu consultée gratuitement (voir openDetailsPanel() dans script.js). Le
+     contenu change si la personne a déjà un pass actif (voir openGuidePaywallModal()) :
+     plus de message "limite atteinte" ni d'offres, juste une confirmation. -->
 <div id="cart-modal" class="modal hidden">
     <div class="modal-content paywall-modal-content">
         <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
-        <h2 class="paywall-title" data-i18n="paywallTitle">🔒 You've reached your free limit (3/3)</h2>
-        <p class="paywall-body" data-i18n="paywallBody">Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.</p>
+        <div id="paywall-limit-block">
+            <h2 class="paywall-title" data-i18n="paywallTitle">You've reached your free limit (3/3)</h2>
+            <p class="paywall-body" data-i18n="paywallBody">Loving the secret map? There are still 500+ addresses left to discover! Unlock every filming location, iconic restaurant, and address your idols frequent to plan the trip of your dreams.</p>
+        </div>
+        <div id="paywall-active-block" class="hidden">
+            <h2 class="paywall-title" data-i18n="paywallActiveTitle">You already have an active pass</h2>
+            <p class="paywall-body" id="paywall-active-desc"></p>
+        </div>
 
-        <div class="paywall-cards">
+        <div class="paywall-cards" id="paywall-cards">
             <div class="paywall-card">
-                <div class="paywall-card-name" data-i18n="paywallMonthlyName">🎟️ TRAVEL PASS (1 Month)</div>
+                <div class="paywall-card-name" data-i18n="paywallMonthlyName">TRAVEL PASS (1 Month)</div>
                 <div class="paywall-card-desc" data-i18n="paywallMonthlyDesc">Perfect for planning a short trip.</div>
                 <ul class="paywall-features">
                     <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
@@ -260,11 +272,11 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
                 </ul>
                 <div class="paywall-price" data-i18n="paywallMonthlyPrice">€9.99 / month</div>
                 <div class="paywall-terms" data-i18n="paywallMonthlyTerms">No commitment</div>
-                <button type="button" class="paywall-buy-btn" onclick="buyGuidePass('monthly')" data-i18n="paywallBuyMonthly">Get the Travel Pass</button>
+                <button type="button" class="paywall-buy-btn" onclick="window.location.href='payment.html?plan=monthly'" data-i18n="paywallBuyMonthly">Get the Travel Pass</button>
             </div>
             <div class="paywall-card paywall-card-vip">
                 <div class="paywall-vip-badge" data-i18n="paywallVipBadge">⭐️ BEST VALUE</div>
-                <div class="paywall-card-name" data-i18n="paywallVipName">👑 VIP PASS (Lifetime Access)</div>
+                <div class="paywall-card-name" data-i18n="paywallVipName">VIP PASS (Lifetime Access)</div>
                 <div class="paywall-card-desc" data-i18n="paywallVipDesc">For true fans. Pay once, enjoy forever.</div>
                 <ul class="paywall-features">
                     <li>✔️ <span data-i18n="paywallFeatureFullAccess">Full access to 500+ addresses</span></li>
@@ -273,15 +285,15 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
                     <li>✔️ <span data-i18n="paywallFeatureOffline">Offline mode (coming soon)</span></li>
                 </ul>
                 <div class="paywall-price" data-i18n="paywallVipPrice">€19.99 (one-time payment)</div>
-                <button type="button" class="paywall-buy-btn paywall-buy-btn-vip" onclick="buyGuidePass('lifetime')" data-i18n="paywallBuyVip">Get the VIP Pass</button>
+                <button type="button" class="paywall-buy-btn paywall-buy-btn-vip" onclick="window.location.href='payment.html?plan=lifetime'" data-i18n="paywallBuyVip">Get the VIP Pass</button>
             </div>
         </div>
     </div>
 </div>
 
-<script type="module" src="firebase-init.js"></script>
-<script src="countries.js"></script>
-<script src="script.js"></script>
+<script type="module" src="firebase-init.js?v=20260830"></script>
+<script src="countries.js?v=20260830"></script>
+<script src="script.js?v=20260830"></script>
 <script>
     // NOTE : l'ouverture/fermeture des menus (langue, compte) est gérée uniquement par
     // script.js (un seul gestionnaire d'événement par bouton, pas de double binding).
