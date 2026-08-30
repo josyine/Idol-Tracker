@@ -1,23 +1,17 @@
 // ==========================================
 // MODE TOURNÉE EN DIRECT (Tour Mode)
 // ==========================================
-// Gère le badge (toujours visible sur la carte) et le panneau détaillé qu'il ouvre.
-// S'appuie sur TOUR_MODE_DATA / MEMBER_EVENTS_DATA / getCurrentTourStop() /
-// getCurrentMemberEvent() / getTourStopStatus() définis dans script.js (chargé avant ce
-// fichier). Purement informatif et public : aucune donnée liée à un compte, donc affiché
-// à l'identique en mode démo et pour un compte réel.
+// Gère le badge (toujours visible sur la carte) et le panneau plein écran qu'il ouvre :
+// une carte décorative à gauche (route + étapes numérotées) et un rail clair à droite
+// (sélecteur de tournée, liste complète des étapes, détail de l'étape sélectionnée,
+// navigation précédent/suivant). S'appuie sur TOUR_MODE_DATA / MEMBER_EVENTS_DATA /
+// getCurrentTourStop() / getCurrentMemberEvent() / getTourStopStatus() définis dans
+// script.js (chargé avant ce fichier). Purement informatif et public : aucune donnée
+// liée à un compte, donc affiché à l'identique en mode démo et pour un compte réel.
 //
-// Le panneau affiche une fenêtre glissante de 5 étapes maximum (2 avant, l'étape
-// affichée, 2 après) plutôt que les 34 arrêts d'un coup — la tournée réelle est bien trop
-// longue pour tenir sur une seule route lisible. Naviguer précédent/suivant fait glisser
-// cette fenêtre. Le sélecteur "Choisir une tournée" liste les tournées disponibles dans
-// TOUR_MODE_DATA (une seule pour l'instant) — prêt à en accueillir d'autres plus tard sans
-// changement de structure.
-//
-// Priorité d'affichage du badge : un événement solo d'un membre (ex: Jimin en fashion
-// week) prime sur la tournée du groupe, car c'est l'info la plus spécifique du moment.
-// Si rien n'est en cours, le badge reste visible mais affiche un libellé générique
-// ("Tournée"/"Tour") — cliquer dessus ouvre quand même le calendrier complet.
+// À l'ouverture, l'étape affichée par défaut est la PROCHAINE à venir (celle en cours si
+// une l'est déjà, sinon la suivante) — jamais un arrêt déjà passé au hasard. Si la
+// tournée est entièrement terminée, on retombe sur sa toute première étape.
 (function () {
     let currentStopIndex = 0;
 
@@ -39,66 +33,100 @@
         return `${joined}, ${groups[groups.length - 1].year}`;
     }
 
-    // Fenêtre de 5 arrêts maximum centrée sur `current`, bornée aux limites du tableau.
-    function windowIndices(current, total) {
-        const size = Math.min(5, total);
-        let start = current - Math.floor((size - 1) / 2);
-        start = Math.max(0, Math.min(start, total - size));
-        return Array.from({ length: size }, (_, i) => start + i);
-    }
-
-    function routePoints() {
+    // La première étape non terminée (en cours, ou à venir) — jamais un arrêt déjà passé.
+    // Si la tournée entière est terminée, on retombe sur la toute première étape.
+    function getDefaultStopIndex() {
         const stops = TOUR_MODE_DATA.stops;
         const now = getTourNow();
-        const idxs = windowIndices(currentStopIndex, stops.length);
-        const padX = 70, w = 700 - padX * 2, baseY = 95, amp = 30;
-        return idxs.map((stopIdx, j) => ({
-            stopIdx,
-            x: idxs.length === 1 ? 350 : padX + (w * j) / (idxs.length - 1),
-            y: baseY + amp * Math.sin(j * 2.4),
-            status: getTourStopStatus(stops[stopIdx], now)
-        }));
+        const idx = stops.findIndex(s => getTourStopStatus(s, now) !== 'done');
+        return idx === -1 ? 0 : idx;
     }
 
-    function renderRoute() {
-        const svg = document.getElementById('tour-mode-route-svg');
-        if (!svg) return;
-        const points = routePoints();
+    // Dispose tous les arrêts en "serpentin" (lignes successives, sens alterné) sur le
+    // canevas de la carte — purement décoratif, pas une projection géographique réelle
+    // (avec 34 étapes sur 5 continents, une vraie projection serait illisible).
+    function routeLayout() {
+        const stops = TOUR_MODE_DATA.stops;
+        const n = stops.length;
+        const w = 760, h = 620, marginX = 60, marginY = 70;
+        const perRow = Math.min(n, 6);
+        const rows = Math.ceil(n / perRow);
+        const colGap = perRow > 1 ? (w - marginX * 2) / (perRow - 1) : 0;
+        const rowGap = rows > 1 ? (h - marginY * 2) / (rows - 1) : 0;
+        return stops.map((stop, i) => {
+            const row = Math.floor(i / perRow);
+            let col = i % perRow;
+            if (row % 2 === 1) col = perRow - 1 - col;
+            return { x: marginX + col * colGap, y: marginY + row * rowGap, status: getTourStopStatus(stop, getTourNow()) };
+        });
+    }
 
-        let d = `M ${points[0].x} ${points[0].y}`;
-        for (let k = 1; k < points.length; k++) {
-            const p0 = points[k - 1], p1 = points[k];
+    function pathD(pts) {
+        if (pts.length < 2) return '';
+        let d = `M ${pts[0].x} ${pts[0].y}`;
+        for (let k = 1; k < pts.length; k++) {
+            const p0 = pts[k - 1], p1 = pts[k];
             const midX = (p0.x + p1.x) / 2;
             d += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`;
         }
-        let html = `<path d="${d}" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="1 8" stroke-linecap="round"/>`;
+        return d;
+    }
 
-        points.forEach(p => {
-            const stop = TOUR_MODE_DATA.stops[p.stopIdx];
-            const isCurrent = p.stopIdx === currentStopIndex;
-            const r = isCurrent ? 9 : 6;
-            const fill = isCurrent ? '#211C2E' : p.status === 'upcoming' ? '#fff' : '#D42759';
-            const stroke = p.status === 'upcoming' && !isCurrent ? '#cbd5e1' : isCurrent ? '#211C2E' : '#D42759';
-            const labelBelow = p.y < 95;
-            const labelY = labelBelow ? p.y + 22 : p.y - 16;
-            const labelClass = isCurrent ? 'tour-mode-route-label tour-mode-route-label-current' : 'tour-mode-route-label';
+    function drawDecorativeRoads(svg, w, h) {
+        let s = '';
+        for (let i = 0; i < 6; i++) {
+            const y = (h / 7) * (i + 1) + (i % 2 ? 14 : -10);
+            s += `<path class="tour-mode-map-road" d="M0 ${y} Q ${w * 0.3} ${y - 40} ${w * 0.55} ${y + 10} T ${w} ${y - 20}"/>`;
+        }
+        for (let i = 0; i < 4; i++) {
+            const x = (w / 5) * (i + 1);
+            s += `<path class="tour-mode-map-road" d="M${x} 0 Q ${x + 30} ${h * 0.4} ${x - 20} ${h}"/>`;
+        }
+        svg.insertAdjacentHTML('beforeend', s);
+    }
 
-            html += `<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="2.5" style="cursor:pointer;" onclick="tourModeGoToIndex(${p.stopIdx})"></circle>`;
-            html += `<text x="${p.x}" y="${labelY}" text-anchor="middle" class="${labelClass}" style="cursor:pointer;" onclick="tourModeGoToIndex(${p.stopIdx})">${stop.city}</text>`;
+    function renderMap() {
+        const svg = document.getElementById('tour-mode-map-svg');
+        if (!svg) return;
+        const w = 760, h = 620;
+        svg.innerHTML = '';
+        drawDecorativeRoads(svg, w, h);
 
-            if (isCurrent) {
-                html += `<g id="tour-mode-plane" class="tour-mode-plane-pin" transform="translate(${p.x + 16}, ${p.y - 34})">
-                    <circle r="13" fill="#ef4444"></circle>
-                    <circle r="9" fill="none" stroke="#ef4444" stroke-width="2" opacity="0.55">
-                        <animate attributeName="r" values="9;17;9" dur="1.8s" repeatCount="indefinite"/>
-                        <animate attributeName="opacity" values="0.55;0;0.55" dur="1.8s" repeatCount="indefinite"/>
-                    </circle>
-                    <text y="5" text-anchor="middle" font-size="13">✈️</text>
-                </g>`;
+        const points = routeLayout();
+        const d = pathD(points);
+        svg.insertAdjacentHTML('beforeend', `<path class="tour-mode-route-path-glow" d="${d}"/><path class="tour-mode-route-path" d="${d}"/>`);
+
+        TOUR_MODE_DATA.stops.forEach((stop, i) => {
+            const p = points[i];
+            const isActive = i === currentStopIndex;
+            const fill = p.status === 'done' ? '#171331' : (isActive ? 'var(--primary-magenta)' : '#c9bfe0');
+            let html = '';
+            if (isActive) {
+                html += `<circle class="tour-mode-pulse-ring" cx="${p.x}" cy="${p.y}" r="9"/><circle class="tour-mode-pulse-ring tour-mode-pulse-ring2" cx="${p.x}" cy="${p.y}" r="9"/>`;
             }
+            html += `<g class="${isActive ? 'tour-mode-marker-active' : ''}" style="cursor:pointer;" onclick="tourModeGoToIndex(${i})">
+                <circle cx="${p.x}" cy="${p.y}" r="9" fill="${fill}" stroke="#fff" stroke-width="2"/>
+                <text class="tour-mode-marker-num" x="${p.x}" y="${p.y + 0.5}">${i + 1}</text>
+            </g>`;
+            html += `<text class="tour-mode-marker-label" x="${p.x + 13}" y="${p.y + 3}" style="cursor:pointer;" onclick="tourModeGoToIndex(${i})">${stop.city}</text>`;
+            svg.insertAdjacentHTML('beforeend', html);
         });
 
-        svg.innerHTML = html;
+        const pillEl = document.getElementById('tour-mode-map-pill');
+        if (pillEl) pillEl.textContent = t('tourModeStep').replace('{n}', currentStopIndex + 1).replace('{total}', TOUR_MODE_DATA.stops.length);
+    }
+
+    function renderRailList() {
+        const list = document.getElementById('tour-mode-rail-list');
+        if (!list) return;
+        list.innerHTML = TOUR_MODE_DATA.stops.map((stop, i) => {
+            const status = getTourStopStatus(stop, getTourNow());
+            const cls = i === currentStopIndex ? 'active' : (status === 'done' ? 'done' : '');
+            return `<div class="tour-mode-rnode ${cls}" onclick="tourModeGoToIndex(${i})">
+                <div class="tour-mode-rnode-num">${i + 1}</div>
+                <div class="tour-mode-rnode-tx"><b>${stop.city}</b><span>${fmtShowDates(stop.showDates)}</span></div>
+            </div>`;
+        }).join('');
     }
 
     function renderStopInfo(idx) {
@@ -122,9 +150,17 @@
         if (nextBtn) nextBtn.disabled = idx === TOUR_MODE_DATA.stops.length - 1;
     }
 
+    function scrollActiveNodeIntoView() {
+        const list = document.getElementById('tour-mode-rail-list');
+        const active = list && list.querySelector('.tour-mode-rnode.active');
+        if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
     function refresh() {
-        renderRoute();
+        renderMap();
+        renderRailList();
         renderStopInfo(currentStopIndex);
+        scrollActiveNodeIntoView();
     }
 
     window.tourModeNavigate = function (delta) {
@@ -157,9 +193,7 @@
     function renderTourSelect() {
         const label = document.getElementById('tour-mode-select-label');
         const menu = document.getElementById('tour-mode-select-menu');
-        const titleEl = document.getElementById('tour-mode-panel-title');
         if (label) label.textContent = TOUR_MODE_DATA.tourName;
-        if (titleEl) titleEl.textContent = TOUR_MODE_DATA.tourName;
         if (menu) {
             menu.innerHTML = `<div class="tour-mode-select-option active">${TOUR_MODE_DATA.tourName} <span>✓</span></div>`;
         }
@@ -178,8 +212,7 @@
         const panel = document.getElementById('tour-mode-panel');
         if (!panel) return;
         const memberEvent = getCurrentMemberEvent();
-        const groupStop = getCurrentTourStop();
-        currentStopIndex = groupStop ? TOUR_MODE_DATA.stops.indexOf(groupStop) : 0;
+        currentStopIndex = getDefaultStopIndex();
 
         renderTourSelect();
         renderMemberCard(memberEvent);
@@ -193,7 +226,7 @@
         const panel = document.getElementById('tour-mode-panel');
         if (!panel) return;
         panel.classList.remove('open');
-        setTimeout(() => panel.classList.add('hidden'), 350);
+        setTimeout(() => panel.classList.add('hidden'), 300);
     };
 
     window.initTourModeBadge = function () {

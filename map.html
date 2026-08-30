@@ -120,64 +120,82 @@
   .tour-mode-badge-live .tour-mode-live-dot { background: #ef4444; animation: tourModePulse 1.6s infinite; }
   @keyframes tourModePulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow: 0 0 0 8px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
 
-  .tour-mode-panel { position: fixed; inset: 0; z-index: 9500; }
+  /* Panneau plein écran : carte à gauche (décorative, route + étapes) + rail clair à
+     droite (sélecteur de tournée, liste des étapes, détail de l'étape + navigation). */
+  .tour-mode-panel { position: fixed; inset: 0; z-index: 9500; display: flex; opacity: 0; transition: opacity .3s ease; }
   .tour-mode-panel.hidden { display: none; }
-  .tour-mode-panel-backdrop { position: absolute; inset: 0; background: rgba(20,16,30,0.55); opacity: 0; transition: opacity .3s ease; }
-  .tour-mode-panel.open .tour-mode-panel-backdrop { opacity: 1; }
-  .tour-mode-panel-sheet { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 100%); width: min(640px, 92vw); max-height: 86vh; overflow-y: auto; background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.3); transition: transform .35s cubic-bezier(0.25,1,0.5,1); font-family: 'Poppins', sans-serif; }
-  .tour-mode-panel.open .tour-mode-panel-sheet { transform: translate(-50%, 0); }
+  .tour-mode-panel.open { opacity: 1; }
 
-  .tour-mode-panel-header { position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; background: #211C2E; border-radius: 24px 24px 0 0; padding: 18px 20px; }
-  .tour-mode-panel-header-left { display: flex; align-items: flex-start; gap: 12px; }
-  .tour-mode-close-btn { background: rgba(255,255,255,0.14); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; color: #fff; cursor: pointer; line-height: 1; flex-shrink: 0; }
-  .tour-mode-close-btn:hover { background: rgba(255,255,255,0.24); }
-  .tour-mode-panel-eyebrow { font-size: 10.5px; font-weight: 800; color: #f472a4; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 3px; }
-  .tour-mode-panel-title { font-size: 18px; font-weight: 800; color: #fff; }
-  .tour-mode-select-wrap { position: relative; flex-shrink: 0; }
-  .tour-mode-select-btn { background: rgba(255,255,255,0.14); border: none; border-radius: 100px; padding: 8px 14px; font-size: 11.5px; font-weight: 700; color: #fff; cursor: pointer; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-  .tour-mode-select-btn:hover { background: rgba(255,255,255,0.24); }
-  .tour-mode-select-menu { position: absolute; top: calc(100% + 8px); right: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.25); min-width: 200px; padding: 6px; z-index: 10; }
+  .tour-mode-mapwrap { flex: 1; position: relative; background: #efe9dc; overflow: hidden; }
+  .tour-mode-map-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .tour-mode-map-road { stroke: #dcd3bd; stroke-width: 1.4; fill: none; }
+  .tour-mode-route-path { fill: none; stroke: var(--primary-magenta); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; opacity: .8; }
+  .tour-mode-route-path-glow { fill: none; stroke: var(--primary-magenta); stroke-width: 5; opacity: .08; }
+  .tour-mode-marker-num { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-weight: 700; font-size: 9px; fill: #fff; text-anchor: middle; dominant-baseline: middle; }
+  .tour-mode-marker-label { font-size: 9.5px; font-weight: 700; fill: var(--text-main); }
+  .tour-mode-pulse-ring { fill: none; stroke: var(--primary-magenta); stroke-width: 2; animation: tourModeRing 2.2s ease-out infinite; }
+  .tour-mode-pulse-ring2 { animation-delay: .7s; }
+  @keyframes tourModeRing { 0% { r: 9; opacity: .9; stroke-width: 2.4; } 100% { r: 24; opacity: 0; stroke-width: .4; } }
+  .tour-mode-marker-active { animation: tourModeBob 1.8s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes tourModeBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+  .tour-mode-close-btn { position: absolute; top: 16px; left: 16px; z-index: 6; background: rgba(23,19,49,0.68); backdrop-filter: blur(6px); border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; color: #fff; cursor: pointer; line-height: 1; }
+  .tour-mode-close-btn:hover { background: rgba(23,19,49,0.85); }
+  .tour-mode-map-pill { position: absolute; top: 16px; left: 60px; z-index: 6; background: rgba(255,255,255,.88); backdrop-filter: blur(4px); border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 700; color: var(--text-main); }
+
+  .tour-mode-rail { width: 300px; flex-shrink: 0; background: #fff; border-left: 1px solid #eee; display: flex; flex-direction: column; box-shadow: -12px 0 30px rgba(0,0,0,0.08); }
+
+  .tour-mode-select-wrap { position: relative; padding: 14px 14px 10px; flex-shrink: 0; }
+  .tour-mode-select-btn { width: 100%; background: var(--sidebar-bg); border: none; border-radius: 100px; padding: 10px 16px; font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .tour-mode-select-btn:hover { filter: brightness(0.97); }
+  .tour-mode-select-menu { position: absolute; top: calc(100% + 2px); left: 14px; right: 14px; background: #fff; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.25); padding: 6px; z-index: 10; }
   .tour-mode-select-menu.hidden { display: none; }
   .tour-mode-select-option { padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
   .tour-mode-select-option:hover { background: #f1f5f9; }
   .tour-mode-select-option.active { color: var(--primary-magenta); }
 
-  .tour-mode-member-card { display: flex; align-items: center; gap: 12px; background: var(--accent-pink); margin: 16px 20px 0; border-radius: 14px; padding: 12px 16px; }
+  .tour-mode-member-card { display: flex; align-items: center; gap: 10px; background: var(--accent-pink); margin: 0 14px 10px; border-radius: 12px; padding: 10px 13px; flex-shrink: 0; }
   .tour-mode-member-card.hidden { display: none; }
-  .tour-mode-member-dot { width: 9px; height: 9px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: tourModePulse 1.6s infinite; }
-  .tour-mode-member-name { font-size: 13.5px; font-weight: 800; color: var(--primary-magenta); }
-  .tour-mode-member-place { font-size: 11.5px; color: #64748b; margin-top: 1px; }
+  .tour-mode-member-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: tourModePulse 1.6s infinite; }
+  .tour-mode-member-name { font-size: 12.5px; font-weight: 800; color: var(--primary-magenta); }
+  .tour-mode-member-place { font-size: 10.5px; color: #64748b; margin-top: 1px; }
 
-  .tour-mode-route-wrap { width: 100%; margin-top: 16px; background: var(--sidebar-bg); }
-  .tour-mode-route-wrap svg { width: 100%; height: 190px; display: block; }
-  .tour-mode-route-label { font-size: 11px; font-weight: 700; fill: #64748b; }
-  .tour-mode-route-label.tour-mode-route-label-current { font-size: 12.5px; font-weight: 800; fill: #1e293b; }
-  .tour-mode-plane-pin { transition: transform .4s cubic-bezier(0.25,1,0.5,1); }
+  .tour-mode-rail-list { flex: 1; overflow-y: auto; padding: 4px 14px; position: relative; }
+  .tour-mode-rail-list::before { content: ""; position: absolute; left: 27px; top: 14px; bottom: 14px; width: 1px; background: var(--accent-pink); }
+  .tour-mode-rnode { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; position: relative; cursor: pointer; }
+  .tour-mode-rnode .tour-mode-rnode-num { width: 20px; height: 20px; border-radius: 50%; font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; background: var(--sidebar-bg); color: var(--muted-text); }
+  .tour-mode-rnode.done .tour-mode-rnode-num { background: #E9DFF6; color: #64748b; }
+  .tour-mode-rnode.active .tour-mode-rnode-num { background: var(--primary-magenta); color: #fff; box-shadow: 0 0 0 3px var(--accent-pink); }
+  .tour-mode-rnode .tour-mode-rnode-tx b { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-main); }
+  .tour-mode-rnode .tour-mode-rnode-tx span { font-size: 9.5px; color: var(--muted-text); }
+  .tour-mode-rnode:hover .tour-mode-rnode-tx b { color: var(--primary-magenta); }
 
-  .tour-mode-stop-info { padding: 20px 20px 4px; }
-  .tour-mode-stop-tag-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .tour-mode-stop-info { padding: 14px 14px 4px; flex-shrink: 0; border-top: 1px solid #f1f5f9; }
+  .tour-mode-stop-tag-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
   .tour-mode-stop-tag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .tour-mode-stop-tag-text { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
+  .tour-mode-stop-tag-text { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
   .tour-mode-tag-live .tour-mode-stop-tag-dot { background: #ef4444; animation: tourModePulse 1.6s infinite; }
   .tour-mode-tag-live .tour-mode-stop-tag-text { color: #ef4444; }
   .tour-mode-tag-done .tour-mode-stop-tag-dot { background: #94a3b8; }
   .tour-mode-tag-done .tour-mode-stop-tag-text { color: #94a3b8; }
   .tour-mode-tag-upcoming .tour-mode-stop-tag-dot { background: var(--primary-magenta); border: 2px solid var(--accent-pink); box-sizing: content-box; }
   .tour-mode-tag-upcoming .tour-mode-stop-tag-text { color: var(--primary-magenta); }
-  .tour-mode-stop-title { font-size: 19px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; line-height: 1.3; }
-  .tour-mode-stop-sub { font-size: 12.5px; color: #64748b; }
+  .tour-mode-stop-title { font-size: 15.5px; font-weight: 800; color: var(--text-main); margin-bottom: 3px; line-height: 1.3; }
+  .tour-mode-stop-sub { font-size: 11px; color: #64748b; }
 
-  .tour-mode-nav { display: flex; align-items: center; gap: 10px; padding: 20px; }
-  .tour-mode-nav-btn { flex: 1; border: none; border-radius: 100px; padding: 14px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; text-align: center; transition: transform 0.15s ease; }
+  .tour-mode-nav { display: flex; align-items: center; gap: 8px; padding: 12px 14px; flex-shrink: 0; }
+  .tour-mode-nav-btn { flex: 1; border: none; border-radius: 100px; padding: 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; text-align: center; transition: transform 0.15s ease; }
   .tour-mode-nav-btn:hover:not(:disabled) { transform: translateY(-1px); }
   .tour-mode-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
   #tour-mode-prev { background: #f1f5f9; color: var(--text-main); }
   #tour-mode-next { background: var(--primary-magenta); color: #fff; }
-  .tour-mode-footer { font-size: 11px; color: #94a3b8; text-align: center; padding: 0 20px 18px; line-height: 1.5; }
+  .tour-mode-footer { font-size: 10px; color: #94a3b8; text-align: center; padding: 0 14px 14px; line-height: 1.5; flex-shrink: 0; }
   @media (max-width: 800px) {
       .tour-mode-badge { top: 60px; left: 14px; right: 14px; transform: none; width: auto; max-width: none; padding: 8px 14px 8px 12px; font-size: 11.5px; z-index: 3400; justify-content: center; }
       .tour-mode-badge:hover { transform: translateY(-2px); }
       .tour-mode-badge span#tour-mode-badge-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .tour-mode-panel { flex-direction: column; }
+      .tour-mode-mapwrap { flex: none; height: 38vh; }
+      .tour-mode-rail { width: auto; flex: 1; box-shadow: none; border-left: none; border-top: 1px solid #eee; }
   }
 </style>
 </head>
@@ -535,29 +553,22 @@
     </main>
 </div>
 
-<!-- Mode Tournée : panneau détaillé (route + navigation entre les arrêts) -->
+<!-- Mode Tournée : panneau plein écran (carte décorative + rail des étapes à droite) -->
 <div id="tour-mode-panel" class="tour-mode-panel hidden">
-    <div class="tour-mode-panel-backdrop" onclick="closeTourModePanel()"></div>
-    <div class="tour-mode-panel-sheet">
-        <div class="tour-mode-panel-header">
-            <div class="tour-mode-panel-header-left">
-                <button class="tour-mode-close-btn" onclick="closeTourModePanel()" type="button">&times;</button>
-                <div>
-                    <div class="tour-mode-panel-eyebrow" data-i18n="tourModeEyebrow">Tour Mode</div>
-                    <div class="tour-mode-panel-title" id="tour-mode-panel-title"></div>
-                </div>
-            </div>
-            <div class="tour-mode-select-wrap">
-                <button class="tour-mode-select-btn" type="button" onclick="tourModeToggleSelect(event)">
-                    <span id="tour-mode-select-label" data-i18n="tourModeChooseTour">Choose a tour</span> ▾
-                </button>
-                <div id="tour-mode-select-menu" class="tour-mode-select-menu hidden"></div>
-            </div>
+    <div class="tour-mode-mapwrap">
+        <button class="tour-mode-close-btn" onclick="closeTourModePanel()" type="button">&times;</button>
+        <span class="tour-mode-map-pill" id="tour-mode-map-pill"></span>
+        <svg class="tour-mode-map-svg" id="tour-mode-map-svg" viewBox="0 0 760 620" preserveAspectRatio="xMidYMid slice"></svg>
+    </div>
+    <div class="tour-mode-rail">
+        <div class="tour-mode-select-wrap">
+            <button class="tour-mode-select-btn" type="button" onclick="tourModeToggleSelect(event)">
+                <span id="tour-mode-select-label" data-i18n="tourModeChooseTour">Choose a tour</span> ▾
+            </button>
+            <div id="tour-mode-select-menu" class="tour-mode-select-menu hidden"></div>
         </div>
         <div id="tour-mode-member-card" class="tour-mode-member-card hidden"></div>
-        <div class="tour-mode-route-wrap">
-            <svg id="tour-mode-route-svg" viewBox="0 0 700 190" preserveAspectRatio="xMidYMid meet"></svg>
-        </div>
+        <div class="tour-mode-rail-list" id="tour-mode-rail-list"></div>
         <div class="tour-mode-stop-info">
             <div class="tour-mode-stop-tag-row" id="tour-mode-stop-tag-row">
                 <span class="tour-mode-stop-tag-dot"></span>
