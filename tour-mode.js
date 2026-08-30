@@ -303,6 +303,28 @@
     // champs optionnels (`stop.highlights` / `stop.surpriseSong`) sur chaque étape dans
     // script.js ; tant qu'ils ne sont pas renseignés avec de vraies infos, on affiche un
     // message honnête plutôt que d'inventer des anecdotes.
+    // Un "stop" (une ville/salle) peut regrouper plusieurs soirs, chacun avec ses propres
+    // temps forts et/ou surprise songs (ex: Las Vegas a 4 dates, chacune différente) — voir
+    // `stop.nights` dans ARIRANG_TOUR (script.js). Tant qu'aucune vraie info n'a été
+    // transmise pour une étape, on affiche un message honnête plutôt que d'inventer.
+    function renderNightsHTML(stop) {
+        if (!stop.nights || !stop.nights.length) {
+            return `<div class="tour-mode-tip-empty-msg">${t('tourModeNoHighlightsYet')}</div>`;
+        }
+        const blocks = stop.nights.map(night => {
+            let inner = '';
+            if (night.highlights && night.highlights.length) {
+                inner += `<ul class="tour-mode-tip-hl">${night.highlights.map(h => `<li class="tour-mode-tip-hl-item">${h}</li>`).join('')}</ul>`;
+            }
+            if (night.surpriseSongs && night.surpriseSongs.length) {
+                inner += `<div class="tour-mode-tip-ss"><span class="tour-mode-tip-ss-label">${t('tourModeSurpriseSong')}</span>${night.surpriseSongs.join(' · ')}</div>`;
+            }
+            if (!inner) return '';
+            return `<div class="tour-mode-tip-night"><div class="tour-mode-tip-night-date">${fmtShowDates(night.dates)}</div>${inner}</div>`;
+        }).filter(Boolean).join('');
+        return blocks || `<div class="tour-mode-tip-empty-msg">${t('tourModeNoHighlightsYet')}</div>`;
+    }
+
     function renderTipContent(idx) {
         const stop = TOUR_MODE_DATA.stops[idx];
         if (!stop) return;
@@ -311,28 +333,14 @@
         const tagText = document.getElementById('tour-mode-tip-tag-text');
         const titleEl = document.getElementById('tour-mode-tip-title');
         const dateEl = document.getElementById('tour-mode-tip-date');
-        const hlList = document.getElementById('tour-mode-tip-hl');
-        const ssEl = document.getElementById('tour-mode-tip-ss');
-        if (!tagRow || !tagText || !titleEl || !dateEl || !hlList || !ssEl) return;
+        const nightsEl = document.getElementById('tour-mode-tip-nights');
+        if (!tagRow || !tagText || !titleEl || !dateEl || !nightsEl) return;
 
         tagRow.className = 'tour-mode-stop-tag-row ' + (status === 'current' ? 'tour-mode-tag-live' : status === 'done' ? 'tour-mode-tag-done' : 'tour-mode-tag-upcoming');
         tagText.textContent = status === 'current' ? t('tourModeLive') : status === 'done' ? t('tourModeDone') : t('tourModeUpcoming');
         titleEl.textContent = stop.venue ? `${stop.venue} — ${stop.city}` : `${stop.city}, ${stop.country}`;
         dateEl.textContent = fmtShowDates(stop.showDates);
-
-        if (stop.highlights && stop.highlights.length) {
-            hlList.innerHTML = stop.highlights.map(h => `<li class="tour-mode-tip-hl-item"><div class="tour-mode-tip-av">${h.who}</div><div class="tour-mode-tip-tx">${h.text}</div></li>`).join('');
-        } else {
-            hlList.innerHTML = `<li class="tour-mode-tip-empty">${t('tourModeNoHighlightsYet')}</li>`;
-        }
-
-        if (stop.surpriseSong) {
-            ssEl.classList.remove('empty');
-            ssEl.innerHTML = `<div class="tour-mode-tip-ss-title">${stop.surpriseSong.title}</div><div class="tour-mode-tip-ss-by">${stop.surpriseSong.by}</div>`;
-        } else {
-            ssEl.classList.add('empty');
-            ssEl.textContent = t('tourModeNoSurpriseSongYet');
-        }
+        nightsEl.innerHTML = renderNightsHTML(stop);
     }
 
     function positionTip(idx) {

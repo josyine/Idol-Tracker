@@ -73,25 +73,102 @@ const ARIRANG_TOUR = {
     tourName: "Arirang World Tour",
     group: "BTS",
     stops: [
-        { id: 'goyang',      city: 'Goyang',        country: 'South Korea', venue: 'Goyang Stadium',            lat: 37.6584,  lng: 126.7828,  showDates: ['2026-04-09', '2026-04-11', '2026-04-12'] },
-        { id: 'tokyo',       city: 'Tokyo',         country: 'Japan',       venue: 'Tokyo Dome',                 lat: 35.7056,  lng: 139.7519,  showDates: ['2026-04-17', '2026-04-18'] },
-        { id: 'tampa',       city: 'Tampa',         country: 'USA',         venue: 'Raymond James Stadium',      lat: 27.9759,  lng: -82.5033,  showDates: ['2026-04-25', '2026-04-26', '2026-04-28'] },
-        { id: 'elpaso',      city: 'El Paso',       country: 'USA',         venue: 'Sun Bowl Stadium',           lat: 31.7757,  lng: -106.5004, showDates: ['2026-05-02', '2026-05-03'] },
-        { id: 'mexicocity',  city: 'Mexico City',   country: 'Mexico',      venue: 'Estadio GNP Seguros',        lat: 19.3046,  lng: -99.1505,  showDates: ['2026-05-07', '2026-05-09', '2026-05-10'] },
-        { id: 'stanford',    city: 'Stanford',      country: 'USA',         venue: 'Stanford Stadium',           lat: 37.4342,  lng: -122.1610, showDates: ['2026-05-16', '2026-05-17', '2026-05-19'] },
-        { id: 'vegas',       city: 'Las Vegas',     country: 'USA',         venue: 'Allegiant Stadium',          lat: 36.0908,  lng: -115.1833, showDates: ['2026-05-23', '2026-05-24', '2026-05-27', '2026-05-28'] },
-        { id: 'busan',       city: 'Busan',         country: 'South Korea', venue: 'Busan Asiad Main Stadium',   lat: 35.1907,  lng: 129.0587,  showDates: ['2026-06-12', '2026-06-13'] },
-        { id: 'madrid',      city: 'Madrid',        country: 'Spain',       venue: 'Riyadh Air Metropolitano',   lat: 40.4362,  lng: -3.5995,   showDates: ['2026-06-26', '2026-06-27'] },
-        { id: 'brussels',    city: 'Brussels',      country: 'Belgium',     venue: 'Stade Roi Baudouin',         lat: 50.8951,  lng: 4.3411,    showDates: ['2026-07-01', '2026-07-02'] },
-        { id: 'london',      city: 'London',        country: 'UK',          venue: 'Tottenham Hotspur Stadium',  lat: 51.6043,  lng: -0.0668,   showDates: ['2026-07-06', '2026-07-07'] },
-        { id: 'munich',      city: 'Munich',        country: 'Germany',     venue: 'Allianz Arena',              lat: 48.2188,  lng: 11.6247,   showDates: ['2026-07-11', '2026-07-12'] },
-        { id: 'paris',       city: 'Paris',         country: 'France',      venue: 'Stade de France',            lat: 48.9244,  lng: 2.3601,    showDates: ['2026-07-17', '2026-07-18'] },
-        { id: 'newyork',     city: 'East Rutherford (New York)', country: 'USA', venue: 'MetLife Stadium',       lat: 40.8135,  lng: -74.0745,  showDates: ['2026-08-01', '2026-08-02'] },
-        { id: 'foxborough',  city: 'Foxborough (Boston)', country: 'USA',   venue: 'Gillette Stadium',           lat: 42.0909,  lng: -71.2643,  showDates: ['2026-08-05', '2026-08-06'] },
-        { id: 'baltimore',   city: 'Baltimore',     country: 'USA',         venue: 'M&T Bank Stadium',           lat: 39.2780,  lng: -76.6227,  showDates: ['2026-08-10', '2026-08-11'] },
-        { id: 'arlington',   city: 'Arlington (Dallas)', country: 'USA',    venue: 'AT&T Stadium',               lat: 32.7473,  lng: -97.0945,  showDates: ['2026-08-15', '2026-08-16'] },
-        { id: 'toronto',     city: 'Toronto',       country: 'Canada',      venue: 'Rogers Stadium',             lat: 43.6532,  lng: -79.3832,  showDates: ['2026-08-22', '2026-08-23'] },
-        { id: 'chicago',     city: 'Chicago',       country: 'USA',         venue: 'Soldier Field',              lat: 41.8623,  lng: -87.6167,  showDates: ['2026-08-27', '2026-08-28'] },
+        { id: 'goyang',      city: 'Goyang',        country: 'South Korea', venue: 'Goyang Stadium',            lat: 37.6584,  lng: 126.7828,  showDates: ['2026-04-09', '2026-04-11', '2026-04-12'],
+          nights: [
+              { dates: ['2026-04-09'], highlights: ["Le tout premier concert de retrouvailles après le service militaire : <b>Jin</b> et <b>Jungkook</b> ont fondu en larmes dès la chanson d'ouverture en voyant l'océan violet."] },
+              { dates: ['2026-04-11', '2026-04-12'], highlights: ["<b>RM</b> a fait un discours bouleversant sur leur promesse tenue de revenir à sept, provoquant une standing ovation de 5 minutes."] }
+          ] },
+        { id: 'tokyo',       city: 'Tokyo',         country: 'Japan',       venue: 'Tokyo Dome',                 lat: 35.7056,  lng: 139.7519,  showDates: ['2026-04-17', '2026-04-18'],
+          nights: [
+              { dates: ['2026-04-17', '2026-04-18'], highlights: ["<b>V</b> a chanté un extrait de sa chanson solo a cappella.", "<b>Jimin</b> s'est amusé à porter un chapeau en forme de mont Fuji lancé par une fan."] }
+          ] },
+        { id: 'tampa',       city: 'Tampa',         country: 'USA',         venue: 'Raymond James Stadium',      lat: 27.9759,  lng: -82.5033,  showDates: ['2026-04-25', '2026-04-26', '2026-04-28'],
+          nights: [
+              { dates: ['2026-04-25', '2026-04-26'], highlights: ['La "Maknae Line" (<b>Jimin</b>, <b>V</b>, <b>Jungkook</b>) a improvisé une chorégraphie chaotique pendant le rappel, finissant par s\'écrouler de rire sur scène.'] },
+              { dates: ['2026-04-28'], surpriseSongs: ['Life Goes On', '뱁새 (Silver Spoon)'], highlights: ["<b>RM</b> a été complètement trempé lors de la bataille d'eau traditionnelle du rappel et a glissé de façon comique sans se faire mal, amusant tout le stade."] }
+          ] },
+        { id: 'elpaso',      city: 'El Paso',       country: 'USA',         venue: 'Sun Bowl Stadium',           lat: 31.7757,  lng: -106.5004, showDates: ['2026-05-02', '2026-05-03'],
+          nights: [
+              { dates: ['2026-05-02'], surpriseSongs: ['On', 'Outro: Wings'], highlights: ['<b>Suga</b> a souri tendrement à une pancarte d\'une fan qui disait "I will sue Min Yoongi again in 2026".'] },
+              { dates: ['2026-05-03'], surpriseSongs: ['Dionysus', 'Best of Me'] }
+          ] },
+        { id: 'mexicocity',  city: 'Mexico City',   country: 'Mexico',      venue: 'Estadio GNP Seguros',        lat: 19.3046,  lng: -99.1505,  showDates: ['2026-05-07', '2026-05-09', '2026-05-10'],
+          nights: [
+              { dates: ['2026-05-07'], surpriseSongs: ['상남자 (Boy in Luv)', 'So What'], highlights: ['Le public a chanté un "Cielito Lindo" assourdissant avant le rappel, ce qui a profondément ému <b>J-Hope</b>.'] },
+              { dates: ['2026-05-09', '2026-05-10'], highlights: ['Les fans mexicains ont organisé un projet lumineux aux couleurs du drapeau coréen et mexicain.'] }
+          ] },
+        { id: 'stanford',    city: 'Stanford',      country: 'USA',         venue: 'Stanford Stadium',           lat: 37.4342,  lng: -122.1610, showDates: ['2026-05-16', '2026-05-17', '2026-05-19'],
+          nights: [
+              { dates: ['2026-05-16', '2026-05-17'], highlights: ['<b>Jungkook</b> a remarqué un enfant déguisé en Cooky (BT21) dans la fosse et est descendu lui taper dans la main.'] },
+              { dates: ['2026-05-19'], surpriseSongs: ['I Need U', 'No More Dream'], highlights: ['Moment iconique : les ARMYs de la Bay Area ont organisé un projet massif en levant simultanément le drapeau de la Corée du Sud tout en chantant Arirang pendant la chanson Body to Body.'] }
+          ] },
+        { id: 'vegas',       city: 'Las Vegas',     country: 'USA',         venue: 'Allegiant Stadium',          lat: 36.0908,  lng: -115.1833, showDates: ['2026-05-23', '2026-05-24', '2026-05-27', '2026-05-28'],
+          nights: [
+              { dates: ['2026-05-23'], surpriseSongs: ['Permission to Dance', '고민보다 Go (Go Go)'] },
+              { dates: ['2026-05-24'], surpriseSongs: ['Black Swan', '등골브레이커 (Spine Breaker)'], highlights: ['<b>Jin</b>, avec ses fameuses lunettes humoristiques, a livré une performance de danse complètement décalée sur Spine Breaker, soutenu par <b>Suga</b>.'] },
+              { dates: ['2026-05-27'], surpriseSongs: ['Anpanman', '진격의 방탄 (Attack on Bangtan)'] },
+              { dates: ['2026-05-28'], surpriseSongs: ['흥탄소년단 (Boyz with Fun)', 'Danger'], highlights: ["Le concert s'est terminé sous un feu d'artifice spectaculaire au-dessus de l'Allegiant Stadium."] }
+          ] },
+        { id: 'busan',       city: 'Busan',         country: 'South Korea', venue: 'Busan Asiad Main Stadium',   lat: 35.1907,  lng: 129.0587,  showDates: ['2026-06-12', '2026-06-13'],
+          nights: [
+              { dates: ['2026-06-12'], surpriseSongs: ['팔도강산 (Paldogangsan)', 'Ma City'], highlights: ["Retour sur les terres de <b>Jimin</b> et <b>Jungkook</b> : <b>Jimin</b> a pleuré à chaudes larmes en s'adressant à sa famille présente dans le public."] },
+              { dates: ['2026-06-13'], surpriseSongs: ['보조개 (Dimple)', '땡 (Ddaeng)', 'Magic Shop'], highlights: ['Anniversaire des 13 ans de BTS, retransmis en direct dans les cinémas du monde entier : le groupe a partagé un énorme gâteau sur scène, et l\'interprétation de Ddaeng a rendu le stade complètement hystérique.'] }
+          ] },
+        { id: 'madrid',      city: 'Madrid',        country: 'Spain',       venue: 'Riyadh Air Metropolitano',   lat: 40.4362,  lng: -3.5995,   showDates: ['2026-06-26', '2026-06-27'],
+          nights: [
+              { dates: ['2026-06-26'], surpriseSongs: ['Airplane Pt.2', 'Outro: Wings'] },
+              { dates: ['2026-06-27'], surpriseSongs: ['소우주 (Mikrokosmos)', 'Best of Me'], highlights: ['<b>V</b> s\'est amusé avec les mots espagnols appris pour l\'occasion, lâchant des "Te amo mucho" enflammés.'] }
+          ] },
+        { id: 'brussels',    city: 'Brussels',      country: 'Belgium',     venue: 'Stade Roi Baudouin',         lat: 50.8951,  lng: 4.3411,    showDates: ['2026-07-01', '2026-07-02'],
+          nights: [
+              { dates: ['2026-07-01'], surpriseSongs: ['Tomorrow', '작은 것들을 위한 시 (Boy with Luv)'] },
+              { dates: ['2026-07-02'], surpriseSongs: ['On', 'For Youth'], highlights: ["<b>Jungkook</b> a récupéré le téléphone d'une ARMY au premier rang pour se filmer avec pendant le concert."] }
+          ] },
+        { id: 'london',      city: 'London',        country: 'UK',          venue: 'Tottenham Hotspur Stadium',  lat: 51.6043,  lng: -0.0668,   showDates: ['2026-07-06', '2026-07-07'],
+          nights: [
+              { dates: ['2026-07-06'], surpriseSongs: ['Life Goes On', 'Dionysus'], highlights: ["<b>J-Hope</b> s'est lancé dans un freestyle de danse absolument dantesque sous la pluie londonienne."] },
+              { dates: ['2026-07-07'], highlights: ["Séance classique : OT7 a chaleureusement remercié l'Europe pour sa loyauté."] }
+          ] },
+        { id: 'munich',      city: 'Munich',        country: 'Germany',     venue: 'Allianz Arena',              lat: 48.2188,  lng: 11.6247,   showDates: ['2026-07-11', '2026-07-12'],
+          nights: [
+              { dates: ['2026-07-11'], surpriseSongs: ['뱁새 (Silver Spoon)', 'Pied Piper'] },
+              { dates: ['2026-07-12'], surpriseSongs: ['Louder than Bombs', '피 땀 눈물 (Blood Sweat & Tears)'], highlights: ["Chanter Louder than Bombs en live était une immense demande des fans : l'arène a tremblé tellement les fans criaient."] }
+          ] },
+        { id: 'paris',       city: 'Paris',         country: 'France',      venue: 'Stade de France',            lat: 48.9244,  lng: 2.3601,    showDates: ['2026-07-17', '2026-07-18'],
+          nights: [
+              { dates: ['2026-07-17'], surpriseSongs: ['작은 것들을 위한 시 (Boy with Luv)', 'Jump'], highlights: ["Lors des salutations finales, <b>Jimin</b> a retiré son t-shirt de la tournée (le fameux t-shirt blanc Layered de l'édition Arirang) et l'a donné directement à un jeune enfant sur les épaules de son père dans la fosse, créant un moment viral mondial."] },
+              { dates: ['2026-07-18'], surpriseSongs: ['So What', 'We Are Bulletproof: The Eternal'], highlights: ["Projet monumental du public français au Stade de France, qui a illuminé les gradins aux couleurs de la France puis en violet intégral. <b>Jungkook</b> a de nouveau lâché quelques larmes lors du discours final."] }
+          ] },
+        { id: 'newyork',     city: 'East Rutherford (New York)', country: 'USA', venue: 'MetLife Stadium',       lat: 40.8135,  lng: -74.0745,  showDates: ['2026-08-01', '2026-08-02'],
+          nights: [
+              { dates: ['2026-08-01'], surpriseSongs: ['병 (Dis-ease)', 'Run'] },
+              { dates: ['2026-08-02'], surpriseSongs: ['고엽 (Autumn Leaves)', '고민보다 Go (Go Go)'] }
+          ] },
+        { id: 'foxborough',  city: 'Foxborough (Boston)', country: 'USA',   venue: 'Gillette Stadium',           lat: 42.0909,  lng: -71.2643,  showDates: ['2026-08-05', '2026-08-06'],
+          nights: [
+              { dates: ['2026-08-05'], surpriseSongs: ['낙원 (Paradise)', 'No More Dream'] },
+              { dates: ['2026-08-06'], surpriseSongs: ['Make It Right', 'N.O'], highlights: ['<b>Jin</b> a fait une blague légendaire sur les "homards de Boston" avant de mimer un homard pendant 3 minutes sur scène.'] }
+          ] },
+        { id: 'baltimore',   city: 'Baltimore',     country: 'USA',         venue: 'M&T Bank Stadium',           lat: 39.2780,  lng: -76.6227,  showDates: ['2026-08-10', '2026-08-11'],
+          nights: [
+              { dates: ['2026-08-10'], surpriseSongs: ['잠시 (Telepathy)', '상남자 (Boy in Luv)'] },
+              { dates: ['2026-08-11'], surpriseSongs: ['하루만 (Just One Day)', 'Best of Me'] }
+          ] },
+        { id: 'arlington',   city: 'Arlington (Dallas)', country: 'USA',    venue: 'AT&T Stadium',               lat: 32.7473,  lng: -97.0945,  showDates: ['2026-08-15', '2026-08-16'],
+          nights: [
+              { dates: ['2026-08-15'], surpriseSongs: ['Permission to Dance', '고민보다 Go (Go Go)'] },
+              { dates: ['2026-08-16'], surpriseSongs: ['Butterfly', 'DNA'] }
+          ] },
+        { id: 'toronto',     city: 'Toronto',       country: 'Canada',      venue: 'Rogers Stadium',             lat: 43.6532,  lng: -79.3832,  showDates: ['2026-08-22', '2026-08-23'],
+          nights: [
+              { dates: ['2026-08-22'], surpriseSongs: ['Outro: Wings', '쩔어 (Dope)'] },
+              { dates: ['2026-08-23'], surpriseSongs: ["00:00 (Zero O'Clock)", 'Outro: Tear'], highlights: ["La Rap Line (<b>RM</b>, <b>Suga</b>, <b>J-Hope</b>) a offert une performance de Outro: Tear tellement intense que même les autres membres du groupe s'inclinaient devant eux sur les côtés de la scène."] }
+          ] },
+        { id: 'chicago',     city: 'Chicago',       country: 'USA',         venue: 'Soldier Field',              lat: 41.8623,  lng: -87.6167,  showDates: ['2026-08-27', '2026-08-28'],
+          nights: [
+              { dates: ['2026-08-27'], surpriseSongs: ['Tomorrow', '힙합성애자 (Hip Hop Phile)'] },
+              { dates: ['2026-08-28'], surpriseSongs: ['134340', '소우주 (Mikrokosmos)'], highlights: ['Pendant Mikrokosmos, une pluie fine a commencé à tomber sur le stade ouvert, rendant l\'atmosphère magique et très poétique.'] }
+          ] },
         { id: 'la',          city: 'Los Angeles',   country: 'USA',         venue: 'SoFi Stadium',               lat: 33.9535,  lng: -118.3392, showDates: ['2026-09-01', '2026-09-02', '2026-09-05', '2026-09-06'] },
         { id: 'bogota',      city: 'Bogota',        country: 'Colombia',    venue: 'Estadio El Campín',          lat: 4.6486,   lng: -74.0925,  showDates: ['2026-10-02', '2026-10-03'] },
         { id: 'lima',        city: 'Lima',          country: 'Peru',        venue: 'Estadio San Marcos',         lat: -12.0578, lng: -77.0839,  showDates: ['2026-10-07', '2026-10-09', '2026-10-10'] },

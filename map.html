@@ -194,17 +194,17 @@
   .tour-mode-tip-arrow.flip { bottom: auto; top: -6px; box-shadow: -3px -3px 6px rgba(0,0,0,.05); }
   .tour-mode-tip-close { position: absolute; top: 9px; right: 9px; background: var(--sidebar-bg); border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 12px; line-height: 1; color: var(--text-main); }
   .tour-mode-tip-title { font-size: 13.5px; font-weight: 800; color: var(--text-main); margin: 3px 0 2px; line-height: 1.3; padding-right: 20px; }
-  .tour-mode-tip-date { font-size: 10.5px; color: var(--muted-text); margin-bottom: 10px; }
-  .tour-mode-tip-section-label { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted-text); margin: 10px 0 7px; }
-  .tour-mode-tip-hl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .tour-mode-tip-hl-item { display: flex; gap: 8px; align-items: flex-start; }
-  .tour-mode-tip-av { width: 22px; height: 22px; border-radius: 50%; background: var(--accent-pink); color: var(--primary-magenta); font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .tour-mode-tip-tx { font-size: 11px; line-height: 1.45; color: var(--text-main); }
-  .tour-mode-tip-empty { font-size: 11px; line-height: 1.5; color: var(--muted-text); list-style: none; }
-  .tour-mode-tip-ss { border-radius: 10px; padding: 9px 11px; background: var(--primary-magenta); color: #fff; font-size: 10.5px; }
-  .tour-mode-tip-ss.empty { background: var(--sidebar-bg); color: var(--muted-text); }
-  .tour-mode-tip-ss-title { font-size: 11px; font-weight: 800; }
-  .tour-mode-tip-ss-by { font-size: 9.5px; opacity: .9; margin-top: 1px; }
+  .tour-mode-tip-date { font-size: 10.5px; color: var(--muted-text); margin-bottom: 4px; }
+  .tour-mode-tip-nights { max-height: 260px; overflow-y: auto; margin-top: 8px; }
+  .tour-mode-tip-night { padding-top: 9px; margin-top: 9px; border-top: 1px solid #f1f5f9; }
+  .tour-mode-tip-night:first-child { border-top: none; margin-top: 0; }
+  .tour-mode-tip-night-date { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--primary-magenta); margin-bottom: 6px; }
+  .tour-mode-tip-hl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .tour-mode-tip-hl-item { font-size: 11px; line-height: 1.45; color: var(--text-main); padding-left: 12px; position: relative; }
+  .tour-mode-tip-hl-item::before { content: "•"; position: absolute; left: 0; color: var(--primary-magenta); }
+  .tour-mode-tip-ss { font-size: 10.5px; line-height: 1.5; color: var(--text-main); margin-top: 6px; }
+  .tour-mode-tip-ss-label { font-weight: 800; color: var(--primary-magenta); margin-right: 4px; }
+  .tour-mode-tip-empty-msg { font-size: 11px; line-height: 1.5; color: var(--muted-text); }
   @media (max-width: 800px) {
       .tour-mode-tip { width: 240px; }
       .tour-mode-badge { top: 60px; left: 14px; right: 14px; transform: none; width: auto; max-width: none; padding: 8px 14px 8px 12px; font-size: 11.5px; z-index: 3400; justify-content: center; }
@@ -586,10 +586,7 @@
                 </div>
                 <div class="tour-mode-tip-title" id="tour-mode-tip-title"></div>
                 <div class="tour-mode-tip-date" id="tour-mode-tip-date"></div>
-                <div class="tour-mode-tip-section-label" data-i18n="tourModeHighlights">Highlights</div>
-                <ul class="tour-mode-tip-hl" id="tour-mode-tip-hl"></ul>
-                <div class="tour-mode-tip-section-label" id="tour-mode-tip-ss-label" data-i18n="tourModeSurpriseSong">Surprise song 🎤</div>
-                <div class="tour-mode-tip-ss" id="tour-mode-tip-ss"></div>
+                <div class="tour-mode-tip-nights" id="tour-mode-tip-nights"></div>
             </div>
         </div>
     </div>
