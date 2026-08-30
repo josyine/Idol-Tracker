@@ -18,6 +18,7 @@
     let tourModeLeafletMap = null;
     let tourModeMarkers = [];
     let liveMapMarker = null;
+    let tourModeTipIndex = null;
 
     function fmtShowDates(showDates) {
         const locale = currentLang || 'en';
@@ -60,6 +61,8 @@
         tourModeLeafletMap = L.map('tour-mode-map-container', { zoomControl: false }).setView([20, 0], 2);
         createOSMTileLayer(tourModeLeafletMap).addTo(tourModeLeafletMap);
         L.control.zoom({ position: 'bottomright' }).addTo(tourModeLeafletMap);
+        tourModeLeafletMap.on('click', () => window.closeTourModeTip());
+        tourModeLeafletMap.on('movestart zoomstart', () => window.closeTourModeTip());
         return tourModeLeafletMap;
     }
 
@@ -89,7 +92,7 @@
                 iconAnchor: [size / 2, size / 2]
             });
             const marker = L.marker([stop.lat, stop.lng], { icon }).addTo(map);
-            marker.on('click', () => tourModeGoToIndex(i));
+            marker.on('click', () => { tourModeGoToIndex(i); window.openTourModeTip(i); });
             tourModeMarkers.push(marker);
         });
 
@@ -110,7 +113,7 @@
         list.innerHTML = TOUR_MODE_DATA.stops.map((stop, i) => {
             const status = getTourStopStatus(stop, getTourNow());
             const cls = i === currentStopIndex ? 'active' : (status === 'done' ? 'done' : '');
-            return `<div class="tour-mode-rnode ${cls}" onclick="tourModeGoToIndex(${i})">
+            return `<div class="tour-mode-rnode ${cls}" onclick="tourModeGoToIndex(${i}); openTourModeTip(${i});">
                 <div class="tour-mode-rnode-num">${i + 1}</div>
                 <div class="tour-mode-rnode-tx"><b>${stop.city}</b><span>${fmtShowDates(stop.showDates)}</span></div>
             </div>`;
@@ -152,6 +155,7 @@
     }
 
     window.tourModeNavigate = function (delta) {
+        window.closeTourModeTip();
         currentStopIndex = Math.max(0, Math.min(TOUR_MODE_DATA.stops.length - 1, currentStopIndex + delta));
         refresh();
     };
@@ -194,6 +198,7 @@
         }
     }
     window.tourModeSelectTour = function (tourId) {
+        window.closeTourModeTip();
         selectedTourId = tourId;
         currentStopIndex = getDefaultStopIndex();
         renderTourSelect();
@@ -214,6 +219,7 @@
     window.openTourModePanel = function () {
         const panel = document.getElementById('tour-mode-panel');
         if (!panel) return;
+        window.closeTourModeTip();
         selectedTourId = LIVE_TOUR_ID; // toujours repartir de la tournée en cours à l'ouverture
         const memberEvent = getCurrentMemberEvent();
         currentStopIndex = getDefaultStopIndex();
@@ -236,6 +242,7 @@
     window.closeTourModePanel = function () {
         const panel = document.getElementById('tour-mode-panel');
         if (!panel) return;
+        window.closeTourModeTip();
         panel.classList.remove('open');
         setTimeout(() => {
             panel.classList.add('hidden');
@@ -289,6 +296,92 @@
         const label = live.member ? `${live.member} — ${live.eventName}<br>${live.city}, ${live.country}` : `🔴 ${TOUR_MODE_DATA.tourName}<br>${live.city}, ${live.country}`;
         liveMapMarker.bindTooltip(label, { direction: 'top', offset: [0, -8] });
     }
+
+    // Bulle infos concert : apparaît au clic sur un pin de la carte (ou sur une étape du
+    // rail, qui pointe alors la même bulle vers son pin sur la carte). Contenu : statut,
+    // lieu/ville, dates, "Temps forts" et "Surprise song" — ces deux derniers sont des
+    // champs optionnels (`stop.highlights` / `stop.surpriseSong`) sur chaque étape dans
+    // script.js ; tant qu'ils ne sont pas renseignés avec de vraies infos, on affiche un
+    // message honnête plutôt que d'inventer des anecdotes.
+    function renderTipContent(idx) {
+        const stop = TOUR_MODE_DATA.stops[idx];
+        if (!stop) return;
+        const status = getTourStopStatus(stop, getTourNow());
+        const tagRow = document.getElementById('tour-mode-tip-tag-row');
+        const tagText = document.getElementById('tour-mode-tip-tag-text');
+        const titleEl = document.getElementById('tour-mode-tip-title');
+        const dateEl = document.getElementById('tour-mode-tip-date');
+        const hlList = document.getElementById('tour-mode-tip-hl');
+        const ssEl = document.getElementById('tour-mode-tip-ss');
+        if (!tagRow || !tagText || !titleEl || !dateEl || !hlList || !ssEl) return;
+
+        tagRow.className = 'tour-mode-stop-tag-row ' + (status === 'current' ? 'tour-mode-tag-live' : status === 'done' ? 'tour-mode-tag-done' : 'tour-mode-tag-upcoming');
+        tagText.textContent = status === 'current' ? t('tourModeLive') : status === 'done' ? t('tourModeDone') : t('tourModeUpcoming');
+        titleEl.textContent = stop.venue ? `${stop.venue} — ${stop.city}` : `${stop.city}, ${stop.country}`;
+        dateEl.textContent = fmtShowDates(stop.showDates);
+
+        if (stop.highlights && stop.highlights.length) {
+            hlList.innerHTML = stop.highlights.map(h => `<li class="tour-mode-tip-hl-item"><div class="tour-mode-tip-av">${h.who}</div><div class="tour-mode-tip-tx">${h.text}</div></li>`).join('');
+        } else {
+            hlList.innerHTML = `<li class="tour-mode-tip-empty">${t('tourModeNoHighlightsYet')}</li>`;
+        }
+
+        if (stop.surpriseSong) {
+            ssEl.classList.remove('empty');
+            ssEl.innerHTML = `<div class="tour-mode-tip-ss-title">${stop.surpriseSong.title}</div><div class="tour-mode-tip-ss-by">${stop.surpriseSong.by}</div>`;
+        } else {
+            ssEl.classList.add('empty');
+            ssEl.textContent = t('tourModeNoSurpriseSongYet');
+        }
+    }
+
+    function positionTip(idx) {
+        const map = tourModeLeafletMap;
+        const stop = TOUR_MODE_DATA.stops[idx];
+        const tip = document.getElementById('tour-mode-tip');
+        const wrap = document.getElementById('tour-mode-mapwrap') || document.querySelector('.tour-mode-mapwrap');
+        const arrow = document.getElementById('tour-mode-tip-arrow');
+        if (!map || !stop || !tip || !wrap) return;
+
+        const pt = map.latLngToContainerPoint([stop.lat, stop.lng]);
+        const wrapRect = wrap.getBoundingClientRect();
+        const tipW = tip.offsetWidth || 270;
+        const tipH = tip.offsetHeight || 260;
+        let left = Math.max(8, Math.min(pt.x - 30, wrapRect.width - tipW - 8));
+        let top = pt.y - 16 - tipH;
+        let flipped = false;
+        if (top < 8) { top = pt.y + 20; flipped = true; }
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+        if (arrow) {
+            arrow.classList.toggle('flip', flipped);
+            arrow.style.left = Math.max(14, Math.min(pt.x - left - 8, tipW - 30)) + 'px';
+        }
+    }
+
+    window.openTourModeTip = function (idx) {
+        if (!TOUR_MODE_DATA.stops[idx]) return;
+        tourModeTipIndex = idx;
+        renderTipContent(idx);
+        const tip = document.getElementById('tour-mode-tip');
+        if (tip) tip.classList.add('open');
+        const map = tourModeLeafletMap;
+        if (map) {
+            positionTip(idx);
+            map.once('moveend', () => { if (tourModeTipIndex === idx) positionTip(idx); });
+        }
+    };
+    window.closeTourModeTip = function () {
+        tourModeTipIndex = null;
+        const tip = document.getElementById('tour-mode-tip');
+        if (tip) tip.classList.remove('open');
+    };
+    document.addEventListener('click', (e) => {
+        const tip = document.getElementById('tour-mode-tip');
+        if (!tip || !tip.classList.contains('open')) return;
+        if (e.target.closest('#tour-mode-tip') || e.target.closest('.tour-mode-rnode') || e.target.closest('.leaflet-marker-icon')) return;
+        window.closeTourModeTip();
+    });
 
     // Balayage tactile (mobile) pour naviguer entre les étapes, en plus des boutons
     // Précédent/Suivant et du clic sur une étape — sans gêner le défilement vertical
