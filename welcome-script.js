@@ -319,6 +319,10 @@ async function loadExistingProfileAndRedirect(user) {
         if (snap.exists()) {
             const data = snap.data();
             if (data.username) localStorage.setItem('userName', data.username);
+            // Comptes créés avant l'ajout du partage de voyages : sans pseudo réservé dans
+            // l'index public usernames/, personne ne peut inviter cette personne comme
+            // "travel buddy" — on le répare discrètement à chaque connexion.
+            if (data.username && typeof window.claimUsername === 'function') window.claimUsername(data.username);
             if (data.firstName) localStorage.setItem('userFirstName', data.firstName);
             if (Array.isArray(data.unlockedGroups)) localStorage.setItem('unlockedGroups', JSON.stringify(data.unlockedGroups));
             // Pays d'intérêt : sans ça, une connexion sur un appareil qui n'a jamais vu ce
@@ -527,6 +531,10 @@ if(btnToStep3) {
                 // On laisse la personne avancer même si l'écriture échoue pour l'instant ;
                 // les règles de sécurité Firestore seront ajustées dans une étape suivante.
             }
+            // Réserve le pseudo dans l'index public usernames/ (voir firebase-init.js) :
+            // c'est ce qui permet à un autre utilisateur d'inviter cette personne comme
+            // "travel buddy" sur un voyage (trips.html) en tapant simplement son pseudo.
+            if (typeof window.claimUsername === 'function') window.claimUsername(usernameVal);
             btnToStep3.disabled = false;
         }
         

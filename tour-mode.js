@@ -435,15 +435,23 @@
         tourModeTipIndex = idx;
         renderTipContent(idx);
         const tip = document.getElementById('tour-mode-tip');
-        if (tip) tip.classList.add('open');
         const map = tourModeLeafletMap;
         if (map) {
             const stop = TOUR_MODE_DATA.stops[idx];
             tourModeMapUserInteracted = true;
+            // map.setView() ci-dessous déclenche movestart/zoomstart de façon SYNCHRONE dès
+            // que la vue change réellement (voir ensureMap() : ces évènements ferment la
+            // bulle). Ouvrir la bulle avant cet appel la refermait donc aussitôt dans le
+            // même clic — invisible au premier clic sur une étape, sauf si la carte était
+            // déjà exactement sur ce point/zoom (d'où le besoin d'un second clic identique
+            // pour que setView() devienne un no-op ne déclenchant plus ces évènements). On
+            // déplace donc la vue D'ABORD, puis on ouvre la bulle une fois cela fait.
             map.setView([stop.lat, stop.lng], Math.max(map.getZoom(), TOUR_MODE_TIP_ZOOM), { animate: true });
+            if (tip) tip.classList.add('open');
             positionTip(idx);
             map.once('moveend', () => { if (tourModeTipIndex === idx) positionTip(idx); });
         } else if (tip) {
+            tip.classList.add('open');
             // La carte peut ne pas encore exister (clic sur une étape du rail juste après
             // l'ouverture du panneau, avant la fin des 320ms d'attente de ensureMap()) —
             // plutôt que de laisser la bulle sans position (invisible ou coincée en

@@ -77,12 +77,12 @@ const ARIRANG_TOUR = {
     stops: [
         { id: 'goyang',      city: 'Goyang',        country: 'South Korea', venue: 'Goyang Stadium',            lat: 37.6584,  lng: 126.7828,  showDates: ['2026-04-09', '2026-04-11', '2026-04-12'],
           nights: [
-              { dates: ['2026-04-09'], highlights: { en: ["The very first reunion concert after military service: <b>Jin</b> and <b>Jungkook</b> burst into tears during the opening song at the sight of the sea of purple."], fr: ["Le tout premier concert de retrouvailles après le service militaire : <b>Jin</b> et <b>Jungkook</b> ont fondu en larmes dès la chanson d'ouverture en voyant l'océan violet."], es: ["El primerísimo concierto de reencuentro tras el servicio militar: <b>Jin</b> y <b>Jungkook</b> rompieron a llorar desde la canción de apertura al ver el océano violeta."], it: ["Il primissimo concerto di riunione dopo il servizio militare: <b>Jin</b> e <b>Jungkook</b> sono scoppiati in lacrime già dalla canzone d'apertura, alla vista dell'oceano viola."], pt: ["O primeiríssimo show de reencontro após o serviço militar: <b>Jin</b> e <b>Jungkook</b> começaram a chorar já na música de abertura, ao ver o oceano roxo."], ko: ["군 복무 후 첫 재회 콘서트: <b>진</b>과 <b>정국</b>은 오프닝 곡에서부터 보라색 바다를 보고 눈물을 터뜨렸다."], ja: ["兵役後、初めての再会コンサート。<b>ジン</b>と<b>ジョングク</b>はオープニング曲から紫色の海を見て涙をこぼした。"], zh: ["服兵役后的首场重聚演唱会：<b>Jin</b>和<b>Jungkook</b>在开场曲时看到紫色的海洋便落泪了。"] } },
-              { dates: ['2026-04-11', '2026-04-12'], highlights: { en: ["<b>RM</b> gave a moving speech about their kept promise to return as seven, sparking a 5-minute standing ovation."], fr: ["<b>RM</b> a fait un discours bouleversant sur leur promesse tenue de revenir à sept, provoquant une standing ovation de 5 minutes."], es: ["<b>RM</b> dio un discurso conmovedor sobre su promesa cumplida de volver siendo siete, provocando una ovación de pie de 5 minutos."], it: ["<b>RM</b> ha tenuto un discorso commovente sulla promessa mantenuta di tornare in sette, scatenando una standing ovation di 5 minuti."], pt: ["<b>RM</b> fez um discurso emocionante sobre a promessa cumprida de voltarem sendo sete, provocando uma ovação de pé de 5 minutos."], ko: ["<b>RM</b>은 일곱 명이 함께 돌아오겠다는 약속을 지켰다는 감동적인 연설을 했고, 5분간의 기립박수가 이어졌다."], ja: ["<b>RM</b>は「7人で戻る」という約束を守れたことについて感動的なスピーチを行い、5分間のスタンディングオベーションが起きた。"], zh: ["<b>RM</b>发表了关于七人一起回归这一承诺兑现的感人演讲，引发了长达5分钟的起立鼓掌。"] } }
+              { dates: ['2026-04-09'], surpriseSongs: ['봄날 (Spring Day)', 'Save ME'], highlights: { en: ["The very first reunion concert after military service: <b>Jin</b> and <b>Jungkook</b> burst into tears during the opening song at the sight of the sea of purple."], fr: ["Le tout premier concert de retrouvailles après le service militaire : <b>Jin</b> et <b>Jungkook</b> ont fondu en larmes dès la chanson d'ouverture en voyant l'océan violet."], es: ["El primerísimo concierto de reencuentro tras el servicio militar: <b>Jin</b> y <b>Jungkook</b> rompieron a llorar desde la canción de apertura al ver el océano violeta."], it: ["Il primissimo concerto di riunione dopo il servizio militare: <b>Jin</b> e <b>Jungkook</b> sono scoppiati in lacrime già dalla canzone d'apertura, alla vista dell'oceano viola."], pt: ["O primeiríssimo show de reencontro após o serviço militar: <b>Jin</b> e <b>Jungkook</b> começaram a chorar já na música de abertura, ao ver o oceano roxo."], ko: ["군 복무 후 첫 재회 콘서트: <b>진</b>과 <b>정국</b>은 오프닝 곡에서부터 보라색 바다를 보고 눈물을 터뜨렸다."], ja: ["兵役後、初めての再会コンサート。<b>ジン</b>と<b>ジョングク</b>はオープニング曲から紫色の海を見て涙をこぼした。"], zh: ["服兵役后的首场重聚演唱会：<b>Jin</b>和<b>Jungkook</b>在开场曲时看到紫色的海洋便落泪了。"] } },
+              { dates: ['2026-04-11', '2026-04-12'], surpriseSongs: ['FIRE', 'Not Today'], highlights: { en: ["<b>RM</b> gave a moving speech about their kept promise to return as seven, sparking a 5-minute standing ovation."], fr: ["<b>RM</b> a fait un discours bouleversant sur leur promesse tenue de revenir à sept, provoquant une standing ovation de 5 minutes."], es: ["<b>RM</b> dio un discurso conmovedor sobre su promesa cumplida de volver siendo siete, provocando una ovación de pie de 5 minutos."], it: ["<b>RM</b> ha tenuto un discorso commovente sulla promessa mantenuta di tornare in sette, scatenando una standing ovation di 5 minuti."], pt: ["<b>RM</b> fez um discurso emocionante sobre a promessa cumprida de voltarem sendo sete, provocando uma ovação de pé de 5 minutos."], ko: ["<b>RM</b>은 일곱 명이 함께 돌아오겠다는 약속을 지켰다는 감동적인 연설을 했고, 5분간의 기립박수가 이어졌다."], ja: ["<b>RM</b>は「7人で戻る」という約束を守れたことについて感動的なスピーチを行い、5分間のスタンディングオベーションが起きた。"], zh: ["<b>RM</b>发表了关于七人一起回归这一承诺兑现的感人演讲，引发了长达5分钟的起立鼓掌。"] } }
           ] },
         { id: 'tokyo',       city: 'Tokyo',         country: 'Japan',       venue: 'Tokyo Dome',                 lat: 35.7056,  lng: 139.7519,  showDates: ['2026-04-17', '2026-04-18'],
           nights: [
-              { dates: ['2026-04-17', '2026-04-18'], highlights: { en: ["<b>V</b> sang a snippet of his solo song a cappella.", "<b>Jimin</b> had fun wearing a Mount Fuji-shaped hat thrown by a fan."], fr: ["<b>V</b> a chanté un extrait de sa chanson solo a cappella.", "<b>Jimin</b> s'est amusé à porter un chapeau en forme de mont Fuji lancé par une fan."], es: ["<b>V</b> cantó a capela un fragmento de su canción en solitario.", "<b>Jimin</b> se divirtió llevando un sombrero con forma del Monte Fuji lanzado por una fan."], it: ["<b>V</b> ha cantato a cappella un estratto della sua canzone da solista.", "<b>Jimin</b> si è divertito a indossare un cappello a forma di Monte Fuji lanciato da una fan."], pt: ["<b>V</b> cantou a capella um trecho de sua música solo.", "<b>Jimin</b> se divertiu usando um chapéu em forma do Monte Fuji jogado por uma fã."], ko: ["<b>뷔</b>는 자신의 솔로 곡 일부를 아카펠라로 불렀다.", "<b>지민</b>은 한 팬이 던진 후지산 모양 모자를 쓰고 즐거워했다."], ja: ["<b>V</b>はソロ曲の一部をアカペラで歌った。", "<b>ジミン</b>はファンが投げた富士山型の帽子をかぶって楽しんだ。"], zh: ["<b>V</b>清唱了一段他的个人歌曲。", "<b>Jimin</b>开心地戴上了一位粉丝扔来的富士山形状帽子。"] } }
+              { dates: ['2026-04-17', '2026-04-18'], surpriseSongs: ['House Of Cards', 'Euphoria'], highlights: { en: ["<b>V</b> sang a snippet of his solo song a cappella.", "<b>Jimin</b> had fun wearing a Mount Fuji-shaped hat thrown by a fan."], fr: ["<b>V</b> a chanté un extrait de sa chanson solo a cappella.", "<b>Jimin</b> s'est amusé à porter un chapeau en forme de mont Fuji lancé par une fan."], es: ["<b>V</b> cantó a capela un fragmento de su canción en solitario.", "<b>Jimin</b> se divirtió llevando un sombrero con forma del Monte Fuji lanzado por una fan."], it: ["<b>V</b> ha cantato a cappella un estratto della sua canzone da solista.", "<b>Jimin</b> si è divertito a indossare un cappello a forma di Monte Fuji lanciato da una fan."], pt: ["<b>V</b> cantou a capella um trecho de sua música solo.", "<b>Jimin</b> se divertiu usando um chapéu em forma do Monte Fuji jogado por uma fã."], ko: ["<b>뷔</b>는 자신의 솔로 곡 일부를 아카펠라로 불렀다.", "<b>지민</b>은 한 팬이 던진 후지산 모양 모자를 쓰고 즐거워했다."], ja: ["<b>V</b>はソロ曲の一部をアカペラで歌った。", "<b>ジミン</b>はファンが投げた富士山型の帽子をかぶって楽しんだ。"], zh: ["<b>V</b>清唱了一段他的个人歌曲。", "<b>Jimin</b>开心地戴上了一位粉丝扔来的富士山形状帽子。"] } }
           ] },
         { id: 'tampa',       city: 'Tampa',         country: 'USA',         venue: 'Raymond James Stadium',      lat: 27.9759,  lng: -82.5033,  showDates: ['2026-04-25', '2026-04-26', '2026-04-28'],
           nights: [
@@ -567,6 +567,14 @@ window.addEventListener('firebase-ready', async (e) => {
     const user = e.detail && e.detail.user;
     if (!user) return; // visiteur non connecté : on garde les données locales telles quelles
 
+    // Voyages partagés par d'autres utilisateurs (voir listSharedTripsForMe() dans
+    // firebase-init.js) : chargés une fois par page trips.html, indépendamment des
+    // propres voyages de la personne (cloudData.myTrips ci-dessous), puisqu'il s'agit
+    // d'une toute autre collection Firestore.
+    if (document.getElementById('edit-trip-name') && typeof window.refreshSharedTrips === 'function') {
+        window.refreshSharedTrips();
+    }
+
     const cloudData = await window.loadUserCloudData();
     if (cloudData) {
         if (Array.isArray(cloudData.wishlistLocs)) {
@@ -817,6 +825,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
             const target = document.getElementById('tab-' + btn.dataset.tab);
             if(target) target.classList.add('active');
+            if (btn.dataset.tab === 'reviews' && typeof window.loadLocationReviews === 'function' && currentLocationIdForMemory != null) {
+                window.loadLocationReviews(currentLocationIdForMemory);
+            }
         });
     });
 
@@ -1813,7 +1824,7 @@ const translations = {
         itiTitle: "Auto-Itinerary Generator", itiDesc: "Select a group, a country, and how many days you stay.", itiCreateBtn: "Create My Guide", itiCatLabel: "Categories (optional, select multiple)", itiExport: "Export Guide as PDF", itiSave: "Save to My Trips",
         noTripsFound: "No trips found.", selectTripToView: "Select a trip to view", locationsWord: "location", locationsWordPlural: "locations",
         addAnotherVisit: "Add another visit",
-        tabExplore: "Explore", tabMyItinerary: "My Itinerary", yourRating: "Your rating", whenDidYouVisit: "When did you visit?", saveMemory: "Save memory", myVisitTab: "My Visit",
+        tabExplore: "Explore", tabMyItinerary: "My Itinerary", yourRating: "Your rating", whenDidYouVisit: "When did you visit?", saveMemory: "Save memory", myVisitTab: "My Visit", tabReviews: "Reviews", memoryPhotoLabel: "Add a photo (optional)", memoryPhotoChoose: "Choose a photo", memoryPhotoRemove: "Remove", memoryMakePublic: "Make this review public (visible to other users)", reviewsLoading: "Loading reviews…", reviewsEmpty: "No public reviews yet for this place — be the first to share yours from the \"My Visit\" tab!", shareTripSub: "Plan it together", shareTripInvite: "Invite", shareTripHint: "Tap the icon next to a name to switch between edit and view-only access.",
         backToMap: "← Back to Map", moreDetails: "More details", openInMaps: "Open in Google Maps", detailsLabel: "Details", aboutPlaceLabel: "About this place",
         accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accResetPhoto: "Reset profile picture", accNameLabel: "Name", accEmailLabel: "Email address",
         accCountryLabel: "Country you're interested in", accCountryPlaceholder: "Select a country (optional)",
@@ -1875,7 +1886,7 @@ const translations = {
         itiTitle: "Générateur Itinéraire", itiDesc: "Sélectionnez un groupe, un pays, et le nombre de jours.", itiCreateBtn: "Créer mon guide", itiCatLabel: "Catégories (facultatif, sélection multiple)", itiExport: "Exporter en PDF", itiSave: "Sauvegarder dans My Trips",
         noTripsFound: "Aucun voyage trouvé.", selectTripToView: "Sélectionner un voyage", locationsWord: "lieu", locationsWordPlural: "lieux",
         addAnotherVisit: "Ajouter une autre visite",
-        tabExplore: "Explorer", tabMyItinerary: "Mon Itinéraire", yourRating: "Votre note", whenDidYouVisit: "Quand avez-vous visité ce lieu ?", saveMemory: "Enregistrer le souvenir", myVisitTab: "Ma Visite",
+        tabExplore: "Explorer", tabMyItinerary: "Mon Itinéraire", yourRating: "Votre note", whenDidYouVisit: "Quand avez-vous visité ce lieu ?", saveMemory: "Enregistrer le souvenir", myVisitTab: "Ma Visite", tabReviews: "Avis", memoryPhotoLabel: "Ajouter une photo (facultatif)", memoryPhotoChoose: "Choisir une photo", memoryPhotoRemove: "Retirer", memoryMakePublic: "Rendre cet avis public (visible par les autres utilisateurs)", reviewsLoading: "Chargement des avis…", reviewsEmpty: "Aucun avis public pour ce lieu pour l'instant — soyez le premier à partager le vôtre depuis l'onglet « Ma Visite » !", shareTripSub: "Organisez-le ensemble", shareTripInvite: "Inviter", shareTripHint: "Touchez l'icône à côté d'un nom pour basculer entre modification et lecture seule.",
         backToMap: "← Retour à la carte", moreDetails: "Plus de détails", openInMaps: "Ouvrir dans Google Maps", detailsLabel: "Détails", aboutPlaceLabel: "À propos de ce lieu",
         accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accResetPhoto: "Réinitialiser la photo de profil", accNameLabel: "Nom", accEmailLabel: "Adresse e-mail",
         accCountryLabel: "Pays qui vous intéresse", accCountryPlaceholder: "Choisir un pays (optionnel)",
@@ -1937,7 +1948,7 @@ const translations = {
         itiTitle: "Generador de Itinerarios", itiDesc: "Selecciona un grupo, un país y cuántos días te quedas.", itiCreateBtn: "Crear mi guía", itiCatLabel: "Categorías (opcional, selección múltiple)", itiExport: "Exportar guía en PDF", itiSave: "Guardar en Mis Viajes",
         noTripsFound: "No se encontraron viajes.", selectTripToView: "Selecciona un viaje para ver", locationsWord: "lugar", locationsWordPlural: "lugares",
         addAnotherVisit: "Añadir otra visita",
-        tabExplore: "Explorar", tabMyItinerary: "Mi Itinerario", yourRating: "Tu valoración", whenDidYouVisit: "¿Cuándo visitaste este lugar?", saveMemory: "Guardar recuerdo", myVisitTab: "Mi Visita",
+        tabExplore: "Explorar", tabMyItinerary: "Mi Itinerario", yourRating: "Tu valoración", whenDidYouVisit: "¿Cuándo visitaste este lugar?", saveMemory: "Guardar recuerdo", myVisitTab: "Mi Visita", tabReviews: "Reseñas", memoryPhotoLabel: "Añadir una foto (opcional)", memoryPhotoChoose: "Elegir una foto", memoryPhotoRemove: "Quitar", memoryMakePublic: "Hacer pública esta reseña (visible para otros usuarios)", reviewsLoading: "Cargando reseñas…", reviewsEmpty: "Todavía no hay reseñas públicas para este lugar — ¡sé el primero en compartir la tuya desde la pestaña «Mi Visita»!",
         backToMap: "← Volver al mapa", moreDetails: "Más detalles", openInMaps: "Abrir en Google Maps", detailsLabel: "Detalles", aboutPlaceLabel: "Sobre este lugar",
         accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accResetPhoto: "Restablecer foto de perfil", accNameLabel: "Nombre", accEmailLabel: "Correo electrónico",
         accCountryLabel: "País que te interesa", accCountryPlaceholder: "Elige un país (opcional)",
@@ -1998,7 +2009,7 @@ const translations = {
         itiTitle: "Generatore di Itinerari", itiDesc: "Seleziona un gruppo, un paese e quanti giorni resti.", itiCreateBtn: "Crea la mia guida", itiCatLabel: "Categorie (opzionale, selezione multipla)", itiExport: "Esporta guida in PDF", itiSave: "Salva nei Miei Viaggi",
         noTripsFound: "Nessun viaggio trovato.", selectTripToView: "Seleziona un viaggio da vedere", locationsWord: "luogo", locationsWordPlural: "luoghi",
         addAnotherVisit: "Aggiungi un'altra visita",
-        tabExplore: "Esplora", tabMyItinerary: "Il Mio Itinerario", yourRating: "La tua valutazione", whenDidYouVisit: "Quando hai visitato questo posto?", saveMemory: "Salva ricordo", myVisitTab: "La Mia Visita",
+        tabExplore: "Esplora", tabMyItinerary: "Il Mio Itinerario", yourRating: "La tua valutazione", whenDidYouVisit: "Quando hai visitato questo posto?", saveMemory: "Salva ricordo", myVisitTab: "La Mia Visita", tabReviews: "Recensioni", memoryPhotoLabel: "Aggiungi una foto (facoltativo)", memoryPhotoChoose: "Scegli una foto", memoryPhotoRemove: "Rimuovi", memoryMakePublic: "Rendi pubblica questa recensione (visibile agli altri utenti)", reviewsLoading: "Caricamento recensioni…", reviewsEmpty: "Ancora nessuna recensione pubblica per questo posto — sii il primo a condividere la tua dalla scheda «La Mia Visita»!",
         backToMap: "← Torna alla mappa", moreDetails: "Maggiori dettagli", openInMaps: "Apri in Google Maps", detailsLabel: "Dettagli", aboutPlaceLabel: "Informazioni su questo luogo",
         accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accResetPhoto: "Ripristina foto profilo", accNameLabel: "Nome", accEmailLabel: "Indirizzo email",
         accCountryLabel: "Paese che ti interessa", accCountryPlaceholder: "Scegli un paese (opzionale)",
@@ -2059,7 +2070,7 @@ const translations = {
         itiTitle: "Gerador de Roteiros", itiDesc: "Selecione um grupo, um país e quantos dias você fica.", itiCreateBtn: "Criar meu guia", itiCatLabel: "Categorias (opcional, seleção múltipla)", itiExport: "Exportar guia em PDF", itiSave: "Salvar em Minhas Viagens",
         noTripsFound: "Nenhuma viagem encontrada.", selectTripToView: "Selecione uma viagem para ver", locationsWord: "local", locationsWordPlural: "locais",
         addAnotherVisit: "Adicionar outra visita",
-        tabExplore: "Explorar", tabMyItinerary: "Meu Itinerário", yourRating: "Sua avaliação", whenDidYouVisit: "Quando você visitou este lugar?", saveMemory: "Salvar lembrança", myVisitTab: "Minha Visita",
+        tabExplore: "Explorar", tabMyItinerary: "Meu Itinerário", yourRating: "Sua avaliação", whenDidYouVisit: "Quando você visitou este lugar?", saveMemory: "Salvar lembrança", myVisitTab: "Minha Visita", tabReviews: "Avaliações", memoryPhotoLabel: "Adicionar uma foto (opcional)", memoryPhotoChoose: "Escolher uma foto", memoryPhotoRemove: "Remover", memoryMakePublic: "Tornar esta avaliação pública (visível para outros usuários)", reviewsLoading: "Carregando avaliações…", reviewsEmpty: "Ainda não há avaliações públicas para este lugar — seja o primeiro a compartilhar a sua na aba «Minha Visita»!",
         backToMap: "← Voltar ao mapa", moreDetails: "Mais detalhes", openInMaps: "Abrir no Google Maps", detailsLabel: "Detalhes", aboutPlaceLabel: "Sobre este local",
         accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accResetPhoto: "Redefinir foto de perfil", accNameLabel: "Nome", accEmailLabel: "Endereço de e-mail",
         accCountryLabel: "País de interesse", accCountryPlaceholder: "Escolha um país (opcional)",
@@ -2120,7 +2131,7 @@ const translations = {
         itiTitle: "자동 일정 생성기", itiDesc: "그룹, 국가, 체류 일수를 선택하세요.", itiCreateBtn: "가이드 만들기", itiCatLabel: "카테고리 (선택 사항, 다중 선택 가능)", itiExport: "가이드 PDF로 내보내기", itiSave: "내 여행에 저장",
         noTripsFound: "여행을 찾을 수 없습니다.", selectTripToView: "볼 여행을 선택하세요", locationsWord: "장소", locationsWordPlural: "장소",
         addAnotherVisit: "다른 방문 추가",
-        tabExplore: "탐색", tabMyItinerary: "내 일정", yourRating: "평점", whenDidYouVisit: "언제 방문하셨나요?", saveMemory: "추억 저장", myVisitTab: "내 방문",
+        tabExplore: "탐색", tabMyItinerary: "내 일정", yourRating: "평점", whenDidYouVisit: "언제 방문하셨나요?", saveMemory: "추억 저장", myVisitTab: "내 방문", tabReviews: "후기", memoryPhotoLabel: "사진 추가 (선택 사항)", memoryPhotoChoose: "사진 선택", memoryPhotoRemove: "제거", memoryMakePublic: "이 후기를 공개로 설정 (다른 사용자에게 표시됨)", reviewsLoading: "후기를 불러오는 중…", reviewsEmpty: "아직 이 장소에 대한 공개 후기가 없습니다 — '내 방문' 탭에서 첫 후기를 남겨보세요!",
         backToMap: "← 지도로 돌아가기", moreDetails: "자세히 보기", openInMaps: "구글 지도에서 열기", detailsLabel: "상세 정보", aboutPlaceLabel: "이 장소에 대해",
         accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accResetPhoto: "프로필 사진 재설정", accNameLabel: "이름", accEmailLabel: "이메일 주소",
         accCountryLabel: "관심 있는 국가", accCountryPlaceholder: "국가 선택 (선택 사항)",
@@ -2181,7 +2192,7 @@ const translations = {
         itiTitle: "自動旅程ジェネレーター", itiDesc: "グループ、国、滞在日数を選択してください。", itiCreateBtn: "ガイドを作成", itiCatLabel: "カテゴリー（任意、複数選択可）", itiExport: "ガイドをPDFで出力", itiSave: "マイトリップに保存",
         noTripsFound: "旅行が見つかりません。", selectTripToView: "表示する旅行を選択", locationsWord: "スポット", locationsWordPlural: "スポット",
         addAnotherVisit: "別の訪問を追加",
-        tabExplore: "探索", tabMyItinerary: "マイ旅程", yourRating: "評価", whenDidYouVisit: "いつ訪れましたか？", saveMemory: "思い出を保存", myVisitTab: "マイビジット",
+        tabExplore: "探索", tabMyItinerary: "マイ旅程", yourRating: "評価", whenDidYouVisit: "いつ訪れましたか？", saveMemory: "思い出を保存", myVisitTab: "マイビジット", tabReviews: "レビュー", memoryPhotoLabel: "写真を追加（任意）", memoryPhotoChoose: "写真を選択", memoryPhotoRemove: "削除", memoryMakePublic: "このレビューを公開する（他のユーザーに表示されます）", reviewsLoading: "レビューを読み込み中…", reviewsEmpty: "この場所にはまだ公開レビューがありません —「マイビジット」タブから最初のレビューを共有しましょう！",
         backToMap: "← 地図に戻る", moreDetails: "詳細を見る", openInMaps: "Googleマップで開く", detailsLabel: "詳細", aboutPlaceLabel: "この場所について",
         accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accResetPhoto: "プロフィール写真をリセット", accNameLabel: "名前", accEmailLabel: "メールアドレス",
         accCountryLabel: "興味のある国", accCountryPlaceholder: "国を選択（任意）",
@@ -2242,7 +2253,7 @@ const translations = {
         itiTitle: "自动行程生成器", itiDesc: "选择一个团体、一个国家，以及停留天数。", itiCreateBtn: "生成我的指南", itiCatLabel: "类别（可选，可多选）", itiExport: "导出指南为 PDF", itiSave: "保存到我的行程",
         noTripsFound: "未找到任何行程。", selectTripToView: "选择要查看的行程", locationsWord: "个地点", locationsWordPlural: "个地点",
         addAnotherVisit: "添加另一次访问",
-        tabExplore: "探索", tabMyItinerary: "我的行程", yourRating: "你的评分", whenDidYouVisit: "你什么时候去的？", saveMemory: "保存回忆", myVisitTab: "我的到访",
+        tabExplore: "探索", tabMyItinerary: "我的行程", yourRating: "你的评分", whenDidYouVisit: "你什么时候去的？", saveMemory: "保存回忆", myVisitTab: "我的到访", tabReviews: "评价", memoryPhotoLabel: "添加照片（可选）", memoryPhotoChoose: "选择照片", memoryPhotoRemove: "移除", memoryMakePublic: "公开此评价（其他用户可见）", reviewsLoading: "正在加载评价…", reviewsEmpty: "该地点暂无公开评价——从「我的到访」标签页分享第一条评价吧！",
         backToMap: "← 返回地图", moreDetails: "更多详情", openInMaps: "在 Google 地图中打开", detailsLabel: "详情", aboutPlaceLabel: "关于这个地方",
         accTitle: "我的账户", accChangePhoto: "更换头像", accResetPhoto: "重置头像", accNameLabel: "姓名", accEmailLabel: "电子邮箱",
         accCountryLabel: "感兴趣的国家", accCountryPlaceholder: "选择国家（可选）",
@@ -2675,23 +2686,41 @@ function addSingleLocationMarker(loc, visitedData) {
 }
 
 function addClusterMarker(cluster) {
-    // Couleur représentative : le groupe le plus fréquent dans le cluster, pour que le
-    // marqueur groupé garde un sens visuel même quand plusieurs groupes sont mélangés.
-    const groupCounts = {};
-    cluster.locs.forEach(l => { groupCounts[l.group] = (groupCounts[l.group] || 0) + 1; });
-    const dominantGroup = Object.keys(groupCounts).sort((a, b) => groupCounts[b] - groupCounts[a])[0];
-    const baseColor = groupColors[dominantGroup] || '#334e68';
     const count = cluster.locs.length;
 
-    // Le badge (span, pas div) et le conteneur (span aussi) évitent volontairement le
-    // sélecteur CSS ".custom-category-marker div", qui appliquerait sinon le style rond
-    // du marqueur à tout div descendant, y compris le conteneur et le badge.
-    const html = `
-        <span style="position:relative; display:inline-block;">
-            <div style="border-color:${baseColor}; --marker-color:${baseColor}; background-color:${baseColor}; color:#fff;">${CLUSTER_ICON_SVG}</div>
-            <span class="cluster-badge">×${count}</span>
-        </span>
-    `;
+    // Groupes distincts présents dans ce cluster : un même lieu réel (mêmes coordonnées,
+    // ex: BTS ET Blackpink ayant tous deux tourné au Stade de France) finit dans le même
+    // cluster que "plusieurs lieux proches regroupés au dézoom", donc systématiquement
+    // via addClusterMarker — mais jusqu'ici le marqueur affichait toujours la couleur d'UN
+    // seul groupe "dominant", masquant les autres. On distingue maintenant les deux cas :
+    // un seul groupe -> couleur pleine comme avant ; plusieurs groupes -> le disque du
+    // marqueur est divisé en parts égales, une couleur par groupe présent, pour qu'aucun
+    // des groupes ayant visité ce lieu ne disparaisse visuellement derrière un autre.
+    const distinctGroups = [...new Set(cluster.locs.map(l => l.group))];
+    const html = distinctGroups.length > 1
+        ? (() => {
+            const step = 360 / distinctGroups.length;
+            const slices = distinctGroups.map((g, i) => `${groupColors[g] || '#334e68'} ${(i * step).toFixed(2)}deg ${((i + 1) * step).toFixed(2)}deg`).join(', ');
+            return `
+                <span style="position:relative; display:inline-block;">
+                    <div style="border-color:#fff; --marker-color:#fff; background:conic-gradient(${slices}); color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.3);">${CLUSTER_ICON_SVG}</div>
+                    <span class="cluster-badge">×${count}</span>
+                </span>
+            `;
+        })()
+        : (() => {
+            const baseColor = groupColors[distinctGroups[0]] || '#334e68';
+            // Le badge (span, pas div) et le conteneur (span aussi) évitent volontairement
+            // le sélecteur CSS ".custom-category-marker div", qui appliquerait sinon le
+            // style rond du marqueur à tout div descendant, y compris le conteneur et le
+            // badge.
+            return `
+                <span style="position:relative; display:inline-block;">
+                    <div style="border-color:${baseColor}; --marker-color:${baseColor}; background-color:${baseColor}; color:#fff;">${CLUSTER_ICON_SVG}</div>
+                    <span class="cluster-badge">×${count}</span>
+                </span>
+            `;
+        })();
     const clusterIcon = L.divIcon({ className: 'custom-category-marker', html, iconSize: [32, 32], iconAnchor: [16, 16] });
     const marker = L.marker(cluster.center, { icon: clusterIcon }).addTo(markerGroup);
     marker.on('click', () => { map.setView(cluster.center, Math.min(map.getZoom() + 3, 18)); });
@@ -3414,11 +3443,76 @@ document.querySelectorAll('#memory-stars .star').forEach(star => {
 // la visite existante à cet index dans le tableau "visits" du lieu courant.
 let editingVisitIndex = null;
 
-// Ouvre le formulaire (étoiles / date / notes) pour ajouter une nouvelle visite
-// (visitIndex = null) ou modifier une visite existante (visitIndex = un nombre).
+// Redimensionne/compresse une photo (via canvas) avant de l'enregistrer, comme pour la
+// photo de profil (account.html) : une photo de téléphone à pleine résolution
+// dépasserait largement la limite de 1 Mo par champ Firestore.
+function resizeImageDataUrl(dataUrl, maxSize) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = function() {
+            const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.75));
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+    });
+}
+
+// Photo en attente de sauvegarde pour la visite en cours d'édition (data URL déjà
+// redimensionnée), remise à zéro à chaque ouverture du formulaire.
+let pendingMemoryPhoto = null;
+
+const memoryPhotoInput = document.getElementById('memory-photo-input');
+if (memoryPhotoInput) {
+    memoryPhotoInput.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async function(event) {
+            pendingMemoryPhoto = await resizeImageDataUrl(event.target.result, 700);
+            const preview = document.getElementById('memory-photo-preview');
+            const previewImg = document.getElementById('memory-photo-preview-img');
+            const removeBtn = document.getElementById('memory-photo-remove');
+            if (previewImg) previewImg.src = pendingMemoryPhoto;
+            if (preview) preview.classList.remove('hidden');
+            if (removeBtn) removeBtn.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    });
+}
+const memoryPhotoRemoveBtn = document.getElementById('memory-photo-remove');
+if (memoryPhotoRemoveBtn) {
+    memoryPhotoRemoveBtn.addEventListener('click', () => {
+        pendingMemoryPhoto = null;
+        const preview = document.getElementById('memory-photo-preview');
+        const removeBtn = document.getElementById('memory-photo-remove');
+        const input = document.getElementById('memory-photo-input');
+        if (preview) preview.classList.add('hidden');
+        if (removeBtn) removeBtn.classList.add('hidden');
+        if (input) input.value = '';
+    });
+}
+
+// Ouvre le formulaire (étoiles / date / notes / photo / public) pour ajouter une
+// nouvelle visite (visitIndex = null) ou modifier une visite existante (visitIndex =
+// un nombre).
 function openMemoryEditor(visitIndex) {
     editingVisitIndex = visitIndex;
     const dropdown = document.getElementById('memory-dropdown');
+    pendingMemoryPhoto = null;
+    const preview = document.getElementById('memory-photo-preview');
+    const removeBtn = document.getElementById('memory-photo-remove');
+    const photoInput = document.getElementById('memory-photo-input');
+    const publicCheck = document.getElementById('memory-public-check');
+    if (preview) preview.classList.add('hidden');
+    if (removeBtn) removeBtn.classList.add('hidden');
+    if (photoInput) photoInput.value = '';
+    if (publicCheck) publicCheck.checked = false;
 
     if (visitIndex === null) {
         // Nouvelle visite : date du jour, note vierge, 4 étoiles par défaut.
@@ -3434,6 +3528,14 @@ function openMemoryEditor(visitIndex) {
             document.getElementById('memory-date').value = visit.date || '';
             document.getElementById('memory-notes').value = visit.notes || '';
             window.setStars(visit.rating || 4);
+            if (visit.photo) {
+                pendingMemoryPhoto = visit.photo;
+                const previewImg = document.getElementById('memory-photo-preview-img');
+                if (previewImg) previewImg.src = visit.photo;
+                if (preview) preview.classList.remove('hidden');
+                if (removeBtn) removeBtn.classList.remove('hidden');
+            }
+            if (publicCheck) publicCheck.checked = !!visit.isPublic;
         }
     }
 
@@ -3448,10 +3550,12 @@ if(saveMemoryBtn) {
         const rating = Number(document.getElementById('memory-rating-val').value);
         const date = document.getElementById('memory-date').value;
         const notes = document.getElementById('memory-notes').value;
-        
+        const photo = pendingMemoryPhoto || null;
+        const isPublic = !!(document.getElementById('memory-public-check') && document.getElementById('memory-public-check').checked);
+
         let list = getVisitedLocs();
         const idx = list.findIndex(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
-        
+
         if(idx !== -1) {
             list[idx] = normalizeVisitEntry(list[idx]);
 
@@ -3459,16 +3563,32 @@ if(saveMemoryBtn) {
             // Modification d'une visite existante : seule la différence avec l'ancienne
             // note compte (le nombre de visites, lui, ne change pas).
             if (editingVisitIndex === null) {
-                list[idx].visits.push({ date, rating, notes });
+                list[idx].visits.push({ date, rating, notes, photo, isPublic });
                 applyCommunityRatingDelta(currentLocationIdForMemory, rating, 1);
             } else {
                 const oldRating = list[idx].visits[editingVisitIndex].rating || 0;
-                list[idx].visits[editingVisitIndex] = { date, rating, notes };
+                list[idx].visits[editingVisitIndex] = { date, rating, notes, photo, isPublic };
                 applyCommunityRatingDelta(currentLocationIdForMemory, rating - oldRating, 0);
             }
 
             localStorage.setItem('visitedLocs', JSON.stringify(list));
             syncVisited(list);
+
+            // Avis public (voir setLocationReview()/deleteLocationReview() dans
+            // firebase-init.js) : un seul avis public par personne et par lieu, dérivé
+            // de CETTE visite (la plus récemment enregistrée avec la case cochée) —
+            // publié/retiré/mis à jour à chaque sauvegarde selon l'état de la case.
+            if (isPublic) {
+                if (typeof window.setLocationReview === 'function') {
+                    window.setLocationReview(String(currentLocationIdForMemory), {
+                        rating, notes, photo,
+                        userName: (localStorage.getItem('userFirstName') || localStorage.getItem('userName') || 'ARMY').trim(),
+                        userPhoto: localStorage.getItem('userPhoto') || null
+                    });
+                }
+            } else if (typeof window.deleteLocationReview === 'function') {
+                window.deleteLocationReview(String(currentLocationIdForMemory));
+            }
 
             document.getElementById('memory-dropdown').classList.remove('open');
             document.getElementById('tab-btn-visit').classList.remove('hidden');
@@ -3489,7 +3609,8 @@ window.renderVisitsList = function(visits) {
     const editSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
 
     // On garde une trace de l'index d'origine (dans le tableau non trié) pour que
-    // "Edit" modifie bien la bonne visite, même une fois la liste triée à l'affichage.
+    // "Edit"/"Supprimer" modifient bien la bonne visite, même une fois la liste triée à
+    // l'affichage.
     const withIndex = visits.map((v, i) => ({ ...v, __idx: i }));
     withIndex.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
@@ -3511,26 +3632,162 @@ window.renderVisitsList = function(visits) {
 
         const notesText = v.notes ? `"${v.notes}"` : (currentLang === 'fr' ? "Aucune note pour cette visite." : "No notes for this visit.");
         const editLabel = currentLang === 'fr' ? 'Modifier' : 'Edit memory';
+        const deleteLabel = currentLang === 'fr' ? 'Supprimer cette visite' : 'Delete this visit';
+        const publicLabel = currentLang === 'fr' ? 'Publique' : 'Public';
+        const photoHtml = v.photo ? `<img src="${v.photo}" style="width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin-top:10px; display:block;">` : '';
+        const publicBadgeHtml = v.isPublic ? `<span style="display:inline-block; margin-left:8px; font-size:9.5px; font-weight:700; color:#10b981; background:#10b98118; padding:2px 8px; border-radius:100px; vertical-align:middle;">${publicLabel}</span>` : '';
 
         const card = document.createElement('div');
         card.className = 'memory-card';
+        card.style.position = 'relative';
         card.innerHTML = `
+            <div class="delete-memory-btn" data-idx="${v.__idx}" title="${deleteLabel}" style="position:absolute; top:10px; right:10px; width:22px; height:22px; border-radius:50%; background:#f1f5f9; color:#94a3b8; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; line-height:1; font-weight:700;">&times;</div>
             <div class="memory-card-header">
                 <div class="stars" style="pointer-events:none;">${starsHtml}</div>
-                <div class="memory-date">${formattedDate || (currentLang === 'fr' ? 'Date inconnue' : 'Unknown date')}</div>
+                <div class="memory-date">${formattedDate || (currentLang === 'fr' ? 'Date inconnue' : 'Unknown date')}${publicBadgeHtml}</div>
             </div>
             <div class="memory-notes">${notesText}</div>
+            ${photoHtml}
             <button class="edit-memory-btn" data-idx="${v.__idx}" style="background:transparent; border:1.5px solid #cbd5e1; color:#64748b; font-size:11px; font-weight:700; padding:6px 12px; border-radius:100px; margin-top:20px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">${editSvg} ${editLabel}</button>
         `;
         card.querySelector('.edit-memory-btn').addEventListener('click', () => openMemoryEditor(v.__idx));
+        card.querySelector('.delete-memory-btn').addEventListener('click', () => window.confirmDeleteVisit(v.__idx));
         container.appendChild(card);
     });
+};
+
+// Popup de confirmation générique "Supprimer cette visite ?" — injectée en JS (plutôt que
+// dupliquée en HTML statique sur map.html ET visited.html/wishlist.html, qui partagent
+// tous renderVisitsList) pour n'exister qu'une fois, peu importe la page.
+function ensureDeleteVisitModal() {
+    let modal = document.getElementById('delete-visit-modal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'delete-visit-modal';
+    modal.className = 'modal hidden';
+    modal.style.zIndex = '10500';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:380px; text-align:center;">
+            <h3 style="margin-bottom:10px; color:#212832;" id="delete-visit-title">${currentLang === 'fr' ? 'Supprimer cette visite ?' : 'Delete this visit?'}</h3>
+            <p style="font-size:13px; color:#64748b; margin-bottom:20px;" id="delete-visit-desc">${currentLang === 'fr' ? 'Cette action est définitive et ne peut pas être annulée.' : 'This action is permanent and cannot be undone.'}</p>
+            <div style="display:flex; gap:10px;">
+                <button class="gen-btn ghost" style="flex:1; justify-content:center;" id="delete-visit-cancel">${currentLang === 'fr' ? 'Annuler' : 'Cancel'}</button>
+                <button class="gen-btn" style="background:#ef4444; border-color:#ef4444; flex:1; justify-content:center;" id="delete-visit-confirm">${currentLang === 'fr' ? 'Supprimer' : 'Delete'}</button>
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('#delete-visit-cancel').addEventListener('click', () => modal.classList.add('hidden'));
+    return modal;
+}
+
+let __pendingDeleteVisitIdx = null;
+window.confirmDeleteVisit = function(idx) {
+    __pendingDeleteVisitIdx = idx;
+    const modal = ensureDeleteVisitModal();
+    const titleEl = document.getElementById('delete-visit-title');
+    const descEl = document.getElementById('delete-visit-desc');
+    if (titleEl) titleEl.textContent = currentLang === 'fr' ? 'Supprimer cette visite ?' : 'Delete this visit?';
+    if (descEl) descEl.textContent = currentLang === 'fr' ? 'Cette action est définitive et ne peut pas être annulée.' : 'This action is permanent and cannot be undone.';
+    const confirmBtn = document.getElementById('delete-visit-confirm');
+    confirmBtn.onclick = () => { window.deleteVisit(idx); modal.classList.add('hidden'); };
+    modal.classList.remove('hidden');
+};
+
+// Supprime UNE visite (pas tout le lieu) : retire l'entrée du tableau "visits" du lieu
+// actuellement affiché (currentLocationIdForMemory), retire sa contribution à la note
+// communautaire, et décoche complètement "J'ai visité ce lieu" si c'était la dernière
+// visite restante (repasse le lieu en "non visité" plutôt que de garder une case cochée
+// sans aucune visite dessous, ce qui serait incohérent).
+window.deleteVisit = function(idx) {
+    let list = getVisitedLocs();
+    const listIdx = list.findIndex(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
+    if (listIdx === -1) return;
+    list[listIdx] = normalizeVisitEntry(list[listIdx]);
+    const removed = list[listIdx].visits[idx];
+    if (!removed) return;
+    list[listIdx].visits.splice(idx, 1);
+    applyCommunityRatingDelta(currentLocationIdForMemory, -(removed.rating || 0), -1);
+
+    if (list[listIdx].visits.length === 0) {
+        list.splice(listIdx, 1);
+    }
+    localStorage.setItem('visitedLocs', JSON.stringify(list));
+    syncVisited(list);
+
+    const vCheck = document.getElementById('details-visited');
+    const tabBtnVisit = document.getElementById('tab-btn-visit');
+    const remaining = list.find(v => v.id === currentLocationIdForMemory || v === currentLocationIdForMemory);
+    if (remaining) {
+        window.renderVisitsList(normalizeVisitEntry(remaining).visits);
+    } else {
+        if (vCheck) vCheck.checked = false;
+        if (tabBtnVisit) {
+            tabBtnVisit.classList.add('hidden');
+            const infoTabBtn = document.querySelector('.tab-btn[data-tab="info"]');
+            if (infoTabBtn) infoTabBtn.click();
+        }
+    }
+    window.refreshLocationRating(currentLocationIdForMemory);
+    if (typeof window.refreshVisitedFromCloud === 'function') window.refreshVisitedFromCloud();
 };
 
 const addVisitBtn = document.getElementById('add-visit-btn');
 if (addVisitBtn) {
     addVisitBtn.addEventListener('click', () => openMemoryEditor(null));
 }
+
+// Onglet "Reviews" du détail d'un lieu : charge et affiche les avis PUBLICS laissés par
+// d'autres utilisateurs (voir setLocationReview()/fetchLocationReviews() dans
+// firebase-init.js) — chargé à la demande, au clic sur l'onglet plutôt qu'au chargement
+// de la fiche, pour ne pas payer une lecture Firestore par lieu survolé.
+window.loadLocationReviews = async function(locationId) {
+    const loadingEl = document.getElementById('reviews-loading');
+    const emptyEl = document.getElementById('reviews-empty');
+    const listEl = document.getElementById('reviews-list');
+    if (!listEl) return;
+    if (loadingEl) loadingEl.classList.remove('hidden');
+    if (emptyEl) emptyEl.classList.add('hidden');
+    listEl.innerHTML = '';
+
+    const reviews = typeof window.fetchLocationReviews === 'function' ? await window.fetchLocationReviews(locationId) : [];
+    if (loadingEl) loadingEl.classList.add('hidden');
+
+    if (!reviews || reviews.length === 0) {
+        if (emptyEl) emptyEl.classList.remove('hidden');
+        return;
+    }
+
+    const starSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="#D42759" stroke="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const emptyStarSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="#e2e8f0" stroke="#e2e8f0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+    reviews
+        .sort((a, b) => (b.updatedAt && b.updatedAt.seconds || 0) - (a.updatedAt && a.updatedAt.seconds || 0))
+        .forEach(r => {
+            let starsHtml = '';
+            for (let i = 0; i < 5; i++) { starsHtml += (i < (r.rating || 0)) ? starSvg : emptyStarSvg; }
+            const initial = (r.userName || 'A').trim().charAt(0).toUpperCase();
+            const avatarHtml = r.userPhoto
+                ? `<img src="${r.userPhoto}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">`
+                : `<div style="width:32px; height:32px; border-radius:50%; background:#FCE7F0; color:#D42759; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">${initial}</div>`;
+            const notesHtml = r.notes ? `<div class="memory-notes" style="margin-top:8px;">"${r.notes}"</div>` : '';
+            const photoHtml = r.photo ? `<img src="${r.photo}" style="width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin-top:10px; display:block;">` : '';
+
+            const card = document.createElement('div');
+            card.className = 'memory-card';
+            card.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    ${avatarHtml}
+                    <div style="flex:1;">
+                        <div style="font-size:12.5px; font-weight:700; color:#212832;">${r.userName || (currentLang === 'fr' ? 'ARMY' : 'ARMY')}</div>
+                        <div class="stars" style="pointer-events:none; margin-top:2px;">${starsHtml}</div>
+                    </div>
+                </div>
+                ${notesHtml}
+                ${photoHtml}
+            `;
+            listEl.appendChild(card);
+        });
+};
 
 window.closeDetailsPanel = function() {
     const dDetails = document.getElementById('sidebar-details');
@@ -4110,7 +4367,7 @@ window.addSelectedDaysToTrip = function() {
     closeModal('itinerary-modal');
 };
 
-window.saveItineraryToTrips = function() {
+window.saveItineraryToTrips = async function() {
     const country = document.getElementById('iti-country').value;
     const daysCount = parseInt(document.getElementById('iti-days').value);
     const newTripId = 'trip-' + Date.now();
@@ -4141,10 +4398,18 @@ window.saveItineraryToTrips = function() {
     let trips = getMyTripsList();
     trips.push(newTrip);
     localStorage.setItem('myTrips', JSON.stringify(trips));
-    syncTrips(trips);
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
-    syncWishlist(wList);
     localStorage.setItem('activeTripId', newTripId);
+
+    // On ATTEND que la synchronisation Firestore soit vraiment terminée avant de
+    // continuer (redirection comprise) : sinon, la navigation vers trips.html pouvait
+    // devancer l'écriture cloud encore en vol, et le firebase-ready de trips.html
+    // écrasait alors le localStorage tout juste mis à jour avec d'anciennes données
+    // cloud ne contenant pas encore ce nouveau voyage — qui semblait alors "ne pas se
+    // créer" alors qu'il avait bien été généré un instant plus tôt.
+    if (typeof window.syncUserData === 'function') {
+        await window.syncUserData({ myTrips: trips, wishlistLocs: wList });
+    }
 
     if(document.getElementById('trip-name-display')) {
         document.getElementById('itinerary-modal').classList.add('hidden');
@@ -4155,54 +4420,45 @@ window.saveItineraryToTrips = function() {
 };
 
 window.exportItineraryPDF = function() {
-    const el = document.getElementById('iti-result');
+    const daysListEl = document.getElementById('iti-days-list');
     const btn = document.getElementById('export-pdf-btn');
     const saveBtn = document.getElementById('save-trip-btn');
-    if(!el) return;
+    if(!daysListEl) return;
     if(typeof html2pdf === 'undefined') {
         alert(currentLang === 'fr' ? "L'export PDF n'a pas pu se charger. Vérifiez votre connexion et réessayez." : 'The PDF export library failed to load. Check your connection and try again.');
         return;
     }
     if(btn) btn.style.display = 'none';
     if(saveBtn) saveBtn.style.display = 'none';
-
-    // Le bouton "Export as PDF" ne faisait jusqu'ici rien du tout, sans aucune erreur visible :
-    // #iti-result contient la carte Leaflet en direct (#iti-map-container), dont les tuiles
-    // OpenStreetMap sont chargées cross-origin sans que Leaflet ne les marque comme lisibles par
-    // canvas (crossOrigin). html2canvas (utilisé en interne par html2pdf) se retrouve alors avec
-    // un canvas "tainted" et lève une SecurityError silencieuse dès qu'il tente de le lire, ce qui
-    // annule tout le PDF sans jamais déclencher le .then(). On exporte donc un clone du contenu
-    // sans la carte (peu utile de toute façon dans un PDF imprimé : chaque jour garde son propre
-    // lien "Open Route in Google Maps"), avec en renfort useCORS/allowTaint pour les cas où
-    // d'autres images cross-origin s'ajouteraient plus tard.
-    const clone = el.cloneNode(true);
-    clone.removeAttribute('id');
-    clone.classList.remove('hidden');
-    const mapCard = clone.querySelector('#iti-map-container');
-    if(mapCard && mapCard.parentElement) mapCard.parentElement.remove();
-    // Positionné à left:-9999px (hors écran), le clone produisait un PDF entièrement
-    // blanc : html2canvas calcule sa fenêtre de capture à partir du viewport réel, et un
-    // grand décalage négatif la fait pointer loin du contenu à capturer — rien n'est
-    // jamais dessiné sur le canvas, sans erreur visible (le fichier PDF se télécharge
-    // quand même, juste vide). On le garde donc dans le coin (0,0) du viewport réel, mais
-    // caché visuellement derrière le reste de la page (z-index négatif + inerte au clic),
-    // ce qu'html2canvas capture correctement.
-    clone.style.position = 'fixed';
-    clone.style.left = '0';
-    clone.style.top = '0';
-    clone.style.zIndex = '-999';
-    clone.style.pointerEvents = 'none';
-    clone.style.width = el.offsetWidth + 'px';
-    clone.style.background = '#fff';
-    document.body.appendChild(clone);
-
     const restore = () => {
         if(btn) btn.style.display = 'block';
         if(saveBtn) saveBtn.style.display = 'block';
-        clone.remove();
     };
 
-    html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' }, html2canvas: { useCORS: true, allowTaint: true } }).from(clone).save()
+    // Deux tentatives précédentes avaient déjà échoué à produire autre chose qu'un PDF
+    // entièrement blanc :
+    // 1) #iti-result contient la carte Leaflet en direct (#iti-map-container), dont les
+    //    tuiles OpenStreetMap chargées cross-origin "tainted" le canvas sans erreur visible.
+    // 2) Un simple clone repositionné (même caché derrière le reste de la page plutôt que
+    //    hors-écran) restait un DOM VIVANT héritant de tout le CSS de la page — variables
+    //    CSS, .hidden en display:none!important à retirer soi-même, et surtout le
+    //    max-height:40vh + overflow-y:auto de #iti-days-list lui-même, qui ne laissait
+    //    html2canvas capturer que la portion visible avant scroll, jamais tout le contenu.
+    // On construit donc une chaîne HTML autonome (aucune classe externe, uniquement du
+    // style inline déjà présent dans le HTML généré par displayGeneratedItinerary — voir
+    // plus haut), qu'on laisse html2pdf gérer lui-même de bout en bout : c'est l'usage le
+    // plus simple et le plus éprouvé de cette librairie (from(string) plutôt que
+    // from(élémentDuDOMVivant)), sans aucune des sources de blocage ci-dessus.
+    const isFr = currentLang === 'fr';
+    const title = isFr ? 'Mon itinéraire Screen To Street' : 'My Screen To Street itinerary';
+    const exportHtml = `
+        <div style="font-family:'Poppins',Arial,sans-serif; background:#fff; color:#212832; padding:6px; width:700px;">
+            <div style="font-size:20px; font-weight:700; margin-bottom:4px;">${title}</div>
+            <div style="font-size:11px; color:#94a3b8; margin-bottom:18px;">Screen To Street</div>
+            ${daysListEl.innerHTML}
+        </div>`;
+
+    html2pdf().set({ margin: 10, filename: 'ScreenToStreet_Guide.pdf', jsPDF: { format: 'a4' }, html2canvas: { useCORS: true, allowTaint: true, backgroundColor: '#ffffff' } }).from(exportHtml).save()
         .then(restore)
         .catch((err) => {
             console.error('Export PDF failed:', err);
@@ -4281,10 +4537,184 @@ if(btnReject) btnReject.addEventListener('click', closeCookies);
 // ==========================================
 // 12. LOGIQUE SPECIFIQUE POUR TRIPS.HTML
 // ==========================================
+// Voyages partagés par D'AUTRES personnes avec ce compte (jamais dans myTrips, voir
+// listSharedTripsForMe() dans firebase-init.js) — chargés une fois au démarrage de
+// trips.html, réutilisés à chaque rendu de la liste de voyages dans la sidebar.
+let sharedTripsCache = [];
+window.refreshSharedTrips = async function() {
+    sharedTripsCache = typeof window.listSharedTripsForMe === 'function' ? await window.listSharedTripsForMe() : [];
+    window.renderTripsSidebar();
+    // Personne sans aucun voyage à elle mais avec au moins un voyage partagé : on ouvre
+    // directement le premier plutôt que de laisser l'état vide "New trip" s'afficher, ce
+    // qui laisserait croire à tort qu'il n'y a rien du tout à voir.
+    if (getMyTripsList().length === 0 && sharedTripsCache.length > 0 && !currentTrip) {
+        window.openSharedTrip(sharedTripsCache[0]._sharedTripId);
+    }
+};
+
+// Ouvre un voyage partagé par quelqu'un d'autre dans le même panneau de détail que les
+// voyages possédés (réutilise tout le rendu/drag&drop existant de renderTrip()) — seul
+// activeTripAccess change, pour que saveTrip() sache qu'il ne doit jamais écrire dans
+// myTrips ici, et que la classe body.trip-view-only masque les contrôles de modification
+// si le rôle est "view" (voir .edit-only dans style.css).
+window.openSharedTrip = function(sharedTripId) {
+    const shared = sharedTripsCache.find(t => t._sharedTripId === sharedTripId);
+    if (!shared) return;
+    activeTripAccess.isOwner = false;
+    activeTripAccess.role = shared._myRole;
+    currentTrip = Object.assign({}, shared, { id: sharedTripId });
+    if (!currentTrip.days) currentTrip.days = [];
+    localStorage.removeItem('activeTripId');
+    document.body.classList.toggle('trip-view-only', shared._myRole === 'view');
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('trip-detail-content').style.display = 'block';
+    if(document.getElementById('trip-map-container') && !tripPageMap) {
+        tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
+        createOSMTileLayer(tripPageMap).addTo(tripPageMap);
+        tripPageLayer = L.featureGroup().addTo(tripPageMap);
+    }
+    window.renderTripsSidebar();
+    window.renderTrip();
+};
+
+// ==========================================
+// PARTAGE D'UN VOYAGE ("travel buddies") — trips.html
+// ==========================================
+// Modal injectée en JS (voir ensureDeleteVisitModal() plus haut pour le même principe) :
+// avatars + icône crayon/œil cliquable par collaborateur pour son niveau d'accès, comme
+// demandé (version "icônes crayon/œil" du prototype fourni), plus un champ pour inviter
+// par pseudo (voir claimUsername()/lookupUserByUsername() dans firebase-init.js — la
+// recherche ne fonctionne que par pseudo exact, pas par email, faute de backend capable
+// de résoudre un email en identifiant de compte côté client).
+const editIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+const viewIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+
+function ensureShareTripModal() {
+    let modal = document.getElementById('share-trip-modal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'share-trip-modal';
+    modal.className = 'modal hidden';
+    modal.style.zIndex = '10500';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:380px;">
+            <span class="close-btn" onclick="document.getElementById('share-trip-modal').classList.add('hidden')">&times;</span>
+            <div style="text-align:center; margin-bottom:16px;">
+                <div style="font-size:15px; font-weight:700; color:#212832;" id="share-trip-name"></div>
+                <div style="font-size:11px; color:#94a3b8; margin-top:2px;" data-i18n="shareTripSub">Plan it together</div>
+            </div>
+            <div id="share-trip-buddies"></div>
+            <div id="share-trip-error" class="hidden" style="font-size:11px; color:#D42759; margin-bottom:8px;"></div>
+            <div style="display:flex; gap:8px; margin-top:6px;">
+                <input id="share-trip-invite-input" placeholder="${currentLang === 'fr' ? 'Leur pseudo' : 'Their username'}" style="flex:1; border:1.5px solid #cbd5e1; border-radius:100px; padding:10px 14px; font-size:12px; font-family:'Poppins',sans-serif;">
+                <button id="share-trip-invite-btn" style="background:#D42759; color:#fff; border:none; border-radius:100px; padding:10px 18px; font-size:12px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="shareTripInvite">Invite</button>
+            </div>
+            <div style="font-size:9.5px; color:#94a3b8; text-align:center; margin-top:10px;" data-i18n="shareTripHint">Tap the icon next to a name to switch between edit and view-only access.</div>
+        </div>`;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+let shareTripCurrentId = null;
+window.openShareTripModal = async function(tripId, event) {
+    if (event) event.stopPropagation();
+    shareTripCurrentId = tripId;
+    const modal = ensureShareTripModal();
+    const trips = getMyTripsList();
+    const trip = trips.find(t => t.id === tripId);
+    if (!trip) return;
+    document.getElementById('share-trip-name').textContent = trip.name;
+    modal.classList.remove('hidden');
+    await window.renderShareTripBuddies(tripId);
+
+    const inviteBtn = document.getElementById('share-trip-invite-btn');
+    inviteBtn.onclick = async () => {
+        const input = document.getElementById('share-trip-invite-input');
+        const username = input.value.trim();
+        const errorEl = document.getElementById('share-trip-error');
+        if (errorEl) errorEl.classList.add('hidden');
+        if (!username) return;
+        inviteBtn.disabled = true;
+        // Un voyage doit exister côté Firestore partagé AVANT de pouvoir y ajouter un
+        // collaborateur (voir createSharedTrip()) — créé au tout premier partage, jamais
+        // avant, pour ne pas alourdir Firestore d'un document par voyage jamais partagé.
+        if (typeof window.createSharedTrip === 'function' && !trip.isShared) {
+            await window.createSharedTrip(trip);
+            trip.isShared = true;
+            const idx = trips.findIndex(t => t.id === tripId);
+            if (idx !== -1) { trips[idx] = trip; localStorage.setItem('myTrips', JSON.stringify(trips)); syncTrips(trips); }
+        }
+        const result = typeof window.inviteTripCollaborator === 'function' ? await window.inviteTripCollaborator(tripId, username, 'view') : { error: 'failed' };
+        inviteBtn.disabled = false;
+        if (result && result.error) {
+            if (errorEl) {
+                errorEl.textContent = currentLang === 'fr' ? `Aucun compte trouvé pour le pseudo « ${username} ».` : `No account found for the username "${username}".`;
+                errorEl.classList.remove('hidden');
+            }
+            return;
+        }
+        input.value = '';
+        window.renderShareTripBuddies(tripId);
+    };
+};
+
+window.renderShareTripBuddies = async function(tripId) {
+    const container = document.getElementById('share-trip-buddies');
+    if (!container) return;
+    container.innerHTML = `<div style="text-align:center; padding:10px 0; font-size:11px; color:#94a3b8;">${currentLang === 'fr' ? 'Chargement…' : 'Loading…'}</div>`;
+
+    const ownerInitial = (localStorage.getItem('userFirstName') || localStorage.getItem('userName') || 'U').trim().charAt(0).toUpperCase();
+    const ownerName = (localStorage.getItem('userFirstName') || localStorage.getItem('userName') || (currentLang === 'fr' ? 'Vous' : 'You')).trim();
+    const creatorLabel = currentLang === 'fr' ? 'Créateur du voyage' : 'Trip creator';
+
+    let members = {};
+    let memberNames = {};
+    if (typeof window.loadSharedTrip === 'function') {
+        const shared = await window.loadSharedTrip(tripId);
+        if (shared) { members = shared.members || {}; memberNames = shared.memberNames || {}; }
+    }
+
+    let rowsHtml = `
+        <div style="display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #f6f4fb;">
+            <div style="width:34px; height:34px; border-radius:50%; background:#D42759; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0;">${ownerInitial}</div>
+            <div style="flex:1;"><div style="font-size:12px; font-weight:700; color:#212832;">${ownerName}</div><div style="font-size:9px; color:#94a3b8;">${creatorLabel}</div></div>
+        </div>`;
+
+    Object.keys(members).forEach(uid => {
+        const role = members[uid];
+        const name = memberNames[uid] || uid;
+        const initial = name.trim().charAt(0).toUpperCase();
+        rowsHtml += `
+        <div style="display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #f6f4fb;">
+            <div style="width:34px; height:34px; border-radius:50%; background:#8B5CF6; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0;">${initial}</div>
+            <div style="flex:1;"><div style="font-size:12px; font-weight:700; color:#212832;">${name}</div></div>
+            <div class="share-role-toggle" data-uid="${uid}" data-role="${role}" title="${role === 'edit' ? (currentLang === 'fr' ? 'Peut modifier' : 'Can edit') : (currentLang === 'fr' ? 'Lecture seule' : 'View only')}" style="width:28px; height:28px; border-radius:50%; background:${role === 'edit' ? '#FCE7F0' : '#f1f5f9'}; display:flex; align-items:center; justify-content:center; cursor:pointer;">${role === 'edit' ? editIconSvg : viewIconSvg}</div>
+            <div class="share-remove-btn" data-uid="${uid}" title="${currentLang === 'fr' ? 'Retirer' : 'Remove'}" style="width:20px; height:20px; border-radius:50%; color:#cbd5e1; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; font-weight:700;">&times;</div>
+        </div>`;
+    });
+
+    container.innerHTML = rowsHtml;
+
+    container.querySelectorAll('.share-role-toggle').forEach(el => {
+        el.addEventListener('click', async () => {
+            const uid = el.dataset.uid;
+            const newRole = el.dataset.role === 'edit' ? 'view' : 'edit';
+            if (typeof window.setTripCollaboratorRole === 'function') await window.setTripCollaboratorRole(tripId, uid, newRole);
+            window.renderShareTripBuddies(tripId);
+        });
+    });
+    container.querySelectorAll('.share-remove-btn').forEach(el => {
+        el.addEventListener('click', async () => {
+            if (typeof window.removeTripCollaborator === 'function') await window.removeTripCollaborator(tripId, el.dataset.uid);
+            window.renderShareTripBuddies(tripId);
+        });
+    });
+};
+
 window.initTrips = function() {
     let trips = getMyTripsList();
-    
-    if (trips.length === 0) {
+
+    if (trips.length === 0 && sharedTripsCache.length === 0) {
         // Le bouton "+ New trip" de la sidebar est caché par défaut sur mobile (tiroir
         // fermé) : on duplique donc un bouton directement dans l'état vide, au premier
         // plan, pour qu'il reste cliquable sans devoir d'abord ouvrir le menu.
@@ -4337,15 +4767,18 @@ window.renderTripsSidebar = function() {
         let totalLocs = allAssignedIds.length + unassignedCount;
 
         let dateStr = t.dateType === 'duration' ? (t.duration || 'Flexible') : `${t.startDate || '?'} to ${t.endDate || '?'}`;
-        
+
         let pill = document.createElement('div');
-        pill.className = `trip-pill ${currentTrip && currentTrip.id === t.id ? 'active' : ''}`;
+        pill.className = `trip-pill ${activeTripAccess.isOwner && currentTrip && currentTrip.id === t.id ? 'active' : ''}`;
         pill.setAttribute('draggable', 'true');
         pill.ondragstart = (e) => window.dragTripStart(e, t.id, 'trip');
         pill.ondragover = (e) => window.dragTripOver(e);
         pill.ondragleave = (e) => window.dragTripLeave(e);
         pill.ondrop = (e) => window.dropTrip(e, t.id);
-        pill.onclick = () => { 
+        pill.onclick = () => {
+            activeTripAccess.isOwner = true;
+            activeTripAccess.role = 'edit';
+            document.body.classList.remove('trip-view-only');
             localStorage.setItem('activeTripId', t.id);
             window.initTrips();
         };
@@ -4353,12 +4786,40 @@ window.renderTripsSidebar = function() {
         pill.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div class="trip-pill-name">${t.name}</div>
-                <div class="del-trip-btn" onclick="openDeleteModal('${t.id}', event)" title="Delete trip">✕</div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <div class="share-trip-btn" title="${currentLang === 'fr' ? 'Partager' : 'Share'}" onclick="openShareTripModal('${t.id}', event)" style="width:18px; height:18px; display:flex; align-items:center; justify-content:center; color:#94a3b8; cursor:pointer;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    </div>
+                    <div class="del-trip-btn" onclick="openDeleteModal('${t.id}', event)" title="Delete trip">✕</div>
+                </div>
             </div>
             <div class="trip-pill-meta">${dateStr} &middot; ${totalLocs} locations</div>
         `;
         listContainer.appendChild(pill);
     });
+
+    // Voyages que d'AUTRES personnes ont partagés avec ce compte (jamais dans myTrips —
+    // voir refreshSharedTrips()) : affichés à la suite, avec un badge indiquant qui les a
+    // partagés et le niveau d'accès accordé, pas de glisser-déposer ni de suppression
+    // (ce n'est pas notre voyage).
+    if (sharedTripsCache.length > 0) {
+        const sectionTitle = document.createElement('div');
+        sectionTitle.style.cssText = 'font-size:10.5px; font-weight:800; color:#94a3b8; letter-spacing:.05em; text-transform:uppercase; margin:18px 0 8px;';
+        sectionTitle.textContent = currentLang === 'fr' ? `Partagés avec moi (${sharedTripsCache.length})` : `Shared with me (${sharedTripsCache.length})`;
+        listContainer.appendChild(sectionTitle);
+
+        sharedTripsCache.forEach(t => {
+            const roleLabel = t._myRole === 'edit' ? (currentLang === 'fr' ? 'Peut modifier' : 'Can edit') : (currentLang === 'fr' ? 'Lecture seule' : 'View only');
+            const pill = document.createElement('div');
+            pill.className = `trip-pill ${!activeTripAccess.isOwner && currentTrip && currentTrip.id === t._sharedTripId ? 'active' : ''}`;
+            pill.onclick = () => window.openSharedTrip(t._sharedTripId);
+            pill.innerHTML = `
+                <div class="trip-pill-name">${t.name}</div>
+                <div class="trip-pill-meta">${currentLang === 'fr' ? 'Partagé par' : 'Shared by'} ${t.ownerName || 'ARMY'} &middot; ${roleLabel}</div>
+            `;
+            listContainer.appendChild(pill);
+        });
+    }
 }
 
 window.dragTripStart = function(e, id, type) { 
@@ -4871,8 +5332,18 @@ window.quickAddLoc = function(locId) {
     }
 }
 
+// Accès à currentTrip quand ce n'est PAS un voyage possédé (voir "shared with me" dans
+// window.initTrips) : { isOwner:true } par défaut pour tout voyage de myTrips ; mis à
+// jour à {isOwner:false, role:'edit'|'view'} en ouvrant un voyage partagé par quelqu'un
+// d'autre. saveTrip() (fonction centrale par laquelle passe TOUTE modification de
+// voyage) s'appuie dessus pour bloquer l'écriture en lecture seule, et rediriger vers le
+// document Firestore partagé plutôt que vers myTrips quand on n'est pas propriétaire.
+let activeTripAccess = { isOwner: true, role: 'edit' };
+window.activeTripAccess = activeTripAccess;
+
 window.saveTrip = function() {
     if(!currentTrip) return;
+    if (!activeTripAccess.isOwner && activeTripAccess.role === 'view') return; // lecture seule : aucune écriture
     currentTrip.name = document.getElementById('edit-trip-name').value || currentTrip.name;
     
     const isFlexible = document.querySelector('.edit-banner .date-tab[data-tab="edit-flexible"]')?.classList.contains('active');
@@ -4894,13 +5365,25 @@ window.saveTrip = function() {
         newDays.push(ids);
     });
     currentTrip.days = newDays;
-    
-    let trips = getMyTripsList();
-    const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
-    if(tripIndex !== -1) trips[tripIndex] = currentTrip;
-    localStorage.setItem('myTrips', JSON.stringify(trips));
-    syncTrips(trips);
-    
+
+    if (activeTripAccess.isOwner) {
+        let trips = getMyTripsList();
+        const tripIndex = trips.findIndex(t => t.id === currentTrip.id);
+        if(tripIndex !== -1) trips[tripIndex] = currentTrip;
+        localStorage.setItem('myTrips', JSON.stringify(trips));
+        syncTrips(trips);
+        // Voyage déjà partagé (voir openShareTripModal) : on répercute aussi les
+        // modifications du propriétaire vers le document Firestore partagé, pour que
+        // les collaborateurs voient la dernière version au prochain chargement.
+        if (currentTrip.isShared && typeof window.saveSharedTrip === 'function') {
+            window.saveSharedTrip(currentTrip.id, currentTrip);
+        }
+    } else if (activeTripAccess.role === 'edit' && typeof window.saveSharedTrip === 'function') {
+        // Collaborateur avec droit de modification : jamais écrit dans myTrips (ce
+        // voyage n'est pas le sien), seulement dans le document Firestore partagé.
+        window.saveSharedTrip(currentTrip.id, currentTrip);
+    }
+
     window.renderTripsSidebar();
 
     if(tripPageMap) {
