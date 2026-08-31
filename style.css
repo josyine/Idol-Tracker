@@ -169,6 +169,11 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .map-loading-spinner { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--border-color); border-top-color: var(--primary-magenta); animation: mapLoadingSpin 0.8s linear infinite; }
 @keyframes mapLoadingSpin { to { transform: rotate(360deg); } }
 
+/* Voyage partagé consulté en lecture seule (rôle "view", voir openSharedTrip() dans
+   script.js) : masque tous les contrôles de modification déjà marqués .edit-only dans le
+   HTML généré pour trips.html (glisser-déposer, ✕ suppression, "+ Add"...). */
+body.trip-view-only .edit-only { display: none !important; }
+
 /* Bouton "(re)lancer le guide de démo" — visible seulement sur map.html?demo=1, voir map-tour.js */
 .demo-tour-btn {
     position: absolute; bottom: 24px; left: 20px; z-index: 2000;

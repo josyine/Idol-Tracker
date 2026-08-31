@@ -453,7 +453,22 @@
                         
                         <span class="sub-label">Your notes (optional)</span>
                         <textarea id="memory-notes" placeholder="What do you remember about this place?" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:12px; font-family:'Poppins',sans-serif; height:60px; resize:none; margin-bottom:14px; outline:none;"></textarea>
-                        
+
+                        <span class="sub-label" data-i18n="memoryPhotoLabel">Add a photo (optional)</span>
+                        <div style="margin-bottom:14px;">
+                            <div id="memory-photo-preview" class="hidden" style="width:100%; height:110px; border-radius:8px; overflow:hidden; margin-bottom:8px; background:#f1f5f9;"><img id="memory-photo-preview-img" style="width:100%; height:100%; object-fit:cover;"></div>
+                            <input type="file" id="memory-photo-input" accept="image/*" style="display:none;">
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" onclick="document.getElementById('memory-photo-input').click()" style="flex:1; background:transparent; border:1.5px dashed #cbd5e1; color:#64748b; font-size:11.5px; font-weight:700; padding:9px; border-radius:8px; cursor:pointer; font-family:'Poppins',sans-serif;" data-i18n="memoryPhotoChoose">Choose a photo</button>
+                                <button type="button" id="memory-photo-remove" class="hidden" style="background:transparent; border:1.5px solid #FBD5DC; color:#D42759; font-size:11.5px; font-weight:700; padding:9px 12px; border-radius:8px; cursor:pointer; font-family:'Poppins',sans-serif;" data-i18n="memoryPhotoRemove">Remove</button>
+                            </div>
+                        </div>
+
+                        <label style="display:flex; align-items:center; gap:8px; margin-bottom:14px; cursor:pointer;">
+                            <input type="checkbox" id="memory-public-check" style="width:16px; height:16px; cursor:pointer; accent-color:#D42759;">
+                            <span style="font-size:11.5px; color:#475569; font-weight:600;" data-i18n="memoryMakePublic">Make this review public (visible to other users)</span>
+                        </label>
+
                         <button id="save-memory-btn" style="width:100%; margin-top:10px; background:#D42759; color:#fff; border:none; border-radius:9px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="saveMemory">Save memory</button>
                     </div>
                 </div>
@@ -462,6 +477,7 @@
                     <button class="tab-btn active" data-tab="info" data-i18n="tabInfo">Info</button>
                     <button class="tab-btn" data-tab="story" data-i18n="tabStory">Story</button>
                     <button class="tab-btn hidden" id="tab-btn-visit" data-tab="visit" data-i18n="myVisitTab">My Visit</button>
+                    <button class="tab-btn" data-tab="reviews" data-i18n="tabReviews">Reviews</button>
                 </div>
 
                 <div class="tab-panel active" id="tab-info">
@@ -505,7 +521,7 @@
 
                     <div class="story-section hidden" id="details-tip-section" style="margin-bottom:0;">
                         <div class="tips-box">
-                            <div class="tips-title">💡 <span data-i18n="lTipsTitle">THE "SCREEN TO STREET" TIPS</span></div>
+                            <div class="tips-title"><span data-i18n="lTipsTitle">THE "SCREEN TO STREET" TIPS</span></div>
                             <div id="details-tips-list"></div>
                         </div>
                     </div>
@@ -517,6 +533,12 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span id="add-visit-btn-label" data-i18n="addAnotherVisit">Add another visit</span>
                     </button>
+                </div>
+
+                <div class="tab-panel" id="tab-reviews">
+                    <div id="reviews-loading" style="text-align:center; padding:20px 0; font-size:12px; color:#94a3b8;" data-i18n="reviewsLoading">Loading reviews…</div>
+                    <div id="reviews-empty" class="hidden" style="text-align:center; padding:20px 0; font-size:12px; color:#94a3b8;" data-i18n="reviewsEmpty">No public reviews yet for this place — be the first to share yours from the "My Visit" tab!</div>
+                    <div id="reviews-list"></div>
                 </div>
 
             </div>

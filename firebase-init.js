@@ -21,7 +21,7 @@ import {
     EmailAuthProvider,
     updatePassword
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, getDocs, collection, setDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collection, setDoc, deleteDoc, deleteField, increment, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBa1e1JhWCxYI3fSWtVN6TsFiOnvxH7i5I",
@@ -192,6 +192,185 @@ window.loadAllLocationRatings = async function () {
     } catch (e) {
         console.warn('Lecture des notes communautaires échouée :', e);
         return {};
+    }
+};
+
+// Avis publics ("Reviews") sur un lieu : une personne peut rendre publique sa fiche
+// "J'ai visité ce lieu" (note + notes + photo) pour que les autres utilisateurs la
+// voient dans le nouvel onglet "Reviews" du détail d'un lieu. Un avis par personne et
+// par lieu (écrase le précédent s'il republie), stocké dans une sous-collection dédiée
+// pour pouvoir lire tous les avis d'UN SEUL lieu sans lire toute la collection (pas de
+// requête where() disponible ici, seulement collection()+getDocs()).
+//
+// IMPORTANT — nécessite une règle Firestore dédiée que ce fichier ne peut pas déployer
+// lui-même (à ajouter dans la console Firebase, onglet Firestore > Rules) :
+//   match /locationReviews/{locationId}/items/{uid} {
+//     allow read: if true;
+//     allow write: if request.auth != null && request.auth.uid == uid;
+//   }
+window.setLocationReview = async function (locationId, reviewData) {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        await setDoc(doc(db, 'locationReviews', String(locationId), 'items', user.uid), Object.assign({
+            uid: user.uid,
+            updatedAt: serverTimestamp()
+        }, reviewData));
+    } catch (e) {
+        console.warn('Publication de l\'avis échouée :', e);
+    }
+};
+
+window.deleteLocationReview = async function (locationId) {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        await deleteDoc(doc(db, 'locationReviews', String(locationId), 'items', user.uid));
+    } catch (e) {
+        console.warn('Suppression de l\'avis échouée :', e);
+    }
+};
+
+window.fetchLocationReviews = async function (locationId) {
+    try {
+        const snap = await getDocs(collection(db, 'locationReviews', String(locationId), 'items'));
+        const result = [];
+        snap.forEach(d => result.push(d.data()));
+        return result;
+    } catch (e) {
+        console.warn('Lecture des avis échouée :', e);
+        return [];
+    }
+};
+
+// ==========================================
+// PARTAGE DE VOYAGES ENTRE UTILISATEURS ("travel buddies", trips.html)
+// ==========================================
+// Un voyage privé vit dans users/{uid}.myTrips (voir plus haut) — invisible aux autres
+// comptes par construction. Le partager nécessite donc une VRAIE collection séparée
+// trips/{tripId}, lisible/modifiable par le propriétaire ET chaque collaborateur ajouté
+// (members: {uid: 'edit'|'view'}). Retrouver un compte à partir du pseudo tapé dans la
+// case "Their username or email" nécessite à son tour un index public séparé
+// (usernames/{pseudo} -> uid) : sans lui, impossible de résoudre un pseudo en uid sans
+// élargir dangereusement les droits de lecture sur la collection privée users/.
+// Limite connue : la recherche ne fonctionne que par PSEUDO exact (pas par email — cela
+// nécessiterait une Cloud Function avec les droits admin, hors de portée d'un site 100%
+// statique comme celui-ci).
+//
+// IMPORTANT — nécessite ces règles Firestore (non déployables depuis ce fichier, à
+// ajouter dans la console Firebase, onglet Firestore > Rules) :
+//   match /usernames/{username} {
+//     allow read: if true;
+//     allow write: if request.auth != null && request.resource.data.uid == request.auth.uid;
+//   }
+//   match /trips/{tripId} {
+//     allow read: if request.auth != null
+//       && (resource.data.ownerUid == request.auth.uid || request.auth.uid in resource.data.members);
+//     allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+//     allow update: if request.auth != null
+//       && (resource.data.ownerUid == request.auth.uid || resource.data.members[request.auth.uid] == 'edit');
+//     allow delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+//   }
+window.claimUsername = async function (username) {
+    const user = auth.currentUser;
+    if (!user || !username) return;
+    try {
+        await setDoc(doc(db, 'usernames', username.toLowerCase().trim()), { uid: user.uid }, { merge: true });
+    } catch (e) {
+        console.warn('Réservation du pseudo échouée :', e);
+    }
+};
+
+window.lookupUserByUsername = async function (username) {
+    if (!username) return null;
+    try {
+        const snap = await getDoc(doc(db, 'usernames', username.toLowerCase().trim()));
+        return snap.exists() ? snap.data().uid : null;
+    } catch (e) {
+        console.warn('Recherche du pseudo échouée :', e);
+        return null;
+    }
+};
+
+window.createSharedTrip = async function (trip) {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        await setDoc(doc(db, 'trips', trip.id), Object.assign({}, trip, {
+            ownerUid: user.uid,
+            ownerName: (localStorage.getItem('userFirstName') || localStorage.getItem('userName') || 'ARMY').trim(),
+            members: {},
+            memberNames: {}
+        }));
+    } catch (e) {
+        console.warn('Création du voyage partagé échouée :', e);
+    }
+};
+
+window.saveSharedTrip = async function (tripId, fields) {
+    try {
+        await setDoc(doc(db, 'trips', tripId), fields, { merge: true });
+    } catch (e) {
+        console.warn('Sauvegarde du voyage partagé échouée :', e);
+    }
+};
+
+window.loadSharedTrip = async function (tripId) {
+    try {
+        const snap = await getDoc(doc(db, 'trips', tripId));
+        return snap.exists() ? snap.data() : null;
+    } catch (e) {
+        console.warn('Lecture du voyage partagé échouée :', e);
+        return null;
+    }
+};
+
+window.inviteTripCollaborator = async function (tripId, username, role) {
+    const uid = await window.lookupUserByUsername(username);
+    if (!uid) return { error: 'not-found' };
+    try {
+        await setDoc(doc(db, 'trips', tripId), {
+            members: { [uid]: role },
+            memberNames: { [uid]: username.trim() }
+        }, { merge: true });
+        return { uid, username: username.trim(), role };
+    } catch (e) {
+        console.warn('Invitation échouée :', e);
+        return { error: 'failed' };
+    }
+};
+
+window.setTripCollaboratorRole = async function (tripId, uid, role) {
+    try {
+        await setDoc(doc(db, 'trips', tripId), { members: { [uid]: role } }, { merge: true });
+    } catch (e) {
+        console.warn('Changement de permission échoué :', e);
+    }
+};
+
+window.removeTripCollaborator = async function (tripId, uid) {
+    try {
+        await setDoc(doc(db, 'trips', tripId), {
+            members: { [uid]: deleteField() },
+            memberNames: { [uid]: deleteField() }
+        }, { merge: true });
+    } catch (e) {
+        console.warn('Retrait du collaborateur échoué :', e);
+    }
+};
+
+window.listSharedTripsForMe = async function () {
+    const user = auth.currentUser;
+    if (!user) return [];
+    try {
+        const q = query(collection(db, 'trips'), where(`members.${user.uid}`, 'in', ['edit', 'view']));
+        const snap = await getDocs(q);
+        const result = [];
+        snap.forEach(d => result.push(Object.assign({ _sharedTripId: d.id, _myRole: d.data().members[user.uid] }, d.data())));
+        return result;
+    } catch (e) {
+        console.warn('Lecture des voyages partagés échouée :', e);
+        return [];
     }
 };
 
