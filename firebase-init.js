@@ -208,16 +208,24 @@ window.loadAllLocationRatings = async function () {
 //     allow read: if true;
 //     allow write: if request.auth != null && request.auth.uid == uid;
 //   }
+// Renvoie {success:true} ou {success:false, code} (jamais une exception) pour que
+// l'appelant (script.js) puisse prévenir la personne si la publication a échoué —
+// notamment si les règles Firestore ci-dessus n'ont pas encore été ajoutées côté
+// console (code 'permission-denied'), auquel cas la publication échouait jusqu'ici
+// TOUJOURS en silence : la case restait cochée dans l'interface, mais rien n'était
+// réellement publié, donnant l'impression trompeuse que ça avait marché.
 window.setLocationReview = async function (locationId, reviewData) {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) return { success: false, code: 'not-authenticated' };
     try {
         await setDoc(doc(db, 'locationReviews', String(locationId), 'items', user.uid), Object.assign({
             uid: user.uid,
             updatedAt: serverTimestamp()
         }, reviewData));
+        return { success: true };
     } catch (e) {
         console.warn('Publication de l\'avis échouée :', e);
+        return { success: false, code: e && e.code || 'unknown' };
     }
 };
 

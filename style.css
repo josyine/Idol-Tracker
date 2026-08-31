@@ -173,6 +173,10 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
    script.js) : masque tous les contrôles de modification déjà marqués .edit-only dans le
    HTML généré pour trips.html (glisser-déposer, ✕ suppression, "+ Add"...). */
 body.trip-view-only .edit-only { display: none !important; }
+/* Voyage partagé consulté par un(e) collaborateur/trice (peu importe son rôle modifier/
+   lecture seule) : les actions réservées au propriétaire (ex: supprimer tout le voyage)
+   restent masquées même pour un rôle "edit". */
+body.trip-not-owner .owner-only { display: none !important; }
 
 /* Bouton "(re)lancer le guide de démo" — visible seulement sur map.html?demo=1, voir map-tour.js */
 .demo-tour-btn {

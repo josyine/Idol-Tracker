@@ -596,7 +596,22 @@ window.addEventListener('firebase-ready', async (e) => {
             if (typeof window.refreshVisitedFromCloud === 'function') window.refreshVisitedFromCloud();
         }
         if (Array.isArray(cloudData.myTrips)) {
-            localStorage.setItem('myTrips', JSON.stringify(cloudData.myTrips));
+            // FUSION plutôt qu'un simple écrasement : un voyage tout juste créé en local
+            // (ex: "Save Trip" depuis l'Auto-Itinerary Generator) mais dont la synchro
+            // Firestore n'a pas encore eu le temps d'aboutir (page rechargée trop vite,
+            // firebase-init.js pas encore totalement chargé sur une connexion lente...)
+            // se faisait purement et simplement effacer par cette lecture cloud, qui ne
+            // le connaissait pas encore — donnant l'impression que "Save Trip" ne
+            // sauvegardait rien. On garde donc tout voyage présent en local mais absent
+            // du cloud (probable écriture pas encore propagée) plutôt que de le perdre.
+            const localTrips = getMyTripsList();
+            const cloudIds = new Set(cloudData.myTrips.map(t => t.id));
+            const localOnlyTrips = localTrips.filter(t => !cloudIds.has(t.id));
+            const mergedTrips = cloudData.myTrips.concat(localOnlyTrips);
+            localStorage.setItem('myTrips', JSON.stringify(mergedTrips));
+            if (localOnlyTrips.length > 0 && typeof window.syncUserData === 'function') {
+                window.syncUserData({ myTrips: mergedTrips });
+            }
             if (document.getElementById('edit-trip-name') && typeof window.initTrips === 'function') window.initTrips();
             if (typeof window.loadItineraryTabOptions === 'function' && document.getElementById('tab-itinerary-btn')) window.loadItineraryTabOptions();
         }
@@ -1826,7 +1841,7 @@ const translations = {
         addAnotherVisit: "Add another visit",
         tabExplore: "Explore", tabMyItinerary: "My Itinerary", yourRating: "Your rating", whenDidYouVisit: "When did you visit?", saveMemory: "Save memory", myVisitTab: "My Visit", tabReviews: "Reviews", memoryPhotoLabel: "Add a photo (optional)", memoryPhotoChoose: "Choose a photo", memoryPhotoRemove: "Remove", memoryMakePublic: "Make this review public (visible to other users)", reviewsLoading: "Loading reviews…", reviewsEmpty: "No public reviews yet for this place — be the first to share yours from the \"My Visit\" tab!", shareTripSub: "Plan it together", shareTripInvite: "Invite", shareTripHint: "Tap the icon next to a name to switch between edit and view-only access.",
         backToMap: "← Back to Map", moreDetails: "More details", openInMaps: "Open in Google Maps", detailsLabel: "Details", aboutPlaceLabel: "About this place",
-        accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accResetPhoto: "Reset profile picture", accNameLabel: "Name", accEmailLabel: "Email address",
+        accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accResetPhoto: "Reset profile picture", accNameLabel: "Username", accChangeUsernameHint: "Change username", accEmailLabel: "Email address",
         accCountryLabel: "Country you're interested in", accCountryPlaceholder: "Select a country (optional)",
         accActivityTitle: "Your activity", accTrips: "Trips", accVisited: "Visited", accWishlist: "Wishlist", accPasses: "Passes & billing",
         accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes",
@@ -1888,7 +1903,7 @@ const translations = {
         addAnotherVisit: "Ajouter une autre visite",
         tabExplore: "Explorer", tabMyItinerary: "Mon Itinéraire", yourRating: "Votre note", whenDidYouVisit: "Quand avez-vous visité ce lieu ?", saveMemory: "Enregistrer le souvenir", myVisitTab: "Ma Visite", tabReviews: "Avis", memoryPhotoLabel: "Ajouter une photo (facultatif)", memoryPhotoChoose: "Choisir une photo", memoryPhotoRemove: "Retirer", memoryMakePublic: "Rendre cet avis public (visible par les autres utilisateurs)", reviewsLoading: "Chargement des avis…", reviewsEmpty: "Aucun avis public pour ce lieu pour l'instant — soyez le premier à partager le vôtre depuis l'onglet « Ma Visite » !", shareTripSub: "Organisez-le ensemble", shareTripInvite: "Inviter", shareTripHint: "Touchez l'icône à côté d'un nom pour basculer entre modification et lecture seule.",
         backToMap: "← Retour à la carte", moreDetails: "Plus de détails", openInMaps: "Ouvrir dans Google Maps", detailsLabel: "Détails", aboutPlaceLabel: "À propos de ce lieu",
-        accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accResetPhoto: "Réinitialiser la photo de profil", accNameLabel: "Nom", accEmailLabel: "Adresse e-mail",
+        accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accResetPhoto: "Réinitialiser la photo de profil", accNameLabel: "Identifiant", accChangeUsernameHint: "Changer d'identifiant", accEmailLabel: "Adresse e-mail",
         accCountryLabel: "Pays qui vous intéresse", accCountryPlaceholder: "Choisir un pays (optionnel)",
         accActivityTitle: "Votre activité", accTrips: "Voyages", accVisited: "Visités", accWishlist: "Wishlist", accPasses: "Pass et facturation",
         accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif",
@@ -1950,7 +1965,7 @@ const translations = {
         addAnotherVisit: "Añadir otra visita",
         tabExplore: "Explorar", tabMyItinerary: "Mi Itinerario", yourRating: "Tu valoración", whenDidYouVisit: "¿Cuándo visitaste este lugar?", saveMemory: "Guardar recuerdo", myVisitTab: "Mi Visita", tabReviews: "Reseñas", memoryPhotoLabel: "Añadir una foto (opcional)", memoryPhotoChoose: "Elegir una foto", memoryPhotoRemove: "Quitar", memoryMakePublic: "Hacer pública esta reseña (visible para otros usuarios)", reviewsLoading: "Cargando reseñas…", reviewsEmpty: "Todavía no hay reseñas públicas para este lugar — ¡sé el primero en compartir la tuya desde la pestaña «Mi Visita»!",
         backToMap: "← Volver al mapa", moreDetails: "Más detalles", openInMaps: "Abrir en Google Maps", detailsLabel: "Detalles", aboutPlaceLabel: "Sobre este lugar",
-        accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accResetPhoto: "Restablecer foto de perfil", accNameLabel: "Nombre", accEmailLabel: "Correo electrónico",
+        accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accResetPhoto: "Restablecer foto de perfil", accNameLabel: "Nombre de usuario", accChangeUsernameHint: "Cambiar nombre de usuario", accEmailLabel: "Correo electrónico",
         accCountryLabel: "País que te interesa", accCountryPlaceholder: "Elige un país (opcional)",
         accActivityTitle: "Tu actividad", accTrips: "Viajes", accVisited: "Visitados", accWishlist: "Lista de deseos", accPasses: "Pases y facturación",
         accEditBtn: "Editar perfil", accSaveBtn: "Guardar cambios", accSaved: "✓ Guardado con éxito", accNoPasses: "Sin pases activos",
@@ -2011,7 +2026,7 @@ const translations = {
         addAnotherVisit: "Aggiungi un'altra visita",
         tabExplore: "Esplora", tabMyItinerary: "Il Mio Itinerario", yourRating: "La tua valutazione", whenDidYouVisit: "Quando hai visitato questo posto?", saveMemory: "Salva ricordo", myVisitTab: "La Mia Visita", tabReviews: "Recensioni", memoryPhotoLabel: "Aggiungi una foto (facoltativo)", memoryPhotoChoose: "Scegli una foto", memoryPhotoRemove: "Rimuovi", memoryMakePublic: "Rendi pubblica questa recensione (visibile agli altri utenti)", reviewsLoading: "Caricamento recensioni…", reviewsEmpty: "Ancora nessuna recensione pubblica per questo posto — sii il primo a condividere la tua dalla scheda «La Mia Visita»!",
         backToMap: "← Torna alla mappa", moreDetails: "Maggiori dettagli", openInMaps: "Apri in Google Maps", detailsLabel: "Dettagli", aboutPlaceLabel: "Informazioni su questo luogo",
-        accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accResetPhoto: "Ripristina foto profilo", accNameLabel: "Nome", accEmailLabel: "Indirizzo email",
+        accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accResetPhoto: "Ripristina foto profilo", accNameLabel: "Nome utente", accChangeUsernameHint: "Cambia nome utente", accEmailLabel: "Indirizzo email",
         accCountryLabel: "Paese che ti interessa", accCountryPlaceholder: "Scegli un paese (opzionale)",
         accActivityTitle: "La tua attività", accTrips: "Viaggi", accVisited: "Visitati", accWishlist: "Wishlist", accPasses: "Pass e fatturazione",
         accEditBtn: "Modifica profilo", accSaveBtn: "Salva modifiche", accSaved: "✓ Salvato con successo", accNoPasses: "Nessun pass attivo",
@@ -2072,7 +2087,7 @@ const translations = {
         addAnotherVisit: "Adicionar outra visita",
         tabExplore: "Explorar", tabMyItinerary: "Meu Itinerário", yourRating: "Sua avaliação", whenDidYouVisit: "Quando você visitou este lugar?", saveMemory: "Salvar lembrança", myVisitTab: "Minha Visita", tabReviews: "Avaliações", memoryPhotoLabel: "Adicionar uma foto (opcional)", memoryPhotoChoose: "Escolher uma foto", memoryPhotoRemove: "Remover", memoryMakePublic: "Tornar esta avaliação pública (visível para outros usuários)", reviewsLoading: "Carregando avaliações…", reviewsEmpty: "Ainda não há avaliações públicas para este lugar — seja o primeiro a compartilhar a sua na aba «Minha Visita»!",
         backToMap: "← Voltar ao mapa", moreDetails: "Mais detalhes", openInMaps: "Abrir no Google Maps", detailsLabel: "Detalhes", aboutPlaceLabel: "Sobre este local",
-        accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accResetPhoto: "Redefinir foto de perfil", accNameLabel: "Nome", accEmailLabel: "Endereço de e-mail",
+        accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accResetPhoto: "Redefinir foto de perfil", accNameLabel: "Nome de usuário", accChangeUsernameHint: "Alterar nome de usuário", accEmailLabel: "Endereço de e-mail",
         accCountryLabel: "País de interesse", accCountryPlaceholder: "Escolha um país (opcional)",
         accActivityTitle: "Sua atividade", accTrips: "Viagens", accVisited: "Visitados", accWishlist: "Wishlist", accPasses: "Passes e faturamento",
         accEditBtn: "Editar perfil", accSaveBtn: "Salvar alterações", accSaved: "✓ Salvo com sucesso", accNoPasses: "Nenhum passe ativo",
@@ -2133,7 +2148,7 @@ const translations = {
         addAnotherVisit: "다른 방문 추가",
         tabExplore: "탐색", tabMyItinerary: "내 일정", yourRating: "평점", whenDidYouVisit: "언제 방문하셨나요?", saveMemory: "추억 저장", myVisitTab: "내 방문", tabReviews: "후기", memoryPhotoLabel: "사진 추가 (선택 사항)", memoryPhotoChoose: "사진 선택", memoryPhotoRemove: "제거", memoryMakePublic: "이 후기를 공개로 설정 (다른 사용자에게 표시됨)", reviewsLoading: "후기를 불러오는 중…", reviewsEmpty: "아직 이 장소에 대한 공개 후기가 없습니다 — '내 방문' 탭에서 첫 후기를 남겨보세요!",
         backToMap: "← 지도로 돌아가기", moreDetails: "자세히 보기", openInMaps: "구글 지도에서 열기", detailsLabel: "상세 정보", aboutPlaceLabel: "이 장소에 대해",
-        accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accResetPhoto: "프로필 사진 재설정", accNameLabel: "이름", accEmailLabel: "이메일 주소",
+        accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accResetPhoto: "프로필 사진 재설정", accNameLabel: "아이디", accChangeUsernameHint: "아이디 변경", accEmailLabel: "이메일 주소",
         accCountryLabel: "관심 있는 국가", accCountryPlaceholder: "국가 선택 (선택 사항)",
         accActivityTitle: "내 활동", accTrips: "여행", accVisited: "방문함", accWishlist: "위시리스트", accPasses: "이용권 및 결제",
         accEditBtn: "프로필 수정", accSaveBtn: "변경사항 저장", accSaved: "✓ 저장되었습니다", accNoPasses: "활성화된 이용권 없음",
@@ -2194,7 +2209,7 @@ const translations = {
         addAnotherVisit: "別の訪問を追加",
         tabExplore: "探索", tabMyItinerary: "マイ旅程", yourRating: "評価", whenDidYouVisit: "いつ訪れましたか？", saveMemory: "思い出を保存", myVisitTab: "マイビジット", tabReviews: "レビュー", memoryPhotoLabel: "写真を追加（任意）", memoryPhotoChoose: "写真を選択", memoryPhotoRemove: "削除", memoryMakePublic: "このレビューを公開する（他のユーザーに表示されます）", reviewsLoading: "レビューを読み込み中…", reviewsEmpty: "この場所にはまだ公開レビューがありません —「マイビジット」タブから最初のレビューを共有しましょう！",
         backToMap: "← 地図に戻る", moreDetails: "詳細を見る", openInMaps: "Googleマップで開く", detailsLabel: "詳細", aboutPlaceLabel: "この場所について",
-        accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accResetPhoto: "プロフィール写真をリセット", accNameLabel: "名前", accEmailLabel: "メールアドレス",
+        accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accResetPhoto: "プロフィール写真をリセット", accNameLabel: "ユーザー名", accChangeUsernameHint: "ユーザー名を変更", accEmailLabel: "メールアドレス",
         accCountryLabel: "興味のある国", accCountryPlaceholder: "国を選択（任意）",
         accActivityTitle: "アクティビティ", accTrips: "旅行", accVisited: "訪問済み", accWishlist: "ウィッシュリスト", accPasses: "パスとお支払い",
         accEditBtn: "プロフィールを編集", accSaveBtn: "変更を保存", accSaved: "✓ 保存しました", accNoPasses: "有効なパスはありません",
@@ -2255,7 +2270,7 @@ const translations = {
         addAnotherVisit: "添加另一次访问",
         tabExplore: "探索", tabMyItinerary: "我的行程", yourRating: "你的评分", whenDidYouVisit: "你什么时候去的？", saveMemory: "保存回忆", myVisitTab: "我的到访", tabReviews: "评价", memoryPhotoLabel: "添加照片（可选）", memoryPhotoChoose: "选择照片", memoryPhotoRemove: "移除", memoryMakePublic: "公开此评价（其他用户可见）", reviewsLoading: "正在加载评价…", reviewsEmpty: "该地点暂无公开评价——从「我的到访」标签页分享第一条评价吧！",
         backToMap: "← 返回地图", moreDetails: "更多详情", openInMaps: "在 Google 地图中打开", detailsLabel: "详情", aboutPlaceLabel: "关于这个地方",
-        accTitle: "我的账户", accChangePhoto: "更换头像", accResetPhoto: "重置头像", accNameLabel: "姓名", accEmailLabel: "电子邮箱",
+        accTitle: "我的账户", accChangePhoto: "更换头像", accResetPhoto: "重置头像", accNameLabel: "用户名", accChangeUsernameHint: "更改用户名", accEmailLabel: "电子邮箱",
         accCountryLabel: "感兴趣的国家", accCountryPlaceholder: "选择国家（可选）",
         accActivityTitle: "我的动态", accTrips: "行程", accVisited: "已访问", accWishlist: "收藏清单", accPasses: "通行证与账单",
         accEditBtn: "编辑资料", accSaveBtn: "保存更改", accSaved: "✓ 保存成功", accNoPasses: "暂无有效通行证",
@@ -2638,17 +2653,30 @@ function renderLocations(skipFitBounds) {
 // une bouillie d'icônes illisible. On les regroupe alors en un seul marqueur avec un
 // badge "×N" ; recalculé à chaque changement de zoom (les lieux qui se séparent
 // suffisamment en zoomant redeviennent des marqueurs individuels).
-const CLUSTER_PIXEL_RADIUS = 45;
+//
+// Le rayon de fusion suit désormais la taille RÉELLE des marqueurs à ce zoom (mêmes
+// paliers que --marker-size plus haut) au lieu d'un rayon fixe de 45px : avec un rayon
+// fixe plus grand que le plus grand marqueur (32px), deux lieux encore visiblement
+// espacés (un peu d'espace blanc entre les deux icônes) se retrouvaient déjà fusionnés
+// en "×2" — le badge de regroupement doit au contraire n'apparaître que lorsque les
+// marqueurs se chevaucheraient réellement à l'écran.
+function clusterPixelRadiusForZoom(zoom) {
+    if (zoom < 4) return 16;
+    if (zoom < 6) return 22;
+    if (zoom < 9) return 26;
+    return 32;
+}
 // Au zoom maximal (limite de la tuile OSM, voir maxZoom du tileLayer plus bas), deux
 // lieux réellement distincts mais très proches en vrai (ex: deux cafés de la même rue)
-// peuvent encore projeter à moins de 45px l'un de l'autre et rester fusionnés en un
-// cluster "×2" — trompeur puisque l'utilisateur est déjà au niveau de zoom maximum et ne
-// peut pas zoomer davantage pour les séparer. On désactive donc le clustering dès ce
-// niveau : chaque lieu redevient son propre marqueur individuel.
+// peuvent encore projeter à moins du rayon ci-dessus l'un de l'autre et rester fusionnés
+// en un cluster "×2" — trompeur puisque l'utilisateur est déjà au niveau de zoom maximum
+// et ne peut pas zoomer davantage pour les séparer. On désactive donc le clustering dès
+// ce niveau : chaque lieu redevient son propre marqueur individuel.
 const MAP_MAX_ZOOM = 19;
 
 function clusterLocationsForZoom(locations, zoom) {
     if (zoom >= MAP_MAX_ZOOM) return locations.map(loc => ({ locs: [loc], center: [loc.lat, loc.lng] }));
+    const clusterRadius = clusterPixelRadiusForZoom(zoom);
 
     const points = locations.map(loc => ({ loc, px: map.project([loc.lat, loc.lng], zoom) }));
     const used = new Array(points.length).fill(false);
@@ -2660,7 +2688,7 @@ function clusterLocationsForZoom(locations, zoom) {
         used[i] = true;
         for (let j = i + 1; j < points.length; j++) {
             if (used[j]) continue;
-            if (points[i].px.distanceTo(points[j].px) <= CLUSTER_PIXEL_RADIUS) {
+            if (points[i].px.distanceTo(points[j].px) <= clusterRadius) {
                 group.push(points[j]);
                 used[j] = true;
             }
@@ -3043,7 +3071,12 @@ function renderDayMiniMaps(trip) {
             return;
         }
 
-        const dayMap = L.map(container, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, attributionControl: false }).setView(coords[0], 13);
+        // zoomControl:true + dragging:true (contrairement à avant) : la mini-carte de
+        // chaque jour était entièrement figée, impossible d'en sortir du cadrage
+        // automatique pour vérifier un détail — les boutons +/- de Leaflet suffisent
+        // pour zoomer sans avoir à activer aussi le défilement à la molette (qui
+        // capturerait le scroll de la page au survol de la carte).
+        const dayMap = L.map(container, { zoomControl: true, dragging: true, scrollWheelZoom: false, doubleClickZoom: true, attributionControl: false }).setView(coords[0], 13);
         createOSMTileLayer(dayMap).addTo(dayMap);
         const dayLayer = L.featureGroup().addTo(dayMap);
 
@@ -3546,7 +3579,7 @@ window.openMemoryEditor = openMemoryEditor;
 
 const saveMemoryBtn = document.getElementById('save-memory-btn');
 if(saveMemoryBtn) {
-    saveMemoryBtn.addEventListener('click', () => {
+    saveMemoryBtn.addEventListener('click', async () => {
         const rating = Number(document.getElementById('memory-rating-val').value);
         const date = document.getElementById('memory-date').value;
         const notes = document.getElementById('memory-notes').value;
@@ -3580,11 +3613,20 @@ if(saveMemoryBtn) {
             // publié/retiré/mis à jour à chaque sauvegarde selon l'état de la case.
             if (isPublic) {
                 if (typeof window.setLocationReview === 'function') {
-                    window.setLocationReview(String(currentLocationIdForMemory), {
+                    const publishResult = await window.setLocationReview(String(currentLocationIdForMemory), {
                         rating, notes, photo,
                         userName: (localStorage.getItem('userFirstName') || localStorage.getItem('userName') || 'ARMY').trim(),
                         userPhoto: localStorage.getItem('userPhoto') || null
                     });
+                    // Sans ça, un échec de publication (règles Firestore pas encore
+                    // déployées, hors-ligne...) passait totalement inaperçu : la case
+                    // "rendre public" restait cochée dans l'interface comme si tout
+                    // s'était bien passé, alors que rien n'était réellement publié.
+                    if (publishResult && !publishResult.success) {
+                        alert(currentLang === 'fr'
+                            ? "Votre visite a bien été enregistrée, mais la publication de l'avis public a échoué (problème de connexion ou de configuration). Réessayez plus tard."
+                            : "Your visit was saved, but publishing the public review failed (connection or configuration issue). Please try again later.");
+                    }
                 }
             } else if (typeof window.deleteLocationReview === 'function') {
                 window.deleteLocationReview(String(currentLocationIdForMemory));
@@ -4238,7 +4280,7 @@ window.generateItinerary = function() {
             }
 
             if (it.lunchBefore) {
-                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="display:inline-block; background:#FFF7F8; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#D42759; line-height:1.5;">🍽️ ${txt.lunchBreak}</span></div>`;
+                html += `<div style="padding-left:18px; border-left: 2px dashed #cbd5e1; margin-bottom:15px; padding-top:5px; padding-bottom:5px;"><span style="display:inline-block; background:#FFF7F8; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; color:#D42759; line-height:1.5;">${txt.lunchBreak}</span></div>`;
             }
 
             html += `
@@ -4566,6 +4608,7 @@ window.openSharedTrip = function(sharedTripId) {
     if (!currentTrip.days) currentTrip.days = [];
     localStorage.removeItem('activeTripId');
     document.body.classList.toggle('trip-view-only', shared._myRole === 'view');
+    document.body.classList.add('trip-not-owner');
     document.getElementById('empty-state').classList.add('hidden');
     document.getElementById('trip-detail-content').style.display = 'block';
     if(document.getElementById('trip-map-container') && !tripPageMap) {
@@ -4778,21 +4821,17 @@ window.renderTripsSidebar = function() {
         pill.onclick = () => {
             activeTripAccess.isOwner = true;
             activeTripAccess.role = 'edit';
-            document.body.classList.remove('trip-view-only');
+            document.body.classList.remove('trip-view-only', 'trip-not-owner');
             localStorage.setItem('activeTripId', t.id);
             window.initTrips();
         };
 
         pill.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div class="trip-pill-name">${t.name}</div>
-                <div style="display:flex; gap:6px; align-items:center;">
-                    <div class="share-trip-btn" title="${currentLang === 'fr' ? 'Partager' : 'Share'}" onclick="openShareTripModal('${t.id}', event)" style="width:18px; height:18px; display:flex; align-items:center; justify-content:center; color:#94a3b8; cursor:pointer;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                    </div>
-                    <div class="del-trip-btn" onclick="openDeleteModal('${t.id}', event)" title="Delete trip">✕</div>
-                </div>
+            <div class="trip-pill-name">${t.name}</div>
+            <div class="share-trip-btn" title="${currentLang === 'fr' ? 'Partager' : 'Share'}" onclick="openShareTripModal('${t.id}', event)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
             </div>
+            <div class="del-trip-btn" onclick="openDeleteModal('${t.id}', event)" title="Delete trip">✕</div>
             <div class="trip-pill-meta">${dateStr} &middot; ${totalLocs} locations</div>
         `;
         listContainer.appendChild(pill);
@@ -4924,8 +4963,9 @@ const TRIPS_TXT_DICT = {
 // `isFirstOfDay` est passé explicitement (plutôt que déduit de la position dans un
 // tableau) car cette fonction est appelée une fois par lieu dans refreshDayTimelines(),
 // pour ne mettre à jour que la pastille de CE lieu sans reconstruire toute la liste.
-function renderDayTimelineHTML(it, isFirstOfDay) {
+function renderDayTimelineHTML(it, isFirstOfDay, dayColor) {
     const txt = TRIPS_TXT_DICT[currentLang] || TRIPS_TXT_DICT.en;
+    const color = dayColor || '#D42759';
     const formatMin = (mins) => {
         const d = new Date();
         d.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
@@ -4937,10 +4977,10 @@ function renderDayTimelineHTML(it, isFirstOfDay) {
         html += `<div style="font-size:10.5px; font-weight:600; color:#64748b; padding:3px 0 3px 4px;">${isFirstOfDay ? '📍 ' + txt.fromHotel + ' · ' : ''}${legLabel}</div>`;
     }
     if (it.lunchBefore) {
-        html += `<div style="font-size:10.5px; font-weight:600; color:#D42759; padding:3px 0 3px 4px;">🍽️ ${txt.lunchBreak}</div>`;
+        html += `<div style="font-size:10.5px; font-weight:600; color:${color}; padding:3px 0 3px 4px;">${txt.lunchBreak}</div>`;
     }
     const warn = (it.pastClose || it.pastHardEnd) ? ' <span style="color:#ef4444;" title="Hors des horaires réalistes de la journée">⚠</span>' : '';
-    html += `<div style="font-size:10.5px; font-weight:700; color:#D42759; padding-left:4px;">${formatMin(it.arrival)} - ${formatMin(it.departure)}${warn}</div>`;
+    html += `<div style="font-size:10.5px; font-weight:700; color:${color}; padding-left:4px;">${formatMin(it.arrival)} - ${formatMin(it.departure)}${warn}</div>`;
     return html;
 }
 
@@ -4949,9 +4989,10 @@ function renderDayTimelineHTML(it, isFirstOfDay) {
 // pour ne jamais perturber un glisser-déposer en cours ou en cours d'affichage).
 window.refreshDayTimelines = function() {
     if (!currentTrip) return;
-    document.querySelectorAll('.day-card').forEach(card => {
+    document.querySelectorAll('.day-card').forEach((card, cardIdx) => {
         const rows = Array.from(card.querySelectorAll('.day-loc'));
         if (rows.length === 0) return;
+        const dayColor = TRIP_DAY_COLORS[cardIdx % TRIP_DAY_COLORS.length];
         const locs = rows.map(el => celebLocations.find(l => l.id === parseInt(el.dataset.id))).filter(Boolean);
         const items = computeDayTimeline(locs, currentTrip.homeBase);
         items.forEach((it, idx) => {
@@ -4963,15 +5004,48 @@ window.refreshDayTimelines = function() {
                 badge.className = 'day-loc-timing';
                 rowEl.appendChild(badge);
             }
-            badge.innerHTML = renderDayTimelineHTML(it, idx === 0);
+            badge.innerHTML = renderDayTimelineHTML(it, idx === 0, dayColor);
         });
     });
 }
+
+// Avatars des personnes qui ont accès à ce voyage (voir la demande du 31/08/2026),
+// affichés en haut du détail : le créateur d'abord, puis chaque collaborateur — masqué
+// entièrement si le voyage n'a jamais été partagé, pour ne pas encombrer l'écran d'un
+// avatar "solo" sans intérêt.
+window.renderTripBuddiesAvatars = async function() {
+    const container = document.getElementById('trip-buddies-avatars');
+    if (!container || !currentTrip) return;
+
+    let ownerName, members = {}, memberNames = {};
+    if (activeTripAccess.isOwner) {
+        if (!currentTrip.isShared) { container.classList.add('hidden'); container.innerHTML = ''; return; }
+        ownerName = (localStorage.getItem('userFirstName') || localStorage.getItem('userName') || 'You').trim();
+        if (typeof window.loadSharedTrip === 'function') {
+            const shared = await window.loadSharedTrip(currentTrip.id);
+            if (shared) { members = shared.members || {}; memberNames = shared.memberNames || {}; }
+        }
+    } else {
+        ownerName = currentTrip.ownerName || 'ARMY';
+        members = currentTrip.members || {};
+        memberNames = currentTrip.memberNames || {};
+    }
+
+    const palette = ['#D42759', '#8B5CF6', '#F06090', '#10b981', '#3b82f6', '#f59e0b'];
+    let html = `<div class="trip-buddy-avatar" style="background:${palette[0]};" title="${ownerName}">${ownerName.charAt(0).toUpperCase()}</div>`;
+    Object.keys(members).forEach((uid, i) => {
+        const name = memberNames[uid] || uid;
+        html += `<div class="trip-buddy-avatar" style="background:${palette[(i + 1) % palette.length]};" title="${name}">${name.charAt(0).toUpperCase()}</div>`;
+    });
+    container.innerHTML = html;
+    container.classList.remove('hidden');
+};
 
 window.renderTrip = function() {
     if (!currentTrip) return;
 
     document.getElementById('edit-trip-name').value = currentTrip.name;
+    if (typeof window.renderTripBuddiesAvatars === 'function') window.renderTripBuddiesAvatars();
     
     let metaText = "";
     if (currentTrip.group) metaText += currentTrip.group + " • ";
@@ -5061,9 +5135,10 @@ window.renderTrip = function() {
             if (loc) itemsHtml += window.createLocRowHtml(loc);
         });
 
+        const dayColor = TRIP_DAY_COLORS[index % TRIP_DAY_COLORS.length];
         card.innerHTML = `
             <div class="day-header">
-                <div class="day-title"><span class="drag-handle" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${index + 1}</div>
+                <div class="day-title" style="color:${dayColor};"><span class="drag-handle edit-only" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${index + 1}</div>
                 <div class="x-btn edit-only" style="display:block;" onclick="removeDay(this)">✕</div>
             </div>
             <div class="day-items">${itemsHtml}</div>
@@ -5137,6 +5212,9 @@ window.createLocRow = function(loc) {
     div.setAttribute('draggable', 'true');
     div.setAttribute('ondragstart', 'dragStart(event, "loc")');
     div.setAttribute('ondragend', 'dragEnd(event)');
+    div.setAttribute('ondragover', 'allowDrop(event)');
+    div.setAttribute('ondrop', 'drop(event)');
+    div.setAttribute('ondragleave', 'dragLeave(event)');
     div.innerHTML = `
         <span class="drag-handle edit-only" style="display:inline;">⠿</span>
         ${loc.name}
@@ -5146,8 +5224,14 @@ window.createLocRow = function(loc) {
 }
 
 window.createLocRowHtml = function(loc) {
+    // ondragover/ondrop DIRECTEMENT sur la ligne (pas seulement sur .day-card, son
+    // parent) : sans ça, l'évènement ne fait que remonter (bubbling) jusqu'au
+    // gestionnaire de .day-card, où event.currentTarget vaut TOUJOURS .day-card (jamais
+    // .day-loc) — la condition "survole une autre ligne" (voir allowDrop()) n'était donc
+    // jamais vraie, et le trait indicateur .drag-over-top/.drag-over-bottom (déjà stylé
+    // en CSS) ne s'affichait jamais entre deux lieux pendant un glisser-déposer.
     return `
-        <div class="day-loc" data-id="${loc.id}" draggable="true" ondragstart="dragStart(event, 'loc')" ondragend="dragEnd(event)">
+        <div class="day-loc" data-id="${loc.id}" draggable="true" ondragstart="dragStart(event, 'loc')" ondragend="dragEnd(event)" ondragover="allowDrop(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
             <span class="drag-handle edit-only" style="display:inline;">⠿</span>
             ${loc.name}
             <span class="x-btn edit-only" style="display:inline;" onclick="removeFromTrip(this, ${loc.id})">✕</span>
@@ -5222,7 +5306,9 @@ window.drop = function(e) {
         
         document.querySelectorAll('.day-card').forEach((c, index) => {
             c.dataset.day = index + 1;
-            c.querySelector('.day-title').innerHTML = `<span class="drag-handle" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${index + 1}`;
+            const dayTitleEl = c.querySelector('.day-title');
+            dayTitleEl.style.color = TRIP_DAY_COLORS[index % TRIP_DAY_COLORS.length];
+            dayTitleEl.innerHTML = `<span class="drag-handle edit-only" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${index + 1}`;
         });
     } else if (dragType === 'loc') {
         if (e.currentTarget.classList.contains('day-loc')) {
@@ -5255,7 +5341,7 @@ window.addDay = function() {
     card.setAttribute('ondragleave', 'dragLeave(event)');
     card.innerHTML = `
         <div class="day-header">
-            <div class="day-title"><span class="drag-handle" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${newDayNum}</div>
+            <div class="day-title" style="color:${TRIP_DAY_COLORS[(newDayNum - 1) % TRIP_DAY_COLORS.length]};"><span class="drag-handle edit-only" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${newDayNum}</div>
             <div class="x-btn edit-only" style="display:flex;" onclick="removeDay(this)">✕</div>
         </div>
         <div class="day-items"></div>
@@ -5279,7 +5365,9 @@ window.confirmRemoveDay = function() {
     
     document.querySelectorAll('.day-card').forEach((c, index) => {
         c.dataset.day = index + 1;
-        c.querySelector('.day-title').innerHTML = `<span class="drag-handle" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${index + 1}`;
+        const dayTitleEl = c.querySelector('.day-title');
+        dayTitleEl.style.color = TRIP_DAY_COLORS[index % TRIP_DAY_COLORS.length];
+        dayTitleEl.innerHTML = `<span class="drag-handle edit-only" style="cursor:grab; margin-right:8px;">⠿</span>${currentLang==='fr'?'Jour':'Day'} ${index + 1}`;
     });
     window.saveTrip();
     closeModal('remove-day-modal');
