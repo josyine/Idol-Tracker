@@ -122,7 +122,10 @@
             const doFit = () => {
                 if (!tourModeLeafletMap || tourModeMapUserInteracted) return;
                 tourModeLeafletMap.invalidateSize();
-                tourModeLeafletMap.fitBounds(routeLine.getBounds(), { padding: [40, 40], maxZoom: 5 });
+                // maxZoom relevé de 5 à 6 : sur mobile, .tour-mode-mapwrap ne fait que 38vh de
+                // haut — plafonner le zoom à 5 laissait souvent de larges bandes grises
+                // au-dessus/en dessous du tracé de la tournée au lieu de vraiment le remplir.
+                tourModeLeafletMap.fitBounds(routeLine.getBounds(), { padding: [40, 40], maxZoom: 6 });
             };
             doFit();
             [150, 400, 900].forEach(delay => setTimeout(doFit, delay));

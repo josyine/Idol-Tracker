@@ -143,14 +143,21 @@ h1.pg-title { font-size: 22px; font-weight: 700; color: #1e293b; margin-bottom: 
     const _origChangeLang = window.changeLang;
     window.changeLang = function(lang) { _origChangeLang(lang); fillSummary(); };
 
-    // Sans compte connecté, l'achat n'a pas de sens (rien à synchroniser) — retour à
-    // l'accueil. On se fie à l'indice local (comme le voile anti-clignotement de
-    // map.html), PAS au premier évènement "firebase-ready" : Firebase déclenche
-    // toujours une première fois avec user=null pendant que la session se restaure
-    // depuis le stockage local, avant de re-déclencher avec le vrai compte — se fier à
-    // ce premier signal aurait renvoyé vers l'accueil même une personne bien connectée.
+    // Redirection automatique retirée : elle renvoyait certaines personnes pourtant bien
+    // connectées vers l'accueil (voir sur map.html le même indice localStorage, présenté
+    // comme un simple raccourci anti-clignotement, PAS une vérité absolue — le vrai état
+    // Firebase peut mettre un moment à se confirmer, notamment sur mobile). Un achat
+    // simulé (voir buyGuidePass() dans script.js, pas de vraie passerelle de paiement
+    // nulle part sur le site) reste sans risque à laisser passer même sans confirmation
+    // Firebase immédiate : il écrit dans le localStorage local, qui seul détermine
+    // hasGuidePass() ; la synchronisation Firestore (syncUserData) se contente de ne
+    // rien faire si personne n'est confirmé connecté, sans jamais faire échouer l'achat.
+    // On affiche seulement un bandeau discret si vraiment aucun compte n'est détecté.
     if (!localStorage.getItem('userEmail')) {
-        window.location.href = 'index.html';
+        const banner = document.createElement('p');
+        banner.style.cssText = 'background:#FEF2F2; color:#B91C1C; border:1px solid #FECACA; border-radius:9px; padding:10px 12px; font-size:12px; font-weight:600; margin-bottom:16px;';
+        banner.innerHTML = '<span data-i18n="paymentNoAccountWarning">You don\'t seem to be logged in — </span><a href="index.html" style="color:#B91C1C; text-decoration:underline;" data-i18n="paymentNoAccountLink">sign up first</a>';
+        document.querySelector('.summary-box').insertAdjacentElement('beforebegin', banner);
     }
 
     const paymentForm = document.getElementById('payment-form');

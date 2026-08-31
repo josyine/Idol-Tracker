@@ -80,8 +80,8 @@ const dict = {
         skipPassesLink: "Continue with the free version",
         skipConfirmTitle: "Are you sure?", skipConfirmBody: "With the free version, you'll only have access to 3 locations. Unlock the full guide (500+ addresses) with a Travel or VIP pass instead.",
         skipConfirmBack: "See the passes again", skipConfirmProceed: "No thanks, continue for free",
-        paywallMonthlyName: "🎟️ TRAVEL PASS (1 Month)", paywallMonthlyPrice: "€9.99 / month",
-        paywallVipName: "👑 VIP PASS (Lifetime Access)", paywallVipPrice: "€19.99 (one-time payment)",
+        paywallMonthlyName: "TRAVEL PASS (1 Month)", paywallMonthlyPrice: "€9.99 / month",
+        paywallVipName: "VIP PASS (Lifetime Access)", paywallVipPrice: "€19.99 (one-time payment)",
         subtotalLabel: "Subtotal:", payBtnEmpty: "Select a pass", btnToPayment: "Continue to Payment",
         
         step4Title: "Payment", step4Desc: "Complete your purchase to unlock the guides.",
@@ -134,8 +134,8 @@ const dict = {
         skipPassesLink: "Continuer avec la version gratuite",
         skipConfirmTitle: "Êtes-vous sûr(e) ?", skipConfirmBody: "Avec la version gratuite, vous n'aurez accès qu'à 3 lieux. Débloquez le guide complet (500+ adresses) avec un Pass Voyage ou VIP.",
         skipConfirmBack: "Revoir les pass", skipConfirmProceed: "Non merci, continuer gratuitement",
-        paywallMonthlyName: "🎟️ PASS VOYAGE (1 Mois)", paywallMonthlyPrice: "9,99 € / mois",
-        paywallVipName: "👑 PASS VIP (Accès à vie)", paywallVipPrice: "19,99 € (paiement unique)",
+        paywallMonthlyName: "PASS VOYAGE (1 Mois)", paywallMonthlyPrice: "9,99 € / mois",
+        paywallVipName: "PASS VIP (Accès à vie)", paywallVipPrice: "19,99 € (paiement unique)",
         subtotalLabel: "Sous-total :", payBtnEmpty: "Sélectionnez un pass", btnToPayment: "Passer au paiement",
         
         step4Title: "Paiement", step4Desc: "Finalisez votre achat pour débloquer les guides.",
