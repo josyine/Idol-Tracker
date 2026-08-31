@@ -573,13 +573,18 @@ window.addEventListener('firebase-ready', async (e) => {
             localStorage.setItem('wishlistLocs', JSON.stringify(cloudData.wishlistLocs));
 
             // Rafraîchit les affichages déjà construits qui dépendent de la wishlist.
-            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations();
+            // skipFitBounds=true (comme dans map.html) : ce rafraîchissement arrive ici de
+            // façon asynchrone, APRÈS le centrage initial sur le pays choisi fait par
+            // map.html au moment du login — un simple renderLocations() sans ce paramètre
+            // rappelait fitBounds() sur TOUS les lieux et effaçait ce centrage un instant
+            // plus tard (c'était le vrai bug persistant du recadrage carte sur mobile).
+            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations(true);
             if (document.getElementById('edit-trip-name') && typeof window.renderTrip === 'function' && currentTrip) window.renderTrip();
             if (typeof window.refreshWishlistFromCloud === 'function') window.refreshWishlistFromCloud();
         }
         if (Array.isArray(cloudData.visitedLocs)) {
             localStorage.setItem('visitedLocs', JSON.stringify(cloudData.visitedLocs));
-            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations();
+            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations(true);
             if (typeof window.refreshVisitedFromCloud === 'function') window.refreshVisitedFromCloud();
         }
         if (Array.isArray(cloudData.myTrips)) {
@@ -1620,26 +1625,11 @@ let celebLocations = [
     // GPS exacte. BTS-18, BTS-19 et BTS-24 : narration réécrite pour rester cohérente avec
     // le lieu réellement vérifié (le fichier source gardait encore l'ancien texte associé à
     // une adresse déjà corrigée par ailleurs — voir sa colonne "Lieux vérifiés").
-    { id: 156, name: "Yoojung Sikdang", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2013-2015", address: "14 Dosan-daero 28-gil, Gangnam-gu", lat: 37.5265, lng: 127.041, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
-      fullDescription: { en: `<p>During their trainee years, BTS practically lived in this modest restaurant. Located a short walk from their old dorm and practice studio, Yoojung Sikdang served as their unofficial mess hall.</p><p>Eating the signature Heukdwaeji Dolsot Bibimbap at the exact table where the members used to sit is a mandatory rite of passage for every ARMY visiting Seoul.</p>`,
-        fr: `<p>Pendant leurs années de trainees, BTS vivait pratiquement dans ce restaurant modeste. Situé à quelques pas de leur ancien dortoir et de leur studio de répétition, Yoojung Sikdang servait de cantine officieuse au groupe.</p><p>Manger le fameux Heukdwaeji Dolsot Bibimbap à la table même où s'asseyaient les membres est un passage obligé pour toute ARMY visitant Séoul.</p>` },
-      tip: { en: "Order the signature dish — Ask for the \"Bangtan Bibimbap\", their favorite menu item back in the day.", fr: "Commandez le plat signature — Demandez le « Bangtan Bibimbap », leur plat préféré à l'époque." },
-      directions: { en: "Take the subway to Hakdong Station (Line 7), and walk about 10 minutes.", fr: "Prenez le métro jusqu'à la station Hakdong (ligne 7), puis marchez environ 10 minutes." } },
-    { id: 157, name: "Hakdong Park", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013", address: "83 Nonhyeon-dong, Gangnam-gu", lat: 37.5158, lng: 127.0295, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
-      fullDescription: { en: `<p>Tucked away on a steep hill, Hakdong Park holds immense emotional weight as the outdoor sanctuary where the young trainees spent countless hours resting and dreaming.</p><p>RM, Suga, and J-Hope frequently mentioned coming here to clear their heads during their hardest pre-debut years.</p>`,
-        fr: `<p>Niché sur une colline escarpée, Hakdong Park porte un poids émotionnel immense : ce fut le sanctuaire en plein air où les jeunes trainees passaient d'innombrables heures à se reposer et à rêver.</p><p>RM, Suga et J-Hope ont souvent mentionné venir ici pour se vider la tête pendant leurs années les plus difficiles avant leurs débuts.</p>` },
-      tip: { en: "The basketball court — Head to the court where the members used to shoot hoops after midnight practice.", fr: "Le terrain de basket — Direction le terrain où les membres tiraient des paniers après leurs répétitions de minuit." },
-      directions: { en: "Exit from Hakdong Station (Line 7) and walk uphill for 5 minutes.", fr: "Sortez de la station Hakdong (ligne 7) et marchez 5 minutes en montée." } },
     { id: 158, name: "Old Big Hit Studio (Cheonggu Bldg)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013-2016", address: "10-31 Nonhyeon-dong, Gangnam-gu", lat: 37.5155, lng: 127.0305, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
       fullDescription: { en: `<p>The basement of the Cheonggu Building is the legendary birthplace of BTS, where the seven members sweat through years of grueling choreography practice.</p><p>The exterior walls became a massive canvas where thousands of fans wrote messages in permanent marker, standing as a quiet monument to their humble beginnings.</p>`,
         fr: `<p>Le sous-sol du bâtiment Cheonggu est le lieu de naissance légendaire de BTS, où les sept membres ont sué pendant des années sur des chorégraphies épuisantes.</p><p>Les murs extérieurs sont devenus une immense toile où des milliers de fans ont écrit des messages au marqueur indélébile, un monument discret à leurs débuts modestes.</p>` },
       tip: { en: "Respect the neighborhood — Keep noise levels down and do not attempt to enter private property.", fr: "Respectez le quartier — Restez discret et ne tentez pas d'entrer dans une propriété privée." },
       directions: { en: "Located just a few streets away from Hakdong Park.", fr: "Situé à quelques rues seulement de Hakdong Park." } },
-    { id: 159, name: "Ilchi Art Hall", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2013", address: "860 Seolleung-ro, Gangnam-gu", lat: 37.5257, lng: 127.0392, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>On June 12, 2013, Ilchi Art Hall hosted BTS's official debut showcase. Here they performed "No More Dream" in front of the press and their very first fans.</p><p>Visiting the exterior of this hall allows fans to stand exactly where the boys took their very first steps into the spotlight.</p>`,
-        fr: `<p>Le 12 juin 2013, Ilchi Art Hall a accueilli le showcase officiel des débuts de BTS. C'est ici qu'ils ont interprété « No More Dream » devant la presse et leurs tout premiers fans.</p><p>Se rendre devant cette salle permet aux fans de se tenir exactement là où le groupe a fait ses tout premiers pas sous les projecteurs.</p>` },
-      tip: { en: "Take a photo at the entrance — The main glass doors are exactly as they appeared in their debut documentary.", fr: "Prenez une photo à l'entrée — Les portes vitrées principales sont exactement telles qu'on les voit dans leur documentaire de débuts." },
-      directions: { en: "A short walk from Apgujeong Rodeo Station.", fr: "À quelques minutes à pied de la station Apgujeong Rodeo." } },
     { id: 160, name: "First BTS Dormitory", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013-2015", address: "9-8 Nonhyeon-dong, Gangnam-gu", lat: 37.515, lng: 127.0215, img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600",
       fullDescription: { en: `<p>This infamous small, cramped 3rd-floor apartment was where all 7 members shared a single bedroom, sleeping on bunk beds, surrounded by shoes and clothes.</p><p>The dorm was heavily featured in their debut anniversary broadcasts and Rookie King, representing the ultimate symbol of their shared struggles.</p>`,
         fr: `<p>Ce petit appartement exigu du 3e étage, tristement célèbre, est celui où les 7 membres partageaient une seule chambre, dormant sur des lits superposés entourés de chaussures et de vêtements.</p><p>Ce dortoir est apparu abondamment dans les diffusions anniversaire de leurs débuts et dans Rookie King, symbole ultime de leurs galères partagées.</p>` },
@@ -1650,56 +1640,6 @@ let celebLocations = [
         fr: `<p>Pendant leurs débuts, BTS venait souvent boire des berry ades chez The Min's. Un endroit sûr pour eux, tenu par un artiste senior de confiance.</p><p>Les membres ont posté des dizaines de selfies depuis la terrasse de ce café en 2014, en faisant l'un des tout premiers vrais lieux de « pèlerinage ARMY » à Séoul.</p>` },
       tip: { en: "Nostalgia walk — Even though it's closed, the street itself is part of their rookie memories.", fr: "Balade nostalgique — Même fermé, la rue elle-même fait partie des souvenirs de leurs débuts." },
       directions: { en: "Apgujeong Rodeo area.", fr: "Quartier d'Apgujeong Rodeo." } },
-    { id: 162, name: "YES24 Live Hall (AX-Korea)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "319 Gucheonmyeon-ro, Gwangjin-gu", lat: 37.5478, lng: 127.0956, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>In October 2014, BTS held their very first solo concert, "The Red Bullet," at this venue. It was a deeply emotional milestone for a group from a small agency.</p><p>Standing outside YES24 Live Hall reminds fans of the days when BTS struggled to sell out a 2,000-seat venue, long before their stadium tours.</p>`,
-        fr: `<p>En octobre 2014, BTS a donné son tout premier concert solo, « The Red Bullet », dans cette salle. Une étape profondément émouvante pour un groupe issu d'une petite agence.</p><p>Se tenir devant le YES24 Live Hall rappelle aux fans l'époque où BTS peinait à remplir une salle de 2 000 places, bien avant les tournées de stades.</p>` },
-      tip: { en: "The Entrance steps — Recreate the fan photos taken during the 2014 concert queuing.", fr: "Les marches de l'entrée — Recréez les photos de fans prises pendant la file d'attente du concert de 2014." },
-      directions: { en: "Gwangnaru Station (Line 5), exit 2.", fr: "Station Gwangnaru (ligne 5), sortie 2." } },
-    { id: 163, name: "Olympic Hall", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "424 Olympic-ro, Songpa-gu", lat: 37.5205, lng: 127.1218, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>Olympic Hall was the site of the very first "MUSTER" in March 2014, the official fan meeting that cemented the bond between BTS and the newly named ARMY.</p><p>This venue represents the birth of BTS's unique fan-culture events, filled with early inside jokes and tearful speeches.</p>`,
-        fr: `<p>Olympic Hall a accueilli le tout premier « MUSTER » en mars 2014, la fan meeting officielle qui a scellé le lien entre BTS et l'ARMY tout juste nommée.</p><p>Cette salle marque la naissance des événements fan-culture uniques de BTS, remplis de blagues internes des débuts et de discours émouvants.</p>` },
-      tip: { en: "Explore Olympic Park — The park is huge and beautiful, great for renting a bike.", fr: "Explorez Olympic Park — Le parc est immense et magnifique, idéal pour louer un vélo." },
-      directions: { en: "Olympic Park Station (Line 5 & 9).", fr: "Station Olympic Park (lignes 5 et 9)." } },
-    { id: 164, name: "SBS Prism Tower", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2015", address: "82 Sangamsan-ro, Mapo-gu", lat: 37.5817, lng: 126.8895, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
-      fullDescription: { en: `<p>On May 5, 2015, BTS won their very first music show trophy for "I Need U" on SBS MTV's The Show at the Prism Tower. It was a turning point that saved the group.</p><p>The emotional footage of the members crying backstage was filmed right in the corridors of this building, making it a sacred site.</p>`,
-        fr: `<p>Le 5 mai 2015, BTS a remporté son tout premier trophée d'émission musicale pour « I Need U » sur The Show de SBS MTV, à la Prism Tower. Un tournant qui a sauvé le groupe.</p><p>Les images émouvantes des membres en larmes en coulisses ont été filmées directement dans les couloirs de ce bâtiment, en faisant un lieu quasi sacré.</p>` },
-      tip: { en: "The front plaza — The futuristic exterior makes for great architectural photos.", fr: "L'esplanade avant — L'extérieur futuriste offre de superbes photos d'architecture." },
-      directions: { en: "Digital Media City Station (Line 6).", fr: "Station Digital Media City (ligne 6)." } },
-    { id: 165, name: "KBS Yeouido Broadcast Center", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013-2015", address: "13 Yeouigongwon-ro, Yeongdeungpo-gu", lat: 37.5237, lng: 126.9198, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
-      fullDescription: { en: `<p>During their rookie days, the walk from the vans to the KBS studio doors for Music Bank was a crucial way for BTS to get media attention, often wearing matching customized outfits.</p><p>Fans still visit the KBS steps where BTS used to greet reporters, representing the grind of their early promotion cycles.</p>`,
-        fr: `<p>Pendant leurs débuts, le trajet des vans jusqu'aux portes du studio KBS pour Music Bank était un moyen crucial pour BTS d'attirer l'attention des médias, souvent en tenues assorties personnalisées.</p><p>Les fans visitent encore les marches de KBS où BTS avait l'habitude de saluer les journalistes, symbole du travail acharné de leurs premiers cycles promotionnels.</p>` },
-      tip: { en: "The KBS Steps — Find the specific stairs leading to the entrance where press photos are taken.", fr: "Les marches de KBS — Repérez l'escalier précis menant à l'entrée où sont prises les photos de presse." },
-      directions: { en: "National Assembly Station (Line 9), exit 4.", fr: "Station National Assembly (ligne 9), sortie 4." } },
-    { id: 166, name: "Han River Park (Jamwon)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2013-2015", address: "Jamwon-dong, Seocho-gu, Seoul", lat: 37.5134, lng: 127.0138, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
-      fullDescription: { en: `<p>The Jamwon section of the Han River was just a short distance from Big Hit's old Nonhyeon dorm. The members frequently escaped here late at night to skateboard, practice, or film early video logs.</p><p>It was by the Han River that RM recorded some of his most introspective early vlogs, talking about his anxieties before debuting.</p>`,
-        fr: `<p>La section Jamwon du fleuve Han n'était qu'à quelques minutes de l'ancien dortoir de Big Hit à Nonhyeon. Les membres s'y échappaient souvent tard le soir pour faire du skate, répéter ou filmer leurs premiers vlogs.</p><p>C'est au bord du fleuve Han que RM a enregistré certains de ses tout premiers vlogs les plus introspectifs, évoquant ses angoisses avant leurs débuts.</p>` },
-      tip: { en: "Eat Riverside Ramen — Use the automatic foil-bowl machines at the convenience store.", fr: "Mangez un ramen au bord du fleuve — Utilisez les distributeurs automatiques de bols du convenience store." },
-      directions: { en: "Jamwon Station (Line 3) or Sinsa Station, then walk to the river.", fr: "Station Jamwon (ligne 3) ou Sinsa, puis marchez jusqu'au fleuve." } },
-    { id: 167, name: "Incheon Airport Terminal 1", group: "BTS", member: "All", country: "South Korea", city: "Incheon", category: "Bon Voyage", year: "2014", address: "272 Gonghang-ro, Jung-gu, Incheon", lat: 37.4602, lng: 126.4407, img: "https://images.unsplash.com/photo-1601439678777-b2b3c56fa72e?w=600",
-      fullDescription: { en: `<p>In the summer of 2014, BTS arrived at Incheon Airport to film American Hustle Life in LA. They were famously tricked into thinking it was a relaxing vacation.</p><p>Their hilariously flashy rookie airport fashion, complete with heavy eyeliner and oversized hip-hop gear, remains legendary among fans.</p>`,
-        fr: `<p>À l'été 2014, BTS s'est envolé depuis l'aéroport d'Incheon pour tourner American Hustle Life à Los Angeles. On leur avait fait croire, avec humour, qu'il s'agissait de vacances tranquilles.</p><p>Leur look aéroport de rookies, hilarant et clinquant, entre eye-liner appuyé et tenues hip-hop XXL, reste légendaire chez les fans.</p>` },
-      tip: { en: "The Departure Gates — Walk the same halls where thousands of press photos of BTS have been taken.", fr: "Les portes d'embarquement — Marchez dans les mêmes couloirs où des milliers de photos de presse de BTS ont été prises." },
-      directions: { en: "AREX Train from Seoul Station.", fr: "Train AREX depuis la gare de Séoul." } },
-    { id: 168, name: "Ilsan Lake Park", group: "BTS", member: "Namjoon", country: "South Korea", city: "Goyang", category: "Landmarks", year: "2013-2014", address: "595 Hosu-ro, Ilsandong-gu, Goyang-si", lat: 37.6584, lng: 126.7703, img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600",
-      fullDescription: { en: `<p>As RM's hometown, Ilsan shaped his childhood and early songwriting. He frequently visited this lake park to write lyrics and reflect before moving to the Gangnam dorms.</p><p>Walking around Ilsan Lake Park gives fans a deep understanding of Namjoon's roots and the quiet nature he constantly seeks out.</p>`,
-        fr: `<p>Ville natale de RM, Ilsan a façonné son enfance et ses premières compositions. Il venait souvent dans ce parc au bord du lac pour écrire des paroles et réfléchir, avant son déménagement dans les dortoirs de Gangnam.</p><p>Se promener autour d'Ilsan Lake Park permet aux fans de mieux comprendre les racines de Namjoon et la nature paisible qu'il recherche sans cesse.</p>` },
-      tip: { en: "Find the musical fountains — A popular spot mentioned in his early memories.", fr: "Trouvez les fontaines musicales — Un lieu populaire mentionné dans ses souvenirs de jeunesse." },
-      directions: { en: "Jeongbalsan Station (Line 3), exit 2.", fr: "Station Jeongbalsan (ligne 3), sortie 2." } },
-    { id: 169, name: "Second BTS Dormitory", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2015-2017", address: "Nonhyeon-dong, Gangnam-gu, Seoul", lat: 37.514, lng: 127.025, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
-      fullDescription: { en: `<p>Moving into this slightly larger dorm in 2015 marked the beginning of their most critical era. They finally had a bit more space as "I Need U" skyrocketed them to fame.</p><p>This dorm was featured in the 2015 Festa broadcasts, showing a chaotic but happier environment as they began winning awards.</p>`,
-        fr: `<p>Emménager dans ce dortoir un peu plus grand en 2015 a marqué le début de leur ère la plus décisive. Ils avaient enfin un peu plus d'espace tandis que « I Need U » les propulsait vers la célébrité.</p><p>Ce dortoir est apparu dans les diffusions Festa de 2015, montrant un environnement chaotique mais plus heureux, à l'heure de leurs premiers trophées.</p>` },
-      tip: { en: "Respect privacy — Remember this is just neighborhood history now.", fr: "Respectez la vie privée — Ce n'est aujourd'hui qu'un lieu chargé d'histoire dans un quartier résidentiel." },
-      directions: { en: "Nonhyeon area.", fr: "Quartier de Nonhyeon." } },
-    { id: 170, name: "Gwanghwamun Square", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2013", address: "172 Sejong-daero, Jongno-gu, Seoul", lat: 37.5717, lng: 126.9768, img: "https://images.unsplash.com/photo-1522093005080-d132e14a2e6f?w=600",
-      fullDescription: { en: `<p>During their early promotions, BTS and their staff handed out flyers and did guerilla interviews in major public spaces like Gwanghwamun to gain public recognition.</p><p>Standing in the massive square, it's incredible to think of a young BTS trying to catch the attention of passing citizens, years before they became global ambassadors for Seoul.</p>`,
-        fr: `<p>Pendant leurs débuts promotionnels, BTS et leur équipe distribuaient des flyers et enchaînaient les interviews sauvages dans de grands espaces publics comme Gwanghwamun pour se faire connaître.</p><p>Debout sur cette immense place, difficile d'imaginer qu'un jeune BTS tentait autrefois d'attirer l'attention des passants, des années avant de devenir ambassadeurs mondiaux de Séoul.</p>` },
-      tip: { en: "King Sejong Statue — A must-visit landmark in the center of the square.", fr: "La statue du roi Sejong — Un incontournable au centre de la place." },
-      directions: { en: "Gwanghwamun Station (Line 5).", fr: "Station Gwanghwamun (ligne 5)." } },
-    { id: 171, name: "CJ ENM Center (M Countdown)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2013", address: "66 Sangamsan-ro, Mapo-gu, Seoul", lat: 37.5793, lng: 126.8888, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>On June 13, 2013, BTS stepped onto the M Countdown stage inside this very building to perform "No More Dream" for their first-ever live television broadcast. This date is officially celebrated as their debut anniversary.</p><p>While you can't easily enter the filming studios, walking into the main lobby of the CJ ENM Center allows you to trace the exact steps the nervous rookies took on their way to their very first dressing room.</p>`,
-        fr: `<p>Le 13 juin 2013, BTS est monté sur la scène de M Countdown, dans ce même bâtiment, pour interpréter « No More Dream » lors de sa toute première diffusion télévisée en direct. Cette date est officiellement célébrée comme l'anniversaire de leurs débuts.</p><p>S'il n'est pas facile d'accéder aux studios de tournage, entrer dans le hall principal du CJ ENM Center permet de suivre exactement les pas des jeunes recrues nerveuses en route vers leur toute première loge.</p>` },
-      tip: { en: "The First Floor Cafe — Grab a coffee in the lobby cafe where artists and staff frequently mingle before Thursday broadcasts.", fr: "Le café du rez-de-chaussée — Prenez un café dans le hall, là où artistes et équipes se croisent souvent avant les diffusions du jeudi." },
-      directions: { en: "Digital Media City Station (Line 6, AREX, Gyeongui-Jungang), exit 9.", fr: "Station Digital Media City (ligne 6, AREX, Gyeongui-Jungang), sortie 9." } },
     { id: 172, name: "The Troubadour", group: "BTS", member: "All", country: "United States", city: "West Hollywood, CA", category: "Concerts", year: "2014", address: "9081 Santa Monica Blvd, West Hollywood, CA 90069", lat: 34.0809, lng: -118.39, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
       fullDescription: { en: `<p>On July 13, 2014, during their American Hustle Life trip to Los Angeles, BTS played a surprise showcase at The Troubadour, the legendary West Hollywood club where acts from Elton John to Guns N' Roses got their start.</p><p>For a group still selling out venues of a few thousand back home, performing on this storied stage was a rare, low-key brush with LA's live-music history — a striking contrast to the arena and stadium tours that would follow just a few years later.</p>`,
         fr: `<p>Le 13 juillet 2014, pendant leur séjour à Los Angeles pour American Hustle Life, BTS a donné un showcase surprise au Troubadour, le club légendaire de West Hollywood où des artistes tels qu'Elton John ou Guns N' Roses ont fait leurs débuts.</p><p>Pour un groupe qui remplissait encore des salles de quelques milliers de places au pays, se produire sur cette scène chargée d'histoire fut un moment rare et discret dans l'histoire musicale live de LA — un contraste saisissant avec les tournées de stades qui suivraient à peine quelques années plus tard.</p>` },
@@ -1710,36 +1650,11 @@ let celebLocations = [
         fr: `<p>Dans un épisode légendaire des débuts de Run BTS ! (le Silmido Special), les garçons se sont rendus au XGame Resort, dans les montagnes d'Inje, Gangwon-do, pour affronter leur peur du saut à l'élastique. L'épisode est resté célèbre pour l'hésitation larmoyante de J-Hope et le saut sans peur, tout sourire, de Jungkook.</p><p>Loin du centre de Séoul, la tour de saut du complexe attire encore des ARMY venus revivre les décomptes hurlés des membres avant de sauter à leur tour.</p>` },
       tip: { en: "Take the leap — XGame Resort still operates its bungee platform for visitors brave enough to follow in the members' footsteps.", fr: "Sautez le pas — Le XGame Resort exploite toujours sa plateforme de saut à l'élastique pour les visiteurs assez courageux pour suivre les traces des membres." },
       directions: { en: "Best reached by car from Seoul (around 2 hours); public transit in this part of Gangwon-do is very limited.", fr: "Se rejoint le plus facilement en voiture depuis Séoul (environ 2 heures) ; les transports en commun sont très limités dans ce secteur du Gangwon-do." } },
-    { id: 174, name: "Old Big Hit 2nd Office (Hakdong-ro)", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2016-2017", address: "5-30 Hakdong-ro 30-gil, Gangnam-gu, Seoul", lat: 37.5185, lng: 127.0405, img: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600",
-      fullDescription: { en: `<p>Though slightly past the 2015 mark, this second agency building represents the direct result of their early struggles. They moved here right around the explosive success of the Wings era.</p><p>Many of their most famous chaotic V Live broadcasts (like Jin's 'Eat Jin' sessions) were filmed in the small practice rooms of this specific building before they moved to their massive Yongsan headquarters.</p>`,
-        fr: `<p>Bien qu'un peu postérieur à 2015, ce second bâtiment de l'agence est le résultat direct de leurs premières galères. Ils y ont emménagé au moment du succès explosif de l'ère Wings.</p><p>Beaucoup de leurs V Live les plus chaotiques et célèbres (comme les sessions « Eat Jin » de Jin) ont été filmés dans les petites salles de répétition de ce bâtiment précis, avant leur déménagement vers leur immense siège de Yongsan.</p>` },
-      tip: { en: "The V Live Vibe — Look at the exterior and remember the countless hours of live streams broadcasted from those windows.", fr: "L'ambiance V Live — Regardez la façade en pensant aux innombrables heures de live diffusées depuis ces fenêtres." },
-      directions: { en: "Hakdong Station (Line 7), exit 3.", fr: "Station Hakdong (ligne 7), sortie 3." } },
-    { id: 175, name: "School of Performing Arts Seoul (SOPA)", group: "BTS", member: "Jungkook", country: "South Korea", city: "Seoul", category: "Landmarks", year: "2014-2017", address: "147-1 Gung-dong, Guro-gu, Seoul", lat: 37.4945, lng: 126.8862, img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600",
-      fullDescription: { en: `<p>In 2014, all six older members escorted a very young Jungkook to his high school entrance ceremony at SOPA, a famous arts high school recognizable by its bright yellow uniforms.</p><p>The heartwarming tradition continued three years later when all the members returned to attend his graduation. Fans often visit the exterior to remember the Golden Maknae's youth.</p>`,
-        fr: `<p>En 2014, les six aînés ont accompagné un tout jeune Jungkook à sa cérémonie de rentrée au lycée SOPA, un célèbre lycée d'arts reconnaissable à ses uniformes jaune vif.</p><p>Cette tradition touchante s'est poursuivie trois ans plus tard, quand tous les membres sont revenus assister à sa remise de diplôme. Les fans visitent souvent l'extérieur pour se remémorer la jeunesse du Golden Maknae.</p>` },
-      tip: { en: "Respect the Students — Take a quick photo of the entrance gate from a distance and move on.", fr: "Respectez les élèves — Prenez rapidement une photo du portail d'entrée à distance, puis passez votre chemin." },
-      directions: { en: "Onsu Station (Lines 1 and 7).", fr: "Station Onsu (lignes 1 et 7)." } },
-    { id: 176, name: "Jamsil Olympic Stadium", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2015", address: "25 Olympic-ro, Songpa-gu, Seoul", lat: 37.5155, lng: 127.0731, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>In 2015, a still-growing BTS performed "I Need U" at the massive Dream Concert held at Jamsil Olympic Stadium. At the time, they were just one of many groups performing for a mixed crowd.</p><p>Years later, they would return to this exact stadium to completely sell it out for their Love Yourself and Permission to Dance solo concerts, making it the ultimate symbol of their rise to the top.</p>`,
-        fr: `<p>En 2015, un BTS encore en pleine ascension a interprété « I Need U » lors de l'immense Dream Concert au stade olympique de Jamsil. À l'époque, ils n'étaient qu'un groupe parmi d'autres devant un public mixte.</p><p>Des années plus tard, ils reviendraient remplir intégralement ce même stade pour leurs concerts solo Love Yourself et Permission to Dance, en faisant le symbole ultime de leur ascension au sommet.</p>` },
-      tip: { en: "The Olympic Rings — Take a photo in front of the giant Olympic rings at the main entrance.", fr: "Les anneaux olympiques — Prenez une photo devant les immenses anneaux olympiques à l'entrée principale." },
-      directions: { en: "Sports Complex Station (Lines 2 and 9).", fr: "Station Sports Complex (lignes 2 et 9)." } },
-    { id: 177, name: "Blue Square", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "294 Itaewon-ro, Yongsan-gu, Seoul", lat: 37.5347, lng: 126.9946, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>In August 2014, BTS held their official showcase for their first full-length album, Dark & Wild, at the Blue Square Samsung Card Hall. This marked a significant step up from their smaller debut venues.</p><p>Walking into the Blue Square complex today, fans can appreciate how much the group grew in just one year. The venue is also famous for its stunning Book Park, a great place to relax.</p>`,
-        fr: `<p>En août 2014, BTS a tenu le showcase officiel de son premier album complet, Dark & Wild, au Blue Square Samsung Card Hall. Une montée en gamme notable par rapport à leurs premières salles de débuts.</p><p>En entrant aujourd'hui dans le complexe Blue Square, les fans peuvent mesurer à quel point le groupe a grandi en seulement un an. Le lieu est aussi réputé pour son superbe Book Park, un endroit idéal pour se détendre.</p>` },
-      tip: { en: "Visit the Book Park — Don't miss the massive, multi-story bookstore inside the complex for incredible architectural photos.", fr: "Visitez le Book Park — Ne manquez pas cette immense librairie sur plusieurs étages, pour des photos d'architecture superbes." },
-      directions: { en: "Hangangjin Station (Line 6), exit 2 is directly connected to the venue.", fr: "Station Hangangjin (ligne 6), la sortie 2 est directement reliée à la salle." } },
     { id: 178, name: "Lotte Card Art Center", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2014", address: "Cheongdam-dong, Gangnam-gu, Seoul", lat: 37.5236, lng: 127.0479, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
       fullDescription: { en: `<p>Before Dark & Wild, BTS launched their breakthrough mini-album Skool Luv Affair (featuring "Boy In Luv") with a press and fan showcase at the Lotte Card Art Center in Cheongdam-dong, in February 2014.</p><p>The intimate size of this venue is a stark reminder of their rookie days: only a few hundred lucky fans got to witness the first-ever live performance of "Boy In Luv" in this small room.</p>`,
         fr: `<p>Avant Dark & Wild, BTS a lancé son mini-album décisif Skool Luv Affair (avec « Boy In Luv ») lors d'un showcase presse et fans au Lotte Card Art Center, à Cheongdam-dong, en février 2014.</p><p>La taille intimiste de cette salle rappelle crûment leurs débuts : seules quelques centaines de fans chanceux ont assisté à la toute première performance live de « Boy In Luv » dans cette petite pièce.</p>` },
       tip: { en: "The Entrance Walk — Walk up the front steps where the members gave their press greetings.", fr: "Le perron d'entrée — Montez les marches où les membres ont salué la presse." },
       directions: { en: "Samseong Station (Line 2), exit 8.", fr: "Station Samseong (ligne 2), sortie 8." } },
-    { id: 179, name: "Korea University Hwajeong Gym", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2016", address: "145 Anam-ro, Seongbuk-gu, Seoul", lat: 37.5875, lng: 127.0323, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>Though taking place slightly later in early 2016, the 2nd MUSTER represents the culmination of their rookie era struggles. Held at Hwajeong Gymnasium, it was a deeply emotional fan meeting where they reflected on their first music show wins.</p><p>The steep walk up to the gymnasium is legendary among K-pop fans. The campus itself is beautiful and features classic, European-style university architecture.</p>`,
-        fr: `<p>Bien qu'un peu plus tardif, début 2016, le 2e MUSTER marque l'aboutissement des galères de leurs années de débuts. Tenue au gymnase Hwajeong, ce fut une fan meeting profondément émouvante où ils sont revenus sur leurs premiers trophées.</p><p>La montée abrupte jusqu'au gymnase est légendaire chez les fans de k-pop. Le campus lui-même est magnifique, avec une architecture universitaire classique de style européen.</p>` },
-      tip: { en: "The Uphill Hike — Be prepared for a genuine workout to reach the gym from the subway station.", fr: "La montée — Préparez-vous à un vrai effort physique pour rejoindre le gymnase depuis la station de métro." },
-      directions: { en: "Anam Station (Line 6), then a steep uphill walk through the campus.", fr: "Station Anam (ligne 6), puis une montée abrupte à travers le campus." } },
     { id: 180, name: "Lotte Museum of Art", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Museums", year: "2019", address: "300 Olympic-ro, Songpa-gu, Seoul", lat: 37.5125, lng: 127.1025, img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=600",
       fullDescription: { en: `<p>Both RM and V have visited exhibitions here, notably the James Jean show. The artist they saw eventually created the spectacular Seven Phases artwork based on the BTS members, later displayed at the HYBE Insight museum.</p><p>Located high up in the Lotte World Tower complex, the museum hosts vibrant, pop-culture-adjacent contemporary art — a great stop for fans who want a mix of shopping, entertainment and modern art.</p>`,
         fr: `<p>RM et V ont tous deux visité des expositions ici, notamment celle de James Jean. Cet artiste a par la suite créé l'œuvre spectaculaire Seven Phases inspirée des membres de BTS, exposée plus tard au musée HYBE Insight.</p><p>Perché en hauteur dans le complexe Lotte World Tower, le musée présente un art contemporain vivant, proche de la pop culture — une belle étape pour les fans qui veulent mêler shopping, divertissement et art moderne.</p>` },
@@ -1810,11 +1725,6 @@ let celebLocations = [
         fr: `<p>Le 15 octobre 2022, BTS y a donné un concert gratuit devant environ 55 000 fans, en soutien à la candidature de Busan pour l'Exposition universelle 2030, retransmis dans le monde entier sur Weverse.</p><p>Ce concert s'est révélé être la dernière prestation du groupe au complet avant l'annonce de leur incorporation militaire, seulement deux jours plus tard, lui conférant une portée durable aux yeux des fans ; une version cinéma en a ensuite été tirée sous le titre « BTS: Yet to Come in Cinemas ».</p>` },
       tip: { en: "Hometown tie — Busan is the hometown of members Jimin and Jungkook, adding to the concert's emotional weight.", fr: "Un lien avec leur ville natale — Busan est la ville natale des membres Jimin et Jungkook, ce qui ajoute à la charge émotionnelle du concert." },
       directions: { en: "Sports Complex Station (Busan Metro Line 3).", fr: "Station Sports Complex (ligne 3 du métro de Busan)." } },
-    { id: 194, name: "Gocheok Sky Dome", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Concerts", year: "2018", address: "430 Gyeongin-ro, Gocheok-dong, Guro-gu, Seoul", lat: 37.4982, lng: 126.8672, img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600",
-      fullDescription: { en: `<p>BTS held their 4th Muster fanmeeting here on January 13-14, 2018 — at the time their last domestic fanmeeting before the group's global explosion later that year with "Fake Love" and their first Billboard 200 No.1.</p><p>The venue's dome roof makes it one of the few Seoul venues that can host a full-scale indoor stadium show regardless of weather, and it has since hosted several other major K-pop award shows and concerts.</p>`,
-        fr: `<p>BTS y a tenu son 4e Muster, sa fan meeting, les 13 et 14 janvier 2018 — à l'époque leur dernière fan meeting nationale avant l'explosion mondiale du groupe plus tard cette année-là avec « Fake Love » et son premier n°1 au Billboard 200.</p><p>Le toit en dôme de la salle en fait l'un des rares lieux de Séoul capables d'accueillir un show de stade en intérieur quelle que soit la météo, et elle a depuis accueilli plusieurs autres grandes cérémonies et concerts k-pop.</p>` },
-      tip: { en: "Weather-proof — Unlike outdoor stadiums, the retractable dome means shows here run rain or shine.", fr: "À l'abri de la météo — Contrairement aux stades à ciel ouvert, le dôme rétractable permet aux concerts de se tenir qu'il pleuve ou qu'il vente." },
-      directions: { en: "Guil Station (Line 1) or Guro-gu Office Station (Line 2), then a short walk.", fr: "Station Guil (ligne 1) ou Guro-gu Office (ligne 2), puis une courte marche." } },
 ];
 
 // ==========================================
@@ -1949,7 +1859,8 @@ const translations = {
         paywallActiveDescMonthly: "Your Travel Pass is active until {date}. Thanks for supporting Screen To Street!", paywallActiveDescVip: "Your VIP Pass gives you lifetime access. Thanks for supporting Screen To Street!",
         freeViewsCounter: "{remaining}/3 free locations left",
         paymentTitle: "Complete your purchase", paymentDesc: "Enter your payment details to unlock the full guide.", paymentSummaryLabel: "Selected pass:", paymentTotalLabel: "Total due:",
-        cardNum: "Card Number", expiry: "Expiry Date", cvc: "CVC", paySecurely: "Pay securely", processing: "Processing securely…", paymentBackLink: "← Back to map"
+        cardNum: "Card Number", expiry: "Expiry Date", cvc: "CVC", paySecurely: "Pay securely", processing: "Processing securely…", paymentBackLink: "← Back to map",
+        paymentNoAccountWarning: "You don't seem to be logged in — ", paymentNoAccountLink: "sign up first"
     },
     fr: { 
         btnGenerateIti: "Générateur Itinéraire", filterGroup: "GROUPE", filterMember: "MEMBRE", filterArea: "RÉGION", filterYear: "ANNÉE", filterCategories: "CATÉGORIES", 
@@ -2010,7 +1921,8 @@ const translations = {
         paywallActiveDescMonthly: "Votre Pass Voyage est actif jusqu'au {date}. Merci de soutenir Screen To Street !", paywallActiveDescVip: "Votre Pass VIP vous donne un accès à vie. Merci de soutenir Screen To Street !",
         freeViewsCounter: "{remaining}/3 lieux gratuits restants",
         paymentTitle: "Finaliser votre achat", paymentDesc: "Renseignez vos informations de paiement pour débloquer le guide complet.", paymentSummaryLabel: "Pass sélectionné :", paymentTotalLabel: "Total dû :",
-        cardNum: "Numéro de carte", expiry: "Date d'expiration", cvc: "CVC", paySecurely: "Payer en toute sécurité", processing: "Traitement sécurisé en cours…", paymentBackLink: "← Retour à la carte"
+        cardNum: "Numéro de carte", expiry: "Date d'expiration", cvc: "CVC", paySecurely: "Payer en toute sécurité", processing: "Traitement sécurisé en cours…", paymentBackLink: "← Retour à la carte",
+        paymentNoAccountWarning: "Vous ne semblez pas connecté(e) — ", paymentNoAccountLink: "inscrivez-vous d'abord"
     },
     es: {
         btnGenerateIti: "Generador de Itinerarios", filterGroup: "GRUPO", filterMember: "MIEMBRO", filterArea: "ZONA", filterYear: "AÑO", filterCategories: "CATEGORÍAS",
@@ -2457,7 +2369,7 @@ function updateUI() {
 
     if(document.getElementById('group-select')) {
         initializeFilters();
-        renderLocations();
+        renderLocations(true);
     }
     
     window.initItineraryGenerator();
@@ -2819,7 +2731,7 @@ window.switchMainTab = function(tabName) {
         const p = document.getElementById('sidebar-explore');
         if(p) { p.classList.remove('hidden'); p.classList.add('active'); }
         clearTripFromMainMap();
-        renderLocations();
+        renderLocations(true);
     } else if (tabName === 'itinerary') {
         document.getElementById('tab-itinerary-btn').classList.add('active');
         const p = document.getElementById('sidebar-itinerary');
@@ -3039,7 +2951,7 @@ window.clearTripFromMainMap = function() {
     if(cont) cont.classList.add('hidden');
 
     if(document.getElementById('tab-explore-btn')) {
-        renderLocations();
+        renderLocations(true);
     }
 }
 
@@ -3185,7 +3097,7 @@ window.toggleWishlist = function() {
     }
     localStorage.setItem('wishlistLocs', JSON.stringify(wList));
     syncWishlist(wList);
-    if(map) renderLocations();
+    if(map) renderLocations(true);
 };
 
 window.handleTripSelect = function() {
@@ -3439,7 +3351,7 @@ window.openDetailsPanel = function(id) {
                 syncVisited(list);
                 window.refreshLocationRating(loc.id);
             }
-            if(map) renderLocations();
+            if(map) renderLocations(true);
         };
     }
 
@@ -4042,10 +3954,16 @@ window.generateItinerary = function() {
             dayLocs.forEach((l, locIdx) => coordsForMap.push({ dayIdx: i, locIdx, lat: l.lat, lng: l.lng }));
         }
 
+        // Même couleur que ce jour sur la carte de l'itinéraire juste en dessous (voir
+        // TRIP_DAY_COLORS, réutilisées telles quelles) : le jour 1 est en rose partout
+        // (titre, puce, ligne de temps du détail), le jour 2 en violet, etc. — plus
+        // besoin de faire l'aller-retour avec la carte pour savoir quel jour est lequel.
+        const dayColor = TRIP_DAY_COLORS[i % TRIP_DAY_COLORS.length];
+
         let html = `<div class="iti-day-card" style="padding: 18px 16px;">
-            <div class="iti-day-title" style="display:flex; justify-content:space-between; align-items:center; font-size:16px; color:#D42759; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+            <div class="iti-day-title" style="display:flex; justify-content:space-between; align-items:center; font-size:16px; color:${dayColor}; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
                 <span>${txt.day} ${i + 1}</span>
-                ${isTripsPage ? `<input type="checkbox" class="iti-day-checkbox" value="${i}" checked style="width:18px; height:18px; cursor:pointer; accent-color:#D42759;">` : ''}
+                ${isTripsPage ? `<input type="checkbox" class="iti-day-checkbox" value="${i}" checked style="width:18px; height:18px; cursor:pointer; accent-color:${dayColor};">` : ''}
             </div>`;
 
         items.forEach((it, idx) => {
@@ -4067,9 +3985,9 @@ window.generateItinerary = function() {
             }
 
             html += `
-                <div style="padding-left:18px; border-left: 2px solid #D42759; position:relative; margin-bottom:15px;">
-                    <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:#D42759; border:2px solid #fff;"></div>
-                    <div style="font-size:11px; font-weight:700; color:#D42759; margin-bottom:3px;">${formatMin(it.arrival)} - ${formatMin(it.departure)}</div>
+                <div style="padding-left:18px; border-left: 2px solid ${dayColor}; position:relative; margin-bottom:15px;">
+                    <div style="position:absolute; left:-6px; top:0; width:10px; height:10px; border-radius:50%; background:${dayColor}; border:2px solid #fff;"></div>
+                    <div style="font-size:11px; font-weight:700; color:${dayColor}; margin-bottom:3px;">${formatMin(it.arrival)} - ${formatMin(it.departure)}</div>
                     <div style="font-size:14px; font-weight:700; color:#212832; margin-bottom:4px;">${idx+1}. ${l.name}</div>
                     <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${getCatName(l.category)}</div>
                 </div>`;
@@ -4262,9 +4180,18 @@ window.exportItineraryPDF = function() {
     clone.classList.remove('hidden');
     const mapCard = clone.querySelector('#iti-map-container');
     if(mapCard && mapCard.parentElement) mapCard.parentElement.remove();
+    // Positionné à left:-9999px (hors écran), le clone produisait un PDF entièrement
+    // blanc : html2canvas calcule sa fenêtre de capture à partir du viewport réel, et un
+    // grand décalage négatif la fait pointer loin du contenu à capturer — rien n'est
+    // jamais dessiné sur le canvas, sans erreur visible (le fichier PDF se télécharge
+    // quand même, juste vide). On le garde donc dans le coin (0,0) du viewport réel, mais
+    // caché visuellement derrière le reste de la page (z-index négatif + inerte au clic),
+    // ce qu'html2canvas capture correctement.
     clone.style.position = 'fixed';
-    clone.style.left = '-9999px';
+    clone.style.left = '0';
     clone.style.top = '0';
+    clone.style.zIndex = '-999';
+    clone.style.pointerEvents = 'none';
     clone.style.width = el.offsetWidth + 'px';
     clone.style.background = '#fff';
     document.body.appendChild(clone);
