@@ -34,7 +34,7 @@
   .reviews-header.hidden { display: none; }
   .reviews-count { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .02em; }
   .reviews-avg-badge { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 800; color: #D42759; }
-  .reviews-avg-star { color: #fbbf24; }
+  .reviews-avg-star { color: #D42759; }
   .reviews-divider { border: none; border-top: 1px solid #EFECF6; margin: 18px 0 16px; }
   .reviews-write-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 8px; }
   .review-compose-stars { display: flex; gap: 4px; cursor: pointer; margin-bottom: 10px; }
@@ -432,8 +432,8 @@
                              ses visites ("I visited this place" -> formulaire de souvenir). Le site
                              n'a pas de note communautaire partagée entre utilisateurs (pas de backend
                              d'agrégation), donc pas de fausse moyenne globale inventée ici. -->
-                        <div id="details-rating" class="location-rating hidden" style="margin-left:auto; display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; color:#f59e0b;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+                        <div id="details-rating" class="location-rating hidden" style="margin-left:auto; display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; color:#D42759;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
                             <span id="details-rating-value">4.5</span><span style="color:#94a3b8; font-weight:600;">/5</span>
                         </div>
                     </div>
@@ -587,7 +587,7 @@
                     <div id="review-compose-photo-preview" class="hidden review-compose-photo-preview"><img id="review-compose-photo-preview-img"></div>
                     <input type="file" id="review-compose-photo-input" accept="image/*" style="display:none;">
                     <div class="review-compose-actions">
-                        <button type="button" id="review-compose-photo-btn" class="review-compose-photo-btn">📷 <span data-i18n="memoryPhotoChoose">Choose a photo</span></button>
+                        <button type="button" id="review-compose-photo-btn" class="review-compose-photo-btn"><span data-i18n="memoryPhotoChoose">Choose a photo</span></button>
                         <label class="review-compose-public-label">
                             <input type="checkbox" id="review-compose-public-check" checked>
                             <span data-i18n="reviewsComposeMakePublic">Make this public</span>

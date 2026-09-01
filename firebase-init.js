@@ -279,13 +279,27 @@ window.fetchLocationReviews = async function (locationId) {
 //       && (resource.data.ownerUid == request.auth.uid || resource.data.members[request.auth.uid] == 'edit');
 //     allow delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
 //   }
+// Réserve un pseudo dans l'index public usernames/{pseudo} -> uid. Vérifie D'ABORD que
+// le pseudo n'appartient pas déjà à un AUTRE compte avant d'écrire — sans ça, deux
+// comptes choisissant le même pseudo pouvaient silencieusement se voler l'index l'un
+// l'autre (le dernier à sauvegarder "gagnait"), rendant les invitations "travel buddy"
+// imprévisibles. Renvoie {success, code} comme setLocationReview()/setDoc() plus haut,
+// pour que l'appelant (account.html) puisse bloquer et prévenir la personne si le
+// pseudo est déjà pris ailleurs.
 window.claimUsername = async function (username) {
     const user = auth.currentUser;
-    if (!user || !username) return;
+    if (!user || !username) return { success: false, code: 'invalid' };
+    const key = username.toLowerCase().trim();
     try {
-        await setDoc(doc(db, 'usernames', username.toLowerCase().trim()), { uid: user.uid }, { merge: true });
+        const existing = await getDoc(doc(db, 'usernames', key));
+        if (existing.exists() && existing.data().uid !== user.uid) {
+            return { success: false, code: 'taken' };
+        }
+        await setDoc(doc(db, 'usernames', key), { uid: user.uid }, { merge: true });
+        return { success: true };
     } catch (e) {
         console.warn('Réservation du pseudo échouée :', e);
+        return { success: false, code: e && e.code || 'unknown' };
     }
 };
 

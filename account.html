@@ -123,7 +123,6 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     </svg>
     <div>
         <div class="brand-text">Screen To <b style="color: #D42759;">Street</b></div>
-        <div class="tagline">Following the footsteps of your favorite artists</div>
     </div>
 </a>
 
@@ -181,7 +180,8 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         <div style="text-align:left;">
           <span class="field-label" data-i18n="accNameLabel">Username</span>
           <input type="text" id="user-name-input" class="field-value" style="outline:none;" readonly value="User">
-          <a id="change-username-link" style="display:block; font-size:11px; font-weight:700; color:#D42759; cursor:pointer; margin:6px 0 16px;" data-i18n="accChangeUsernameHint">Change username</a>
+          <a id="change-username-link" style="display:block; font-size:11px; font-weight:700; color:#D42759; cursor:pointer; margin:6px 0 4px;" data-i18n="accChangeUsernameHint">Change username</a>
+          <div id="username-msg" class="hidden" style="font-size:10.5px; font-weight:600; margin:0 0 12px;"></div>
           <span class="field-label" data-i18n="accEmailLabel">Email address</span>
           <div class="field-value" id="user-email-input">email@example.com</div>
           <span class="field-label" style="margin-top:16px;" data-i18n="accCountryLabel">Country you're interested in</span>
@@ -423,31 +423,119 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
     // L'identifiant (nom d'utilisateur), lui, reste en lecture seule par défaut — le
     // lien discret "Changer d'identifiant" en dessous du champ le rend éditable pour
-    // cette seule modification, puis sauvegarde dès qu'on quitte le champ (Entrée ou
-    // clic ailleurs), sans bouton "Save" séparé.
+    // cette seule modification. Contrairement au pays (qui se sauvegarde librement à
+    // chaque changement), un identifiant doit être VALIDÉ avant sauvegarde : format
+    // correct, et surtout pas déjà pris par un autre compte (voir usernames/{pseudo}
+    // dans firebase-init.js — l'index public utilisé pour retrouver un ami par pseudo
+    // dans le partage de voyage). Sans cette vérification, deux comptes pouvaient
+    // silencieusement se marcher dessus sur le même pseudo. Entrée valide et
+    // sauvegarde ; cliquer ailleurs SANS valider annule (pas de sauvegarde à l'aveugle
+    // d'une frappe accidentelle).
     const nameInputEl = document.getElementById('user-name-input');
     const changeUsernameLink = document.getElementById('change-username-link');
-    function saveUsername() {
+    const usernameMsgEl = document.getElementById('username-msg');
+    const USERNAME_RE = /^[a-zA-Z0-9_.]{3,20}$/;
+    let usernameOriginalValue = '';
+    let usernameSaveInProgress = false;
+    let currentAccountUid = null;
+
+    function showUsernameMsg(text, isError) {
+        if (!usernameMsgEl) return;
+        if (!text) { usernameMsgEl.classList.add('hidden'); usernameMsgEl.textContent = ''; return; }
+        usernameMsgEl.textContent = text;
+        usernameMsgEl.style.color = isError ? '#D42759' : '#10b981';
+        usernameMsgEl.classList.remove('hidden');
+    }
+    function exitUsernameEditMode() {
         nameInputEl.setAttribute('readonly', true);
         nameInputEl.style.borderColor = '#e2e8f0';
+    }
+
+    async function saveUsername() {
+        if (usernameSaveInProgress) return;
         const newName = nameInputEl.value.trim();
-        if (!newName) { nameInputEl.value = localStorage.getItem('userName') || ''; return; }
-        localStorage.setItem('userName', newName);
-        if (typeof window.syncUserData === 'function') window.syncUserData({ username: newName });
+        const isFr = currentLang === 'fr';
+
+        if (!newName || newName === usernameOriginalValue) {
+            nameInputEl.value = usernameOriginalValue;
+            showUsernameMsg(null);
+            exitUsernameEditMode();
+            return;
+        }
+        if (!USERNAME_RE.test(newName)) {
+            showUsernameMsg(isFr ? "3 à 20 caractères : lettres, chiffres, . ou _ uniquement." : "3–20 characters: letters, numbers, . or _ only.", true);
+            return;
+        }
+
+        usernameSaveInProgress = true;
+        showUsernameMsg(isFr ? "Vérification de la disponibilité…" : "Checking availability…", false);
+        nameInputEl.setAttribute('disabled', true);
+
+        let takenByOther = false;
+        try {
+            if (typeof window.lookupUserByUsername === 'function') {
+                const existingUid = await window.lookupUserByUsername(newName);
+                takenByOther = !!existingUid && !!currentAccountUid && existingUid !== currentAccountUid;
+            }
+        } catch (e) { /* réseau indisponible : on laisse passer plutôt que de tout bloquer */ }
+
+        nameInputEl.removeAttribute('disabled');
+        usernameSaveInProgress = false;
+
+        if (takenByOther) {
+            showUsernameMsg(isFr ? "Cet identifiant est déjà pris." : "This username is already taken.", true);
+            nameInputEl.removeAttribute('readonly');
+            nameInputEl.style.borderColor = '#D42759';
+            nameInputEl.focus();
+            nameInputEl.select();
+            return;
+        }
+
         // Le pseudo public (voir claimUsername() dans firebase-init.js) doit rester
         // synchronisé avec le nouveau nom, sinon les invitations "travel buddy" par
-        // pseudo (trips.html) chercheraient encore l'ancien identifiant.
-        if (typeof window.claimUsername === 'function') window.claimUsername(newName);
+        // pseudo (trips.html) chercheraient encore l'ancien identifiant. claimUsername()
+        // revalide lui-même l'unicité côté serveur avant d'écrire (le lookup ci-dessus
+        // ne fait que donner un retour rapide ; une vraie course reste possible entre
+        // les deux) — on attend son résultat pour ne jamais afficher "sauvegardé" si le
+        // pseudo a en réalité été pris entre-temps par quelqu'un d'autre.
+        let claimResult = { success: true };
+        if (typeof window.claimUsername === 'function') claimResult = await window.claimUsername(newName);
+        if (claimResult && claimResult.success === false && claimResult.code === 'taken') {
+            showUsernameMsg(isFr ? "Cet identifiant est déjà pris." : "This username is already taken.", true);
+            nameInputEl.removeAttribute('readonly');
+            nameInputEl.style.borderColor = '#D42759';
+            nameInputEl.focus();
+            nameInputEl.select();
+            return;
+        }
+
+        localStorage.setItem('userName', newName);
+        if (typeof window.syncUserData === 'function') window.syncUserData({ username: newName });
+        usernameOriginalValue = newName;
+        showUsernameMsg(isFr ? "✓ Identifiant mis à jour." : "✓ Username updated.", false);
+        exitUsernameEditMode();
+        setTimeout(() => showUsernameMsg(null), 2500);
     }
+
     if (changeUsernameLink && nameInputEl) {
         changeUsernameLink.addEventListener('click', () => {
+            usernameOriginalValue = nameInputEl.value;
+            showUsernameMsg(null);
             nameInputEl.removeAttribute('readonly');
             nameInputEl.style.borderColor = '#D42759';
             nameInputEl.focus();
             nameInputEl.select();
         });
-        nameInputEl.addEventListener('blur', () => { if (!nameInputEl.hasAttribute('readonly')) saveUsername(); });
-        nameInputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') nameInputEl.blur(); });
+        nameInputEl.addEventListener('blur', () => {
+            if (usernameSaveInProgress || nameInputEl.hasAttribute('readonly')) return;
+            nameInputEl.value = usernameOriginalValue;
+            showUsernameMsg(null);
+            exitUsernameEditMode();
+        });
+        nameInputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); saveUsername(); }
+            else if (e.key === 'Escape') { nameInputEl.value = usernameOriginalValue; showUsernameMsg(null); exitUsernameEditMode(); nameInputEl.blur(); }
+        });
     }
 
     // Rafraîchit les quelques éléments générés dynamiquement quand la langue change
@@ -496,7 +584,7 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
     window.addEventListener('firebase-ready', (e) => {
         const user = e.detail && e.detail.user;
-        if (user) renderMemberSince(user);
+        if (user) { renderMemberSince(user); currentAccountUid = user.uid; }
     });
 
     // ==========================================
