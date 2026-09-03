@@ -181,7 +181,8 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
           <span class="field-label" data-i18n="accNameLabel">Username</span>
           <input type="text" id="user-name-input" class="field-value" style="outline:none;" readonly value="User">
           <a id="change-username-link" style="display:block; font-size:11px; font-weight:700; color:#D42759; cursor:pointer; margin:6px 0 4px;" data-i18n="accChangeUsernameHint">Change username</a>
-          <div id="username-msg" class="hidden" style="font-size:10.5px; font-weight:600; margin:0 0 12px;"></div>
+          <div id="username-msg" class="hidden" style="font-size:10.5px; font-weight:600; margin:0 0 4px;"></div>
+          <div style="font-size:10px; color:#94a3b8; margin:0 0 12px;" data-i18n="usernameCooldownNote">You can only change this once every 7 days.</div>
           <span class="field-label" data-i18n="accEmailLabel">Email address</span>
           <div class="field-value" id="user-email-input">email@example.com</div>
           <span class="field-label" style="margin-top:16px;" data-i18n="accCountryLabel">Country you're interested in</span>
@@ -236,6 +237,23 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         <div style="display:flex; gap:10px;">
             <button id="delete-account-cancel" style="flex:1; background:#fff; color:#334155; border:1.5px solid #cbd5e1; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="accDeleteCancel">Cancel</button>
             <button id="delete-account-confirm" style="flex:1; background:#ef4444; color:#fff; border:none; border-radius:100px; padding:12px; font-size:13px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="accDeleteConfirmBtn">Yes, delete my account</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation avant de valider un changement d'identifiant : rappelle qu'on ne
+     pourra pas en changer à nouveau avant 7 jours (voir saveUsername/commitUsernameChange
+     plus bas). -->
+<div id="username-confirm-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 400px; text-align: center; padding: 30px 26px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:#FCE7F0;display:flex;align-items:center;justify-content:center;margin:0 auto 14px auto;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h2 style="font-size:16.5px; color:#1e293b; margin-bottom:10px;" data-i18n="usernameConfirmTitle">Change your username?</h2>
+        <p id="username-confirm-body" style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:22px;"></p>
+        <div style="display:flex; gap:10px;">
+            <button id="username-confirm-cancel" style="flex:1; background:#fff; color:#334155; border:1.5px solid #cbd5e1; border-radius:100px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="usernameConfirmCancel">Cancel</button>
+            <button id="username-confirm-ok" style="flex:1; background:#D42759; color:#fff; border:none; border-radius:100px; padding:11px; font-size:12.5px; font-weight:700; font-family:'Poppins',sans-serif; cursor:pointer;" data-i18n="usernameConfirmOk">Yes, change it</button>
         </div>
     </div>
 </div>
@@ -435,9 +453,11 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
     const changeUsernameLink = document.getElementById('change-username-link');
     const usernameMsgEl = document.getElementById('username-msg');
     const USERNAME_RE = /^[a-zA-Z0-9_.]{3,20}$/;
+    const USERNAME_COOLDOWN_DAYS = 7;
     let usernameOriginalValue = '';
     let usernameSaveInProgress = false;
     let currentAccountUid = null;
+    let pendingUsernameChange = null;
 
     function showUsernameMsg(text, isError) {
         if (!usernameMsgEl) return;
@@ -450,6 +470,30 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         nameInputEl.setAttribute('readonly', true);
         nameInputEl.style.borderColor = '#e2e8f0';
     }
+    // Un changement d'identifiant verrouille le champ pendant USERNAME_COOLDOWN_DAYS —
+    // 'lastUsernameChangeAt' est synchronisé depuis/vers le cloud (voir firebase-ready
+    // dans script.js) pour que vider le localStorage ou changer d'appareil ne
+    // réinitialise pas silencieusement ce délai.
+    function getUsernameCooldownRemainingMs() {
+        const last = parseInt(localStorage.getItem('lastUsernameChangeAt') || '0', 10);
+        if (!last) return 0;
+        const remaining = (USERNAME_COOLDOWN_DAYS * 24 * 60 * 60 * 1000) - (Date.now() - last);
+        return remaining > 0 ? remaining : 0;
+    }
+    function formatCooldownRemaining(ms) {
+        const days = Math.ceil(ms / (24 * 60 * 60 * 1000));
+        const isFr = currentLang === 'fr';
+        if (days <= 1) return isFr ? "moins d'un jour" : "less than a day";
+        return isFr ? `${days} jours` : `${days} days`;
+    }
+    // Rappelée par script.js quand la valeur cloud de l'identifiant arrive (peut différer
+    // de celle déjà affichée si le pseudo a été changé depuis un autre appareil) — ne
+    // touche jamais au champ pendant qu'il est en cours d'édition.
+    window.refreshUsernameFieldFromStorage = function() {
+        if (!nameInputEl || !nameInputEl.hasAttribute('readonly')) return;
+        const stored = (localStorage.getItem('userName') || '').trim();
+        if (stored && stored !== nameInputEl.value) nameInputEl.value = stored;
+    };
 
     async function saveUsername() {
         if (usernameSaveInProgress) return;
@@ -459,6 +503,16 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         if (!newName || newName === usernameOriginalValue) {
             nameInputEl.value = usernameOriginalValue;
             showUsernameMsg(null);
+            exitUsernameEditMode();
+            return;
+        }
+
+        const cooldownRemaining = getUsernameCooldownRemainingMs();
+        if (cooldownRemaining > 0) {
+            showUsernameMsg(isFr
+                ? `Vous pourrez à nouveau changer d'identifiant dans ${formatCooldownRemaining(cooldownRemaining)}.`
+                : `You can change your username again in ${formatCooldownRemaining(cooldownRemaining)}.`, true);
+            nameInputEl.value = usernameOriginalValue;
             exitUsernameEditMode();
             return;
         }
@@ -491,13 +545,35 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
             return;
         }
 
-        // Le pseudo public (voir claimUsername() dans firebase-init.js) doit rester
-        // synchronisé avec le nouveau nom, sinon les invitations "travel buddy" par
-        // pseudo (trips.html) chercheraient encore l'ancien identifiant. claimUsername()
-        // revalide lui-même l'unicité côté serveur avant d'écrire (le lookup ci-dessus
-        // ne fait que donner un retour rapide ; une vraie course reste possible entre
-        // les deux) — on attend son résultat pour ne jamais afficher "sauvegardé" si le
-        // pseudo a en réalité été pris entre-temps par quelqu'un d'autre.
+        // Tout est validé (format, disponibilité, délai écoulé) : on demande confirmation
+        // avant d'appliquer réellement le changement, puisqu'il verrouille le champ pour
+        // 7 jours — mieux vaut laisser une chance d'annuler une frappe hâtive ici.
+        showUsernameMsg(null);
+        openUsernameConfirmModal(newName);
+    }
+
+    function openUsernameConfirmModal(newName) {
+        const modal = document.getElementById('username-confirm-modal');
+        const bodyEl = document.getElementById('username-confirm-body');
+        const isFr = currentLang === 'fr';
+        pendingUsernameChange = newName;
+        if (bodyEl) {
+            bodyEl.textContent = isFr
+                ? `Changer votre identifiant en « ${newName} » ? Vous ne pourrez le modifier à nouveau qu'après ${USERNAME_COOLDOWN_DAYS} jours.`
+                : `Change your username to "${newName}"? You won't be able to change it again for ${USERNAME_COOLDOWN_DAYS} days.`;
+        }
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    // Le pseudo public (voir claimUsername() dans firebase-init.js) doit rester
+    // synchronisé avec le nouveau nom, sinon les invitations "travel buddy" par pseudo
+    // (trips.html) chercheraient encore l'ancien identifiant. claimUsername() revalide
+    // lui-même l'unicité côté serveur avant d'écrire (le lookup dans saveUsername() ne
+    // fait que donner un retour rapide ; une vraie course reste possible entre les deux)
+    // — on attend son résultat pour ne jamais afficher "sauvegardé" si le pseudo a en
+    // réalité été pris entre-temps par quelqu'un d'autre.
+    async function commitUsernameChange(newName) {
+        const isFr = currentLang === 'fr';
         let claimResult = { success: true };
         if (typeof window.claimUsername === 'function') claimResult = await window.claimUsername(newName);
         if (claimResult && claimResult.success === false && claimResult.code === 'taken') {
@@ -509,16 +585,46 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
             return;
         }
 
+        const now = Date.now();
         localStorage.setItem('userName', newName);
-        if (typeof window.syncUserData === 'function') window.syncUserData({ username: newName });
+        localStorage.setItem('lastUsernameChangeAt', String(now));
+        if (typeof window.syncUserData === 'function') window.syncUserData({ username: newName, lastUsernameChangeAt: now });
         usernameOriginalValue = newName;
         showUsernameMsg(isFr ? "✓ Identifiant mis à jour." : "✓ Username updated.", false);
         exitUsernameEditMode();
         setTimeout(() => showUsernameMsg(null), 2500);
     }
 
+    const usernameConfirmCancelBtn = document.getElementById('username-confirm-cancel');
+    const usernameConfirmOkBtn = document.getElementById('username-confirm-ok');
+    if (usernameConfirmCancelBtn) {
+        usernameConfirmCancelBtn.addEventListener('click', () => {
+            window.closeModal('username-confirm-modal');
+            pendingUsernameChange = null;
+            nameInputEl.removeAttribute('readonly');
+            nameInputEl.style.borderColor = '#D42759';
+            nameInputEl.focus();
+            nameInputEl.select();
+        });
+    }
+    if (usernameConfirmOkBtn) {
+        usernameConfirmOkBtn.addEventListener('click', async () => {
+            window.closeModal('username-confirm-modal');
+            if (pendingUsernameChange) await commitUsernameChange(pendingUsernameChange);
+            pendingUsernameChange = null;
+        });
+    }
+
     if (changeUsernameLink && nameInputEl) {
         changeUsernameLink.addEventListener('click', () => {
+            const cooldownRemaining = getUsernameCooldownRemainingMs();
+            if (cooldownRemaining > 0) {
+                const isFr = currentLang === 'fr';
+                showUsernameMsg(isFr
+                    ? `Vous pourrez à nouveau changer d'identifiant dans ${formatCooldownRemaining(cooldownRemaining)}.`
+                    : `You can change your username again in ${formatCooldownRemaining(cooldownRemaining)}.`, true);
+                return;
+            }
             usernameOriginalValue = nameInputEl.value;
             showUsernameMsg(null);
             nameInputEl.removeAttribute('readonly');
