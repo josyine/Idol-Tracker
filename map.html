@@ -34,7 +34,7 @@
   .reviews-header.hidden { display: none; }
   .reviews-count { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .02em; }
   .reviews-avg-badge { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 800; color: #D42759; }
-  .reviews-avg-star { color: #fbbf24; }
+  .reviews-avg-star { color: #D42759; }
   .reviews-divider { border: none; border-top: 1px solid #EFECF6; margin: 18px 0 16px; }
   .reviews-write-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 8px; }
   .review-compose-stars { display: flex; gap: 4px; cursor: pointer; margin-bottom: 10px; }
@@ -229,6 +229,46 @@
   #tour-mode-prev { background: #f1f5f9; color: var(--text-main); }
   #tour-mode-next { background: var(--primary-magenta); color: #fff; }
   .tour-mode-footer { font-size: 10px; color: #94a3b8; text-align: center; padding: 0 14px 14px; line-height: 1.5; flex-shrink: 0; }
+
+  /* ==========================================
+     PANNEAU "LIVE" — timeline unifiée tournée + activités solo, filtrable par membre
+     ========================================== */
+  .live-badge-dot { position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 50%; background: #ef4444; border: 1.5px solid #fff; animation: tourModePulse 1.6s infinite; }
+  .live-badge-dot.hidden { display: none; }
+  #live-badge-btn { position: relative; }
+
+  .live-panel { position: fixed; inset: 0; z-index: 9500; display: flex; align-items: center; justify-content: center; background: rgba(23,19,49,0.45); backdrop-filter: blur(3px); opacity: 0; transition: opacity .2s ease; }
+  .live-panel.hidden { display: none; }
+  .live-panel.open { opacity: 1; }
+  .live-panel-card { width: 380px; max-width: calc(100vw - 32px); max-height: 78vh; background: #fff; border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; overflow: hidden; }
+  .live-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #EFECF6; flex-shrink: 0; }
+  .live-panel-title-row { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text-main); }
+  .live-panel-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; flex-shrink: 0; }
+  .live-panel-dot.live { background: #ef4444; animation: tourModePulse 1.6s infinite; }
+  .live-panel-close { background: var(--sidebar-bg); border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 15px; line-height: 1; color: var(--text-main); }
+  .live-panel-avatars { display: flex; gap: 8px; padding: 14px 18px 0 18px; flex-shrink: 0; }
+  .live-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 11px; flex-shrink: 0; cursor: pointer; opacity: .5; transition: opacity .15s ease, box-shadow .15s ease; box-sizing: border-box; }
+  .live-avatar.active { opacity: 1; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary-magenta); }
+  .live-avatar-all { background: #211C2E; font-size: 9px; }
+  .live-panel-timeline { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px 4px 18px; }
+  .live-panel-timeline::-webkit-scrollbar { width: 5px; }
+  .live-panel-timeline::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 10px; }
+  .live-tl-wrap { position: relative; padding-left: 20px; }
+  .live-tl-wrap::before { content: ""; position: absolute; left: 5px; top: 4px; bottom: 4px; width: 2px; background: #f0dbe4; }
+  .live-tl-item { position: relative; margin-bottom: 16px; }
+  .live-tl-item:last-child { margin-bottom: 0; }
+  .live-tl-dot { position: absolute; left: -19px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; border: 2px solid #fff; }
+  .live-tl-item.is-current .live-tl-dot { background: var(--primary-magenta); box-shadow: 0 0 0 3px rgba(212,39,89,.2); animation: tourModePulse 1.6s infinite; }
+  .live-tl-item.is-upcoming .live-tl-dot { background: #8B5CF6; box-shadow: 0 0 0 2px #EDE7FB; }
+  .live-tl-tag { font-size: 9.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #94a3b8; }
+  .live-tl-item.is-current .live-tl-tag { color: var(--primary-magenta); }
+  .live-tl-item.is-upcoming .live-tl-tag { color: #8B5CF6; }
+  .live-tl-title { font-size: 12.5px; font-weight: 700; color: var(--text-main); margin-top: 1px; cursor: pointer; }
+  .live-tl-title:hover { color: var(--primary-magenta); }
+  .live-tl-kind { display: inline-block; font-size: 9px; font-weight: 700; color: #94a3b8; margin-top: 2px; }
+  .live-panel-empty { padding: 30px 18px; text-align: center; font-size: 12px; color: #94a3b8; line-height: 1.5; }
+  .live-panel-empty.hidden { display: none; }
+  .live-panel-footer { font-size: 10px; color: #94a3b8; text-align: center; padding: 12px 18px 16px; line-height: 1.5; flex-shrink: 0; border-top: 1px solid #f8fafc; }
 
   /* Bulle infos concert : apparaît au clic sur un pin de la carte (ou sur une étape du
      rail, qui pointe alors la même bulle vers son pin) — voir tour-mode.js.
@@ -432,8 +472,8 @@
                              ses visites ("I visited this place" -> formulaire de souvenir). Le site
                              n'a pas de note communautaire partagée entre utilisateurs (pas de backend
                              d'agrégation), donc pas de fausse moyenne globale inventée ici. -->
-                        <div id="details-rating" class="location-rating hidden" style="margin-left:auto; display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; color:#f59e0b;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+                        <div id="details-rating" class="location-rating hidden" style="margin-left:auto; display:flex; align-items:center; gap:4px; font-size:13px; font-weight:700; color:#D42759;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#D42759"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
                             <span id="details-rating-value">4.5</span><span style="color:#94a3b8; font-weight:600;">/5</span>
                         </div>
                     </div>
@@ -587,7 +627,7 @@
                     <div id="review-compose-photo-preview" class="hidden review-compose-photo-preview"><img id="review-compose-photo-preview-img"></div>
                     <input type="file" id="review-compose-photo-input" accept="image/*" style="display:none;">
                     <div class="review-compose-actions">
-                        <button type="button" id="review-compose-photo-btn" class="review-compose-photo-btn">📷 <span data-i18n="memoryPhotoChoose">Choose a photo</span></button>
+                        <button type="button" id="review-compose-photo-btn" class="review-compose-photo-btn"><span data-i18n="memoryPhotoChoose">Choose a photo</span></button>
                         <label class="review-compose-public-label">
                             <input type="checkbox" id="review-compose-public-check" checked>
                             <span data-i18n="reviewsComposeMakePublic">Make this public</span>
@@ -659,6 +699,16 @@
             <div class="dropdown-container">
                 <button id="cart-btn" class="header-icon-btn" onclick="openCartModal()" title="Unlock Passes">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </button>
+            </div>
+            <!-- Bouton "Live" : ouvre le panneau #live-panel (timeline unifiée tournée du
+                 groupe + activités solo des membres, filtrable par avatar) — voir
+                 openLivePanel() dans script.js. Séparé du badge/panneau "Mode Tournée"
+                 existant (qui reste accessible tel quel) pour ne pas le déstabiliser. -->
+            <div class="dropdown-container">
+                <button id="live-badge-btn" class="header-icon-btn" onclick="openLivePanel()" type="button" data-i18n-title="liveBadgeLabel" title="Live">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"></path></svg>
+                    <span class="live-badge-dot hidden" id="live-badge-dot"></span>
                 </button>
             </div>
             <div class="dropdown-container">
@@ -734,6 +784,28 @@
             <button id="tour-mode-next" class="tour-mode-nav-btn" onclick="tourModeNavigate(1)" type="button"><span data-i18n="tourModeNext">Next</span> →</button>
         </div>
         <div class="tour-mode-footer" data-i18n="tourModeFooterNote">Dates as announced by the tour — always double-check official ticketing sites before booking travel.</div>
+    </div>
+</div>
+
+<!-- Panneau "Live" : timeline unifiée (tournée du groupe + activités solo des membres,
+     ex. Jimin à la Fashion Week de Paris) filtrable par membre via la rangée d'avatars.
+     Voir openLivePanel()/renderLiveTimeline() dans script.js. Volontairement plus léger
+     que le panneau Mode Tournée (pas de carte Leaflet dédiée) : sa seule vocation est de
+     répondre vite à "qui est en direct / à venir en ce moment, et où". -->
+<div id="live-panel" class="live-panel hidden">
+    <div class="live-panel-card">
+        <div class="live-panel-header">
+            <div class="live-panel-title-row">
+                <span class="live-panel-dot" id="live-panel-header-dot"></span>
+                <span data-i18n="liveBadgeLabel">Live</span>
+                <span data-i18n="liveTimelineTitle"> &amp; upcoming</span>
+            </div>
+            <button class="live-panel-close" onclick="closeLivePanel()" type="button">&times;</button>
+        </div>
+        <div class="live-panel-avatars" id="live-panel-avatars"></div>
+        <div class="live-panel-timeline" id="live-panel-timeline"></div>
+        <div class="live-panel-empty hidden" id="live-panel-empty" data-i18n="liveTimelineEmpty">Nothing scheduled right now — check back soon.</div>
+        <div class="live-panel-footer" data-i18n="liveTimelineFooterNote">Only official, publicly announced activities — dates as announced, always double-check official sources before booking travel.</div>
     </div>
 </div>
 
