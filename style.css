@@ -89,6 +89,7 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .loc-info { display: flex; flex-direction: column; }
 .loc-cat { font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase;}
 .loc-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+.loc-new-badge { display: inline-block; margin-left: 6px; font-size: 8.5px; font-weight: 800; letter-spacing: .03em; color: #fff; background: var(--primary-magenta); border-radius: 4px; padding: 2px 5px; vertical-align: middle; text-transform: uppercase; }
 
 /* Panneau de détail */
 #sidebar-details { height: 100%; display: flex; flex-direction: column; overflow-y: auto; background: #fff; padding: 0; }
@@ -123,6 +124,10 @@ body { background: #E7E9EC; color: var(--text-main); height: 100vh; width: 100vw
 .practical-item { font-size: 12.5px; line-height: 1.7; color: #3f495c; margin-bottom: 12px; }
 .practical-item:last-child { margin-bottom: 0; }
 .practical-item b { color: #212832; font-weight: 700; }
+.practical-item-titled { margin-bottom: 16px; }
+.practical-item-titled:last-child { margin-bottom: 0; }
+.practical-item-titled .story-heading { margin-bottom: 6px; }
+.practical-item-text { font-size: 12.5px; line-height: 1.7; color: #3f495c; }
 
 .address-block { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
 .address-text { font-size: 11.5px; color: #64748b; line-height: 1.5; }

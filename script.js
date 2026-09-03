@@ -446,6 +446,48 @@ window.initLiveBadge = function() {
     dot.classList.toggle('hidden', !isLive);
 };
 
+// Badge fusionné "Tour" + "Live" (voir map.html) : un seul point d'entrée qui ouvre un
+// petit menu contextuel à deux options plutôt que deux boutons séparés dans le header.
+// Chaque option appelle openTourModePanel()/openLivePanel() TELS QUELS (aucun changement
+// à ces deux panneaux eux-mêmes) — seul ce point d'entrée commun change.
+window.openLiveTourChooser = function(event) {
+    if (event) event.stopPropagation();
+    const chooser = document.getElementById('live-tour-chooser');
+    if (!chooser) return;
+    const wasOpen = !chooser.classList.contains('hidden');
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+    if (wasOpen) { chooser.classList.add('hidden'); return; }
+
+    // Se positionne sous le déclencheur réellement cliqué (badge pilule centré en haut
+    // sur desktop, icône compacte dans le header sur mobile) plutôt qu'à un endroit fixe
+    // qui n'aurait été correct que pour l'un des deux cas.
+    const trigger = (event && event.currentTarget) || document.getElementById('tour-mode-badge');
+    const containerEl = document.querySelector('.map-container');
+    if (trigger && containerEl) {
+        const rect = trigger.getBoundingClientRect();
+        const containerRect = containerEl.getBoundingClientRect();
+        const chooserWidth = 190;
+        let left = rect.left - containerRect.left + rect.width / 2 - chooserWidth / 2;
+        left = Math.max(8, Math.min(left, containerRect.width - chooserWidth - 8));
+        chooser.style.left = left + 'px';
+        chooser.style.top = (rect.bottom - containerRect.top + 8) + 'px';
+        chooser.style.transform = 'none';
+    }
+    chooser.classList.remove('hidden');
+};
+window.chooseLiveTourMode = function(mode) {
+    const chooser = document.getElementById('live-tour-chooser');
+    if (chooser) chooser.classList.add('hidden');
+    if (mode === 'tour' && typeof window.openTourModePanel === 'function') window.openTourModePanel();
+    else if (mode === 'live' && typeof window.openLivePanel === 'function') window.openLivePanel();
+};
+document.addEventListener('click', (e) => {
+    const chooser = document.getElementById('live-tour-chooser');
+    if (!chooser || chooser.classList.contains('hidden')) return;
+    if (chooser.contains(e.target) || e.target.closest('#tour-mode-badge') || e.target.closest('#tour-mode-badge-mobile')) return;
+    chooser.classList.add('hidden');
+});
+
 // ==========================================
 // 1. INITIALISATION ROBUSTE DE L'APPLICATION
 // ==========================================
@@ -712,13 +754,13 @@ window.addEventListener('firebase-ready', async (e) => {
             // map.html au moment du login — un simple renderLocations() sans ce paramètre
             // rappelait fitBounds() sur TOUS les lieux et effaçait ce centrage un instant
             // plus tard (c'était le vrai bug persistant du recadrage carte sur mobile).
-            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations(true);
+            if (document.getElementById('map') && !window.__tripViewActive && typeof renderLocations === 'function') renderLocations(true);
             if (document.getElementById('edit-trip-name') && typeof window.renderTrip === 'function' && currentTrip) window.renderTrip();
             if (typeof window.refreshWishlistFromCloud === 'function') window.refreshWishlistFromCloud();
         }
         if (Array.isArray(cloudData.visitedLocs)) {
             localStorage.setItem('visitedLocs', JSON.stringify(cloudData.visitedLocs));
-            if (document.getElementById('map') && typeof renderLocations === 'function') renderLocations(true);
+            if (document.getElementById('map') && !window.__tripViewActive && typeof renderLocations === 'function') renderLocations(true);
             if (typeof window.refreshVisitedFromCloud === 'function') window.refreshVisitedFromCloud();
         }
         if (Array.isArray(cloudData.myTrips)) {
@@ -798,6 +840,15 @@ window.addEventListener('firebase-ready', async (e) => {
                 else profilePreview.textContent = initial;
             }
             if (typeof window.updateResetPhotoLinkVisibility === 'function') window.updateResetPhotoLinkVisibility();
+        }
+
+        // Identifiant et date de son dernier changement (voir account.html — limité à une
+        // fois par semaine) : synchronisés depuis le cloud pour qu'un nouvel appareil, ou
+        // un localStorage vidé, ne réinitialise pas silencieusement le délai d'attente.
+        if (cloudData.username) localStorage.setItem('userName', cloudData.username);
+        if (cloudData.lastUsernameChangeAt) localStorage.setItem('lastUsernameChangeAt', String(cloudData.lastUsernameChangeAt));
+        if (document.getElementById('user-name-input') && typeof window.refreshUsernameFieldFromStorage === 'function') {
+            window.refreshUsernameFieldFromStorage();
         }
     }
 });
@@ -1047,35 +1098,92 @@ const filterData = {
 let celebLocations = [
    { id: 1, name: "Cafe Camptong", group: "BTS", member: "All", country: "South Korea", city: "Seoul", category: "Run BTS", year: "2020", episode: "Episodes 118 & 119", episodeLink: "https://weverse.io/bts/media/3-104694116", ytId: "yiqe-aegVk0", address: "27 Apgujeong-ro 42-gil, Gangnam-gu", lat: 37.5255, lng: 127.0375, img: "https://img.youtube.com/vi/yiqe-aegVk0/hqdefault.jpg",
   fullDescription: {
-    en: `<p>Once nestled in the trendy alleys of Apgujeong, in the heart of Gangnam, Cafe Camptong was a massive five-story urban oasis dedicated to "glamping" (glamorous camping). The concept was pushed to the extreme: fake grass, cozy indoor tents, camping chairs, and string lights offered a rustic escape without leaving Seoul. Although this iconic establishment has unfortunately closed its doors permanently, its address remains a must-visit pilgrimage site for ARMYs. And for good reason: this is where episodes 118 and 119 of <em>Run BTS!</em> were filmed in late 2020, becoming the stage for one of the most chaotic and memorable scavenger hunts in the show's history. Standing in front of the facade allows you to instantly immerse yourself back into that legendary filming day.</p><p>The café's labyrinthine interior was transformed into a veritable playground where the seven members faced off in a frantic post-it hunt (the famous "Photo Story" arc). The anecdotes from this shoot are legendary: one inevitably thinks of Jin's "squirrel syndrome," compulsively snatching up every post-it he found without even reading them, a Machiavellian plan that ultimately backfired. It was also on these stairs that Jungkook literally exhausted his cameraman by sprinting at top speed to escape the others. Between the fleeting alliances, the hilarious betrayals by the Maknae Line (Jimin and V) to validate their poses in the "Photo Zones," and Suga trying to calmly analyze the situation from inside a tent, the building echoed with their laughter and screams all day long.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; Location Status</div><p>Permanently closed. The original establishment with its tents and indoor rooftop no longer exists. However, the building and the alley (at 27 Apgujeong-ro 42-gil, Gangnam-gu) remain accessible public spaces. It's the perfect opportunity to take a souvenir photo of the complex's exterior and check off this legendary milestone on your pilgrimage map.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; What to do around the cafe?</div><p>Since you can no longer eat or drink on site, take advantage of being in this highly strategic neighborhood! Just a few minutes' walk away, you can reach the famous K-Star Road to admire the well-known "GangnamDols," or walk to Hakdong Park and the area around BTS's old dorm, foundational places from their trainee days.</p>`,
-    fr: `<p>Autrefois niché dans les ruelles branchées d'Apgujeong, au cœur de Gangnam, le Cafe Camptong était une immense oasis urbaine de cinq étages dédiée au "glamping" (le camping glamour). Le concept était poussé à l'extrême : fausse pelouse, tentes d'intérieur douillettes, chaises de camping et guirlandes lumineuses offraient une évasion rustique sans quitter Séoul. Bien que cet établissement emblématique ait malheureusement fermé ses portes définitivement, son adresse reste un lieu de pèlerinage incontournable pour les ARMYs. Et pour cause : c'est ici qu'ont été tournés les épisodes 118 et 119 de <em>Run BTS!</em> fin 2020, devenant le théâtre de l'une des chasses au trésor les plus chaotiques et mémorables de l'histoire de l'émission. Se tenir devant la façade permet de se replonger instantanément dans cette journée de tournage mythique.</p><p>L'intérieur labyrinthique du café s'était alors transformé en un véritable terrain de jeu où les sept membres se sont affrontés lors d'une chasse aux post-it frénétique (le fameux arc "Photo Story"). Les anecdotes de ce tournage sont légendaires : on repense inévitablement au "syndrome de l'écureuil" de Jin, qui arrachait compulsivement tous les post-it trouvés sans même les lire, un plan machiavélique qui s'est finalement retourné contre lui. C'est aussi dans ces escaliers que Jungkook a littéralement épuisé son caméraman à force de sprinter à toute vitesse pour échapper aux autres. Entre les alliances éphémères, les trahisons hilarantes de la Maknae Line (Jimin et V) pour valider leurs poses dans les "Photo Zones", et Suga qui tentait d'analyser calmement la situation depuis une tente, le bâtiment a résonné de leurs rires et de leurs cris toute la journée.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; Statut du lieu</div><p>Fermé définitivement. L'établissement d'origine avec ses tentes et son rooftop intérieur n'existe plus. Cependant, le bâtiment et la ruelle (au 27 Apgujeong-ro 42-gil, Gangnam-gu) restent des espaces publics accessibles. C'est l'occasion parfaite pour prendre une photo souvenir de l'extérieur du complexe et marquer ce point de passage mythique sur votre carte de pèlerinage.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; Que faire autour du café ?</div><p>Puisque vous ne pouvez plus consommer sur place, profitez d'être dans ce quartier hautement stratégique ! À quelques minutes de marche de là, vous pouvez rejoindre la célèbre K-Star Road pour admirer les fameux "GangnamDols", ou marcher jusqu'au parc Hakdong et aux environs de l'ancien dortoir de BTS, des lieux fondateurs de leur époque de trainees.</p>`,
-    es: `<p>Una vez ubicado en los callejones de moda de Apgujeong, en el corazón de Gangnam, Cafe Camptong era un enorme oasis urbano de cinco pisos dedicado al "glamping" (camping glamoroso). El concepto se llevó al extremo: césped artificial, acogedoras tiendas de campaña en el interior, sillas de camping y luces de cadena ofrecían un escape rústico sin salir de Seúl. Aunque este emblemático establecimiento lamentablemente ha cerrado sus puertas de forma permanente, su dirección sigue siendo un lugar de peregrinación de visita obligada para l@s ARMYs. Y por una buena razón: aquí es donde se filmaron los episodios 118 y 119 de <em>Run BTS!</em> a finales de 2020, convirtiéndose en el escenario de una de las búsquedas del tesoro más caóticas y memorables de la historia del programa. Pararse frente a la fachada te permite sumergirte instantáneamente en ese legendario día de rodaje.</p><p>El laberíntico interior del café se transformó en un verdadero patio de recreo donde los siete miembros se enfrentaron en una frenética búsqueda de post-its (el famoso arco de "Photo Story"). Las anécdotas de este rodaje son legendarias: inevitablemente pensamos en el "síndrome de la ardilla" de Jin, quien arrancaba compulsivamente todos los post-its que encontraba sin siquiera leerlos, un plan maquiavélico que al final se volvió en su contra. También fue en estas escaleras donde Jungkook literalmente agotó a su camarógrafo al correr a toda velocidad para escapar de los demás. Entre alianzas fugaces, traiciones hilarantes de la Maknae Line (Jimin y V) para validar sus poses en las "Photo Zones", y Suga intentando analizar con calma la situación desde una tienda de campaña, el edificio resonó con sus risas y gritos durante todo el día.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; Estado del lugar</div><p>Cerrado permanentemente. El establecimiento original con sus tiendas y su azotea interior ya no existe. Sin embargo, el edificio y el callejón (en 27 Apgujeong-ro 42-gil, Gangnam-gu) siguen siendo espacios públicos accesibles. Es la oportunidad perfecta para tomar una foto de recuerdo del exterior del complejo y marcar este punto de paso mítico en tu mapa de peregrinación.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; ¿Qué hacer alrededor del café?</div><p>Ya que no puedes consumir en el lugar, ¡aprovecha estar en este barrio altamente estratégico! A pocos minutos a pie, puedes llegar a la famosa K-Star Road para admirar los famosos "GangnamDols", o caminar hasta el parque Hakdong y los alrededores del antiguo dormitorio de BTS, lugares fundamentales de su época de aprendices.</p>`,
-    it: `<p>Un tempo incastonato nei vicoli alla moda di Apgujeong, nel cuore di Gangnam, il Cafe Camptong era un'enorme oasi urbana di cinque piani dedicata al "glamping" (campeggio glamour). Il concetto era spinto all'estremo: erba finta, accoglienti tende da interni, sedie da campeggio e luci a corda offrivano una fuga rustica senza lasciare Seoul. Anche se questo iconico stabilimento ha purtroppo chiuso definitivamente i battenti, il suo indirizzo rimane un luogo di pellegrinaggio imperdibile per le/gli ARMY. E per una buona ragione: è qui che sono stati girati gli episodi 118 e 119 di <em>Run BTS!</em> alla fine del 2020, diventando il teatro di una delle cacce al tesoro più caotiche e memorabili della storia dello show. Stare davanti alla facciata ti permette di immergerti all'istante in quella leggendaria giornata di riprese.</p><p>L'interno labirintico del caffè si trasformò in un vero e proprio parco giochi in cui i sette membri si sfidarono in una frenetica caccia ai post-it (il famoso arco narrativo "Photo Story"). Le aneddoti di queste riprese sono leggendarie: si pensa inevitabilmente alla "sindrome dello scoiattolo" di Jin, che strappava compulsivamente tutti i post-it trovati senza nemmeno leggerli, un piano machiavellico che alla fine gli si è ritorto contro. È anche su queste scale che Jungkook ha letteralmente sfiancato il suo cameraman scattando a tutta velocità per sfuggire agli altri. Tra alleanze fugaci, esilaranti tradimenti della Maknae Line (Jimin e V) per convalidare le loro pose nelle "Photo Zones", e Suga che cercava di analizzare con calma la situazione da una tenda, l'edificio ha risuonato delle loro risate e urla per tutto il giorno.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; Stato del luogo</div><p>Chiuso definitivamente. La struttura originale con le sue tende e il rooftop interno non esiste più. Tuttavia, l'edificio e il vicolo (al 27 Apgujeong-ro 42-gil, Gangnam-gu) rimangono spazi pubblici accessibili. È l'occasione perfetta per scattare una foto ricordo dell'esterno del complesso e segnare questo punto mitico sulla tua mappa di pellegrinaggio.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; Cosa fare nei dintorni del caffè?</div><p>Poiché non puoi più consumare sul posto, approfitta di essere in questo quartiere altamente strategico! A pochi minuti di cammino, puoi raggiungere la famosa K-Star Road per ammirare i noti "GangnamDols", oppure camminare fino al parco Hakdong e ai dintorni del vecchio dormitorio dei BTS, luoghi fondamentali dei loro giorni da trainee.</p>`,
-    ko: `<p>강남의 심장부, 트렌디한 압구정 골목에 자리 잡고 있던 카페 캠프통은 '글램핑'을 테마로 한 5층 규모의 거대한 도심 속 오아시스였습니다. 인조 잔디, 아늑한 실내 텐트, 캠핑 의자, 꼬마전구 등 콘셉트를 극대화하여 서울을 떠나지 않고도 시골로 탈출한 듯한 느낌을 주었습니다. 아쉽게도 이 상징적인 장소는 영구 폐업했지만, 이 주소는 아미들에게 여전히 필수 순례지로 남아있습니다. 그도 그럴 것이 이곳은 2020년 말 <em>달려라 방탄!</em> 118, 119화가 촬영된 곳으로, 프로그램 역사상 가장 혼란스럽고 기억에 남는 보물찾기의 무대가 되었기 때문입니다. 건물 정면에 서면 그 전설적인 촬영 날의 분위기로 순식간에 빠져들 수 있습니다.</p><p>카페의 미로 같은 내부는 일곱 멤버가 열띤 포스트잇 찾기(유명한 '포토 스토리' 에피소드)를 벌이는 진정한 놀이터로 변했습니다. 이 촬영에 얽힌 일화들은 전설적입니다. 포스트잇을 읽지도 않고 강박적으로 다 뜯어버리던 진의 '다람쥐 증후군'과 결국 자신에게 화살로 돌아온 마키아벨리적 계획은 잊을 수 없습니다. 정국이 다른 멤버들을 피하기 위해 전력 질주하며 카메라맨을 말 그대로 기진맥진하게 만든 곳도 바로 이 계단입니다. 찰나의 동맹, '포토 존'에서 포즈를 인정받기 위한 막내 라인(지민, 뷔)의 유쾌한 배신, 텐트 안에서 상황을 침착하게 분석하려던 슈가 등 건물은 하루 종일 멤버들의 웃음과 비명으로 가득 찼습니다.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; 장소 상태</div><p>영구 폐업. 텐트와 실내 루프탑이 있던 원래 시설은 더 이상 존재하지 않습니다. 하지만 건물과 골목(강남구 압구정로42길 27)은 여전히 접근 가능한 공공장소입니다. 건물 외관을 배경으로 기념사진을 찍고, 순례 지도에 이 전설적인 장소를 표시할 완벽한 기회입니다.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; 카페 주변에서 할 일</div><p>더 이상 이곳에서 커피를 마실 수는 없지만, 이 전략적인 동네에 있다는 사실을 활용하세요! 걸어서 몇 분만 가면 유명한 '강남돌'을 볼 수 있는 K-Star Road가 있고, 연습생 시절의 발자취가 남은 학동공원과 BTS의 옛 숙소 주변까지 걸어갈 수 있습니다.</p>`,
-    ja: `<p>江南の中心部、トレンディな狎鴎亭の路地裏にひっそりと佇んでいたCafe Camptongは、「グランピング」をテーマにした5階建ての巨大な都会のオアシスでした。人工芝、居心地の良い屋内テント、キャンプチェア、ストリングライトなど、コンセプトが極限まで追求され、ソウルにいながらにして田舎への逃避行を提供していました。残念ながらこの象徴的な店は永久に閉店してしまいましたが、その住所は今でもARMYにとって必見の巡礼地です。それもそのはず、ここは2020年末に<em>Run BTS!</em>のエピソード118と119が撮影された場所であり、番組史上最もカオスで記憶に残る宝探しの舞台となったからです。ファサードの前に立つと、あの伝説的な撮影の日に一瞬でタイムスリップできます。</p><p>カフェの迷路のような内部は、7人のメンバーが熱狂的なポストイット探し（有名な「フォトストーリー」編）で対決する本物の遊び場と化しました。この撮影のエピソードは伝説的です。見つけたポストイットを読まずに強迫的に剥がし取ったジンの「リス症候群」や、結局裏目に出たマキャベリ的な計画は忘れられません。ジョングクが他のメンバーから逃れるために全力疾走し、カメラマンを文字通り疲労困憊させたのもこの階段でした。束の間の同盟、「フォトゾーン」でポーズを認めてもらうためのマンネライン（ジミンとV）の爆笑の裏切り、テントの中で状況を冷静に分析しようとしていたシュガなど、建物は一日中彼らの笑い声と叫び声で響き渡っていました。</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; 場所の状況</div><p>永久閉店。テントや屋内屋上があった元の施設はもう存在しません。しかし、建物と路地（江南区狎鴎亭路42街27）は依然としてアクセス可能な公共スペースです。建物の外観の記念写真を撮り、巡礼マップにこの伝説的な場所をマークする絶好の機会です。</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; カフェの周辺で何をする？</div><p>ここで飲食することはもうできませんが、この戦略的なエリアにいることを最大限に活用しましょう！歩いて数分のところに、有名な「江南ドル（GangnamDol）」を楽しめるK-Star Roadがあります。また、練習生時代の原点である鶴洞公園やBTSの旧宿舎周辺まで歩いて行くこともできます。</p>`,
-    pt: `<p>Outrora aninhado nas vielas da moda de Apgujeong, no coração de Gangnam, o Cafe Camptong era um enorme oásis urbano de cinco andares dedicado ao "glamping" (acampamento glamoroso). O conceito foi levado ao extremo: grama falsa, tendas internas aconchegantes, cadeiras de acampamento e luzes de corda ofereciam uma fuga rústica sem sair de Seul. Embora este estabelecimento icônico infelizmente tenha fechado suas portas permanentemente, seu endereço continua sendo um local de peregrinação obrigatório para os ARMYs. E por um bom motivo: foi aqui que os episódios 118 e 119 de <em>Run BTS!</em> foram filmados no final de 2020, tornando-se o palco de uma das caças ao tesouro mais caóticas e memoráveis da história do programa. Ficar em frente à fachada permite que você mergulhe instantaneamente de volta naquele lendário dia de filmagem.</p><p>O interior labiríntico do café se transformou em um verdadeiro playground onde os sete membros se enfrentaram em uma caçada frenética por post-its (o famoso arco "Photo Story"). As anedotas dessa filmagem são lendárias: pensa-se inevitavelmente na "síndrome do esquilo" de Jin, que arrancava compulsivamente todos os post-its encontrados sem sequer lê-los, um plano maquiavélico que acabou se voltando contra ele. Foi também nestas escadas que Jungkook literalmente exauriu o seu cinegrafista correndo a toda velocidade para escapar dos outros. Entre alianças fugazes, as hilárias traições da Maknae Line (Jimin e V) para validar suas poses nas "Photo Zones", e Suga tentando analisar calmamente a situação de dentro de uma tenda, o prédio ecoou com seus risos e gritos o dia todo.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; Status do local</div><p>Permanentemente fechado. O estabelecimento original com suas tendas e terraço interno não existe mais. No entanto, o prédio e o beco (em 27 Apgujeong-ro 42-gil, Gangnam-gu) continuam sendo espaços públicos acessíveis. É a oportunidade perfeita para tirar uma foto de lembrança do exterior do complexo e marcar este marco lendário no seu mapa de peregrinação.</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; O que fazer ao redor do café?</div><p>Já que você não pode mais consumir no local, aproveite estar neste bairro altamente estratégico! A poucos minutos de caminhada, você pode chegar à famosa K-Star Road para admirar os conhecidos "GangnamDols", ou caminhar até o Parque Hakdong e os arredores do antigo dormitório do BTS, lugares fundamentais dos seus tempos de trainee.</p>`,
-    zh: `<p>Cafe Camptong曾经坐落在江南中心时尚的狎鸥亭小巷中，是一个占地五层、以“豪华露营”为主题的巨大都市绿洲。这里的概念发挥到了极致：人造草坪、舒适的室内帐篷、露营椅和串灯，让你无需离开首尔就能享受乡村般的逃离。尽管这家标志性的店面遗憾地已永久关闭，但它的地址依然是ARMY们必去的朝圣地。原因很简单：这里是2020年底<em>Run BTS!</em>第118和119集的拍摄地，也是该节目历史上最混乱、最令人难忘的寻宝游戏舞台。站在建筑正面，你可以瞬间沉浸在那个传奇拍摄日的回忆中。</p><p>咖啡馆迷宫般的内部变成了一个真正的游乐场，七名成员在这里展开了疯狂的便利贴寻找战（著名的“照片故事”篇）。这次拍摄的轶事堪称传奇：不可避免地会让人想起Jin的“松鼠综合症”，他强迫症般地撕下所有找到的便利贴，看都不看一眼，这个马基雅维利式的计划最终让他自食其果。同样是在这些楼梯上，Jungkook为了躲避其他成员全速冲刺，让他的摄像师累得半死。在短暂的结盟、忙内小分队（Jimin和V）为了在“拍照区”认证姿势而上演的搞笑背叛，以及Suga试图在帐篷里冷静分析局势之间，整栋建筑一整天都回荡着他们的笑声和尖叫声。</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; 地点状态</div><p>永久关闭。最初带有帐篷和室内屋顶的设施已不复存在。然而，建筑和所在的小巷（江南区狎鸥亭路42街27号）仍然是可进入的公共空间。这是拍摄建筑外观纪念照、在你的朝圣地图上标记这个传奇地点的绝佳机会。</p><div style="color:#D42759;font-weight:bold;margin:15px 0 5px;">&bull; 在咖啡馆周围做什么？</div><p>既然你已经不能在这里消费了，那就充分利用在这个极具战略意义的街区的时间吧！步行几分钟，你就可以到达著名的韩流明星大道（K-Star Road）欣赏著名的“江南熊（GangnamDols）”，或者步行去鹤洞公园和防弹少年团旧宿舍附近，那些是他们练习生时代的重要地点。</p>`
+    en: `<p>Once nestled in the trendy alleys of Apgujeong, in the heart of Gangnam, Cafe Camptong was a massive five-story urban oasis dedicated to "glamping" (glamorous camping). The concept was pushed to the extreme: fake grass, cozy indoor tents, camping chairs, and string lights offered a rustic escape without leaving Seoul. Although this iconic establishment has unfortunately closed its doors for good, its address remains a must-visit pilgrimage site for ARMYs. And for good reason: this is where episodes 118 and 119 of <em>Run BTS!</em> were filmed in late 2020, becoming the stage for one of the most chaotic and memorable scavenger hunts in the show's history. Standing in front of the facade lets you instantly relive that legendary filming day.</p><p>The café's labyrinthine interior became a true playground where the seven members faced off in a frantic post-it hunt (the famous "Photo Story" arc). The stories from this shoot are legendary: it's impossible not to think of Jin's "squirrel syndrome," compulsively snatching up every post-it he found without even reading them, a Machiavellian plan that ultimately backfired on him. It was also on these stairs that Jungkook literally wore out his cameraman by sprinting at full speed to escape the others. Between fleeting alliances, the Maknae Line's (Jimin and V) hilarious betrayals to get their poses validated in the "Photo Zones," and Suga calmly trying to analyze the situation from inside a tent, the building echoed with their laughter and screams all day long.</p>`,
+    fr: `<p>Autrefois niché dans les ruelles branchées d'Apgujeong, au cœur de Gangnam, le Cafe Camptong était une immense oasis urbaine de cinq étages dédiée au "glamping" (le camping glamour). Le concept était poussé à l'extrême : fausse pelouse, tentes d'intérieur douillettes, chaises de camping et guirlandes lumineuses offraient une évasion rustique sans quitter Séoul. Bien que cet établissement emblématique ait malheureusement fermé ses portes définitivement, son adresse reste un lieu de pèlerinage incontournable pour les ARMYs. Et pour cause : c'est ici qu'ont été tournés les épisodes 118 et 119 de <em>Run BTS!</em> fin 2020, devenant le théâtre de l'une des chasses au trésor les plus chaotiques et mémorables de l'histoire de l'émission. Se tenir devant la façade permet de se replonger instantanément dans cette journée de tournage mythique.</p><p>L'intérieur labyrinthique du café s'était alors transformé en un véritable terrain de jeu où les sept membres se sont affrontés lors d'une chasse aux post-it frénétique (le fameux arc "Photo Story"). Les anecdotes de ce tournage sont légendaires : on repense inévitablement au "syndrome de l'écureuil" de Jin, qui arrachait compulsivement tous les post-it trouvés sans même les lire, un plan machiavélique qui s'est finalement retourné contre lui. C'est aussi dans ces escaliers que Jungkook a littéralement épuisé son caméraman à force de sprinter à toute vitesse pour échapper aux autres. Entre les alliances éphémères, les trahisons hilarantes de la Maknae Line (Jimin et V) pour valider leurs poses dans les "Photo Zones", et Suga qui tentait d'analyser calmement la situation depuis une tente, le bâtiment a résonné de leurs rires et de leurs cris toute la journée.</p>`,
+    es: `<p>Una vez ubicado en los callejones de moda de Apgujeong, en el corazón de Gangnam, Cafe Camptong era un enorme oasis urbano de cinco pisos dedicado al "glamping" (camping glamoroso). El concepto se llevó al extremo: césped artificial, acogedoras tiendas de campaña en el interior, sillas de camping y luces de cadena ofrecían un escape rústico sin salir de Seúl. Aunque este emblemático establecimiento lamentablemente ha cerrado sus puertas de forma permanente, su dirección sigue siendo un lugar de peregrinación de visita obligada para l@s ARMYs. Y por una buena razón: aquí es donde se filmaron los episodios 118 y 119 de <em>Run BTS!</em> a finales de 2020, convirtiéndose en el escenario de una de las búsquedas del tesoro más caóticas y memorables de la historia del programa. Pararse frente a la fachada te permite sumergirte instantáneamente en ese legendario día de rodaje.</p><p>El laberíntico interior del café se transformó en un verdadero patio de recreo donde los siete miembros se enfrentaron en una frenética búsqueda de post-its (el famoso arco de "Photo Story"). Las anécdotas de este rodaje son legendarias: inevitablemente pensamos en el "síndrome de la ardilla" de Jin, quien arrancaba compulsivamente todos los post-its que encontraba sin siquiera leerlos, un plan maquiavélico que al final se volvió en su contra. También fue en estas escaleras donde Jungkook literalmente agotó a su camarógrafo al correr a toda velocidad para escapar de los demás. Entre alianzas fugaces, traiciones hilarantes de la Maknae Line (Jimin y V) para validar sus poses en las "Photo Zones", y Suga intentando analizar con calma la situación desde una tienda de campaña, el edificio resonó con sus risas y gritos durante todo el día.</p>`,
+    it: `<p>Un tempo incastonato nei vicoli alla moda di Apgujeong, nel cuore di Gangnam, il Cafe Camptong era un'enorme oasi urbana di cinque piani dedicata al "glamping" (campeggio glamour). Il concetto era spinto all'estremo: erba finta, accoglienti tende da interni, sedie da campeggio e luci a corda offrivano una fuga rustica senza lasciare Seoul. Anche se questo iconico stabilimento ha purtroppo chiuso definitivamente i battenti, il suo indirizzo rimane un luogo di pellegrinaggio imperdibile per le/gli ARMY. E per una buona ragione: è qui che sono stati girati gli episodi 118 e 119 di <em>Run BTS!</em> alla fine del 2020, diventando il teatro di una delle cacce al tesoro più caotiche e memorabili della storia dello show. Stare davanti alla facciata ti permette di immergerti all'istante in quella leggendaria giornata di riprese.</p><p>L'interno labirintico del caffè si trasformò in un vero e proprio parco giochi in cui i sette membri si sfidarono in una frenetica caccia ai post-it (il famoso arco narrativo "Photo Story"). Le aneddoti di queste riprese sono leggendarie: si pensa inevitabilmente alla "sindrome dello scoiattolo" di Jin, che strappava compulsivamente tutti i post-it trovati senza nemmeno leggerli, un piano machiavellico che alla fine gli si è ritorto contro. È anche su queste scale che Jungkook ha letteralmente sfiancato il suo cameraman scattando a tutta velocità per sfuggire agli altri. Tra alleanze fugaci, esilaranti tradimenti della Maknae Line (Jimin e V) per convalidare le loro pose nelle "Photo Zones", e Suga che cercava di analizzare con calma la situazione da una tenda, l'edificio ha risuonato delle loro risate e urla per tutto il giorno.</p>`,
+    ko: `<p>강남의 심장부, 트렌디한 압구정 골목에 자리 잡고 있던 카페 캠프통은 '글램핑'을 테마로 한 5층 규모의 거대한 도심 속 오아시스였습니다. 인조 잔디, 아늑한 실내 텐트, 캠핑 의자, 꼬마전구 등 콘셉트를 극대화하여 서울을 떠나지 않고도 시골로 탈출한 듯한 느낌을 주었습니다. 아쉽게도 이 상징적인 장소는 영구 폐업했지만, 이 주소는 아미들에게 여전히 필수 순례지로 남아있습니다. 그도 그럴 것이 이곳은 2020년 말 <em>달려라 방탄!</em> 118, 119화가 촬영된 곳으로, 프로그램 역사상 가장 혼란스럽고 기억에 남는 보물찾기의 무대가 되었기 때문입니다. 건물 정면에 서면 그 전설적인 촬영 날의 분위기로 순식간에 빠져들 수 있습니다.</p><p>카페의 미로 같은 내부는 일곱 멤버가 열띤 포스트잇 찾기(유명한 '포토 스토리' 에피소드)를 벌이는 진정한 놀이터로 변했습니다. 이 촬영에 얽힌 일화들은 전설적입니다. 포스트잇을 읽지도 않고 강박적으로 다 뜯어버리던 진의 '다람쥐 증후군'과 결국 자신에게 화살로 돌아온 마키아벨리적 계획은 잊을 수 없습니다. 정국이 다른 멤버들을 피하기 위해 전력 질주하며 카메라맨을 말 그대로 기진맥진하게 만든 곳도 바로 이 계단입니다. 찰나의 동맹, '포토 존'에서 포즈를 인정받기 위한 막내 라인(지민, 뷔)의 유쾌한 배신, 텐트 안에서 상황을 침착하게 분석하려던 슈가 등 건물은 하루 종일 멤버들의 웃음과 비명으로 가득 찼습니다.</p>`,
+    ja: `<p>江南の中心部、トレンディな狎鴎亭の路地裏にひっそりと佇んでいたCafe Camptongは、「グランピング」をテーマにした5階建ての巨大な都会のオアシスでした。人工芝、居心地の良い屋内テント、キャンプチェア、ストリングライトなど、コンセプトが極限まで追求され、ソウルにいながらにして田舎への逃避行を提供していました。残念ながらこの象徴的な店は永久に閉店してしまいましたが、その住所は今でもARMYにとって必見の巡礼地です。それもそのはず、ここは2020年末に<em>Run BTS!</em>のエピソード118と119が撮影された場所であり、番組史上最もカオスで記憶に残る宝探しの舞台となったからです。ファサードの前に立つと、あの伝説的な撮影の日に一瞬でタイムスリップできます。</p><p>カフェの迷路のような内部は、7人のメンバーが熱狂的なポストイット探し（有名な「フォトストーリー」編）で対決する本物の遊び場と化しました。この撮影のエピソードは伝説的です。見つけたポストイットを読まずに強迫的に剥がし取ったジンの「リス症候群」や、結局裏目に出たマキャベリ的な計画は忘れられません。ジョングクが他のメンバーから逃れるために全力疾走し、カメラマンを文字通り疲労困憊させたのもこの階段でした。束の間の同盟、「フォトゾーン」でポーズを認めてもらうためのマンネライン（ジミンとV）の爆笑の裏切り、テントの中で状況を冷静に分析しようとしていたシュガなど、建物は一日中彼らの笑い声と叫び声で響き渡っていました。</p>`,
+    pt: `<p>Outrora aninhado nas vielas da moda de Apgujeong, no coração de Gangnam, o Cafe Camptong era um enorme oásis urbano de cinco andares dedicado ao "glamping" (acampamento glamoroso). O conceito foi levado ao extremo: grama falsa, tendas internas aconchegantes, cadeiras de acampamento e luzes de corda ofereciam uma fuga rústica sem sair de Seul. Embora este estabelecimento icônico infelizmente tenha fechado suas portas permanentemente, seu endereço continua sendo um local de peregrinação obrigatório para os ARMYs. E por um bom motivo: foi aqui que os episódios 118 e 119 de <em>Run BTS!</em> foram filmados no final de 2020, tornando-se o palco de uma das caças ao tesouro mais caóticas e memoráveis da história do programa. Ficar em frente à fachada permite que você mergulhe instantaneamente de volta naquele lendário dia de filmagem.</p><p>O interior labiríntico do café se transformou em um verdadeiro playground onde os sete membros se enfrentaram em uma caçada frenética por post-its (o famoso arco "Photo Story"). As anedotas dessa filmagem são lendárias: pensa-se inevitavelmente na "síndrome do esquilo" de Jin, que arrancava compulsivamente todos os post-its encontrados sem sequer lê-los, um plano maquiavélico que acabou se voltando contra ele. Foi também nestas escadas que Jungkook literalmente exauriu o seu cinegrafista correndo a toda velocidade para escapar dos outros. Entre alianças fugazes, as hilárias traições da Maknae Line (Jimin e V) para validar suas poses nas "Photo Zones", e Suga tentando analisar calmamente a situação de dentro de uma tenda, o prédio ecoou com seus risos e gritos o dia todo.</p>`,
+    zh: `<p>Cafe Camptong曾经坐落在江南中心时尚的狎鸥亭小巷中，是一个占地五层、以“豪华露营”为主题的巨大都市绿洲。这里的概念发挥到了极致：人造草坪、舒适的室内帐篷、露营椅和串灯，让你无需离开首尔就能享受乡村般的逃离。尽管这家标志性的店面遗憾地已永久关闭，但它的地址依然是ARMY们必去的朝圣地。原因很简单：这里是2020年底<em>Run BTS!</em>第118和119集的拍摄地，也是该节目历史上最混乱、最令人难忘的寻宝游戏舞台。站在建筑正面，你可以瞬间沉浸在那个传奇拍摄日的回忆中。</p><p>咖啡馆迷宫般的内部变成了一个真正的游乐场，七名成员在这里展开了疯狂的便利贴寻找战（著名的“照片故事”篇）。这次拍摄的轶事堪称传奇：不可避免地会让人想起Jin的“松鼠综合症”，他强迫症般地撕下所有找到的便利贴，看都不看一眼，这个马基雅维利式的计划最终让他自食其果。同样是在这些楼梯上，Jungkook为了躲避其他成员全速冲刺，让他的摄像师累得半死。在短暂的结盟、忙内小分队（Jimin和V）为了在“拍照区”认证姿势而上演的搞笑背叛，以及Suga试图在帐篷里冷静分析局势之间，整栋建筑一整天都回荡着他们的笑声和尖叫声。</p>`
   },
-  tip: {
-    en: `1. <strong>Immersion tip:</strong> Before heading to this address, don't hesitate to re-watch episode 119 of Run BTS! in your hotel room to perfectly recognize the building's exterior architecture and the street where the members arrived.<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>Where to take a real coffee break?</strong> With Cafe Camptong closed, fall back on other historic addresses in the neighborhood for your snack. Use the app's map mode to find the nearest open BTS location!</div></div>`,
-    fr: `1. <strong>Le conseil immersion :</strong> Avant de vous rendre à cette adresse, n'hésitez pas à re-visionner l'épisode 119 de Run BTS! dans votre chambre d'hôtel pour reconnaître parfaitement l'architecture extérieure du bâtiment et la rue où les membres sont arrivés.<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>Où faire une vraie pause café ?</strong> Le Cafe Camptong étant fermé, rabattez-vous sur d'autres adresses historiques du quartier pour votre goûter. Utilisez le mode carte de l'application pour trouver le lieu BTS ouvert le plus proche !</div></div>`,
-    es: `1. <strong>El consejo de inmersión:</strong> Antes de ir a esta dirección, ¡no dudes en volver a ver el episodio 119 de Run BTS! en tu habitación de hotel para reconocer perfectamente la arquitectura exterior del edificio y la calle por donde llegaron los miembros.<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>¿Dónde tomar un verdadero descanso para el café?</strong> Como el Cafe Camptong está cerrado, recurre a otras direcciones históricas del barrio para tu merienda. ¡Utiliza el modo mapa de la aplicación para encontrar el lugar de BTS abierto más cercano!</div></div>`,
-    it: `1. <strong>Il consiglio per l'immersione:</strong> Prima di recarti a questo indirizzo, non esitare a riguardare l'episodio 119 di Run BTS! nella tua camera d'albergo per riconoscere perfettamente l'architettura esterna dell'edificio e la strada da cui sono arrivati i membri.<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>Dove fare una vera pausa caffè?</strong> Essendo il Cafe Camptong chiuso, ripiega su altri indirizzi storici del quartiere per la tua merenda. Utilizza la modalità mappa dell'app per trovare il luogo BTS aperto più vicino!</div></div>`,
-    ko: `1. <strong>몰입 팁:</strong> 이곳을 방문하기 전, 호텔 방에서 달려라 방탄! 119화를 다시 시청해 보세요. 건물의 외관과 멤버들이 도착했던 거리를 완벽하게 알아볼 수 있을 것입니다.<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>진짜 커피 브레이크는 어디서?</strong> 카페 캠프통이 폐업했으니, 간식을 즐기려면 근처의 다른 역사적인 장소들을 방문해 보세요. 앱의 지도 모드를 사용해 가장 가까운 영업 중인 BTS 관련 장소를 찾아보세요!</div></div>`,
-    ja: `1. <strong>没入感のためのヒント：</strong> この場所に向かう前に、ホテルの部屋でRun BTS!のエピソード119をもう一度見直すことをお勧めします。建物の外観やメンバーが到着した通りを完璧に認識できるようになります。<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>本当のコーヒーブレイクはどこで？</strong> Cafe Camptongは閉店しているので、おやつには近隣の他の歴史的な場所を利用しましょう。アプリのマップモードを使って、一番近くの営業しているBTS関連の場所を見つけてください！</div></div>`,
-    pt: `1. <strong>O conselho de imersão:</strong> Antes de ir a este endereço, não hesite em rever o episódio 119 de Run BTS! no seu quarto de hotel para reconhecer perfeitamente a arquitetura exterior do edifício e a rua onde os membros chegaram.<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>Onde fazer uma verdadeira pausa para o café?</strong> Como o Cafe Camptong está fechado, recorra a outros endereços históricos do bairro para o seu lanche. Use o modo mapa do aplicativo para encontrar o local BTS aberto mais próximo!</div></div>`,
-    zh: `1. <strong>沉浸式提示：</strong> 在前往这个地址之前，不要犹豫在酒店房间里重温一遍Run BTS!的第119集，这样你就能完美认出建筑的外观和成员们到达的街道。<br><br><div style="display:flex; gap:12px; align-items:flex-start; margin-left:-36px;"><div style="width:24px; height:24px; background:#D42759; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; line-height:1; flex-shrink:0;">2</div><div><strong>去哪里享受真正的咖啡休息时间？</strong> 既然Cafe Camptong关门了，去街区里其他有历史意义的地点吃点点心吧。使用应用程序的地图模式寻找最近的正在营业的防弹少年团相关地点！</div></div>`
-  },
-  directions: {
-    en: "Take the Suin-Bundang subway line to Apgujeong Rodeo station and use exit 5. You will need to walk about 8 minutes north. The walk is very pleasant as it takes you through the lively Rodeo shopping streets, lined with boutiques and storefronts typical of Gangnam's luxurious atmosphere.",
-    fr: "Empruntez la ligne de métro Suin-Bundang jusqu'à la station Apgujeong Rodeo et prenez la sortie 5. Il vous faudra marcher environ 8 minutes vers le nord. Le trajet est très agréable car il vous fait traverser les rues commerçantes animées de Rodeo, bordées de boutiques et vitrines typiques de l'atmosphère luxueuse de Gangnam.",
-    es: "Toma la línea de metro Suin-Bundang hasta la estación Apgujeong Rodeo y toma la salida 5. Tendrás que caminar unos 8 minutos hacia el norte. El trayecto es muy agradable ya que te hace atravesar las animadas calles comerciales de Rodeo, bordeadas de boutiques y escaparates típicos del ambiente lujoso de Gangnam.",
-    it: "Prendi la linea della metropolitana Suin-Bundang fino alla stazione Apgujeong Rodeo e prendi l'uscita 5. Dovrai camminare per circa 8 minuti verso nord. Il tragitto è molto piacevole in quanto ti fa attraversare le animate strade dello shopping di Rodeo, fiancheggiate da boutique e vetrine tipiche della lussuosa atmosfera di Gangnam.",
-    ko: "수인분당선을 타고 압구정로데오역에서 내려 5번 출구로 나옵니다. 북쪽으로 약 8분 정도 걸어가야 합니다. 강남 특유의 고급스러운 분위기를 느낄 수 있는 부티크와 쇼윈도가 늘어선 활기찬 로데오 쇼핑거리를 지나게 되어 걷는 길이 매우 즐겁습니다.",
-    ja: "水仁・盆唐線に乗り、狎鴎亭ロデオ駅の5番出口を出ます。北へ約8分歩きます。江南の豪華な雰囲気を象徴するブティックやショーウィンドウが並ぶ、活気あるロデオのショッピングストリートを抜けるため、歩くのもとても楽しいです。",
-    pt: "Pegue a linha de metrô Suin-Bundang até a estação Apgujeong Rodeo e use a saída 5. Você precisará caminhar cerca de 8 minutos para o norte. A caminhada é muito agradável, pois leva você pelas animadas ruas comerciais de Rodeo, repletas de butiques e vitrines típicas da luxuosa atmosfera de Gangnam.",
-    zh: "乘坐水仁·盆唐线至狎鸥亭罗德奥站，从5号出口出站。你需要向北步行约8分钟。这段路非常惬意，因为你将穿过热闹的罗德奥商业街，两旁林立着充满江南奢华气息的精品店和橱窗。"
-  }
+  // Practical information & access : 3 items titrés (statut du lieu, comment s'y
+  // rendre, quoi faire alentour) — voir practicalList dans openDetailsPanel(). Contenu
+  // français fourni tel quel par toi (01/09/2026) ; les autres langues reprennent la
+  // substance déjà traduite précédemment (statut/alentours) et l'ancien champ
+  // "directions" (comment s'y rendre), simplement réorganisés dans cette structure.
+  practicalInfo: [
+    {
+      title: { en: "Location status", fr: "Statut du lieu", es: "Estado del lugar", it: "Stato del luogo", ko: "장소 상태", ja: "場所の状況", pt: "Status do local", zh: "地点状态" },
+      text: {
+        en: "Permanently closed. The original establishment with its tents and indoor rooftop no longer exists. However, the building and the alley (at 27 Apgujeong-ro 42-gil, Gangnam-gu) remain accessible public spaces. It's the perfect opportunity to take a souvenir photo of the complex's exterior and check off this legendary milestone on your pilgrimage map.",
+        fr: "Fermé définitivement. L'établissement d'origine avec ses tentes et son rooftop intérieur n'existe plus. Cependant, le bâtiment et la ruelle (au 27 Apgujeong-ro 42-gil, Gangnam-gu) restent des espaces publics accessibles. C'est l'occasion parfaite pour prendre une photo souvenir de l'extérieur du complexe et marquer ce point de passage mythique sur votre carte de pèlerinage.",
+        es: "Cerrado permanentemente. El establecimiento original con sus tiendas y su azotea interior ya no existe. Sin embargo, el edificio y el callejón (en 27 Apgujeong-ro 42-gil, Gangnam-gu) siguen siendo espacios públicos accesibles. Es la oportunidad perfecta para tomar una foto de recuerdo del exterior del complejo y marcar este punto de paso mítico en tu mapa de peregrinación.",
+        it: "Chiuso definitivamente. La struttura originale con le sue tende e il rooftop interno non esiste più. Tuttavia, l'edificio e il vicolo (al 27 Apgujeong-ro 42-gil, Gangnam-gu) rimangono spazi pubblici accessibili. È l'occasione perfetta per scattare una foto ricordo dell'esterno del complesso e segnare questo punto mitico sulla tua mappa di pellegrinaggio.",
+        ko: "영구 폐업. 텐트와 실내 루프탑이 있던 원래 시설은 더 이상 존재하지 않습니다. 하지만 건물과 골목(강남구 압구정로42길 27)은 여전히 접근 가능한 공공장소입니다. 건물 외관을 배경으로 기념사진을 찍고, 순례 지도에 이 전설적인 장소를 표시할 완벽한 기회입니다.",
+        ja: "永久閉店。テントや屋内屋上があった元の施設はもう存在しません。しかし、建物と路地（江南区狎鴎亭路42街27）は依然としてアクセス可能な公共スペースです。建物の外観の記念写真を撮り、巡礼マップにこの伝説的な場所をマークする絶好の機会です。",
+        pt: "Permanentemente fechado. O estabelecimento original com suas tendas e terraço interno não existe mais. No entanto, o prédio e o beco (em 27 Apgujeong-ro 42-gil, Gangnam-gu) continuam sendo espaços públicos acessíveis. É a oportunidade perfeita para tirar uma foto de lembrança do exterior do complexo e marcar este marco lendário no seu mapa de peregrinação.",
+        zh: "永久关闭。最初带有帐篷和室内屋顶的设施已不复存在。然而，建筑和所在的小巷（江南区狎鸥亭路42街27号）仍然是可进入的公共空间。这是拍摄建筑外观纪念照、在你的朝圣地图上标记这个传奇地点的绝佳机会。"
+      }
+    },
+    {
+      title: { en: "How to get there", fr: "Comment s'y rendre", es: "Cómo llegar", it: "Come arrivare", ko: "가는 방법", ja: "アクセス方法", pt: "Como chegar", zh: "如何前往" },
+      text: {
+        en: "Take the Suin-Bundang subway line to Apgujeong Rodeo station and use exit 5. You will need to walk about 8 minutes north. The walk is very pleasant as it takes you through the lively Rodeo shopping streets, lined with boutiques and storefronts typical of Gangnam's luxurious atmosphere.",
+        fr: "Empruntez la ligne de métro Suin-Bundang jusqu'à la station Apgujeong Rodeo et prenez la sortie 5. Il vous faudra marcher environ 8 minutes vers le nord. Le trajet est très agréable car il vous fait traverser les rues commerçantes animées de Rodeo, bordées de boutiques et vitrines typiques de l'atmosphère luxueuse de Gangnam.",
+        es: "Toma la línea de metro Suin-Bundang hasta la estación Apgujeong Rodeo y toma la salida 5. Tendrás que caminar unos 8 minutos hacia el norte. El trayecto es muy agradable ya que te hace atravesar las animadas calles comerciales de Rodeo, bordeadas de boutiques y escaparates típicos del ambiente lujoso de Gangnam.",
+        it: "Prendi la linea della metropolitana Suin-Bundang fino alla stazione Apgujeong Rodeo e prendi l'uscita 5. Dovrai camminare per circa 8 minuti verso nord. Il tragitto è molto piacevole in quanto ti fa attraversare le animate strade dello shopping di Rodeo, fiancheggiate da boutique e vetrine tipiche della lussuosa atmosfera di Gangnam.",
+        ko: "수인분당선을 타고 압구정로데오역에서 내려 5번 출구로 나옵니다. 북쪽으로 약 8분 정도 걸어가야 합니다. 강남 특유의 고급스러운 분위기를 느낄 수 있는 부티크와 쇼윈도가 늘어선 활기찬 로데오 쇼핑거리를 지나게 되어 걷는 길이 매우 즐겁습니다.",
+        ja: "水仁・盆唐線に乗り、狎鴎亭ロデオ駅の5番出口を出ます。北へ約8分歩きます。江南の豪華な雰囲気を象徴するブティックやショーウィンドウが並ぶ、活気あるロデオのショッピングストリートを抜けるため、歩くのもとても楽しいです。",
+        pt: "Pegue a linha de metrô Suin-Bundang até a estação Apgujeong Rodeo e use a saída 5. Você precisará caminhar cerca de 8 minutos para o norte. A caminhada é muito agradável, pois leva você pelas animadas ruas comerciais de Rodeo, repletas de butiques e vitrines típicas da luxuosa atmosfera de Gangnam.",
+        zh: "乘坐水仁·盆唐线至狎鸥亭罗德奥站，从5号出口出站。你需要向北步行约8分钟。这段路非常惬意，因为你将穿过热闹的罗德奥商业街，两旁林立着充满江南奢华气息的精品店和橱窗。"
+      }
+    },
+    {
+      title: { en: "What to do around the cafe?", fr: "Que faire autour du café ?", es: "¿Qué hacer alrededor del café?", it: "Cosa fare nei dintorni del caffè?", ko: "카페 주변에서 할 일", ja: "カフェの周辺で何をする？", pt: "O que fazer ao redor do café?", zh: "在咖啡馆周围做什么？" },
+      text: {
+        en: "Since you can no longer eat or drink on site, take advantage of being in this highly strategic neighborhood! Just a few minutes' walk away, you can reach the famous K-Star Road to admire the well-known \"GangnamDols,\" or walk to Hakdong Park and the area around BTS's old dorm, foundational places from their trainee days.",
+        fr: "Puisque vous ne pouvez plus consommer sur place, profitez d'être dans ce quartier hautement stratégique ! À quelques minutes de marche de là, vous pouvez rejoindre la célèbre K-Star Road pour admirer les fameux \"GangnamDols\", ou marcher jusqu'au parc Hakdong et aux environs de l'ancien dortoir de BTS, des lieux fondateurs de leur époque de trainees.",
+        es: "Ya que no puedes consumir en el lugar, ¡aprovecha estar en este barrio altamente estratégico! A pocos minutos a pie, puedes llegar a la famosa K-Star Road para admirar los famosos \"GangnamDols\", o caminar hasta el parque Hakdong y los alrededores del antiguo dormitorio de BTS, lugares fundamentales de su época de aprendices.",
+        it: "Poiché non puoi più consumare sul posto, approfitta di essere in questo quartiere altamente strategico! A pochi minuti di cammino, puoi raggiungere la famosa K-Star Road per ammirare i noti \"GangnamDols\", oppure camminare fino al parco Hakdong e ai dintorni del vecchio dormitorio dei BTS, luoghi fondamentali dei loro giorni da trainee.",
+        ko: "더 이상 이곳에서 커피를 마실 수는 없지만, 이 전략적인 동네에 있다는 사실을 활용하세요! 걸어서 몇 분만 가면 유명한 '강남돌'을 볼 수 있는 K-Star Road가 있고, 연습생 시절의 발자취가 남은 학동공원과 BTS의 옛 숙소 주변까지 걸어갈 수 있습니다.",
+        ja: "ここで飲食することはもうできませんが、この戦略的なエリアにいることを最大限に活用しましょう！歩いて数分のところに、有名な「江南ドル（GangnamDol）」を楽しめるK-Star Roadがあります。また、練習生時代の原点である鶴洞公園やBTSの旧宿舎周辺まで歩いて行くこともできます。",
+        pt: "Já que você não pode mais consumir no local, aproveite estar neste bairro altamente estratégico! A poucos minutos de caminhada, você pode chegar à famosa K-Star Road para admirar os conhecidos \"GangnamDols\", ou caminhar até o Parque Hakdong e os arredores do antigo dormitório do BTS, lugares fundamentais dos seus tempos de trainee.",
+        zh: "既然你已经不能在这里消费了，那就充分利用在这个极具战略意义的街区的时间吧！步行几分钟，你就可以到达著名的韩流明星大道（K-Star Road）欣赏著名的“江南熊（GangnamDols）”，或者步行去鹤洞公园和防弹少年团旧宿舍附近，那些是他们练习生时代的重要地点。"
+      }
+    }
+  ],
+  // Tips : 2 conseils titrés (rond numéroté rose automatique via .tip-line/.num — voir
+  // openDetailsPanel()). Contenu français fourni tel quel par toi (01/09/2026) ; les
+  // autres langues reprennent la substance déjà traduite précédemment.
+  tipsList: [
+    {
+      title: { en: "Immersion tip", fr: "Le conseil immersion.", es: "Consejo de inmersión", it: "Consiglio per l'immersione", ko: "몰입 팁", ja: "没入感のためのヒント", pt: "Conselho de imersão", zh: "沉浸式提示" },
+      text: {
+        en: "Before heading to this address, don't hesitate to re-watch episode 119 of Run BTS! in your hotel room. This will let you perfectly recognize the building's exterior architecture and the street where the members arrived, making your visit to the storefront much more vivid and full of nostalgia.",
+        fr: "Avant de vous rendre à cette adresse, n'hésitez pas à re-visionner l'épisode 119 de Run BTS! dans votre chambre d'hôtel. Cela vous permettra de reconnaître parfaitement l'architecture extérieure du bâtiment et la rue où les membres sont arrivés, rendant votre visite devant la devanture beaucoup plus vivante et remplie de nostalgie.",
+        es: "Antes de ir a esta dirección, no dudes en volver a ver el episodio 119 de Run BTS! en tu habitación de hotel para reconocer perfectamente la arquitectura exterior del edificio y la calle por donde llegaron los miembros.",
+        it: "Prima di recarti a questo indirizzo, non esitare a riguardare l'episodio 119 di Run BTS! nella tua camera d'albergo per riconoscere perfettamente l'architettura esterna dell'edificio e la strada da cui sono arrivati i membri.",
+        ko: "이곳을 방문하기 전, 호텔 방에서 달려라 방탄! 119화를 다시 시청해 보세요. 건물의 외관과 멤버들이 도착했던 거리를 완벽하게 알아볼 수 있을 것입니다.",
+        ja: "この場所に向かう前に、ホテルの部屋でRun BTS!のエピソード119をもう一度見直すことをお勧めします。建物の外観やメンバーが到着した通りを完璧に認識できるようになります。",
+        pt: "Antes de ir a este endereço, não hesite em rever o episódio 119 de Run BTS! no seu quarto de hotel para reconhecer perfeitamente a arquitetura exterior do edifício e a rua onde os membros chegaram.",
+        zh: "在前往这个地址之前，不要犹豫在酒店房间里重温一遍Run BTS!的第119集，这样你就能完美认出建筑的外观和成员们到达的街道。"
+      }
+    },
+    {
+      title: { en: "Where to take a real coffee break?", fr: "Où faire une vraie pause café ?", es: "¿Dónde tomar un verdadero descanso para el café?", it: "Dove fare una vera pausa caffè?", ko: "진짜 커피 브레이크는 어디서?", ja: "本当のコーヒーブレイクはどこで？", pt: "Onde fazer uma verdadeira pausa para o café?", zh: "去哪里享受真正的咖啡休息时间？" },
+      text: {
+        en: "With Cafe Camptong closed, fall back on other historic addresses in the neighborhood for your snack. Gangnam is full of other cafés and restaurants the members used to frequent in their younger days: use the app's map mode to find the nearest open BTS location to rest after your walk!",
+        fr: "Le Cafe Camptong étant fermé, rabattez-vous sur d'autres adresses historiques du quartier pour votre goûter. Le quartier de Gangnam regorge d'autres cafés et restaurants fréquentés par les membres dans leur jeunesse : utilisez le mode carte de l'application pour trouver le lieu BTS ouvert le plus proche pour vous reposer après votre marche !",
+        es: "Como el Cafe Camptong está cerrado, recurre a otras direcciones históricas del barrio para tu merienda. ¡Utiliza el modo mapa de la aplicación para encontrar el lugar de BTS abierto más cercano!",
+        it: "Essendo il Cafe Camptong chiuso, ripiega su altri indirizzi storici del quartiere per la tua merenda. Utilizza la modalità mappa dell'app per trovare il luogo BTS aperto più vicino!",
+        ko: "카페 캠프통이 폐업했으니, 간식을 즐기려면 근처의 다른 역사적인 장소들을 방문해 보세요. 앱의 지도 모드를 사용해 가장 가까운 영업 중인 BTS 관련 장소를 찾아보세요!",
+        ja: "Cafe Camptongは閉店しているので、おやつには近隣の他の歴史的な場所を利用しましょう。アプリのマップモードを使って、一番近くの営業しているBTS関連の場所を見つけてください！",
+        pt: "Como o Cafe Camptong está fechado, recorra a outros endereços históricos do bairro para o seu lanche. Use o modo mapa do aplicativo para encontrar o local BTS aberto mais próximo!",
+        zh: "既然Cafe Camptong关门了，去街区里其他有历史意义的地点吃点点心吧。使用应用程序的地图模式寻找最近的正在营业的防弹少年团相关地点！"
+      }
+    }
+  ]
 },
     
     { id: 2, name: "Ossu Seiromushi", group: "BTS", member: "Jin", country: "South Korea", city: "Seoul", category: "Restaurants", year: "2018", ytId: "Otsu1", address: "30 Baekjegobun-ro 45-gil, Songpa-gu", lat: 37.5105, lng: 127.1085, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
@@ -2025,7 +2133,7 @@ const translations = {
         gateResetSent: "Password reset email sent — check your inbox.", gateEnterEmailFirst: "Please enter your email address first.",
         tourModeLiveIn: "Live now — BTS is live in {city}", tourModeSchedule: "Tour Schedule", tourModeLive: "Live", tourModeDone: "Done", tourModeUpcoming: "Upcoming", tourModePrev: "Previous", tourModeNext: "Next",
         tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel.",
-        liveBadgeLabel: "Live", liveTimelineTitle: " & upcoming", liveTimelineEmpty: "Nothing scheduled right now — check back soon.", liveTimelineFooterNote: "Only official, publicly announced activities — dates as announced, always double-check official sources before booking travel.", liveFilterAll: "All", liveTodayLive: "Today · Live", liveKindGroup: "Group", liveKindSolo: "Solo",
+        liveBadgeLabel: "Live", liveTimelineTitle: " & upcoming", liveTimelineEmpty: "Nothing scheduled right now — check back soon.", liveTimelineFooterNote: "Only official, publicly announced activities — dates as announced, always double-check official sources before booking travel.", liveFilterAll: "All", liveTodayLive: "Today · Live", liveKindGroup: "Group", liveKindSolo: "Solo", newBadgeLabel: "New", usernameCooldownNote: "You can only change this once every 7 days.", usernameConfirmTitle: "Change your username?", usernameConfirmCancel: "Cancel", usernameConfirmOk: "Yes, change it", subtitle: "Following the footsteps of your favorite artists", backToList: "← Back to list", chooserTourOption: "Tour route", chooserLiveOption: "All live activity",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} is live now — {event} in {city}",
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
         tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
@@ -2088,7 +2196,7 @@ const translations = {
         gateResetSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.", gateEnterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail.",
         tourModeLiveIn: "En direct — BTS est en concert à {city}", tourModeSchedule: "Calendrier de la tournée", tourModeLive: "En direct", tourModeDone: "Terminé", tourModeUpcoming: "À venir", tourModePrev: "Précédent", tourModeNext: "Suivant",
         tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage.",
-        liveBadgeLabel: "Live", liveTimelineTitle: " et à venir", liveTimelineEmpty: "Rien de prévu pour le moment — revenez bientôt.", liveTimelineFooterNote: "Uniquement des activités officielles et rendues publiques — dates annoncées, vérifiez toujours les sources officielles avant de réserver un voyage.", liveFilterAll: "Tous", liveTodayLive: "Aujourd'hui · En direct", liveKindGroup: "Groupe", liveKindSolo: "Solo",
+        liveBadgeLabel: "Live", liveTimelineTitle: " et à venir", liveTimelineEmpty: "Rien de prévu pour le moment — revenez bientôt.", liveTimelineFooterNote: "Uniquement des activités officielles et rendues publiques — dates annoncées, vérifiez toujours les sources officielles avant de réserver un voyage.", liveFilterAll: "Tous", liveTodayLive: "Aujourd'hui · En direct", liveKindGroup: "Groupe", liveKindSolo: "Solo", newBadgeLabel: "Nouveau", usernameCooldownNote: "Vous ne pouvez changer ceci qu'une fois tous les 7 jours.", usernameConfirmTitle: "Changer votre identifiant ?", usernameConfirmCancel: "Annuler", usernameConfirmOk: "Oui, changer", subtitle: "Sur les traces de vos artistes préférés", backToList: "← Retour à la liste", chooserTourOption: "Itinéraire de tournée", chooserLiveOption: "Toute l'activité en direct",
         tourModeGenericLabel: "Tournée", tourModeMemberLiveIn: "{member} est en direct — {event} à {city}",
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
         tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
@@ -2151,7 +2259,7 @@ const translations = {
         gateResetSent: "Correo de restablecimiento enviado — revisa tu bandeja de entrada.", gateEnterEmailFirst: "Indica primero tu correo electrónico.",
         tourModeLiveIn: "En directo — BTS está actuando en {city}", tourModeSchedule: "Calendario de la gira", tourModeLive: "En directo", tourModeDone: "Finalizado", tourModeUpcoming: "Próximamente", tourModePrev: "Anterior", tourModeNext: "Siguiente",
         tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje.",
-        liveBadgeLabel: "En vivo", liveTimelineTitle: " y próximos", liveTimelineEmpty: "Nada programado por ahora — vuelve pronto.", liveTimelineFooterNote: "Solo actividades oficiales y anunciadas públicamente — fechas según lo anunciado, comprueba siempre las fuentes oficiales antes de reservar un viaje.", liveFilterAll: "Todos", liveTodayLive: "Hoy · En vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo",
+        liveBadgeLabel: "En vivo", liveTimelineTitle: " y próximos", liveTimelineEmpty: "Nada programado por ahora — vuelve pronto.", liveTimelineFooterNote: "Solo actividades oficiales y anunciadas públicamente — fechas según lo anunciado, comprueba siempre las fuentes oficiales antes de reservar un viaje.", liveFilterAll: "Todos", liveTodayLive: "Hoy · En vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Nuevo", usernameCooldownNote: "Solo puedes cambiar esto una vez cada 7 días.", usernameConfirmTitle: "¿Cambiar tu nombre de usuario?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sí, cambiarlo", subtitle: "Siguiendo los pasos de tus artistas favoritos", backToList: "← Volver a la lista", chooserTourOption: "Ruta de la gira", chooserLiveOption: "Toda la actividad en directo",
         tourModeGenericLabel: "Gira", tourModeMemberLiveIn: "{member} está en directo — {event} en {city}",
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
@@ -2213,7 +2321,7 @@ const translations = {
         gateResetSent: "Email di reimpostazione inviata — controlla la posta in arrivo.", gateEnterEmailFirst: "Inserisci prima il tuo indirizzo email.",
         tourModeLiveIn: "In diretta — I BTS si esibiscono a {city}", tourModeSchedule: "Calendario del tour", tourModeLive: "In diretta", tourModeDone: "Concluso", tourModeUpcoming: "In arrivo", tourModePrev: "Precedente", tourModeNext: "Successivo",
         tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio.",
-        liveBadgeLabel: "Live", liveTimelineTitle: " e prossimi", liveTimelineEmpty: "Nulla in programma al momento — torna a trovarci presto.", liveTimelineFooterNote: "Solo attività ufficiali e annunciate pubblicamente — date come annunciate, verifica sempre le fonti ufficiali prima di prenotare un viaggio.", liveFilterAll: "Tutti", liveTodayLive: "Oggi · Live", liveKindGroup: "Gruppo", liveKindSolo: "Solo",
+        liveBadgeLabel: "Live", liveTimelineTitle: " e prossimi", liveTimelineEmpty: "Nulla in programma al momento — torna a trovarci presto.", liveTimelineFooterNote: "Solo attività ufficiali e annunciate pubblicamente — date come annunciate, verifica sempre le fonti ufficiali prima di prenotare un viaggio.", liveFilterAll: "Tutti", liveTodayLive: "Oggi · Live", liveKindGroup: "Gruppo", liveKindSolo: "Solo", newBadgeLabel: "Nuovo", usernameCooldownNote: "Puoi modificarlo solo una volta ogni 7 giorni.", usernameConfirmTitle: "Vuoi cambiare il tuo nome utente?", usernameConfirmCancel: "Annulla", usernameConfirmOk: "Sì, cambialo", subtitle: "Sulle orme dei tuoi artisti preferiti", backToList: "← Torna alla lista", chooserTourOption: "Percorso del tour", chooserLiveOption: "Tutta l'attività dal vivo",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} è in diretta — {event} a {city}",
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
         tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
@@ -2275,7 +2383,7 @@ const translations = {
         gateResetSent: "E-mail de redefinição enviado — verifique sua caixa de entrada.", gateEnterEmailFirst: "Informe primeiro seu endereço de e-mail.",
         tourModeLiveIn: "Ao vivo — BTS está se apresentando em {city}", tourModeSchedule: "Calendário da turnê", tourModeLive: "Ao vivo", tourModeDone: "Concluído", tourModeUpcoming: "Em breve", tourModePrev: "Anterior", tourModeNext: "Próximo",
         tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem.",
-        liveBadgeLabel: "Ao vivo", liveTimelineTitle: " e próximos", liveTimelineEmpty: "Nada programado no momento — volte em breve.", liveTimelineFooterNote: "Apenas atividades oficiais e anunciadas publicamente — datas conforme anunciadas, sempre confira as fontes oficiais antes de reservar uma viagem.", liveFilterAll: "Todos", liveTodayLive: "Hoje · Ao vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo",
+        liveBadgeLabel: "Ao vivo", liveTimelineTitle: " e próximos", liveTimelineEmpty: "Nada programado no momento — volte em breve.", liveTimelineFooterNote: "Apenas atividades oficiais e anunciadas publicamente — datas conforme anunciadas, sempre confira as fontes oficiais antes de reservar uma viagem.", liveFilterAll: "Todos", liveTodayLive: "Hoje · Ao vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Novo", usernameCooldownNote: "Você só pode alterar isso uma vez a cada 7 dias.", usernameConfirmTitle: "Alterar seu nome de usuário?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sim, alterar", subtitle: "Nos passos dos seus artistas favoritos", backToList: "← Voltar à lista", chooserTourOption: "Rota da turnê", chooserLiveOption: "Toda a atividade ao vivo",
         tourModeGenericLabel: "Turnê", tourModeMemberLiveIn: "{member} está ao vivo agora — {event} em {city}",
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
@@ -2337,7 +2445,7 @@ const translations = {
         gateResetSent: "비밀번호 재설정 이메일을 보냈습니다 — 받은편지함을 확인해주세요.", gateEnterEmailFirst: "먼저 이메일 주소를 입력해주세요.",
         tourModeLiveIn: "라이브 중 — BTS가 {city}에서 공연 중입니다", tourModeSchedule: "투어 일정", tourModeLive: "라이브", tourModeDone: "종료", tourModeUpcoming: "예정", tourModePrev: "이전", tourModeNext: "다음",
         tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요.",
-        liveBadgeLabel: "라이브", liveTimelineTitle: " 및 예정", liveTimelineEmpty: "지금은 예정된 일정이 없습니다 — 곧 다시 확인해주세요.", liveTimelineFooterNote: "공식적으로 공개된 활동만 표시됩니다 — 발표된 날짜 기준이며, 여행 예약 전 항상 공식 출처를 확인하세요.", liveFilterAll: "전체", liveTodayLive: "오늘 · 라이브", liveKindGroup: "그룹", liveKindSolo: "솔로",
+        liveBadgeLabel: "라이브", liveTimelineTitle: " 및 예정", liveTimelineEmpty: "지금은 예정된 일정이 없습니다 — 곧 다시 확인해주세요.", liveTimelineFooterNote: "공식적으로 공개된 활동만 표시됩니다 — 발표된 날짜 기준이며, 여행 예약 전 항상 공식 출처를 확인하세요.", liveFilterAll: "전체", liveTodayLive: "오늘 · 라이브", liveKindGroup: "그룹", liveKindSolo: "솔로", newBadgeLabel: "신규", usernameCooldownNote: "7일에 한 번만 변경할 수 있습니다.", usernameConfirmTitle: "아이디를 변경하시겠습니까?", usernameConfirmCancel: "취소", usernameConfirmOk: "네, 변경합니다", subtitle: "당신이 좋아하는 아티스트의 발자취를 따라", backToList: "← 목록으로 돌아가기", chooserTourOption: "투어 경로", chooserLiveOption: "모든 라이브 활동",
         tourModeGenericLabel: "투어", tourModeMemberLiveIn: "{member} 라이브 중 — {city}에서 {event}",
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
         tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
@@ -2399,7 +2507,7 @@ const translations = {
         gateResetSent: "パスワード再設定メールを送信しました — 受信トレイをご確認ください。", gateEnterEmailFirst: "先にメールアドレスを入力してください。",
         tourModeLiveIn: "ライブ配信中 — BTSは{city}で公演中です", tourModeSchedule: "ツアースケジュール", tourModeLive: "ライブ", tourModeDone: "終了", tourModeUpcoming: "開催予定", tourModePrev: "前へ", tourModeNext: "次へ",
         tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。",
-        liveBadgeLabel: "ライブ", liveTimelineTitle: "・今後の予定", liveTimelineEmpty: "現在予定はありません — また後でご確認ください。", liveTimelineFooterNote: "公式に発表された活動のみを表示しています — 発表された日程です。旅行の予約前に必ず公式情報をご確認ください。", liveFilterAll: "すべて", liveTodayLive: "本日・ライブ", liveKindGroup: "グループ", liveKindSolo: "ソロ",
+        liveBadgeLabel: "ライブ", liveTimelineTitle: "・今後の予定", liveTimelineEmpty: "現在予定はありません — また後でご確認ください。", liveTimelineFooterNote: "公式に発表された活動のみを表示しています — 発表された日程です。旅行の予約前に必ず公式情報をご確認ください。", liveFilterAll: "すべて", liveTodayLive: "本日・ライブ", liveKindGroup: "グループ", liveKindSolo: "ソロ", newBadgeLabel: "新着", usernameCooldownNote: "この変更は7日に1回だけ行えます。", usernameConfirmTitle: "ユーザー名を変更しますか？", usernameConfirmCancel: "キャンセル", usernameConfirmOk: "はい、変更します", subtitle: "お気に入りのアーティストの足跡をたどって", backToList: "← リストに戻る", chooserTourOption: "ツアールート", chooserLiveOption: "すべてのライブ活動",
         tourModeGenericLabel: "ツアー", tourModeMemberLiveIn: "{member}がライブ配信中 — {city}で{event}",
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
         tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
@@ -2461,7 +2569,7 @@ const translations = {
         gateResetSent: "密码重置邮件已发送——请查收您的收件箱。", gateEnterEmailFirst: "请先输入您的电子邮箱。",
         tourModeLiveIn: "直播中 — BTS 正在{city}演出", tourModeSchedule: "巡演日程", tourModeLive: "直播中", tourModeDone: "已结束", tourModeUpcoming: "即将开始", tourModePrev: "上一个", tourModeNext: "下一个",
         tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。",
-        liveBadgeLabel: "直播", liveTimelineTitle: "与即将到来", liveTimelineEmpty: "目前暂无安排——请稍后再来查看。", liveTimelineFooterNote: "仅显示官方公开发布的活动——日期以官方公布为准，预订行程前请务必核实官方信息来源。", liveFilterAll: "全部", liveTodayLive: "今天 · 直播中", liveKindGroup: "团体", liveKindSolo: "单人",
+        liveBadgeLabel: "直播", liveTimelineTitle: "与即将到来", liveTimelineEmpty: "目前暂无安排——请稍后再来查看。", liveTimelineFooterNote: "仅显示官方公开发布的活动——日期以官方公布为准，预订行程前请务必核实官方信息来源。", liveFilterAll: "全部", liveTodayLive: "今天 · 直播中", liveKindGroup: "团体", liveKindSolo: "单人", newBadgeLabel: "新增", usernameCooldownNote: "每7天只能更改一次。", usernameConfirmTitle: "要更改你的用户名吗？", usernameConfirmCancel: "取消", usernameConfirmOk: "是的，更改", subtitle: "追随你喜爱的艺人的足迹", backToList: "← 返回列表", chooserTourOption: "巡演路线", chooserLiveOption: "全部直播动态",
         tourModeGenericLabel: "巡演", tourModeMemberLiveIn: "{member} 直播中 — 于{city}参加{event}",
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
         tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
@@ -2743,6 +2851,27 @@ function initializeFilters() {
     }
 }
 
+// Pastille "NEW" sur les lieux récemment ajoutés au catalogue (menu de gauche) : sans
+// date de création par lieu, l'id (assigné dans l'ordre d'ajout) est le seul repère
+// fiable de nouveauté — les NEW_BADGE_COUNT ids les plus élevés sont considérés récents.
+const NEW_BADGE_COUNT = 8;
+function getNewLocationIds() {
+    return celebLocations.map(l => l.id).sort((a, b) => b - a).slice(0, NEW_BADGE_COUNT);
+}
+function getDismissedNewLocationIds() {
+    try { return JSON.parse(localStorage.getItem('dismissedNewLocationIds') || '[]'); }
+    catch (e) { return []; }
+}
+// Une fois cliqué, la pastille disparaît DÉFINITIVEMENT pour cette personne (pas juste
+// pour cette session) — jamais liée à une date de dernière visite du site.
+function dismissNewLocationBadge(locId) {
+    const dismissed = getDismissedNewLocationIds();
+    if (!dismissed.includes(locId)) {
+        dismissed.push(locId);
+        localStorage.setItem('dismissedNewLocationIds', JSON.stringify(dismissed));
+    }
+}
+
 // `skipFitBounds` : au tout premier rendu après connexion (voir map.html), on ne veut
 // SURTOUT PAS que la carte se recadre sur l'étendue de TOUS les lieux affichés (Corée,
 // Japon, USA, Europe...) — ça écrasait immédiatement le centrage sur le pays choisi à
@@ -2774,6 +2903,11 @@ function renderLocations(skipFitBounds) {
                (fCountry === "All" || loc.country === fCountry) && (loc.name.toLowerCase().includes(searchTerm) || (loc.city && loc.city.toLowerCase().includes(searchTerm)));
     });
 
+    // Tri par ordre de nouveauté (les lieux les plus récemment ajoutés au site en
+    // premier) : l'id d'un lieu suit l'ordre dans lequel il a été ajouté au catalogue,
+    // c'est donc le seul repère de "nouveauté" disponible sans dates factices.
+    filteredLocations.sort((a, b) => b.id - a.id);
+
     currentFilteredLocations = filteredLocations;
 
     const cSidebar = document.getElementById('location-count-sidebar');
@@ -2786,6 +2920,8 @@ function renderLocations(skipFitBounds) {
     if(sCountries) sCountries.textContent = new Set(filteredLocations.map(l => l.country)).size;
 
     let visitedData = getVisitedLocs();
+    const newLocationIds = getNewLocationIds();
+    const dismissedNewIds = getDismissedNewLocationIds();
 
     filteredLocations.forEach(loc => {
         const catIconSvg = iconsSVG[loc.category] || iconsSVG["Default"];
@@ -2803,15 +2939,23 @@ function renderLocations(skipFitBounds) {
                  ${commAvg.toFixed(1)}
                </div>`
             : '';
+        // Pastille "NEW" : reste affichée tant que la personne n'a pas cliqué sur ce
+        // lieu précis (voir dismissNewLocationBadge), une seule fois pour de bon —
+        // jamais liée à une session ou une date, purement à l'action de la personne.
+        const isNew = newLocationIds.includes(loc.id) && !dismissedNewIds.includes(loc.id);
+        const newBadgeHtml = isNew ? `<span class="loc-new-badge">${t('newBadgeLabel')}</span>` : '';
         card.innerHTML = `
             <div class="loc-icon-box" style="color:${baseColor}; background:${baseColor}1A;">${catIconSvg}</div>
             <div class="loc-info">
                 <div class="loc-cat">${getCatName(loc.category)} &middot; ${loc.city || ''}</div>
-                <div class="loc-name">${loc.name}</div>
+                <div class="loc-name">${loc.name}${newBadgeHtml}</div>
             </div>
             ${ratingBadgeHtml}
         `;
-        card.addEventListener('click', () => { map.flyTo([loc.lat, loc.lng], 16); window.openDetailsPanel(loc.id); });
+        card.addEventListener('click', () => {
+            if (isNew) dismissNewLocationBadge(loc.id);
+            map.flyTo([loc.lat, loc.lng], 16); window.openDetailsPanel(loc.id);
+        });
         locationListElement.appendChild(card);
     });
 
@@ -2849,7 +2993,13 @@ const MAP_MAX_ZOOM = 19;
 
 function clusterLocationsForZoom(locations, zoom) {
     if (zoom >= MAP_MAX_ZOOM) return locations.map(loc => ({ locs: [loc], center: [loc.lat, loc.lng] }));
-    const clusterRadius = clusterPixelRadiusForZoom(zoom);
+    // clusterPixelRadiusForZoom() donne le DIAMÈTRE du marqueur à ce zoom : à une
+    // distance centre-à-centre égale à ce diamètre, deux cercles sont seulement
+    // TANGENTS (un unique point de contact, pas un vrai chevauchement visible) — dans
+    // les faits ça donnait quand même l'impression de lieux "collés" fusionnés trop tôt.
+    // On applique donc un facteur < 1 pour n'exiger la fusion qu'en cas de réel
+    // chevauchement des cercles, pas d'un simple contact au dernier pixel.
+    const clusterRadius = clusterPixelRadiusForZoom(zoom) * 0.6;
 
     const points = locations.map(loc => ({ loc, px: map.project([loc.lat, loc.lng], zoom) }));
     const used = new Array(points.length).fill(false);
@@ -3233,8 +3383,12 @@ function drawTripOnMap(trip, targetMap, targetLayerGroup) {
                 allPoints.push([loc.lat, loc.lng]);
                 
                 const markerHtml = `<div style="background:${color}; width:28px; height:28px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:bold; box-shadow:0 3px 6px rgba(0,0,0,0.3);">${idx+1}.${locIdx + 1}</div>`;
+                // zIndexOffset élevé : les pins de l'itinéraire doivent TOUJOURS rester au
+                // premier plan par rapport aux marqueurs/clusters normaux de la carte,
+                // même si ceux-ci sont réaffichés par erreur pendant qu'un voyage est
+                // affiché (ex: une synchronisation cloud asynchrone qui arrive en retard).
                 const icon = L.divIcon({ className: '', html: markerHtml, iconSize: [28,28], iconAnchor: [14,14] });
-                const m = L.marker([loc.lat, loc.lng], {icon: icon}).addTo(targetLayerGroup);
+                const m = L.marker([loc.lat, loc.lng], {icon: icon, zIndexOffset: 5000}).addTo(targetLayerGroup);
                 
                 m.on('click', () => { if(window.openDetailsPanel) window.openDetailsPanel(loc.id); });
             }
@@ -3493,11 +3647,24 @@ window.openDetailsPanel = function(id) {
         }
     }
 
-    // Practical information & access : le champ directions existant devient un item unique de la liste.
+    // Practical information & access : un lieu peut fournir plusieurs items TITRÉS
+    // (loc.practicalInfo — ex: statut du lieu, comment s'y rendre, quoi faire alentour),
+    // chacun affiché avec un titre de section comme "The story of this place" (même
+    // classe .story-heading). Sans ce champ, on retombe sur l'ancien rendu à un seul
+    // item dérivé de loc.directions, pour ne pas casser les lieux qui n'ont que ça.
     const practicalList = document.getElementById('details-practical-list');
     if(practicalList) {
-        const directionsText = getLocText(loc.directions);
-        practicalList.innerHTML = directionsText ? `<div class="practical-item"><b>${t('lHowToGetThere')}</b> ${directionsText}</div>` : '';
+        if (Array.isArray(loc.practicalInfo) && loc.practicalInfo.length > 0) {
+            practicalList.innerHTML = loc.practicalInfo.map(item => {
+                const title = getLocText(item.title);
+                const text = getLocText(item.text);
+                if (!text) return '';
+                return `<div class="practical-item-titled"><div class="story-heading"><span class="dot"></span><span>${title}</span></div><div class="practical-item-text">${text}</div></div>`;
+            }).join('');
+        } else {
+            const directionsText = getLocText(loc.directions);
+            practicalList.innerHTML = directionsText ? `<div class="practical-item"><b>${t('lHowToGetThere')}</b> ${directionsText}</div>` : '';
+        }
     }
 
     const dGroup = document.getElementById('details-group');
@@ -3542,13 +3709,24 @@ window.openDetailsPanel = function(id) {
         } else { videoSection.classList.add('hidden'); }
     }
 
-    // Tips box : le champ tip existant (un seul conseil) est enveloppé dans un tableau à un élément
-    // pour remplir la liste de conseils numérotée, sans réécrire les données des 57 lieux.
-    const tipText = getLocText(loc.tip);
-    const tips = tipText ? [tipText] : [];
+    // Tips box : un lieu peut fournir plusieurs conseils TITRÉS (loc.tipsList — titre en
+    // gras + texte, un rond numéroté rose par conseil via .tip-line/.num déjà existants).
+    // Sans ce champ, on retombe sur l'ancien conseil unique (loc.tip, sans titre), pour
+    // ne pas casser les lieux qui n'ont que ça.
     const tipSection = document.getElementById('details-tip-section');
     const tipsList = document.getElementById('details-tips-list');
     if(tipSection && tipsList) {
+        let tips = [];
+        if (Array.isArray(loc.tipsList) && loc.tipsList.length > 0) {
+            tips = loc.tipsList.map(item => {
+                const title = getLocText(item.title);
+                const text = getLocText(item.text);
+                return title ? `<b>${title}</b> ${text}` : text;
+            }).filter(Boolean);
+        } else {
+            const tipText = getLocText(loc.tip);
+            if (tipText) tips = [tipText];
+        }
         if(tips.length > 0) {
             tipsList.innerHTML = tips.map((tip, i) => `<div class="tip-line"><div class="num">${i + 1}</div><div>${tip}</div></div>`).join('');
             tipSection.classList.remove('hidden');
