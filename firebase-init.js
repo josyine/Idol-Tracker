@@ -321,18 +321,27 @@ window.fetchLocationReviews = async function (locationId) {
 //     allow write: if request.auth != null
 //       && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
 //   }
-let _adminCheckCache = null;
+// Mis en cache PAR uid (pas juste un booléen global) : onAuthStateChanged (voir plus bas)
+// appelle son callback une première fois de façon synchrone, souvent avant que la vraie
+// session ne soit résolue — un premier appel avec !user renverrait alors false, et un
+// simple cache global aurait figé ce false pour de bon même une fois la vraie session (et
+// son éventuel statut administrateur) connue. Ne jamais mettre en cache le cas "personne
+// connectée" évite ce piège ; mettre en cache par uid réutilise quand même le résultat une
+// fois qu'une session réelle est là, sans relire Firestore à chaque appel.
+let _adminCheckCache = null; // { uid, isAdmin }
 window.isCurrentUserAdmin = async function () {
     const user = auth.currentUser;
-    if (!user) { _adminCheckCache = false; return false; }
-    if (_adminCheckCache !== null) return _adminCheckCache;
+    if (!user) return false;
+    if (_adminCheckCache && _adminCheckCache.uid === user.uid) return _adminCheckCache.isAdmin;
+    let isAdmin = false;
     try {
         const snap = await getDoc(doc(db, 'admins', user.uid));
-        _adminCheckCache = snap.exists();
+        isAdmin = snap.exists();
     } catch (e) {
-        _adminCheckCache = false;
+        isAdmin = false;
     }
-    return _adminCheckCache;
+    _adminCheckCache = { uid: user.uid, isAdmin };
+    return isAdmin;
 };
 
 // `data` attend la même forme qu'un objet de celebLocations (name, group, member,

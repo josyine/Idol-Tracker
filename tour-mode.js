@@ -122,13 +122,20 @@
             const doFit = () => {
                 if (!tourModeLeafletMap || tourModeMapUserInteracted) return;
                 tourModeLeafletMap.invalidateSize();
-                // maxZoom relevé de 5 à 6 : sur mobile, .tour-mode-mapwrap ne fait que 38vh de
-                // haut — plafonner le zoom à 5 laissait souvent de larges bandes grises
-                // au-dessus/en dessous du tracé de la tournée au lieu de vraiment le remplir.
-                tourModeLeafletMap.fitBounds(routeLine.getBounds(), { padding: [40, 40], maxZoom: 6 });
+                // Sur mobile (.tour-mode-mapwrap ne fait que 38vh de haut, ~390px de large),
+                // une marge de 40px de chaque côté (comme sur desktop) mange une part bien
+                // plus grande d'un espace déjà restreint qu'elle ne le fait dans un grand
+                // conteneur desktop — le tracé de la tournée se retrouvait avec beaucoup de
+                // gris tout autour (demande du 04/09/2026 : "la carte affichée entièrement
+                // sans les zones grises"). maxZoom relevé de 5 à 6 pour la même raison.
+                const isMobile = window.innerWidth <= 800;
+                tourModeLeafletMap.fitBounds(routeLine.getBounds(), { padding: isMobile ? [12, 12] : [40, 40], maxZoom: 6 });
             };
             doFit();
-            [150, 400, 900].forEach(delay => setTimeout(doFit, delay));
+            // Délai supplémentaire (1500ms) en plus des existants : certains mobiles mettent
+            // plus longtemps que 900ms à stabiliser la taille réelle du conteneur (animation
+            // de la barre d'adresse, appareil lent...).
+            [150, 400, 900, 1500].forEach(delay => setTimeout(doFit, delay));
         } else if (activeLatLng) {
             map.panTo(activeLatLng, { animate: true });
         }
