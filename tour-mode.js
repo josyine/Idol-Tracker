@@ -266,6 +266,17 @@
         panel.classList.remove('hidden');
         requestAnimationFrame(() => panel.classList.add('open'));
 
+        // Sélecteur "Switch artist" partagé avec le panneau Live (script.js) — purement
+        // additif, ne touche à aucune des fonctions de rendu ci-dessus.
+        const switcherGroup = window.selectedTourLiveGroup || 'BTS';
+        document.querySelectorAll('.group-switcher-current').forEach(el => { el.textContent = switcherGroup; });
+        const emptyOverlay = document.getElementById('tour-mode-empty-overlay');
+        if (emptyOverlay) {
+            const isBTS = switcherGroup === 'BTS';
+            if (!isBTS && typeof t === 'function') emptyOverlay.textContent = t('groupNoDataYet').replace('{group}', switcherGroup);
+            emptyOverlay.classList.toggle('hidden', isBTS);
+        }
+
         // Le conteneur de la carte est à taille nulle tant que le panneau est masqué —
         // on attend la fin de la transition d'ouverture avant de créer la carte Leaflet,
         // sinon elle se dessinerait avec de mauvaises dimensions.

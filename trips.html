@@ -63,15 +63,20 @@
      .del-trip-btn l'a toujours fait) : les mettre côte à côte dans un flex wrapper ne
      suffisait pas, .del-trip-btn ignore la mise en page du flux normal et se plaçait
      donc systématiquement par-dessus n'importe quel autre bouton ajouté à côté de lui. */
-  .share-trip-btn { position: absolute; top: 9px; right: 32px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: #94a3b8; cursor: pointer; border-radius: 6px; transition: 0.2s; z-index: 10; }
+  .share-trip-btn { position: absolute; top: 10px; right: 32px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: #94a3b8; cursor: pointer; border-radius: 6px; transition: 0.2s; z-index: 10; }
   .share-trip-btn:hover { background: #FCE7F0; color: #D42759; }
   /* Avatars des "travel buddies" (voir renderTripBuddiesAvatars() dans script.js) : le
      créateur du voyage en premier, puis chaque collaborateur, en haut du détail du
      voyage — masqué tant que personne n'a été invité (voyage non partagé). */
-  .trip-buddies-avatars { display: flex; align-items: center; margin-top: 10px; }
-  .trip-buddies-avatars.hidden { display: none; }
+  .trip-access-row { display: flex; align-items: center; gap: 10px; }
+  .trip-buddies-avatars { display: flex; align-items: center; }
   .trip-buddy-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 11px; margin-left: -8px; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
   .trip-buddy-avatar:first-child { margin-left: 0; }
+  .trip-share-pill { display: inline-flex; align-items: center; background: #faf9fc; border: 1.5px dashed #cbd5e1; border-radius: 100px; padding: 6px 14px; font-size: 11.5px; font-weight: 700; color: #64748b; cursor: pointer; font-family: 'Poppins', sans-serif; transition: 0.2s; white-space: nowrap; }
+  .trip-share-pill:hover { border-color: #D42759; color: #D42759; background: #FCE7F0; }
+  .invitee-chip { display: inline-flex; align-items: center; gap: 6px; background: #FCE7F0; color: #D42759; border-radius: 100px; padding: 5px 6px 5px 12px; font-size: 11.5px; font-weight: 700; }
+  .invitee-chip .remove { cursor: pointer; width: 16px; height: 16px; border-radius: 50%; background: rgba(212,39,89,.15); display: flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; }
+  .invitee-chip .remove:hover { background: rgba(212,39,89,.3); }
   .del-trip-btn { position: absolute; top: 10px; right: 10px; font-size: 16px; font-weight: bold; color: #94a3b8; cursor: pointer; transition: 0.2s; padding: 2px 6px; border-radius: 6px; z-index: 10; }
   .del-trip-btn:hover { background: #fef2f2; color: #ef4444; }
   .new-trip-pill { border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 14px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 700; color: #D42759; transition: 0.2s; background: transparent; margin-top: auto; }
@@ -274,8 +279,11 @@
                 <div class="trip-hero">
                     <div class="trip-head-info">
                         <input type="text" id="edit-trip-name" class="trip-name-input" placeholder="Trip Name" onchange="saveTrip()">
+                        <div class="trip-access-row">
+                            <div id="trip-buddies-avatars" class="trip-buddies-avatars"></div>
+                            <button type="button" class="trip-share-pill owner-only" onclick="if(currentTrip) openShareTripModal(currentTrip.id, event)" data-i18n="tripShareThis">+ Share this trip</button>
+                        </div>
                         <div class="trip-dates" id="dates-display"></div>
-                        <div id="trip-buddies-avatars" class="trip-buddies-avatars hidden"></div>
                     </div>
                     <div>
                         <button class="gen-btn ghost owner-only" style="border-color:#ef4444; color:#ef4444;" onclick="openDeleteModal()" id="i18n-delete-trip">Delete</button>
@@ -419,6 +427,20 @@
                  <div class="pill-btn" data-type="create-month" onclick="selectCreatePill(this, 'create-month')">October</div>
                  <div class="pill-btn" data-type="create-month" onclick="selectCreatePill(this, 'create-month')">Next 6 months</div>
             </div>
+        </div>
+
+        <!-- Inviter des collaborateurs DÈS la création (voir la demande du 04/09/2026) : plus
+             besoin de créer le voyage puis d'aller le partager séparément ensuite. Simple
+             liste de pseudos en attente (chips retirables) — la création réelle du voyage
+             partagé + l'envoi des invitations n'a lieu qu'APRÈS la création du voyage
+             lui-même, dans createNewTripAdvanced(). -->
+        <div style="margin-bottom:20px;">
+            <span class="section-label" style="margin:0 0 8px 0;" data-i18n="tripInviteLabel">Invite people (optional)</span>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="create-trip-invite-input" data-i18n-placeholder="shareTripUsernamePlaceholder" placeholder="Their username" style="flex:1; padding:10px 14px; border-radius:100px; border:1.5px solid #cbd5e1; outline:none; font-family:'Poppins',sans-serif; font-size:12px;" onkeydown="if(event.key==='Enter'){event.preventDefault(); addCreateTripInvitee();}">
+                <button type="button" onclick="addCreateTripInvitee()" style="background:#faf9fc; border:1.5px solid #cbd5e1; border-radius:100px; padding:10px 16px; font-size:12px; font-weight:700; color:#64748b; cursor:pointer; font-family:'Poppins',sans-serif;" data-i18n="shareTripInvite">Invite</button>
+            </div>
+            <div id="create-trip-invitees" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
         </div>
 
         <div id="create-trip-error" class="hidden" style="background:#FFF1F3; border:1px solid #FBD5DC; color:#D42759; font-size:12px; font-weight:600; padding:10px 14px; border-radius:8px; margin-bottom:14px;"></div>
