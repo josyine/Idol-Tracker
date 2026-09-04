@@ -1023,6 +1023,16 @@
             window.setCommunityRatings(await window.loadAllLocationRatings());
         }
 
+        // Nouveaux lieux approuvés via la file de relecture (voir approveLocationSubmission()
+        // dans firebase-init.js) : fusionnés dans celebLocations AVANT le premier rendu, pour
+        // qu'un lieu approuvé apparaisse sur la carte sans jamais avoir besoin de modifier
+        // script.js. Lus une seule fois ici, comme les notes communautaires juste au-dessus.
+        if (typeof window.fetchNewLocations === 'function' && typeof celebLocations !== 'undefined') {
+            const newLocs = await window.fetchNewLocations();
+            const existingIds = new Set(celebLocations.map(l => l.id));
+            newLocs.forEach(l => { if (l && l.id && !existingIds.has(l.id)) celebLocations.push(l); });
+        }
+
         if (window.__demoMode) {
             // Mode démo : la carte reste débloquée quel que soit l'état de connexion réel
             // (voir getUnlockedGroups() dans script.js pour les données BTS de démo).

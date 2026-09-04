@@ -3716,50 +3716,13 @@ function highlightSelectedLocationMarker(loc) {
 }
 window.highlightSelectedLocationMarker = highlightSelectedLocationMarker;
 
-window.openDetailsPanel = function(id) {
-    const loc = celebLocations.find(l => l.id === id);
-    if(!loc) return;
-
-    // Mur de paiement : 3 fiches lieu différentes consultables gratuitement (comptées
-    // une seule fois par lieu, pas par clic — revoir un lieu déjà vu ne consomme rien),
-    // au-delà : paywall plutôt que la fiche. Voir hasGuidePass()/getViewedLocationIds()
-    // plus haut — jamais de blocage lié à un groupe/artiste précis.
-    if (!hasGuidePass()) {
-        const viewed = getViewedLocationIds();
-        if (!viewed.includes(id)) {
-            if (viewed.length >= FREE_LOCATION_VIEW_LIMIT) {
-                window.__pendingPaywallLocId = id;
-                window.openGuidePaywallModal();
-                updateFreeViewsCounter();
-                return;
-            }
-            viewed.push(id);
-            localStorage.setItem('viewedLocationIds', JSON.stringify(viewed));
-            if (typeof window.syncUserData === 'function') window.syncUserData({ viewedLocationIds: viewed });
-            updateFreeViewsCounter();
-        }
-    }
-
-    currentLocationIdForMemory = loc.id;
-    highlightSelectedLocationMarker(loc);
-
-    const heroBg = document.getElementById('detail-hero-bg');
-    if(heroBg) {
-        const bgImg = loc.ytId ? `https://img.youtube.com/vi/${loc.ytId}/maxresdefault.jpg` : loc.img;
-        heroBg.style.backgroundImage = `linear-gradient(180deg, rgba(20,16,30,.15) 0%, rgba(20,16,30,.75) 100%), url('${bgImg}')`;
-    }
-    
-    const badge = document.getElementById('detail-badge');
-    if(badge) badge.textContent = `${loc.group} · ${getCatName(loc.category)}`;
-
-    const dTitle = document.getElementById('details-title');
-    if(dTitle) dTitle.textContent = loc.name;
-
-    const dSub = document.getElementById('details-location-sub');
-    if(dSub) dSub.textContent = `${loc.city}, ${loc.country}`;
-    
+// Story, infos pratiques, vidéo et conseils d'un lieu — regroupés ici pour pouvoir être
+// rendus une première fois avec les données locales de script.js (immédiat, jamais de
+// délai), PUIS une seconde fois si une lecture Firestore répond avec une version plus à
+// jour (voir l'appel à window.fetchLocationContent() dans openDetailsPanel ci-dessous).
+function renderLocationRichContent(loc) {
     // Story tab : le fullDescription (1er paragraphe = le lieu, paragraphes suivants = le lien avec BTS)
-    // est découpé automatiquement par balises <p>, sans toucher aux données des 57 lieux.
+    // est découpé automatiquement par balises <p>, sans toucher aux données des lieux.
     const descPlaceEl = document.getElementById('details-desc-place');
     const descBtsSection = document.getElementById('story-section-bts');
     const descBtsEl = document.getElementById('details-desc-bts');
@@ -3803,6 +3766,111 @@ window.openDetailsPanel = function(id) {
         }
     }
 
+    const videoContainer = document.getElementById('details-video-container');
+    const videoSection = document.getElementById('details-video-section');
+    if (videoContainer && videoSection) {
+        videoContainer.innerHTML = "";
+        if (loc.videoEmbeds && loc.videoEmbeds.length > 0) {
+            loc.videoEmbeds.forEach(vidSrc => { videoContainer.innerHTML += `<div class="video-wrapper"><iframe src="${vidSrc}" frameborder="0" allowfullscreen></iframe></div>`; });
+            videoSection.classList.remove('hidden');
+        } else if (loc.ytId) {
+            videoContainer.innerHTML = `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${loc.ytId}" frameborder="0" allowfullscreen></iframe></div>`;
+            videoSection.classList.remove('hidden');
+        } else { videoSection.classList.add('hidden'); }
+    }
+
+    // Tips box : un lieu peut fournir plusieurs conseils TITRÉS (loc.tipsList — titre en
+    // gras + texte, un rond numéroté rose par conseil via .tip-line/.num déjà existants).
+    // Sans ce champ, on retombe sur l'ancien conseil unique (loc.tip, sans titre), pour
+    // ne pas casser les lieux qui n'ont que ça.
+    const tipSection = document.getElementById('details-tip-section');
+    const tipsListEl = document.getElementById('details-tips-list');
+    if(tipSection && tipsListEl) {
+        let tips = [];
+        if (Array.isArray(loc.tipsList) && loc.tipsList.length > 0) {
+            tips = loc.tipsList.map(item => {
+                const title = getLocText(item.title);
+                const text = getLocText(item.text);
+                return title ? `<b>${title}</b> ${text}` : text;
+            }).filter(Boolean);
+        } else {
+            const tipText = getLocText(loc.tip);
+            if (tipText) tips = [tipText];
+        }
+        if(tips.length > 0) {
+            tipsListEl.innerHTML = tips.map((tip, i) => `<div class="tip-line"><div class="num">${i + 1}</div><div>${tip}</div></div>`).join('');
+            tipSection.classList.remove('hidden');
+        } else {
+            tipsListEl.innerHTML = '';
+            tipSection.classList.add('hidden');
+        }
+    }
+
+    const dLink = document.getElementById('details-episode-link');
+    const dLinkCont = document.getElementById('details-link-container');
+    if (dLink && dLinkCont) { if(loc.episodeLink) { dLink.href = loc.episodeLink; dLinkCont.style.display = 'inline'; } else { dLinkCont.style.display = 'none'; } }
+}
+
+window.openDetailsPanel = function(id) {
+    const loc = celebLocations.find(l => l.id === id);
+    if(!loc) return;
+
+    // Mur de paiement : 3 fiches lieu différentes consultables gratuitement (comptées
+    // une seule fois par lieu, pas par clic — revoir un lieu déjà vu ne consomme rien),
+    // au-delà : paywall plutôt que la fiche. Voir hasGuidePass()/getViewedLocationIds()
+    // plus haut — jamais de blocage lié à un groupe/artiste précis.
+    if (!hasGuidePass()) {
+        const viewed = getViewedLocationIds();
+        if (!viewed.includes(id)) {
+            if (viewed.length >= FREE_LOCATION_VIEW_LIMIT) {
+                window.__pendingPaywallLocId = id;
+                window.openGuidePaywallModal();
+                updateFreeViewsCounter();
+                return;
+            }
+            viewed.push(id);
+            localStorage.setItem('viewedLocationIds', JSON.stringify(viewed));
+            if (typeof window.syncUserData === 'function') window.syncUserData({ viewedLocationIds: viewed });
+            updateFreeViewsCounter();
+        }
+    }
+
+    currentLocationIdForMemory = loc.id;
+    highlightSelectedLocationMarker(loc);
+
+    const heroBg = document.getElementById('detail-hero-bg');
+    if(heroBg) {
+        const bgImg = loc.ytId ? `https://img.youtube.com/vi/${loc.ytId}/maxresdefault.jpg` : loc.img;
+        heroBg.style.backgroundImage = `linear-gradient(180deg, rgba(20,16,30,.15) 0%, rgba(20,16,30,.75) 100%), url('${bgImg}')`;
+    }
+    
+    const badge = document.getElementById('detail-badge');
+    if(badge) badge.textContent = `${loc.group} · ${getCatName(loc.category)}`;
+
+    const dTitle = document.getElementById('details-title');
+    if(dTitle) dTitle.textContent = loc.name;
+
+    const dSub = document.getElementById('details-location-sub');
+    if(dSub) dSub.textContent = `${loc.city}, ${loc.country}`;
+    
+    renderLocationRichContent(loc);
+
+    // Étape 1 de la migration vers Firestore (voir fetchLocationContent() dans
+    // firebase-init.js) : le rendu ci-dessus utilise déjà les données locales de
+    // script.js (aucun changement de comportement, aucun délai), puis on tente EN PLUS
+    // une lecture Firestore qui, si elle répond, complète/remplace ce rendu avec une
+    // version plus à jour — sans jamais bloquer ni faire clignoter la fiche pour les
+    // lieux qui n'ont pas encore de document Firestore. Le garde-fou sur
+    // currentLocationIdForMemory évite d'écraser la fiche par une réponse tardive si la
+    // personne a entre-temps cliqué sur un AUTRE lieu.
+    if (typeof window.fetchLocationContent === 'function') {
+        window.fetchLocationContent(id).then(remote => {
+            if (remote && currentLocationIdForMemory === id) {
+                renderLocationRichContent(Object.assign({}, loc, remote));
+            }
+        });
+    }
+
     const dGroup = document.getElementById('details-group');
     if(dGroup) dGroup.textContent = loc.group;
     
@@ -3824,54 +3892,10 @@ window.openDetailsPanel = function(id) {
     const dEpi = document.getElementById('details-episode');
     const dEpiCont = document.getElementById('details-episode-container');
     if (dEpi && dEpiCont) { if(loc.episode) { dEpi.textContent = loc.episode; dEpiCont.style.display = 'inline'; } else { dEpiCont.style.display = 'none'; } }
-    
-    const dLink = document.getElementById('details-episode-link');
-    const dLinkCont = document.getElementById('details-link-container');
-    if (dLink && dLinkCont) { if(loc.episodeLink) { dLink.href = loc.episodeLink; dLinkCont.style.display = 'inline'; } else { dLinkCont.style.display = 'none'; } }
-    
+
     const mapLink = document.getElementById('details-map-link');
     if(mapLink) mapLink.href = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`;
 
-    const videoContainer = document.getElementById('details-video-container');
-    const videoSection = document.getElementById('details-video-section');
-    if (videoContainer && videoSection) {
-        videoContainer.innerHTML = ""; 
-        if (loc.videoEmbeds && loc.videoEmbeds.length > 0) {
-            loc.videoEmbeds.forEach(vidSrc => { videoContainer.innerHTML += `<div class="video-wrapper"><iframe src="${vidSrc}" frameborder="0" allowfullscreen></iframe></div>`; });
-            videoSection.classList.remove('hidden');
-        } else if (loc.ytId) {
-            videoContainer.innerHTML = `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${loc.ytId}" frameborder="0" allowfullscreen></iframe></div>`;
-            videoSection.classList.remove('hidden');
-        } else { videoSection.classList.add('hidden'); }
-    }
-
-    // Tips box : un lieu peut fournir plusieurs conseils TITRÉS (loc.tipsList — titre en
-    // gras + texte, un rond numéroté rose par conseil via .tip-line/.num déjà existants).
-    // Sans ce champ, on retombe sur l'ancien conseil unique (loc.tip, sans titre), pour
-    // ne pas casser les lieux qui n'ont que ça.
-    const tipSection = document.getElementById('details-tip-section');
-    const tipsList = document.getElementById('details-tips-list');
-    if(tipSection && tipsList) {
-        let tips = [];
-        if (Array.isArray(loc.tipsList) && loc.tipsList.length > 0) {
-            tips = loc.tipsList.map(item => {
-                const title = getLocText(item.title);
-                const text = getLocText(item.text);
-                return title ? `<b>${title}</b> ${text}` : text;
-            }).filter(Boolean);
-        } else {
-            const tipText = getLocText(loc.tip);
-            if (tipText) tips = [tipText];
-        }
-        if(tips.length > 0) {
-            tipsList.innerHTML = tips.map((tip, i) => `<div class="tip-line"><div class="num">${i + 1}</div><div>${tip}</div></div>`).join('');
-            tipSection.classList.remove('hidden');
-        } else {
-            tipsList.innerHTML = '';
-            tipSection.classList.add('hidden');
-        }
-    }
-    
     const vCheck = document.getElementById('details-visited');
     const memoryDropdown = document.getElementById('memory-dropdown');
     const tabBtnVisit = document.getElementById('tab-btn-visit');

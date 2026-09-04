@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen To Street — Location submissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20260904">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+a{text-decoration:none;}
+body{background:#E7E9EC;padding:0;min-height:100vh;}
+.hidden{display:none !important;}
+
+.top-bar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.brand{font-size:16px;font-weight:700;color:#2E3644;}
+.brand span{color:#D42759;}
+.back-link{color:#D42759;font-weight:700;font-size:13px;}
+.back-link:hover{text-decoration:underline;}
+
+.page{max-width:820px;margin:0 auto;padding:32px 20px 80px;}
+h1{font-size:22px;color:#212832;margin-bottom:6px;}
+.sub{font-size:13px;color:#64748b;margin-bottom:28px;}
+
+.state-box{background:#fff;border:1px solid #ECE7F3;border-radius:16px;padding:40px;text-align:center;color:#64748b;font-size:14px;}
+.state-box.denied{border-color:#FBD5DC;background:#FFF7F8;color:#D42759;font-weight:600;}
+
+.submission-card{background:#fff;border:1px solid #ECE7F3;border-radius:16px;padding:22px 24px;margin-bottom:18px;}
+.sub-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.sub-name{font-size:16.5px;font-weight:700;color:#212832;}
+.sub-badge{display:inline-block;margin-top:4px;background:#FCE7F0;color:#D42759;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;}
+.sub-edit-tag{background:#EFF6FF;color:#2563eb;}
+.sub-meta{font-size:12px;color:#64748b;margin-bottom:12px;}
+.sub-story{font-size:13px;color:#334155;line-height:1.6;background:#faf9fc;border-radius:10px;padding:12px 14px;margin-bottom:12px;}
+.sub-story p{margin-bottom:8px;}
+.sub-story p:last-child{margin-bottom:0;}
+.sub-fields{font-size:11.5px;color:#94a3b8;margin-bottom:14px;display:flex;gap:14px;flex-wrap:wrap;}
+.sub-source{font-size:12px;margin-bottom:16px;}
+.sub-source a{color:#D42759;font-weight:600;word-break:break-all;}
+.sub-actions{display:flex;gap:10px;}
+.btn-approve{flex:1;background:#10b981;color:#fff;border:none;border-radius:100px;padding:11px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;}
+.btn-approve:hover{filter:brightness(0.95);}
+.btn-reject{flex:1;background:#fff;color:#ef4444;border:1.5px solid #FBD5DC;border-radius:100px;padding:11px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;}
+.btn-reject:hover{background:#fef2f2;}
+.btn-approve:disabled, .btn-reject:disabled{opacity:0.5;cursor:not-allowed;}
+.sub-result{font-size:12px;font-weight:600;margin-top:8px;}
+.sub-result.ok{color:#10b981;}
+.sub-result.err{color:#ef4444;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="brand">Screen To Street <span>· Admin</span></div>
+    <a href="map.html" class="back-link">← Back to Map</a>
+</div>
+
+<div class="page">
+    <h1>Location submissions</h1>
+    <p class="sub">New locations and corrections proposed for review — nothing here is visible on the site until approved.</p>
+
+    <div id="loading-state" class="state-box">Checking access…</div>
+    <div id="denied-state" class="state-box denied hidden">You don't have admin access to this page.</div>
+    <div id="empty-state" class="state-box hidden">No pending submissions right now.</div>
+    <div id="submissions-list"></div>
+</div>
+
+<script type="module" src="firebase-init.js?v=20260904"></script>
+<script src="countries.js?v=20260904"></script>
+<script src="script.js?v=20260904"></script>
+<script>
+    function escapeHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s == null ? '' : String(s);
+        return d.innerHTML;
+    }
+
+    function storyHtml(sub) {
+        const en = sub.fullDescription && sub.fullDescription.en;
+        return en || '<em>No story text provided.</em>';
+    }
+
+    function renderCard(sub) {
+        const isEdit = !!sub.matchedLocId;
+        const practicalCount = Array.isArray(sub.practicalInfo) ? sub.practicalInfo.length : 0;
+        const tipsCount = Array.isArray(sub.tipsList) ? sub.tipsList.length : 0;
+        const submittedAt = sub.submittedAt && sub.submittedAt.toDate ? sub.submittedAt.toDate().toLocaleString() : '';
+
+        const card = document.createElement('div');
+        card.className = 'submission-card';
+        card.innerHTML = `
+            <div class="sub-header">
+                <div>
+                    <div class="sub-name">${escapeHtml(sub.name || '(no name)')}</div>
+                    <span class="sub-badge ${isEdit ? 'sub-edit-tag' : ''}">${isEdit ? 'Correction to existing location #' + escapeHtml(sub.matchedLocId) : 'New location'}</span>
+                </div>
+            </div>
+            <div class="sub-meta">${escapeHtml(sub.group || '')} · ${escapeHtml(sub.member || '')} &middot; ${escapeHtml(sub.city || '')}, ${escapeHtml(sub.country || '')} &middot; ${escapeHtml(sub.category || '')} &middot; ${escapeHtml(sub.year || '')}</div>
+            <div class="sub-story">${storyHtml(sub)}</div>
+            <div class="sub-fields">
+                <span>${practicalCount} practical info item${practicalCount === 1 ? '' : 's'}</span>
+                <span>${tipsCount} tip${tipsCount === 1 ? '' : 's'}</span>
+                <span>${sub.ytId ? 'YouTube video: ' + escapeHtml(sub.ytId) : 'No YouTube video'}</span>
+                <span>lat/lng: ${sub.lat != null ? sub.lat : '—'}, ${sub.lng != null ? sub.lng : '—'}</span>
+            </div>
+            <div class="sub-source">
+                <b>Source:</b> ${sub.episodeLink ? `<a href="${escapeHtml(sub.episodeLink)}" target="_blank" rel="noopener">${escapeHtml(sub.episodeLink)}</a>` : '<em>none provided</em>'}
+                ${sub.sourceNote ? `<br><span style="color:#64748b;">${escapeHtml(sub.sourceNote)}</span>` : ''}
+                <br><span style="color:#94a3b8;">Submitted by ${escapeHtml(sub.submittedBy || 'unknown')}${submittedAt ? ' — ' + submittedAt : ''}</span>
+            </div>
+            <div class="sub-actions">
+                <button class="btn-approve">✓ Approve &amp; publish</button>
+                <button class="btn-reject">✕ Reject</button>
+            </div>
+            <div class="sub-result hidden"></div>
+        `;
+
+        const resultEl = card.querySelector('.sub-result');
+        const approveBtn = card.querySelector('.btn-approve');
+        const rejectBtn = card.querySelector('.btn-reject');
+
+        approveBtn.onclick = async () => {
+            approveBtn.disabled = true; rejectBtn.disabled = true;
+            const res = await window.approveLocationSubmission(sub);
+            resultEl.classList.remove('hidden');
+            if (res.success) {
+                resultEl.textContent = '✓ Published as ' + res.publishedId + '. It will appear on the map for visitors from their next page load.';
+                resultEl.className = 'sub-result ok';
+                setTimeout(() => card.remove(), 2500);
+            } else {
+                resultEl.textContent = 'Failed: ' + res.code;
+                resultEl.className = 'sub-result err';
+                approveBtn.disabled = false; rejectBtn.disabled = false;
+            }
+        };
+
+        rejectBtn.onclick = async () => {
+            const note = prompt('Optional note (why is this rejected?)') || '';
+            approveBtn.disabled = true; rejectBtn.disabled = true;
+            const res = await window.rejectLocationSubmission(sub.id, note);
+            resultEl.classList.remove('hidden');
+            if (res.success) {
+                resultEl.textContent = 'Rejected.';
+                resultEl.className = 'sub-result ok';
+                setTimeout(() => card.remove(), 1500);
+            } else {
+                resultEl.textContent = 'Failed: ' + res.code;
+                resultEl.className = 'sub-result err';
+                approveBtn.disabled = false; rejectBtn.disabled = false;
+            }
+        };
+
+        return card;
+    }
+
+    async function loadSubmissions() {
+        const listEl = document.getElementById('submissions-list');
+        const submissions = await window.listPendingSubmissions();
+        listEl.innerHTML = '';
+        document.getElementById('empty-state').classList.toggle('hidden', submissions.length > 0);
+        submissions.forEach(sub => listEl.appendChild(renderCard(sub)));
+    }
+
+    window.addEventListener('firebase-ready', async (e) => {
+        const user = e.detail && e.detail.user;
+        const loadingEl = document.getElementById('loading-state');
+        const deniedEl = document.getElementById('denied-state');
+        if (!user) {
+            loadingEl.classList.add('hidden');
+            deniedEl.classList.remove('hidden');
+            return;
+        }
+        const isAdmin = typeof window.isCurrentUserAdmin === 'function' && await window.isCurrentUserAdmin();
+        loadingEl.classList.add('hidden');
+        if (!isAdmin) {
+            deniedEl.classList.remove('hidden');
+            return;
+        }
+        await loadSubmissions();
+    });
+</script>
+</body>
+</html>
