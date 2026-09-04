@@ -339,7 +339,67 @@ const BTS_MEMBERS = [
 ];
 let liveTimelineSelectedMember = 'all';
 
+// ==========================================
+// SÉLECTEUR "SWITCH ARTIST" (Mode Tournée + panneau Live)
+// ==========================================
+// Seul BTS a de vraies données de tournée/live pour l'instant (ALL_TOURS, BTS_MEMBERS,
+// MEMBER_EVENTS_DATA) — politique du site : ne jamais inventer de dates pour un autre
+// groupe. Choisir un autre groupe affiche donc un état honnête "pas encore de données"
+// au lieu de tournées fictives, plutôt que de toucher aux fonctions de rendu existantes.
+window.selectedTourLiveGroup = window.selectedTourLiveGroup || 'BTS';
+
+function renderGroupSwitcherMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    // Lu au moment de l'appel (pas au chargement du script) car groupColors est déclaré
+    // plus bas dans ce fichier — y accéder ici évite toute dépendance à l'ordre des const.
+    const groups = Object.keys(groupColors);
+    menu.innerHTML = groups.map(g =>
+        `<div class="group-switcher-option${g === window.selectedTourLiveGroup ? ' active' : ''}" onclick="window.changeTourLiveGroup('${g}')">${g}</div>`
+    ).join('');
+}
+
+window.toggleGroupSwitcher = function(menuId, event) {
+    if (event) event.stopPropagation();
+    ['group-switcher-menu-tour', 'group-switcher-menu-live'].forEach(id => {
+        const m = document.getElementById(id);
+        if (!m) return;
+        if (id === menuId) { renderGroupSwitcherMenu(id); m.classList.toggle('hidden'); }
+        else m.classList.add('hidden');
+    });
+};
+
+document.addEventListener('click', () => {
+    ['group-switcher-menu-tour', 'group-switcher-menu-live'].forEach(id => {
+        const m = document.getElementById(id);
+        if (m) m.classList.add('hidden');
+    });
+});
+
+window.changeTourLiveGroup = function(group) {
+    window.selectedTourLiveGroup = group;
+    document.querySelectorAll('.group-switcher-current').forEach(el => { el.textContent = group; });
+    ['group-switcher-menu-tour', 'group-switcher-menu-live'].forEach(id => {
+        const m = document.getElementById(id);
+        if (m) m.classList.add('hidden');
+    });
+
+    const livePanel = document.getElementById('live-panel');
+    if (livePanel && !livePanel.classList.contains('hidden')) {
+        renderLiveAvatars();
+        renderLiveTimeline();
+    }
+
+    const tourOverlay = document.getElementById('tour-mode-empty-overlay');
+    if (tourOverlay) {
+        const isBTS = group === 'BTS';
+        if (!isBTS) tourOverlay.textContent = t('groupNoDataYet').replace('{group}', group);
+        tourOverlay.classList.toggle('hidden', isBTS);
+    }
+};
+
 function getLiveTimelineEntries() {
+    if (window.selectedTourLiveGroup && window.selectedTourLiveGroup !== 'BTS') return [];
     const now = getTourNow();
     const groupEntries = getLiveTour().stops.map(s => ({
         kind: 'group', member: null, id: s.id,
@@ -373,6 +433,7 @@ function renderLiveAvatars() {
     const wrap = document.getElementById('live-panel-avatars');
     if (!wrap) return;
     wrap.innerHTML = '';
+    if (window.selectedTourLiveGroup && window.selectedTourLiveGroup !== 'BTS') return;
     const allBtn = document.createElement('div');
     allBtn.className = 'live-avatar live-avatar-all' + (liveTimelineSelectedMember === 'all' ? ' active' : '');
     allBtn.textContent = t('liveFilterAll');
@@ -401,7 +462,12 @@ function renderLiveTimeline() {
     if (entries.length === 0) {
         wrapEl.innerHTML = '';
         wrapEl.classList.add('hidden');
-        if (emptyEl) emptyEl.classList.remove('hidden');
+        if (emptyEl) {
+            emptyEl.textContent = (window.selectedTourLiveGroup && window.selectedTourLiveGroup !== 'BTS')
+                ? t('groupNoDataYet').replace('{group}', window.selectedTourLiveGroup)
+                : t('liveTimelineEmpty');
+            emptyEl.classList.remove('hidden');
+        }
         return;
     }
     wrapEl.classList.remove('hidden');
@@ -424,6 +490,7 @@ window.openLivePanel = function() {
     const panel = document.getElementById('live-panel');
     if (!panel) return;
     liveTimelineSelectedMember = 'all';
+    document.querySelectorAll('.group-switcher-current').forEach(el => { el.textContent = window.selectedTourLiveGroup; });
     renderLiveAvatars();
     renderLiveTimeline();
     panel.classList.remove('hidden');
@@ -635,6 +702,10 @@ let tripMainLayerGroup = null;
 let dayMiniMaps = []; // instances Leaflet des mini-cartes par jour (une par .day-card), à détruire avant chaque re-render puisque box.innerHTML='' supprime leur conteneur DOM sans les libérer
 let itiSelectedCategories = []; // catégories cochées dans le multi-select de l'Auto-Itinerary Generator ; tableau vide = toutes les catégories
 let createTripSelectedCategories = []; // même principe pour la modale "Create New Trip" (My Trips)
+// Pseudos en attente d'invitation, saisis DANS la modale "Create New Trip" elle-même
+// (voir la demande du 04/09/2026) — le voyage partagé n'est créé et les invitations
+// envoyées qu'APRÈS la création réelle du voyage, dans createNewTripAdvanced().
+let createTripPendingInvitees = [];
 
 // ==========================================
 // 0bis. SYNCHRONISATION CLOUD DE LA WISHLIST (Firestore)
@@ -2133,10 +2204,10 @@ const translations = {
         gateResetSent: "Password reset email sent — check your inbox.", gateEnterEmailFirst: "Please enter your email address first.",
         tourModeLiveIn: "Live now — BTS is live in {city}", tourModeSchedule: "Tour Schedule", tourModeLive: "Live", tourModeDone: "Done", tourModeUpcoming: "Upcoming", tourModePrev: "Previous", tourModeNext: "Next",
         tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel.",
-        liveBadgeLabel: "Live", liveTimelineTitle: " & upcoming", liveTimelineEmpty: "Nothing scheduled right now — check back soon.", liveTimelineFooterNote: "Only official, publicly announced activities — dates as announced, always double-check official sources before booking travel.", liveFilterAll: "All", liveTodayLive: "Today · Live", liveKindGroup: "Group", liveKindSolo: "Solo", newBadgeLabel: "New", usernameCooldownNote: "You can only change this once every 7 days.", usernameConfirmTitle: "Change your username?", usernameConfirmCancel: "Cancel", usernameConfirmOk: "Yes, change it", subtitle: "Following the footsteps of your favorite artists", backToList: "← Back to list", chooserTourOption: "Tour route", chooserLiveOption: "All live activity",
+        liveBadgeLabel: "Live", liveTimelineTitle: " & upcoming", liveTimelineEmpty: "Nothing scheduled right now — check back soon.", liveTimelineFooterNote: "Only official, publicly announced activities — dates as announced, always double-check official sources before booking travel.", liveFilterAll: "All", liveTodayLive: "Today · Live", liveKindGroup: "Group", liveKindSolo: "Solo", newBadgeLabel: "New", usernameCooldownNote: "You can only change this once every 7 days.", usernameConfirmTitle: "Change your username?", usernameConfirmCancel: "Cancel", usernameConfirmOk: "Yes, change it", subtitle: "Following the footsteps of your favorite artists", backToList: "← Back to list", chooserTourOption: "Tour route", chooserLiveOption: "All live activity", tripShareThis: "+ Share this trip", switchArtistLabel: "Switch artist", groupNoDataYet: "No tour or live data available yet for {group} — check back soon.", tripInviteLabel: "Invite people (optional)", shareTripUsernamePlaceholder: "Their username",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} is live now — {event} in {city}",
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
-        tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
+        tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song:", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
         mapLoading: "Loading map…",
         demoTourBtn: "Tour",
         newLocationToastLabel: "New location added",
@@ -2196,10 +2267,10 @@ const translations = {
         gateResetSent: "E-mail de réinitialisation envoyé — vérifiez votre boîte de réception.", gateEnterEmailFirst: "Merci d'indiquer d'abord votre adresse e-mail.",
         tourModeLiveIn: "En direct — BTS est en concert à {city}", tourModeSchedule: "Calendrier de la tournée", tourModeLive: "En direct", tourModeDone: "Terminé", tourModeUpcoming: "À venir", tourModePrev: "Précédent", tourModeNext: "Suivant",
         tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage.",
-        liveBadgeLabel: "Live", liveTimelineTitle: " et à venir", liveTimelineEmpty: "Rien de prévu pour le moment — revenez bientôt.", liveTimelineFooterNote: "Uniquement des activités officielles et rendues publiques — dates annoncées, vérifiez toujours les sources officielles avant de réserver un voyage.", liveFilterAll: "Tous", liveTodayLive: "Aujourd'hui · En direct", liveKindGroup: "Groupe", liveKindSolo: "Solo", newBadgeLabel: "Nouveau", usernameCooldownNote: "Vous ne pouvez changer ceci qu'une fois tous les 7 jours.", usernameConfirmTitle: "Changer votre identifiant ?", usernameConfirmCancel: "Annuler", usernameConfirmOk: "Oui, changer", subtitle: "Sur les traces de vos artistes préférés", backToList: "← Retour à la liste", chooserTourOption: "Itinéraire de tournée", chooserLiveOption: "Toute l'activité en direct",
+        liveBadgeLabel: "Live", liveTimelineTitle: " et à venir", liveTimelineEmpty: "Rien de prévu pour le moment — revenez bientôt.", liveTimelineFooterNote: "Uniquement des activités officielles et rendues publiques — dates annoncées, vérifiez toujours les sources officielles avant de réserver un voyage.", liveFilterAll: "Tous", liveTodayLive: "Aujourd'hui · En direct", liveKindGroup: "Groupe", liveKindSolo: "Solo", newBadgeLabel: "Nouveau", usernameCooldownNote: "Vous ne pouvez changer ceci qu'une fois tous les 7 jours.", usernameConfirmTitle: "Changer votre identifiant ?", usernameConfirmCancel: "Annuler", usernameConfirmOk: "Oui, changer", subtitle: "Sur les traces de vos artistes préférés", backToList: "← Retour à la liste", chooserTourOption: "Itinéraire de tournée", chooserLiveOption: "Toute l'activité en direct", tripShareThis: "+ Partager ce voyage", switchArtistLabel: "Changer d'artiste", groupNoDataYet: "Aucune donnée de tournée ou de live disponible pour {group} pour le moment — revenez bientôt.", tripInviteLabel: "Inviter des personnes (facultatif)", shareTripUsernamePlaceholder: "Leur pseudo",
         tourModeGenericLabel: "Tournée", tourModeMemberLiveIn: "{member} est en direct — {event} à {city}",
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
-        tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
+        tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Chanson surprise :", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
         mapLoading: "Chargement de la carte…",
         demoTourBtn: "Visite",
         newLocationToastLabel: "Nouveau lieu ajouté",
@@ -2259,10 +2330,10 @@ const translations = {
         gateResetSent: "Correo de restablecimiento enviado — revisa tu bandeja de entrada.", gateEnterEmailFirst: "Indica primero tu correo electrónico.",
         tourModeLiveIn: "En directo — BTS está actuando en {city}", tourModeSchedule: "Calendario de la gira", tourModeLive: "En directo", tourModeDone: "Finalizado", tourModeUpcoming: "Próximamente", tourModePrev: "Anterior", tourModeNext: "Siguiente",
         tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje.",
-        liveBadgeLabel: "En vivo", liveTimelineTitle: " y próximos", liveTimelineEmpty: "Nada programado por ahora — vuelve pronto.", liveTimelineFooterNote: "Solo actividades oficiales y anunciadas públicamente — fechas según lo anunciado, comprueba siempre las fuentes oficiales antes de reservar un viaje.", liveFilterAll: "Todos", liveTodayLive: "Hoy · En vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Nuevo", usernameCooldownNote: "Solo puedes cambiar esto una vez cada 7 días.", usernameConfirmTitle: "¿Cambiar tu nombre de usuario?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sí, cambiarlo", subtitle: "Siguiendo los pasos de tus artistas favoritos", backToList: "← Volver a la lista", chooserTourOption: "Ruta de la gira", chooserLiveOption: "Toda la actividad en directo",
+        liveBadgeLabel: "En vivo", liveTimelineTitle: " y próximos", liveTimelineEmpty: "Nada programado por ahora — vuelve pronto.", liveTimelineFooterNote: "Solo actividades oficiales y anunciadas públicamente — fechas según lo anunciado, comprueba siempre las fuentes oficiales antes de reservar un viaje.", liveFilterAll: "Todos", liveTodayLive: "Hoy · En vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Nuevo", usernameCooldownNote: "Solo puedes cambiar esto una vez cada 7 días.", usernameConfirmTitle: "¿Cambiar tu nombre de usuario?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sí, cambiarlo", subtitle: "Siguiendo los pasos de tus artistas favoritos", backToList: "← Volver a la lista", chooserTourOption: "Ruta de la gira", chooserLiveOption: "Toda la actividad en directo", tripShareThis: "+ Compartir este viaje", switchArtistLabel: "Cambiar de artista", groupNoDataYet: "Aún no hay datos de gira ni de directo para {group} — vuelve pronto.", tripInviteLabel: "Invitar personas (opcional)", shareTripUsernamePlaceholder: "Su nombre de usuario",
         tourModeGenericLabel: "Gira", tourModeMemberLiveIn: "{member} está en directo — {event} en {city}",
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
-        tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa 🎤", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
+        tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa:", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
         mapLoading: "Cargando el mapa…",
         demoTourBtn: "Recorrido",
         newLocationToastLabel: "Nuevo lugar añadido",
@@ -2321,10 +2392,10 @@ const translations = {
         gateResetSent: "Email di reimpostazione inviata — controlla la posta in arrivo.", gateEnterEmailFirst: "Inserisci prima il tuo indirizzo email.",
         tourModeLiveIn: "In diretta — I BTS si esibiscono a {city}", tourModeSchedule: "Calendario del tour", tourModeLive: "In diretta", tourModeDone: "Concluso", tourModeUpcoming: "In arrivo", tourModePrev: "Precedente", tourModeNext: "Successivo",
         tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio.",
-        liveBadgeLabel: "Live", liveTimelineTitle: " e prossimi", liveTimelineEmpty: "Nulla in programma al momento — torna a trovarci presto.", liveTimelineFooterNote: "Solo attività ufficiali e annunciate pubblicamente — date come annunciate, verifica sempre le fonti ufficiali prima di prenotare un viaggio.", liveFilterAll: "Tutti", liveTodayLive: "Oggi · Live", liveKindGroup: "Gruppo", liveKindSolo: "Solo", newBadgeLabel: "Nuovo", usernameCooldownNote: "Puoi modificarlo solo una volta ogni 7 giorni.", usernameConfirmTitle: "Vuoi cambiare il tuo nome utente?", usernameConfirmCancel: "Annulla", usernameConfirmOk: "Sì, cambialo", subtitle: "Sulle orme dei tuoi artisti preferiti", backToList: "← Torna alla lista", chooserTourOption: "Percorso del tour", chooserLiveOption: "Tutta l'attività dal vivo",
+        liveBadgeLabel: "Live", liveTimelineTitle: " e prossimi", liveTimelineEmpty: "Nulla in programma al momento — torna a trovarci presto.", liveTimelineFooterNote: "Solo attività ufficiali e annunciate pubblicamente — date come annunciate, verifica sempre le fonti ufficiali prima di prenotare un viaggio.", liveFilterAll: "Tutti", liveTodayLive: "Oggi · Live", liveKindGroup: "Gruppo", liveKindSolo: "Solo", newBadgeLabel: "Nuovo", usernameCooldownNote: "Puoi modificarlo solo una volta ogni 7 giorni.", usernameConfirmTitle: "Vuoi cambiare il tuo nome utente?", usernameConfirmCancel: "Annulla", usernameConfirmOk: "Sì, cambialo", subtitle: "Sulle orme dei tuoi artisti preferiti", backToList: "← Torna alla lista", chooserTourOption: "Percorso del tour", chooserLiveOption: "Tutta l'attività dal vivo", tripShareThis: "+ Condividi questo viaggio", switchArtistLabel: "Cambia artista", groupNoDataYet: "Nessun dato di tour o live disponibile ancora per {group} — torna a trovarci presto.", tripInviteLabel: "Invita persone (facoltativo)", shareTripUsernamePlaceholder: "Il loro nome utente",
         tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} è in diretta — {event} a {city}",
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
-        tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Surprise song 🎤", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
+        tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Canzone a sorpresa:", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
         mapLoading: "Caricamento della mappa…",
         demoTourBtn: "Tour",
         newLocationToastLabel: "Nuovo luogo aggiunto",
@@ -2383,10 +2454,10 @@ const translations = {
         gateResetSent: "E-mail de redefinição enviado — verifique sua caixa de entrada.", gateEnterEmailFirst: "Informe primeiro seu endereço de e-mail.",
         tourModeLiveIn: "Ao vivo — BTS está se apresentando em {city}", tourModeSchedule: "Calendário da turnê", tourModeLive: "Ao vivo", tourModeDone: "Concluído", tourModeUpcoming: "Em breve", tourModePrev: "Anterior", tourModeNext: "Próximo",
         tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem.",
-        liveBadgeLabel: "Ao vivo", liveTimelineTitle: " e próximos", liveTimelineEmpty: "Nada programado no momento — volte em breve.", liveTimelineFooterNote: "Apenas atividades oficiais e anunciadas publicamente — datas conforme anunciadas, sempre confira as fontes oficiais antes de reservar uma viagem.", liveFilterAll: "Todos", liveTodayLive: "Hoje · Ao vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Novo", usernameCooldownNote: "Você só pode alterar isso uma vez a cada 7 dias.", usernameConfirmTitle: "Alterar seu nome de usuário?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sim, alterar", subtitle: "Nos passos dos seus artistas favoritos", backToList: "← Voltar à lista", chooserTourOption: "Rota da turnê", chooserLiveOption: "Toda a atividade ao vivo",
+        liveBadgeLabel: "Ao vivo", liveTimelineTitle: " e próximos", liveTimelineEmpty: "Nada programado no momento — volte em breve.", liveTimelineFooterNote: "Apenas atividades oficiais e anunciadas publicamente — datas conforme anunciadas, sempre confira as fontes oficiais antes de reservar uma viagem.", liveFilterAll: "Todos", liveTodayLive: "Hoje · Ao vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Novo", usernameCooldownNote: "Você só pode alterar isso uma vez a cada 7 dias.", usernameConfirmTitle: "Alterar seu nome de usuário?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sim, alterar", subtitle: "Nos passos dos seus artistas favoritos", backToList: "← Voltar à lista", chooserTourOption: "Rota da turnê", chooserLiveOption: "Toda a atividade ao vivo", tripShareThis: "+ Compartilhar esta viagem", switchArtistLabel: "Trocar de artista", groupNoDataYet: "Ainda não há dados de turnê ou ao vivo para {group} — volte em breve.", tripInviteLabel: "Convidar pessoas (opcional)", shareTripUsernamePlaceholder: "O nome de usuário deles",
         tourModeGenericLabel: "Turnê", tourModeMemberLiveIn: "{member} está ao vivo agora — {event} em {city}",
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
-        tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa 🎤", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
+        tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa:", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
         mapLoading: "Carregando o mapa…",
         demoTourBtn: "Tour guiado",
         newLocationToastLabel: "Novo local adicionado",
@@ -2445,10 +2516,10 @@ const translations = {
         gateResetSent: "비밀번호 재설정 이메일을 보냈습니다 — 받은편지함을 확인해주세요.", gateEnterEmailFirst: "먼저 이메일 주소를 입력해주세요.",
         tourModeLiveIn: "라이브 중 — BTS가 {city}에서 공연 중입니다", tourModeSchedule: "투어 일정", tourModeLive: "라이브", tourModeDone: "종료", tourModeUpcoming: "예정", tourModePrev: "이전", tourModeNext: "다음",
         tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요.",
-        liveBadgeLabel: "라이브", liveTimelineTitle: " 및 예정", liveTimelineEmpty: "지금은 예정된 일정이 없습니다 — 곧 다시 확인해주세요.", liveTimelineFooterNote: "공식적으로 공개된 활동만 표시됩니다 — 발표된 날짜 기준이며, 여행 예약 전 항상 공식 출처를 확인하세요.", liveFilterAll: "전체", liveTodayLive: "오늘 · 라이브", liveKindGroup: "그룹", liveKindSolo: "솔로", newBadgeLabel: "신규", usernameCooldownNote: "7일에 한 번만 변경할 수 있습니다.", usernameConfirmTitle: "아이디를 변경하시겠습니까?", usernameConfirmCancel: "취소", usernameConfirmOk: "네, 변경합니다", subtitle: "당신이 좋아하는 아티스트의 발자취를 따라", backToList: "← 목록으로 돌아가기", chooserTourOption: "투어 경로", chooserLiveOption: "모든 라이브 활동",
+        liveBadgeLabel: "라이브", liveTimelineTitle: " 및 예정", liveTimelineEmpty: "지금은 예정된 일정이 없습니다 — 곧 다시 확인해주세요.", liveTimelineFooterNote: "공식적으로 공개된 활동만 표시됩니다 — 발표된 날짜 기준이며, 여행 예약 전 항상 공식 출처를 확인하세요.", liveFilterAll: "전체", liveTodayLive: "오늘 · 라이브", liveKindGroup: "그룹", liveKindSolo: "솔로", newBadgeLabel: "신규", usernameCooldownNote: "7일에 한 번만 변경할 수 있습니다.", usernameConfirmTitle: "아이디를 변경하시겠습니까?", usernameConfirmCancel: "취소", usernameConfirmOk: "네, 변경합니다", subtitle: "당신이 좋아하는 아티스트의 발자취를 따라", backToList: "← 목록으로 돌아가기", chooserTourOption: "투어 경로", chooserLiveOption: "모든 라이브 활동", tripShareThis: "+ 이 여행 공유하기", switchArtistLabel: "아티스트 변경", groupNoDataYet: "{group}의 투어 또는 라이브 정보가 아직 없습니다 — 곧 다시 확인해주세요.", tripInviteLabel: "사람 초대하기 (선택 사항)", shareTripUsernamePlaceholder: "상대방 아이디",
         tourModeGenericLabel: "투어", tourModeMemberLiveIn: "{member} 라이브 중 — {city}에서 {event}",
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
-        tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡 🎤", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
+        tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡:", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
         mapLoading: "지도를 불러오는 중…",
         demoTourBtn: "투어",
         newLocationToastLabel: "새로운 장소 추가됨",
@@ -2507,10 +2578,10 @@ const translations = {
         gateResetSent: "パスワード再設定メールを送信しました — 受信トレイをご確認ください。", gateEnterEmailFirst: "先にメールアドレスを入力してください。",
         tourModeLiveIn: "ライブ配信中 — BTSは{city}で公演中です", tourModeSchedule: "ツアースケジュール", tourModeLive: "ライブ", tourModeDone: "終了", tourModeUpcoming: "開催予定", tourModePrev: "前へ", tourModeNext: "次へ",
         tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。",
-        liveBadgeLabel: "ライブ", liveTimelineTitle: "・今後の予定", liveTimelineEmpty: "現在予定はありません — また後でご確認ください。", liveTimelineFooterNote: "公式に発表された活動のみを表示しています — 発表された日程です。旅行の予約前に必ず公式情報をご確認ください。", liveFilterAll: "すべて", liveTodayLive: "本日・ライブ", liveKindGroup: "グループ", liveKindSolo: "ソロ", newBadgeLabel: "新着", usernameCooldownNote: "この変更は7日に1回だけ行えます。", usernameConfirmTitle: "ユーザー名を変更しますか？", usernameConfirmCancel: "キャンセル", usernameConfirmOk: "はい、変更します", subtitle: "お気に入りのアーティストの足跡をたどって", backToList: "← リストに戻る", chooserTourOption: "ツアールート", chooserLiveOption: "すべてのライブ活動",
+        liveBadgeLabel: "ライブ", liveTimelineTitle: "・今後の予定", liveTimelineEmpty: "現在予定はありません — また後でご確認ください。", liveTimelineFooterNote: "公式に発表された活動のみを表示しています — 発表された日程です。旅行の予約前に必ず公式情報をご確認ください。", liveFilterAll: "すべて", liveTodayLive: "本日・ライブ", liveKindGroup: "グループ", liveKindSolo: "ソロ", newBadgeLabel: "新着", usernameCooldownNote: "この変更は7日に1回だけ行えます。", usernameConfirmTitle: "ユーザー名を変更しますか？", usernameConfirmCancel: "キャンセル", usernameConfirmOk: "はい、変更します", subtitle: "お気に入りのアーティストの足跡をたどって", backToList: "← リストに戻る", chooserTourOption: "ツアールート", chooserLiveOption: "すべてのライブ活動", tripShareThis: "+ この旅行を共有", switchArtistLabel: "アーティストを変更", groupNoDataYet: "{group}のツアー・ライブ情報はまだありません — また後でご確認ください。", tripInviteLabel: "メンバーを招待（任意）", shareTripUsernamePlaceholder: "相手のユーザー名",
         tourModeGenericLabel: "ツアー", tourModeMemberLiveIn: "{member}がライブ配信中 — {city}で{event}",
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
-        tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング 🎤", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
+        tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング：", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
         mapLoading: "地図を読み込み中…",
         demoTourBtn: "ツアー",
         newLocationToastLabel: "新しい場所が追加されました",
@@ -2569,10 +2640,10 @@ const translations = {
         gateResetSent: "密码重置邮件已发送——请查收您的收件箱。", gateEnterEmailFirst: "请先输入您的电子邮箱。",
         tourModeLiveIn: "直播中 — BTS 正在{city}演出", tourModeSchedule: "巡演日程", tourModeLive: "直播中", tourModeDone: "已结束", tourModeUpcoming: "即将开始", tourModePrev: "上一个", tourModeNext: "下一个",
         tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。",
-        liveBadgeLabel: "直播", liveTimelineTitle: "与即将到来", liveTimelineEmpty: "目前暂无安排——请稍后再来查看。", liveTimelineFooterNote: "仅显示官方公开发布的活动——日期以官方公布为准，预订行程前请务必核实官方信息来源。", liveFilterAll: "全部", liveTodayLive: "今天 · 直播中", liveKindGroup: "团体", liveKindSolo: "单人", newBadgeLabel: "新增", usernameCooldownNote: "每7天只能更改一次。", usernameConfirmTitle: "要更改你的用户名吗？", usernameConfirmCancel: "取消", usernameConfirmOk: "是的，更改", subtitle: "追随你喜爱的艺人的足迹", backToList: "← 返回列表", chooserTourOption: "巡演路线", chooserLiveOption: "全部直播动态",
+        liveBadgeLabel: "直播", liveTimelineTitle: "与即将到来", liveTimelineEmpty: "目前暂无安排——请稍后再来查看。", liveTimelineFooterNote: "仅显示官方公开发布的活动——日期以官方公布为准，预订行程前请务必核实官方信息来源。", liveFilterAll: "全部", liveTodayLive: "今天 · 直播中", liveKindGroup: "团体", liveKindSolo: "单人", newBadgeLabel: "新增", usernameCooldownNote: "每7天只能更改一次。", usernameConfirmTitle: "要更改你的用户名吗？", usernameConfirmCancel: "取消", usernameConfirmOk: "是的，更改", subtitle: "追随你喜爱的艺人的足迹", backToList: "← 返回列表", chooserTourOption: "巡演路线", chooserLiveOption: "全部直播动态", tripShareThis: "+ 分享此行程", switchArtistLabel: "切换艺人", groupNoDataYet: "{group}暂无巡演或直播数据——请稍后再来查看。", tripInviteLabel: "邀请他人（可选）", shareTripUsernamePlaceholder: "对方的用户名",
         tourModeGenericLabel: "巡演", tourModeMemberLiveIn: "{member} 直播中 — 于{city}参加{event}",
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
-        tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目 🎤", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
+        tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目：", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
         mapLoading: "地图加载中…",
         demoTourBtn: "导览",
         newLocationToastLabel: "新增地点",
@@ -5520,9 +5591,12 @@ window.renderTripBuddiesAvatars = async function() {
 
     let ownerName, members = {}, memberNames = {};
     if (activeTripAccess.isOwner) {
-        if (!currentTrip.isShared) { container.classList.add('hidden'); container.innerHTML = ''; return; }
+        // Toujours affiché, même pour un voyage jamais partagé (au moins son propre
+        // avatar) : sans ça, rien n'indiquait où trouver le partage depuis la fiche du
+        // voyage elle-même — voir la demande du 04/09/2026 (bouton "+ Share this trip"
+        // juste à côté, dans le HTML).
         ownerName = (localStorage.getItem('userFirstName') || localStorage.getItem('userName') || 'You').trim();
-        if (typeof window.loadSharedTrip === 'function') {
+        if (currentTrip.isShared && typeof window.loadSharedTrip === 'function') {
             const shared = await window.loadSharedTrip(currentTrip.id);
             if (shared) { members = shared.members || {}; memberNames = shared.memberNames || {}; }
         }
@@ -6103,6 +6177,27 @@ window.selectCreatePill = function(btn, type) {
     btn.classList.add('active');
 }
 
+window.renderCreateTripInvitees = function() {
+    const container = document.getElementById('create-trip-invitees');
+    if (!container) return;
+    container.innerHTML = createTripPendingInvitees.map(name => `
+        <span class="invitee-chip">${name}<span class="remove" onclick="removeCreateTripInvitee('${name.replace(/'/g, "\\'")}')">&times;</span></span>
+    `).join('');
+};
+window.addCreateTripInvitee = function() {
+    const input = document.getElementById('create-trip-invite-input');
+    if (!input) return;
+    const name = input.value.trim();
+    if (!name || createTripPendingInvitees.includes(name)) { input.value = ''; return; }
+    createTripPendingInvitees.push(name);
+    input.value = '';
+    window.renderCreateTripInvitees();
+};
+window.removeCreateTripInvitee = function(name) {
+    createTripPendingInvitees = createTripPendingInvitees.filter(n => n !== name);
+    window.renderCreateTripInvitees();
+};
+
 window.createNewTripAdvanced = async function() {
     const nameInput = document.getElementById('create-trip-name');
     let name = nameInput.value.trim();
@@ -6251,6 +6346,27 @@ window.createNewTripAdvanced = async function() {
     syncTrips(trips);
 
     localStorage.setItem('activeTripId', newTripId);
+
+    // Invitations saisies DANS cette même modale (voir renderCreateTripInvitees) :
+    // le voyage partagé n'existe côté Firestore qu'à partir de maintenant, comme pour
+    // un partage classique depuis openShareTripModal — on ne bloque jamais la création
+    // du voyage lui-même si une invitation échoue (pseudo introuvable), on continue
+    // simplement avec les suivantes.
+    if (createTripPendingInvitees.length > 0) {
+        if (typeof window.createSharedTrip === 'function') {
+            await window.createSharedTrip(newTrip);
+            newTrip.isShared = true;
+            const idx2 = trips.findIndex(t => t.id === newTripId);
+            if (idx2 !== -1) { trips[idx2] = newTrip; localStorage.setItem('myTrips', JSON.stringify(trips)); syncTrips(trips); }
+        }
+        if (typeof window.inviteTripCollaborator === 'function') {
+            for (const username of createTripPendingInvitees) {
+                await window.inviteTripCollaborator(newTripId, username, 'view');
+            }
+        }
+        createTripPendingInvitees = [];
+        if (document.getElementById('create-trip-invitees')) document.getElementById('create-trip-invitees').innerHTML = '';
+    }
 
     if (createBtn) { createBtn.disabled = false; createBtn.textContent = originalBtnLabel; }
     document.getElementById('add-trip-modal').classList.add('hidden');

@@ -200,6 +200,25 @@
   .tour-mode-select-option:hover { background: #f1f5f9; }
   .tour-mode-select-option.active { color: var(--primary-magenta); }
 
+  /* Sélecteur "Switch artist" — commun au panneau Mode Tournée et au panneau Live.
+     Volontairement additif : ne touche à aucun style/rendu existant de tour-mode.js,
+     seul un calque optionnel (.tour-mode-empty-overlay) au-dessus de la carte change
+     selon le groupe sélectionné. */
+  .group-switcher { position: relative; margin-top: 8px; }
+  .group-switcher-btn { display: flex; align-items: center; gap: 5px; width: 100%; background: #fff; border: 1px solid #EFECF6; border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 700; color: var(--text-main); cursor: pointer; font-family: 'Poppins', sans-serif; justify-content: center; }
+  .group-switcher-btn:hover { filter: brightness(0.97); }
+  .group-switcher-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.25); padding: 6px; z-index: 20; }
+  .group-switcher-menu.hidden { display: none; }
+  .group-switcher-option { padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--text-main); cursor: pointer; }
+  .group-switcher-option:hover { background: #f1f5f9; }
+  .group-switcher-option.active { color: var(--primary-magenta); }
+  .live-panel-header .group-switcher { margin-top: 0; }
+  .live-panel-header .group-switcher-btn { padding: 6px 12px; width: auto; }
+  .live-panel-header .group-switcher-menu { left: auto; right: 0; min-width: 140px; }
+
+  .tour-mode-empty-overlay { position: absolute; inset: 0; z-index: 30; background: rgba(255,255,255,0.97); display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px; font-size: 13px; font-weight: 600; color: #64748b; line-height: 1.5; }
+  .tour-mode-empty-overlay.hidden { display: none; }
+
   .tour-mode-member-card { display: flex; align-items: center; gap: 10px; background: var(--accent-pink); margin: 0 14px 10px; border-radius: 12px; padding: 10px 13px; flex-shrink: 0; }
   .tour-mode-member-card.hidden { display: none; }
   .tour-mode-member-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: tourModePulse 1.6s infinite; }
@@ -772,6 +791,7 @@
                 <div class="tour-mode-tip-nights" id="tour-mode-tip-nights"></div>
             </div>
         </div>
+        <div id="tour-mode-empty-overlay" class="tour-mode-empty-overlay hidden"></div>
     </div>
     <div class="tour-mode-rail">
         <div class="tour-mode-select-wrap">
@@ -779,6 +799,12 @@
                 <span id="tour-mode-select-label" data-i18n="tourModeChooseTour">Choose a tour</span> ▾
             </button>
             <div id="tour-mode-select-menu" class="tour-mode-select-menu hidden"></div>
+            <div class="group-switcher">
+                <button class="group-switcher-btn" type="button" onclick="window.toggleGroupSwitcher('group-switcher-menu-tour', event)">
+                    <span data-i18n="switchArtistLabel">Switch artist</span>: <span class="group-switcher-current">BTS</span> ▾
+                </button>
+                <div id="group-switcher-menu-tour" class="group-switcher-menu hidden"></div>
+            </div>
         </div>
         <div id="tour-mode-member-card" class="tour-mode-member-card hidden"></div>
         <div class="tour-mode-rail-list" id="tour-mode-rail-list"></div>
@@ -811,7 +837,15 @@
                 <span data-i18n="liveBadgeLabel">Live</span>
                 <span data-i18n="liveTimelineTitle"> &amp; upcoming</span>
             </div>
-            <button class="live-panel-close" onclick="closeLivePanel()" type="button">&times;</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="group-switcher">
+                    <button class="group-switcher-btn" type="button" onclick="window.toggleGroupSwitcher('group-switcher-menu-live', event)">
+                        <span class="group-switcher-current">BTS</span> ▾
+                    </button>
+                    <div id="group-switcher-menu-live" class="group-switcher-menu hidden"></div>
+                </div>
+                <button class="live-panel-close" onclick="closeLivePanel()" type="button">&times;</button>
+            </div>
         </div>
         <div class="live-panel-avatars" id="live-panel-avatars"></div>
         <div class="live-panel-timeline" id="live-panel-timeline"></div>
