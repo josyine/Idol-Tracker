@@ -268,6 +268,19 @@ body.trip-not-owner .owner-only { display: none !important; }
    pour être affichés séparément à ce niveau de zoom. */
 .cluster-badge { position: absolute; top: -6px; right: -6px; background: var(--primary-magenta); color: #fff; font-size: 9.5px; font-weight: 800; line-height: 1; border-radius: 100px; min-width: 18px; height: 18px; padding: 0 4px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,.3); }
 
+/* Repère temporaire affiché sur le marqueur du lieu qu'on vient d'ouvrir (clic sur une
+   fiche, un point de timeline, un résultat de recherche...) — voir
+   highlightSelectedLocationMarker() dans script.js. Sans ça, dans une zone dense, rien
+   ne distingue le marqueur visé de ses voisins une fois le zoom terminé. Deux anneaux
+   qui s'étendent en boucle (décalés dans le temps) + un point plein par-dessus les
+   marqueurs normaux (zIndexOffset élevé côté JS). Retiré automatiquement après quelques
+   secondes (pas de nettoyage manuel nécessaire côté utilisateur). */
+.selected-loc-pulse-wrap { position: relative; width: 40px; height: 40px; pointer-events: none; }
+.selected-loc-pulse-ring { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: rgba(212,39,89,0.55); animation: selectedLocPulse 1.4s ease-out infinite; }
+.selected-loc-pulse-ring2 { animation-delay: 0.7s; }
+.selected-loc-pulse-dot { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--primary-magenta); border: 2.5px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.35); z-index: 2; }
+@keyframes selectedLocPulse { 0% { transform: scale(0.5); opacity: 0.9; } 100% { transform: scale(2.8); opacity: 0; } }
+
 /* Marqueur utilisé dans les pop-ups de visited.html / wishlist.html
    (même charte graphique que la carte de map.html) */
 .popup-marker-icon { border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,.3); border: 2px solid #fff; }

@@ -976,6 +976,7 @@
         </div>
 
         <p class="terms"><span data-i18n="gateSignupPrompt">Don't have an account?</span> <a href="index.html" data-i18n="gateSignupLink">Sign up</a></p>
+        <p class="terms"><span data-i18n="gateContinueFreeText">Prefer not to create an account?</span> <a href="#" id="gate-continue-free-link" data-i18n="gateContinueFreeLink">Continue free — 3 locations included</a></p>
     </div>
 
 </div>
@@ -1037,17 +1038,24 @@
 
         const user = e.detail && e.detail.user;
 
-        if (!user) {
+        // "Continuer gratuitement" (voir #gate-continue-free-link plus bas) : la personne
+        // a déjà choisi une fois de parcourir la carte sans compte — on ne lui remontre pas
+        // le mur à chaque visite, elle reste simplement soumise à la même limite de 3 lieux
+        // gratuits que n'importe quel compte sans pass (voir hasGuidePass()/FREE_LOCATION_VIEW_LIMIT).
+        const browsingAsGuest = !user && localStorage.getItem('guestBrowsing') === '1';
+
+        if (!user && !browsingAsGuest) {
             document.getElementById('gate-not-logged-in').classList.remove('hidden');
             document.body.classList.add('auth-gate-active');
             return;
         }
 
-        // Connecté : la carte s'affiche entièrement, avec tous les lieux — voir la
+        // Connecté (ou "continuer gratuitement") : la carte s'affiche entièrement — voir la
         // note du 30/08/2026 dans script.js (getUnlockedGroups()/hasGuidePass()).
         // Il n'existe plus de blocage "aucun groupe débloqué" : le mur de paiement est
         // désormais géré à l'intérieur de la carte (openDetailsPanel()), au clic sur la
-        // 4e fiche lieu, jamais en bloquant l'accès à la carte elle-même.
+        // 4e fiche lieu, jamais en bloquant l'accès à la carte elle-même. Un visiteur sans
+        // compte est soumis à la même limite que n'importe qui sans pass actif.
         document.body.classList.remove('auth-gate-active');
         if (typeof initializeFilters === 'function') initializeFilters();
         // true = ne pas recadrer sur l'étendue de tous les lieux, garder le centrage
@@ -1056,6 +1064,19 @@
         if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
         if (typeof window.updateFreeViewsCounter === 'function') window.updateFreeViewsCounter();
     });
+
+    const gateContinueFreeLink = document.getElementById('gate-continue-free-link');
+    if (gateContinueFreeLink) {
+        gateContinueFreeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.setItem('guestBrowsing', '1');
+            document.body.classList.remove('auth-gate-active');
+            if (typeof initializeFilters === 'function') initializeFilters();
+            if (typeof renderLocations === 'function') renderLocations(true);
+            if (typeof window.showNewLocationToasts === 'function') window.showNewLocationToasts();
+            if (typeof window.updateFreeViewsCounter === 'function') window.updateFreeViewsCounter();
+        });
+    }
 
     const gateLoginBtn = document.getElementById('gate-login-btn');
     if (gateLoginBtn) {

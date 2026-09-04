@@ -52,6 +52,22 @@
             if (window.switchMainTab) window.switchMainTab('itinerary');
             setMobileSidebar(true);
         }, settleDelay: SETTLE_DELAY },
+        // Bouton fusionné Tour/Live (voir openLiveTourChooser() dans script.js) : selon la
+        // largeur d'écran, seul #tour-mode-badge (desktop) OU #tour-mode-badge-mobile
+        // (mobile) est réellement visible — les deux perdent leur classe .hidden ensemble
+        // (voir initTourModeBadge() dans tour-mode.js), donc un simple sélecteur CSS
+        // renverrait toujours le même des deux, quelle que soit la largeur réelle de la
+        // fenêtre. selector en fonction (géré par positionStepNow ci-dessous) pour choisir
+        // celui qui est effectivement affiché.
+        { selector: () => {
+            const badgeMobile = document.getElementById('tour-mode-badge-mobile');
+            if (badgeMobile && badgeMobile.offsetParent !== null) return badgeMobile;
+            return document.getElementById('tour-mode-badge');
+        }, onEnter: () => {
+            if (window.closeDetailsPanel) window.closeDetailsPanel();
+            if (window.switchMainTab) window.switchMainTab('explore');
+            setMobileSidebar(false);
+        }, settleDelay: SETTLE_DELAY },
         { selector: '#profile-menu a[href="map-destinations.html"]', onEnter: () => {
             if (window.closeDetailsPanel) window.closeDetailsPanel();
             if (window.switchMainTab) window.switchMainTab('explore');
@@ -72,6 +88,7 @@
             { title: "Browse by Category", desc: "Cafés, concerts, museums, MV filming spots and more — filter the map down to exactly what you're after." },
             { title: "Every Location, in Detail", desc: "Click any pin or list item to see its full story, practical tips and directions — and, once you've logged your visits, its community rating out of 5." },
             { title: "Auto-Itinerary Generator", desc: "Pick a group, a country and how many days you're staying — get an optimised day-by-day route with realistic transit times, automatically." },
+            { title: "Live & Tour Updates", desc: "One badge tells you what's happening right now — a live show or an upcoming tour stop — for BTS and any other artist you follow. Tap it to see the full schedule." },
             { title: "Explore Destinations", desc: "Browse every country covered by the site, with real filming and visit locations tied to your favourite groups." },
             { title: "Explore Artists", desc: "Discover every group and member on the site, and the real places linked to them." },
             { title: "Settings", desc: "Switch language, manage notifications and cookie preferences, or download your data." },
@@ -85,6 +102,7 @@
             { title: "Parcourir par catégorie", desc: "Cafés, concerts, musées, lieux de tournage de clips et plus encore — filtrez la carte selon ce que vous cherchez." },
             { title: "Chaque lieu, en détail", desc: "Cliquez sur une épingle ou un lieu de la liste pour voir son histoire complète, des conseils pratiques et l'itinéraire — et, une fois vos visites enregistrées, sa note communautaire sur 5." },
             { title: "Générateur d'itinéraire automatique", desc: "Choisissez un groupe, un pays et le nombre de jours de votre séjour — obtenez un itinéraire optimisé jour par jour, avec des temps de trajet réalistes, automatiquement." },
+            { title: "Live & Tournées", desc: "Un seul badge indique ce qui se passe en ce moment — un concert en direct ou une prochaine date de tournée — pour BTS et tout autre artiste que vous suivez. Touchez-le pour voir le programme complet." },
             { title: "Explorer les destinations", desc: "Parcourez tous les pays couverts par le site, avec de vrais lieux de tournage et de visite liés à vos groupes préférés." },
             { title: "Explorer les artistes", desc: "Découvrez chaque groupe et chaque membre du site, ainsi que les vrais lieux qui leur sont liés." },
             { title: "Paramètres", desc: "Changez de langue, gérez vos notifications et préférences de cookies, ou téléchargez vos données." },
@@ -98,6 +116,7 @@
             { title: "Explora por categoría", desc: "Cafeterías, conciertos, museos, lugares de rodaje de videoclips y más — filtra el mapa según lo que buscas." },
             { title: "Cada lugar, en detalle", desc: "Haz clic en cualquier marcador o lugar de la lista para ver su historia completa, consejos prácticos e indicaciones — y, una vez registradas tus visitas, su valoración comunitaria sobre 5." },
             { title: "Generador de itinerarios automático", desc: "Elige un grupo, un país y cuántos días te quedas — obtén una ruta optimizada día por día con tiempos de trayecto realistas, automáticamente." },
+            { title: "Live y giras", desc: "Una sola insignia te muestra lo que está pasando ahora mismo — un show en directo o una próxima fecha de gira — para BTS y cualquier otro artista que sigas. Tócala para ver el calendario completo." },
             { title: "Explorar destinos", desc: "Explora todos los países que cubre el sitio, con lugares reales de rodaje y visita vinculados a tus grupos favoritos." },
             { title: "Explorar artistas", desc: "Descubre cada grupo y miembro del sitio, y los lugares reales vinculados a ellos." },
             { title: "Configuración", desc: "Cambia de idioma, gestiona tus notificaciones y preferencias de cookies, o descarga tus datos." },
@@ -111,6 +130,7 @@
             { title: "Esplora per categoria", desc: "Caffè, concerti, musei, luoghi delle riprese dei video musicali e altro ancora — filtra la mappa in base a ciò che cerchi." },
             { title: "Ogni luogo, nel dettaglio", desc: "Clicca su un segnaposto o su un luogo dell'elenco per vederne la storia completa, consigli pratici e indicazioni — e, una volta registrate le tue visite, la sua valutazione della community su 5." },
             { title: "Generatore automatico di itinerari", desc: "Scegli un gruppo, un paese e quanti giorni resti — ottieni un percorso ottimizzato giorno per giorno con tempi di trasporto realistici, automaticamente." },
+            { title: "Live e tour", desc: "Un solo badge ti mostra cosa sta succedendo in questo momento — uno show dal vivo o una prossima data del tour — per i BTS e qualsiasi altro artista che segui. Toccalo per vedere il calendario completo." },
             { title: "Esplora destinazioni", desc: "Sfoglia tutti i paesi coperti dal sito, con veri luoghi di riprese e visita legati ai tuoi gruppi preferiti." },
             { title: "Esplora artisti", desc: "Scopri ogni gruppo e membro del sito, e i luoghi reali a loro collegati." },
             { title: "Impostazioni", desc: "Cambia lingua, gestisci le notifiche e le preferenze sui cookie, o scarica i tuoi dati." },
@@ -124,6 +144,7 @@
             { title: "Explore por categoria", desc: "Cafés, shows, museus, locais de gravação de videoclipes e muito mais — filtre o mapa de acordo com o que você procura." },
             { title: "Cada lugar, em detalhes", desc: "Clique em qualquer marcador ou lugar da lista para ver sua história completa, dicas práticas e como chegar — e, depois de registrar suas visitas, sua avaliação da comunidade sobre 5." },
             { title: "Gerador automático de roteiros", desc: "Escolha um grupo, um país e quantos dias você fica — obtenha um roteiro otimizado dia a dia com tempos de trajeto realistas, automaticamente." },
+            { title: "Live e turnês", desc: "Um único selo mostra o que está acontecendo agora — um show ao vivo ou uma próxima data de turnê — para o BTS e qualquer outro artista que você segue. Toque nele para ver a agenda completa." },
             { title: "Explorar destinos", desc: "Navegue por todos os países cobertos pelo site, com locais reais de filmagem e visita ligados aos seus grupos favoritos." },
             { title: "Explorar artistas", desc: "Descubra cada grupo e membro do site, e os locais reais ligados a eles." },
             { title: "Configurações", desc: "Mude o idioma, gerencie notificações e preferências de cookies, ou baixe seus dados." },
@@ -137,6 +158,7 @@
             { title: "카테고리별로 둘러보기", desc: "카페, 콘서트, 박물관, 뮤직비디오 촬영지 등 — 원하는 대로 지도를 필터링하세요." },
             { title: "모든 장소를 자세히", desc: "핀이나 목록의 장소를 클릭하면 전체 스토리, 실용적인 팁, 가는 방법을 볼 수 있고, 방문 기록을 남기면 5점 만점의 커뮤니티 평점도 확인할 수 있습니다." },
             { title: "자동 일정 생성기", desc: "그룹, 국가, 머무는 일수를 선택하면 현실적인 이동 시간이 포함된 최적화된 일별 경로를 자동으로 받을 수 있습니다." },
+            { title: "라이브 및 투어 업데이트", desc: "지금 무슨 일이 일어나고 있는지 하나의 배지로 확인하세요 — 라이브 공연이나 다가오는 투어 일정 — BTS와 팔로우하는 다른 아티스트 모두. 탭하면 전체 일정을 볼 수 있습니다." },
             { title: "여행지 탐색", desc: "사이트에 있는 모든 국가를 둘러보세요. 좋아하는 그룹과 관련된 실제 촬영지와 방문 장소가 포함되어 있습니다." },
             { title: "아티스트 탐색", desc: "사이트의 모든 그룹과 멤버, 그리고 그들과 관련된 실제 장소를 확인해보세요." },
             { title: "설정", desc: "언어를 변경하고, 알림 및 쿠키 설정을 관리하거나, 데이터를 다운로드하세요." },
@@ -150,6 +172,7 @@
             { title: "カテゴリーで探す", desc: "カフェ、コンサート、美術館、MV撮影地など — 目的に合わせて地図を絞り込めます。" },
             { title: "すべての場所を詳しく", desc: "ピンやリストの場所をクリックすると、詳しいストーリー、実用的なヒント、行き方が表示され、訪問を記録すると5点満点のコミュニティ評価も確認できます。" },
             { title: "自動旅程ジェネレーター", desc: "グループ、国、滞在日数を選ぶだけで、現実的な移動時間を含む最適化された日ごとのルートが自動で作成されます。" },
+            { title: "ライブ＆ツアー情報", desc: "今何が起きているか（ライブ公演や次のツアー日程）を1つのバッジで確認できます — BTSはもちろん、フォローしている他のアーティストも。タップすると全スケジュールが見られます。" },
             { title: "旅行先を探す", desc: "サイトに掲載されているすべての国を閲覧できます。お気に入りのグループに関連した実際の撮影地や訪問スポットも。" },
             { title: "アーティストを探す", desc: "サイトのすべてのグループとメンバー、そして関連する実際の場所を発見しましょう。" },
             { title: "設定", desc: "言語を切り替えたり、通知やクッキーの設定を管理したり、データをダウンロードできます。" },
@@ -163,6 +186,7 @@
             { title: "按类别浏览", desc: "咖啡馆、演唱会、博物馆、MV取景地等等 — 按你的需求筛选地图。" },
             { title: "每个地点的详细信息", desc: "点击任意图钉或列表中的地点，即可查看完整故事、实用贴士和路线 — 记录你的到访后，还能看到社区评分（满分5分）。" },
             { title: "自动行程生成器", desc: "选择一个组合、一个国家和停留天数，即可自动获得包含真实交通时间的逐日优化路线。" },
+            { title: "直播与巡演更新", desc: "一个徽章即可查看当下动态——正在进行的演出或即将到来的巡演站点——适用于BTS及你关注的其他艺人。点击即可查看完整日程。" },
             { title: "探索目的地", desc: "浏览网站涵盖的所有国家，包含与你喜欢的组合相关的真实取景地和到访地点。" },
             { title: "探索艺人", desc: "发现网站上的每个组合和成员，以及与他们相关的真实地点。" },
             { title: "设置", desc: "切换语言，管理通知和 Cookie 偏好设置，或下载你的数据。" },
@@ -252,7 +276,9 @@
     }
 
     function positionStepNow(stepDef) {
-        const targetEl = stepDef.selector ? document.querySelector(stepDef.selector) : null;
+        const targetEl = typeof stepDef.selector === 'function'
+            ? stepDef.selector()
+            : (stepDef.selector ? document.querySelector(stepDef.selector) : null);
 
         if (!targetEl) {
             spotlight.style.display = 'none';

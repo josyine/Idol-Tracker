@@ -296,6 +296,16 @@
         }, 300);
     };
 
+    // Badge unique et fixe (voir la demande du 04/09/2026) : ne nomme plus un artiste ou
+    // une ville précise, ce qui devenait trompeur/incomplet dès que PLUSIEURS choses sont
+    // en direct en même temps (ex: la tournée du groupe ET un événement solo d'un membre
+    // se chevauchent déjà dans les données actuelles). À la place, un simple compteur —
+    // le détail complet reste à un clic (le badge ouvre le sélecteur Tour/Live, qui mène
+    // au panneau Live listant tout ce qui est en cours). getLiveTimelineEntries() (plus
+    // haut dans ce fichier) fusionne déjà tournée de groupe + événements solo et respecte
+    // le sélecteur "Switch artist" (window.selectedTourLiveGroup) : la réutiliser ici
+    // évite de dupliquer cette logique et généralise naturellement à d'autres artistes
+    // le jour où ils auront de vraies données.
     window.initTourModeBadge = function () {
         const badge = document.getElementById('tour-mode-badge');
         const badgeMobile = document.getElementById('tour-mode-badge-mobile');
@@ -304,14 +314,14 @@
         const memberEvent = getCurrentMemberEvent();
         const groupStop = getCurrentTourStop();
 
+        const liveCount = typeof getLiveTimelineEntries === 'function'
+            ? getLiveTimelineEntries().filter(e => e.status === 'current').length
+            : ((memberEvent ? 1 : 0) + (groupStop ? 1 : 0));
+
         let label;
-        let live = false;
-        if (memberEvent) {
-            live = true;
-            label = t('tourModeMemberLiveIn').replace('{member}', memberEvent.member).replace('{event}', memberEvent.eventName).replace('{city}', memberEvent.city);
-        } else if (groupStop) {
-            live = true;
-            label = t('tourModeLiveIn').replace('{city}', groupStop.city);
+        let live = liveCount > 0;
+        if (live) {
+            label = liveCount === 1 ? t('tourModeLiveNowOne') : t('tourModeLiveNowCount').replace('{n}', liveCount);
         } else {
             label = t('tourModeGenericLabel');
         }
