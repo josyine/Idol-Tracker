@@ -2176,7 +2176,7 @@ const translations = {
         accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accResetPhoto: "Reset profile picture", accNameLabel: "Username", accChangeUsernameHint: "Change username", accEmailLabel: "Email address",
         accCountryLabel: "Country you're interested in", accCountryPlaceholder: "Select a country (optional)",
         accActivityTitle: "Your activity", accTrips: "Trips", accVisited: "Visited", accWishlist: "Wishlist", accPasses: "Passes & billing",
-        accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes", accAmountPaid: "Amount paid",
+        accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes", accAmountPaid: "Amount paid", accGuestUsername: "Not signed in",
         accDangerZone: "Danger zone",
         accDeleteConfirmTitle: "Are you sure you want to delete your account?",
         accDeleteConfirmBody: "This action is permanent. You will not be refunded for any unlocked passes, and all your data — trips, wishlist, and visited places — will be permanently lost.",
@@ -2239,7 +2239,7 @@ const translations = {
         accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accResetPhoto: "Réinitialiser la photo de profil", accNameLabel: "Identifiant", accChangeUsernameHint: "Changer d'identifiant", accEmailLabel: "Adresse e-mail",
         accCountryLabel: "Pays qui vous intéresse", accCountryPlaceholder: "Choisir un pays (optionnel)",
         accActivityTitle: "Votre activité", accTrips: "Voyages", accVisited: "Visités", accWishlist: "Wishlist", accPasses: "Pass et facturation",
-        accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif", accAmountPaid: "Montant payé",
+        accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif", accAmountPaid: "Montant payé", accGuestUsername: "Non connecté",
         accDangerZone: "Zone de danger",
         accDeleteConfirmTitle: "Êtes-vous sûr(e) de vouloir supprimer votre compte ?",
         accDeleteConfirmBody: "Cette action est définitive. Vous ne serez pas remboursé(e) pour les pass débloqués, et toutes vos données — voyages, wishlist et lieux visités — seront définitivement perdues.",
@@ -2302,7 +2302,7 @@ const translations = {
         accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accResetPhoto: "Restablecer foto de perfil", accNameLabel: "Nombre de usuario", accChangeUsernameHint: "Cambiar nombre de usuario", accEmailLabel: "Correo electrónico",
         accCountryLabel: "País que te interesa", accCountryPlaceholder: "Elige un país (opcional)",
         accActivityTitle: "Tu actividad", accTrips: "Viajes", accVisited: "Visitados", accWishlist: "Lista de deseos", accPasses: "Pases y facturación",
-        accEditBtn: "Editar perfil", accSaveBtn: "Guardar cambios", accSaved: "✓ Guardado con éxito", accNoPasses: "Sin pases activos", accAmountPaid: "Importe pagado",
+        accEditBtn: "Editar perfil", accSaveBtn: "Guardar cambios", accSaved: "✓ Guardado con éxito", accNoPasses: "Sin pases activos", accAmountPaid: "Importe pagado", accGuestUsername: "No conectado",
         accDangerZone: "Zona de peligro",
         accDeleteConfirmTitle: "¿Seguro que quieres eliminar tu cuenta?",
         accDeleteConfirmBody: "Esta acción es permanente. No se te reembolsará ningún pase desbloqueado, y todos tus datos — viajes, lista de deseos y lugares visitados — se perderán definitivamente.",
@@ -2364,7 +2364,7 @@ const translations = {
         accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accResetPhoto: "Ripristina foto profilo", accNameLabel: "Nome utente", accChangeUsernameHint: "Cambia nome utente", accEmailLabel: "Indirizzo email",
         accCountryLabel: "Paese che ti interessa", accCountryPlaceholder: "Scegli un paese (opzionale)",
         accActivityTitle: "La tua attività", accTrips: "Viaggi", accVisited: "Visitati", accWishlist: "Wishlist", accPasses: "Pass e fatturazione",
-        accEditBtn: "Modifica profilo", accSaveBtn: "Salva modifiche", accSaved: "✓ Salvato con successo", accNoPasses: "Nessun pass attivo", accAmountPaid: "Importo pagato",
+        accEditBtn: "Modifica profilo", accSaveBtn: "Salva modifiche", accSaved: "✓ Salvato con successo", accNoPasses: "Nessun pass attivo", accAmountPaid: "Importo pagato", accGuestUsername: "Non connesso",
         accDangerZone: "Zona pericolosa",
         accDeleteConfirmTitle: "Sei sicuro di voler eliminare il tuo account?",
         accDeleteConfirmBody: "Questa azione è permanente. Non riceverai rimborsi per i pass sbloccati e tutti i tuoi dati — viaggi, wishlist e luoghi visitati — andranno persi definitivamente.",
@@ -2426,7 +2426,7 @@ const translations = {
         accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accResetPhoto: "Redefinir foto de perfil", accNameLabel: "Nome de usuário", accChangeUsernameHint: "Alterar nome de usuário", accEmailLabel: "Endereço de e-mail",
         accCountryLabel: "País de interesse", accCountryPlaceholder: "Escolha um país (opcional)",
         accActivityTitle: "Sua atividade", accTrips: "Viagens", accVisited: "Visitados", accWishlist: "Wishlist", accPasses: "Passes e faturamento",
-        accEditBtn: "Editar perfil", accSaveBtn: "Salvar alterações", accSaved: "✓ Salvo com sucesso", accNoPasses: "Nenhum passe ativo", accAmountPaid: "Valor pago",
+        accEditBtn: "Editar perfil", accSaveBtn: "Salvar alterações", accSaved: "✓ Salvo com sucesso", accNoPasses: "Nenhum passe ativo", accAmountPaid: "Valor pago", accGuestUsername: "Não conectado",
         accDangerZone: "Zona de perigo",
         accDeleteConfirmTitle: "Tem certeza de que deseja excluir sua conta?",
         accDeleteConfirmBody: "Esta ação é permanente. Você não será reembolsado por nenhum passe desbloqueado, e todos os seus dados — viagens, wishlist e locais visitados — serão perdidos definitivamente.",
@@ -2488,7 +2488,7 @@ const translations = {
         accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accResetPhoto: "프로필 사진 재설정", accNameLabel: "아이디", accChangeUsernameHint: "아이디 변경", accEmailLabel: "이메일 주소",
         accCountryLabel: "관심 있는 국가", accCountryPlaceholder: "국가 선택 (선택 사항)",
         accActivityTitle: "내 활동", accTrips: "여행", accVisited: "방문함", accWishlist: "위시리스트", accPasses: "이용권 및 결제",
-        accEditBtn: "프로필 수정", accSaveBtn: "변경사항 저장", accSaved: "✓ 저장되었습니다", accNoPasses: "활성화된 이용권 없음", accAmountPaid: "결제 금액",
+        accEditBtn: "프로필 수정", accSaveBtn: "변경사항 저장", accSaved: "✓ 저장되었습니다", accNoPasses: "활성화된 이용권 없음", accAmountPaid: "결제 금액", accGuestUsername: "로그인하지 않음",
         accDangerZone: "위험 구역",
         accDeleteConfirmTitle: "정말 계정을 삭제하시겠습니까?",
         accDeleteConfirmBody: "이 작업은 되돌릴 수 없습니다. 잠금 해제한 이용권에 대한 환불은 제공되지 않으며, 여행·위시리스트·방문한 장소를 포함한 모든 데이터가 영구적으로 사라집니다.",
@@ -2550,7 +2550,7 @@ const translations = {
         accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accResetPhoto: "プロフィール写真をリセット", accNameLabel: "ユーザー名", accChangeUsernameHint: "ユーザー名を変更", accEmailLabel: "メールアドレス",
         accCountryLabel: "興味のある国", accCountryPlaceholder: "国を選択（任意）",
         accActivityTitle: "アクティビティ", accTrips: "旅行", accVisited: "訪問済み", accWishlist: "ウィッシュリスト", accPasses: "パスとお支払い",
-        accEditBtn: "プロフィールを編集", accSaveBtn: "変更を保存", accSaved: "✓ 保存しました", accNoPasses: "有効なパスはありません", accAmountPaid: "お支払い金額",
+        accEditBtn: "プロフィールを編集", accSaveBtn: "変更を保存", accSaved: "✓ 保存しました", accNoPasses: "有効なパスはありません", accAmountPaid: "お支払い金額", accGuestUsername: "未ログイン",
         accDangerZone: "危険ゾーン",
         accDeleteConfirmTitle: "本当にアカウントを削除しますか？",
         accDeleteConfirmBody: "この操作は取り消せません。解除済みのパスは返金されず、旅行・ウィッシュリスト・訪れた場所を含むすべてのデータが完全に失われます。",
@@ -2612,7 +2612,7 @@ const translations = {
         accTitle: "我的账户", accChangePhoto: "更换头像", accResetPhoto: "重置头像", accNameLabel: "用户名", accChangeUsernameHint: "更改用户名", accEmailLabel: "电子邮箱",
         accCountryLabel: "感兴趣的国家", accCountryPlaceholder: "选择国家（可选）",
         accActivityTitle: "我的动态", accTrips: "行程", accVisited: "已访问", accWishlist: "收藏清单", accPasses: "通行证与账单",
-        accEditBtn: "编辑资料", accSaveBtn: "保存更改", accSaved: "✓ 保存成功", accNoPasses: "暂无有效通行证", accAmountPaid: "已支付金额",
+        accEditBtn: "编辑资料", accSaveBtn: "保存更改", accSaved: "✓ 保存成功", accNoPasses: "暂无有效通行证", accAmountPaid: "已支付金额", accGuestUsername: "未登录",
         accDangerZone: "危险区域",
         accDeleteConfirmTitle: "确定要删除您的账户吗？",
         accDeleteConfirmBody: "此操作不可撤销。已解锁的通行证不会退款，且您的所有数据——行程、收藏清单和已访问地点——都将被永久删除。",
@@ -5208,6 +5208,10 @@ window.openSharedTrip = function(sharedTripId) {
     document.body.classList.add('trip-not-owner');
     document.getElementById('empty-state').classList.add('hidden');
     document.getElementById('trip-detail-content').style.display = 'block';
+    // Voir la même note dans le onclick des voyages possédés plus haut : sans ça, le
+    // voyage partagé qu'on vient d'ouvrir reste caché derrière le tiroir mobile resté ouvert.
+    const sidebarElShared = document.getElementById('app-sidebar');
+    if (sidebarElShared && sidebarElShared.classList.contains('open') && typeof window.toggleMobileMenu === 'function') window.toggleMobileMenu();
     if(document.getElementById('trip-map-container') && !tripPageMap) {
         tripPageMap = L.map('trip-map-container', { zoomControl: false }).setView([37.541, 127.025], 6);
         createOSMTileLayer(tripPageMap).addTo(tripPageMap);
@@ -5421,6 +5425,12 @@ window.renderTripsSidebar = function() {
             document.body.classList.remove('trip-view-only', 'trip-not-owner');
             localStorage.setItem('activeTripId', t.id);
             window.initTrips();
+            // Sur mobile, la liste des voyages vit dans le tiroir #app-sidebar (voir
+            // toggleMobileMenu()) : sans ça, le voyage qu'on vient de sélectionner reste
+            // caché derrière le tiroir resté ouvert, il faut alors une action en plus
+            // rien que pour le voir.
+            const sidebarEl = document.getElementById('app-sidebar');
+            if (sidebarEl && sidebarEl.classList.contains('open')) window.toggleMobileMenu();
         };
 
         pill.innerHTML = `
@@ -5788,8 +5798,8 @@ window.switchEditDateTab = function(tab) {
     if(tab === 'specific') {
         document.getElementById('edit-date-specific-panel').classList.remove('hidden');
         document.getElementById('edit-date-flexible-panel').classList.add('hidden');
-        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.remove('active');
-        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.add('active');
+        document.querySelector('.date-tab[data-tab="edit-specific"]').classList.add('active');
+        document.querySelector('.date-tab[data-tab="edit-flexible"]').classList.remove('active');
     } else {
         document.getElementById('edit-date-specific-panel').classList.add('hidden');
         document.getElementById('edit-date-flexible-panel').classList.remove('hidden');

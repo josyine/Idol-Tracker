@@ -204,7 +204,7 @@
      Volontairement additif : ne touche à aucun style/rendu existant de tour-mode.js,
      seul un calque optionnel (.tour-mode-empty-overlay) au-dessus de la carte change
      selon le groupe sélectionné. */
-  .group-switcher { position: relative; margin-top: 8px; }
+  .group-switcher { position: relative; margin-top: 8px; z-index: 40; }
   .group-switcher-btn { display: flex; align-items: center; gap: 5px; width: 100%; background: #fff; border: 1px solid #EFECF6; border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 700; color: var(--text-main); cursor: pointer; font-family: 'Poppins', sans-serif; justify-content: center; }
   .group-switcher-btn:hover { filter: brightness(0.97); }
   .group-switcher-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.25); padding: 6px; z-index: 20; }
@@ -791,8 +791,11 @@
                 <div class="tour-mode-tip-nights" id="tour-mode-tip-nights"></div>
             </div>
         </div>
-        <div id="tour-mode-empty-overlay" class="tour-mode-empty-overlay hidden"></div>
     </div>
+    <!-- Couvre TOUT le panneau (carte ET rail) quand un groupe sans données réelles est
+         sélectionné (voir window.changeTourLiveGroup() dans script.js) — un calque limité
+         à .tour-mode-mapwrap seul laissait la liste des étapes BTS visible dans le rail. -->
+    <div id="tour-mode-empty-overlay" class="tour-mode-empty-overlay hidden"></div>
     <div class="tour-mode-rail">
         <div class="tour-mode-select-wrap">
             <button class="tour-mode-select-btn" type="button" onclick="tourModeToggleSelect(event)">

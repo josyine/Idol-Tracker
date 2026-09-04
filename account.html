@@ -207,11 +207,15 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
         <div id="receipts"></div>
       </div>
 
-      <div class="section-title" style="margin-top:10px;" data-i18n="accDangerZone">Danger zone</div>
-      <div style="border:1.5px solid #FBD5DC;background:#FFF7F8;border-radius:16px;padding:22px 24px;">
-        <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span style="font-size:13px;font-weight:700;color:#D42759;" data-i18n="setDeleteAccTitle">Delete account</span></div>
-        <p style="font-size:11.5px;color:#94a3b8;margin-bottom:14px;" data-i18n="setDeleteAccSub">This permanently deletes your trips, wishlist and unlocked passes.</p>
-        <button id="delete-account-btn" style="width:100%;background:#ef4444;color:#fff;border:none;border-radius:100px;padding:13px;font-size:13.5px;font-weight:700;font-family:'Poppins',sans-serif; cursor:pointer;box-shadow:0 6px 15px rgba(239,68,68,0.2);" data-i18n="setDeleteAccBtn">Delete Account</button>
+      <!-- Masqué entièrement pour un visiteur non connecté (voir firebase-ready plus bas)
+           : "supprimer le compte" n'a aucun sens tant qu'il n'y a pas de compte. -->
+      <div id="danger-zone-section">
+        <div class="section-title" style="margin-top:10px;" data-i18n="accDangerZone">Danger zone</div>
+        <div style="border:1.5px solid #FBD5DC;background:#FFF7F8;border-radius:16px;padding:22px 24px;">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D42759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span style="font-size:13px;font-weight:700;color:#D42759;" data-i18n="setDeleteAccTitle">Delete account</span></div>
+          <p style="font-size:11.5px;color:#94a3b8;margin-bottom:14px;" data-i18n="setDeleteAccSub">This permanently deletes your trips, wishlist and unlocked passes.</p>
+          <button id="delete-account-btn" style="width:100%;background:#ef4444;color:#fff;border:none;border-radius:100px;padding:13px;font-size:13.5px;font-weight:700;font-family:'Poppins',sans-serif; cursor:pointer;box-shadow:0 6px 15px rgba(239,68,68,0.2);" data-i18n="setDeleteAccBtn">Delete Account</button>
+        </div>
       </div>
     </div>
 </div>
@@ -694,7 +698,36 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
 
     window.addEventListener('firebase-ready', (e) => {
         const user = e.detail && e.detail.user;
-        if (user) { renderMemberSince(user); currentAccountUid = user.uid; }
+        if (user) {
+            renderMemberSince(user);
+            currentAccountUid = user.uid;
+            // Défait un éventuel état "invité" affiché avant que Firebase n'ait fini de
+            // résoudre la session (voir la branche !user ci-dessous) : sans ça, une session
+            // déjà connectée qui se résout après un premier passage à null resterait
+            // bloquée sur "Not signed in" et la Danger zone masquée.
+            const nameInput = document.getElementById('user-name-input');
+            if (nameInput) nameInput.value = (localStorage.getItem('userName') || '').trim() || 'User';
+            const changeLink = document.getElementById('change-username-link');
+            if (changeLink) changeLink.classList.remove('hidden');
+            const cooldownNote = document.querySelector('[data-i18n="usernameCooldownNote"]');
+            if (cooldownNote) cooldownNote.classList.remove('hidden');
+            const dangerZone = document.getElementById('danger-zone-section');
+            if (dangerZone) dangerZone.classList.remove('hidden');
+        }
+        else {
+            // Visiteur en "continuer gratuitement" (voir map.html) : il n'y a ni compte ni
+            // identifiant réel, donc écrire "User" dans le champ prêtait à confusion (ça
+            // ressemblait à un vrai pseudo déjà attribué). "Supprimer le compte" n'a par
+            // ailleurs aucun sens sans compte.
+            const nameInput = document.getElementById('user-name-input');
+            if (nameInput) nameInput.value = t('accGuestUsername');
+            const changeLink = document.getElementById('change-username-link');
+            if (changeLink) changeLink.classList.add('hidden');
+            const cooldownNote = document.querySelector('[data-i18n="usernameCooldownNote"]');
+            if (cooldownNote) cooldownNote.classList.add('hidden');
+            const dangerZone = document.getElementById('danger-zone-section');
+            if (dangerZone) dangerZone.classList.add('hidden');
+        }
     });
 
     // ==========================================

@@ -326,12 +326,12 @@
                 <div class="edit-banner" style="margin-bottom:30px;">
                     <div class="section-label" style="margin-top:0;">Location Filters</div>
                     <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                         <select id="edit-trip-group" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('group')"></select>
-                         <select id="edit-trip-member" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('member')"></select>
+                         <select id="edit-trip-group" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;" onchange="updateEditTripOptions('group')"></select>
+                         <select id="edit-trip-member" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;" onchange="updateEditTripOptions('member')"></select>
                     </div>
                     <div style="display:flex; gap:10px;">
-                         <select id="edit-trip-country" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('country')"></select>
-                         <select id="edit-trip-city" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateEditTripOptions('city')"></select>
+                         <select id="edit-trip-country" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;" onchange="updateEditTripOptions('country')"></select>
+                         <select id="edit-trip-city" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;" onchange="updateEditTripOptions('city')"></select>
                     </div>
                 </div>
 
@@ -384,18 +384,18 @@
         <input type="text" id="create-trip-name" style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px; outline:none;" placeholder="Trip Name (e.g. Japan 2027)">
 
         <div style="display:flex; gap:10px; margin-bottom: 15px;">
-             <select id="create-trip-group" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateCreateTripOptions()">
+             <select id="create-trip-group" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;" onchange="updateCreateTripOptions()">
                   <option value="">Select Group</option>
              </select>
-             <select id="create-trip-member" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;">
+             <select id="create-trip-member" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;">
                   <option value="All">All Members (Optional)</option>
              </select>
         </div>
         <div style="display:flex; gap:10px; margin-bottom: 20px;">
-             <select id="create-trip-country" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;" onchange="updateCreateTripOptions()">
+             <select id="create-trip-country" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;" onchange="updateCreateTripOptions()">
                   <option value="">Select Country</option>
              </select>
-             <select id="create-trip-city" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; outline:none;">
+             <select id="create-trip-city" style="padding:12px; border-radius:8px; border:1px solid #cbd5e1; flex:1; min-width:0; outline:none;">
                   <option value="">Select City (Optional)</option>
              </select>
         </div>
