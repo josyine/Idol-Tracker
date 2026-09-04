@@ -1022,15 +1022,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         map.on('zoomend', function() {
             const zoom = map.getZoom();
-            let markerSize = 32; let iconSize = 16;
+            let markerSize = 28; let iconSize = 14;
             // Avec des lieux répartis sur plusieurs continents, la carte doit parfois
             // dézoomer beaucoup pour tous les faire tenir : les marqueurs restent donc
             // visibles (avec une icône, même petite) au lieu de devenir de simples
             // anneaux à peine perceptibles.
-            if (zoom < 4) { markerSize = 16; iconSize = 8; }
-            else if (zoom < 6) { markerSize = 22; iconSize = 11; }
-            else if (zoom < 9) { markerSize = 26; iconSize = 13; }
-            else { markerSize = 32; iconSize = 16; }
+            // Tailles légèrement réduites par rapport aux 16/22/26/32px d'origine (demande
+            // du 04/09/2026 : "les boutons de location sont un peu trop gros") — mêmes
+            // paliers de zoom, mêmes proportions icône/marqueur (~50%), juste ~12% plus
+            // petit. Garder clusterPixelRadiusForZoom() ci-dessous en phase avec ces
+            // valeurs : le seuil de regroupement des marqueurs proches est calculé à
+            // partir de leur taille réelle en pixels.
+            if (zoom < 4) { markerSize = 14; iconSize = 7; }
+            else if (zoom < 6) { markerSize = 19; iconSize = 9; }
+            else if (zoom < 9) { markerSize = 22; iconSize = 11; }
+            else { markerSize = 28; iconSize = 14; }
             document.documentElement.style.setProperty('--marker-size', `${markerSize}px`);
             document.documentElement.style.setProperty('--icon-size', `${iconSize}px`);
 
@@ -3089,10 +3095,10 @@ function renderLocations(skipFitBounds) {
 // en "×2" — le badge de regroupement doit au contraire n'apparaître que lorsque les
 // marqueurs se chevaucheraient réellement à l'écran.
 function clusterPixelRadiusForZoom(zoom) {
-    if (zoom < 4) return 16;
-    if (zoom < 6) return 22;
-    if (zoom < 9) return 26;
-    return 32;
+    if (zoom < 4) return 14;
+    if (zoom < 6) return 19;
+    if (zoom < 9) return 22;
+    return 28;
 }
 // Au zoom maximal (limite de la tuile OSM, voir maxZoom du tileLayer plus bas), deux
 // lieux réellement distincts mais très proches en vrai (ex: deux cafés de la même rue)

@@ -1,4 +1,4 @@
-:root { --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; --marker-size: 32px; --icon-size: 16px;}
+:root { --sidebar-bg: linear-gradient(160deg,#F5F3FC,#E9DFF6); --accent-pink: #FCE7F0; --primary-magenta: #D42759; --text-main: #1e293b; --border-color: #cbd5e1; --muted-text: #64748b; --marker-size: 28px; --icon-size: 14px;}
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
 a { text-decoration: none; }
 
