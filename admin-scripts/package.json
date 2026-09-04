@@ -1,0 +1,9 @@
+{
+  "name": "screen-to-street-admin-scripts",
+  "private": true,
+  "description": "One-off local admin/migration scripts for the Screen To Street Firestore project. Never deployed with the site.",
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "firebase": "^11.0.0"
+  }
+}

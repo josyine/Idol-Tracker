@@ -195,6 +195,36 @@ window.loadAllLocationRatings = async function () {
     }
 };
 
+// ==========================================
+// CONTENU RICHE D'UN LIEU (migration progressive hors de script.js)
+// ==========================================
+// Étape 1 de la migration vers Firestore (04/09/2026) : script.js contient encore les
+// textes de TOUS les lieux (fullDescription/practicalInfo/tipsList), mais openDetailsPanel()
+// tente maintenant AUSSI de lire une version à jour depuis Firestore et l'utilise si elle
+// existe — sans jamais bloquer l'affichage (le contenu déjà dans script.js s'affiche
+// immédiatement, cette lecture vient seulement le compléter/remplacer en arrière-plan si
+// elle répond). Ça permet dès maintenant d'ajouter/corriger un lieu uniquement via
+// Firestore (pas de modification de script.js), sans rien casser pour les lieux qui n'ont
+// pas encore de document ici. Une étape 2 séparée (plus tard, plus risquée) retirera
+// progressivement ces champs de script.js une fois cette lecture confirmée fiable en
+// production, ce qui réduira enfin la taille du fichier envoyé à chaque visite.
+//
+// IMPORTANT — nécessite une règle Firestore dédiée que ce fichier ne peut pas déployer
+// lui-même (à ajouter dans la console Firebase, onglet Firestore > Rules) :
+//   match /locationContent/{locationId} {
+//     allow read: if true;
+//     allow write: if false;  // écrit uniquement via le script d'administration, jamais depuis le site
+//   }
+window.fetchLocationContent = async function (locationId) {
+    try {
+        const snap = await getDoc(doc(db, 'locationContent', String(locationId)));
+        return snap.exists() ? snap.data() : null;
+    } catch (e) {
+        console.warn('Lecture du contenu Firestore du lieu échouée :', e);
+        return null;
+    }
+};
+
 // Avis publics ("Reviews") sur un lieu : une personne peut rendre publique sa fiche
 // "J'ai visité ce lieu" (note + notes + photo) pour que les autres utilisateurs la
 // voient dans le nouvel onglet "Reviews" du détail d'un lieu. Un avis par personne et
@@ -247,6 +277,155 @@ window.fetchLocationReviews = async function (locationId) {
         return result;
     } catch (e) {
         console.warn('Lecture des avis échouée :', e);
+        return [];
+    }
+};
+
+// ==========================================
+// FILE DE RELECTURE DES NOUVEAUX LIEUX ("locationSubmissions")
+// ==========================================
+// Permet à un agent (IA ou humain) de PROPOSER un nouveau lieu ou une correction sans
+// jamais publier directement : la proposition atterrit dans locationSubmissions avec
+// status:'pending', et reste invisible sur le site tant qu'un administrateur (voir
+// isCurrentUserAdmin() ci-dessous) ne l'a pas approuvée d'un clic. Volontairement séparé
+// de locationContent (étape 1 de la migration Firestore, voir plus haut) : cette file
+// est la porte d'entrée AVANT publication, locationContent est ce qui est réellement
+// affiché sur le site.
+//
+// Politique du site (rappel) : ne jamais publier de faits non sourcés — un agent IA doit
+// remplir `sourceNote`/`episodeLink` avec une vraie source vérifiable, jamais inventer une
+// date de tournée ou une adresse. L'écran de relecture affiche ces sources pour que la
+// personne qui approuve puisse les vérifier avant de publier.
+//
+// Comment devenir administrateur (aucune interface ne le permet, volontairement — un
+// document dans `admins` ne peut être créé QUE depuis la console Firebase, jamais depuis
+// le site) :
+//   1. Firebase Console > Authentication : copiez votre UID (visible dans la liste des
+//      utilisateurs, colonne "User UID").
+//   2. Firebase Console > Firestore Database > Start collection > id "admins" >
+//      Document ID = VOTRE UID, avec un champ quelconque (ex: role: "owner").
+//
+// IMPORTANT — nécessite ces règles Firestore (non déployables depuis ce fichier, à
+// ajouter dans la console Firebase, onglet Firestore > Rules) :
+//   match /admins/{uid} {
+//     allow read: if request.auth != null && request.auth.uid == uid;
+//     allow write: if false;  // jamais depuis le site, uniquement via la console Firebase
+//   }
+//   match /locationSubmissions/{submissionId} {
+//     allow create: if true;  // n'importe qui (y compris un agent non authentifié) peut proposer
+//     allow read, update, delete: if request.auth != null
+//       && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+//   }
+//   match /newLocations/{locationId} {
+//     allow read: if true;  // lu par tout le monde au chargement de la carte (voir map.html)
+//     allow write: if request.auth != null
+//       && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+//   }
+let _adminCheckCache = null;
+window.isCurrentUserAdmin = async function () {
+    const user = auth.currentUser;
+    if (!user) { _adminCheckCache = false; return false; }
+    if (_adminCheckCache !== null) return _adminCheckCache;
+    try {
+        const snap = await getDoc(doc(db, 'admins', user.uid));
+        _adminCheckCache = snap.exists();
+    } catch (e) {
+        _adminCheckCache = false;
+    }
+    return _adminCheckCache;
+};
+
+// `data` attend la même forme qu'un objet de celebLocations (name, group, member,
+// country, city, category, year, episode, episodeLink, ytId, address, lat, lng, img,
+// fullDescription, practicalInfo, tipsList) — plus `matchedLocId` (optionnel) si la
+// proposition est une CORRECTION d'un lieu déjà publié plutôt qu'un nouveau lieu, et
+// `sourceNote` (recommandé) expliquant d'où vient l'information.
+window.submitLocationForReview = async function (data, submittedBy) {
+    try {
+        const ref = doc(collection(db, 'locationSubmissions'));
+        await setDoc(ref, Object.assign({}, data, {
+            status: 'pending',
+            submittedBy: submittedBy || 'unknown',
+            submittedAt: serverTimestamp()
+        }));
+        return { success: true, id: ref.id };
+    } catch (e) {
+        console.warn('Soumission d\'un lieu échouée :', e);
+        return { success: false, code: e && e.code || 'unknown' };
+    }
+};
+
+// Réservé aux administrateurs (voir isCurrentUserAdmin) — la règle Firestore ci-dessus
+// refuse la lecture à tout autre compte, cette fonction renvoie donc [] pour eux plutôt
+// que de planter.
+window.listPendingSubmissions = async function () {
+    try {
+        const q = query(collection(db, 'locationSubmissions'), where('status', '==', 'pending'));
+        const snap = await getDocs(q);
+        const result = [];
+        snap.forEach(d => result.push(Object.assign({ id: d.id }, d.data())));
+        return result;
+    } catch (e) {
+        console.warn('Lecture des propositions en attente échouée :', e);
+        return [];
+    }
+};
+
+// Publie la proposition : les champs "contenu" (Story/infos pratiques/conseils/vidéo)
+// vont dans locationContent/{id} (lu par TOUT visiteur via fetchLocationContent, voir
+// plus haut) ; s'il s'agit d'un NOUVEAU lieu (pas de matchedLocId), les champs "légers"
+// nécessaires à son affichage sur la carte (nom, coordonnées, catégorie...) vont EN PLUS
+// dans newLocations/{id}, que script.js fusionne dans celebLocations au chargement de la
+// carte (voir map.html) — un nouveau lieu approuvé devient donc visible sans jamais
+// toucher à script.js.
+window.approveLocationSubmission = async function (submission) {
+    const isAdmin = await window.isCurrentUserAdmin();
+    if (!isAdmin) return { success: false, code: 'not-admin' };
+    try {
+        const targetId = submission.matchedLocId ? String(submission.matchedLocId) : 'new-' + submission.id;
+        const contentFields = ['fullDescription', 'practicalInfo', 'tipsList', 'tip', 'directions', 'videoEmbeds', 'ytId', 'episodeLink'];
+        const contentDoc = {};
+        contentFields.forEach(f => { if (submission[f] !== undefined) contentDoc[f] = submission[f]; });
+        await setDoc(doc(db, 'locationContent', targetId), contentDoc, { merge: true });
+
+        if (!submission.matchedLocId) {
+            const lightFields = ['name', 'group', 'member', 'country', 'city', 'category', 'year', 'episode', 'address', 'lat', 'lng', 'img'];
+            const lightDoc = { id: targetId };
+            lightFields.forEach(f => { if (submission[f] !== undefined) lightDoc[f] = submission[f]; });
+            await setDoc(doc(db, 'newLocations', targetId), lightDoc);
+        }
+
+        await setDoc(doc(db, 'locationSubmissions', submission.id), { status: 'approved', reviewedAt: serverTimestamp() }, { merge: true });
+        return { success: true, publishedId: targetId };
+    } catch (e) {
+        console.warn('Approbation de la proposition échouée :', e);
+        return { success: false, code: e && e.code || 'unknown' };
+    }
+};
+
+window.rejectLocationSubmission = async function (submissionId, note) {
+    const isAdmin = await window.isCurrentUserAdmin();
+    if (!isAdmin) return { success: false, code: 'not-admin' };
+    try {
+        await setDoc(doc(db, 'locationSubmissions', submissionId), { status: 'rejected', reviewedAt: serverTimestamp(), reviewNote: note || '' }, { merge: true });
+        return { success: true };
+    } catch (e) {
+        console.warn('Rejet de la proposition échoué :', e);
+        return { success: false, code: e && e.code || 'unknown' };
+    }
+};
+
+// Lu par map.html au chargement (voir firebase-ready) : les nouveaux lieux déjà approuvés
+// (voir approveLocationSubmission ci-dessus) sont fusionnés dans celebLocations à la
+// volée, jamais écrits dans script.js.
+window.fetchNewLocations = async function () {
+    try {
+        const snap = await getDocs(collection(db, 'newLocations'));
+        const result = [];
+        snap.forEach(d => result.push(d.data()));
+        return result;
+    } catch (e) {
+        console.warn('Lecture des nouveaux lieux échouée :', e);
         return [];
     }
 };
