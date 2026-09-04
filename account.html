@@ -383,7 +383,9 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
             : (isFr ? `Pass Voyage · actif jusqu'au ${new Date(passExpiresAt).toLocaleDateString('fr-FR')}` : `Travel Pass · active until ${new Date(passExpiresAt).toLocaleDateString('en-US')}`);
         const price = passType === 'lifetime' ? '19.99€' : '9.99€';
         document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#D4275918;color:#D42759;">${label}</span>`;
-        document.getElementById('receipts').innerHTML = `<div class="receipt-row"><span style="font-weight:600;color:#212832;">${label}</span><span style="color:#94a3b8;">${price}</span></div>`;
+        // Ne pas répéter le nom du pass ici : le badge ci-dessus l'affiche déjà. Cette
+        // ligne complète l'info avec ce que le badge ne montre pas (le montant payé).
+        document.getElementById('receipts').innerHTML = `<div class="receipt-row"><span style="color:#94a3b8;">${t('accAmountPaid')}</span><span style="font-weight:700;color:#212832;">${price}</span></div>`;
     } else {
         document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#f1f5f9;color:#64748b;">${t('accNoPasses')}</span>`;
     }
@@ -659,6 +661,8 @@ h1.pg-title { font-size: 28px; font-weight: 700; color: #D42759; text-align: cen
                 ? (isFr2 ? 'Pass VIP (accès à vie)' : 'VIP Pass (lifetime)')
                 : (isFr2 ? `Pass Voyage · actif jusqu'au ${new Date(passExpiresAt2).toLocaleDateString('fr-FR')}` : `Travel Pass · active until ${new Date(passExpiresAt2).toLocaleDateString('en-US')}`);
             document.getElementById('unlocked-passes').innerHTML = `<span class="pill" style="background:#D4275918;color:#D42759;">${label2}</span>`;
+            const price2 = passType2 === 'lifetime' ? '19.99€' : '9.99€';
+            document.getElementById('receipts').innerHTML = `<div class="receipt-row"><span style="color:#94a3b8;">${t('accAmountPaid')}</span><span style="font-weight:700;color:#212832;">${price2}</span></div>`;
         }
     };
 

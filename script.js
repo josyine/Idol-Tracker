@@ -2176,7 +2176,7 @@ const translations = {
         accTitle: "Your Account", accChangePhoto: "Change Profile Picture", accResetPhoto: "Reset profile picture", accNameLabel: "Username", accChangeUsernameHint: "Change username", accEmailLabel: "Email address",
         accCountryLabel: "Country you're interested in", accCountryPlaceholder: "Select a country (optional)",
         accActivityTitle: "Your activity", accTrips: "Trips", accVisited: "Visited", accWishlist: "Wishlist", accPasses: "Passes & billing",
-        accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes",
+        accEditBtn: "Edit Profile", accSaveBtn: "Save Changes", accSaved: "✓ Saved Successfully", accNoPasses: "No active passes", accAmountPaid: "Amount paid",
         accDangerZone: "Danger zone",
         accDeleteConfirmTitle: "Are you sure you want to delete your account?",
         accDeleteConfirmBody: "This action is permanent. You will not be refunded for any unlocked passes, and all your data — trips, wishlist, and visited places — will be permanently lost.",
@@ -2194,7 +2194,7 @@ const translations = {
         destTitle: "Explore Destinations", destSub: "Browse every country and city featured on Screen To Street", destCountries: "Countries", destCities: "Cities", destLocations: "Locations", destViewMap: "View on Map →",
         artTitle: "Explore Artists", artSub: "Discover every group featured on Screen To Street", artGroups: "Groups", artFeatured: "Featured group",
 
-        gateLoginTitle: "Log in to continue", gateLoginDesc: "You need an account to explore the map.",
+        gateLoginTitle: "Log in to continue", gateLoginDesc: "Log in if you already have an account, or sign up if you don't. You can also continue without an account — 3 locations included, free.", gateContinueFreeText: "Prefer not to create an account?", gateContinueFreeLink: "Continue free — 3 locations included",
         gateEmailLabel: "Email address", gatePasswordLabel: "Password", gateForgotPassword: "Forgot password?",
         gateLoginBtn: "Log in", gateOrDivider: "OR", gateGoogleBtn: "Continue with Google",
         gateSignupPrompt: "Don't have an account?", gateSignupLink: "Sign up",
@@ -2205,7 +2205,7 @@ const translations = {
         tourModeLiveIn: "Live now — BTS is live in {city}", tourModeSchedule: "Tour Schedule", tourModeLive: "Live", tourModeDone: "Done", tourModeUpcoming: "Upcoming", tourModePrev: "Previous", tourModeNext: "Next",
         tourModeFooterNote: "Dates as announced by the tour — always double-check official ticketing sites before booking travel.",
         liveBadgeLabel: "Live", liveTimelineTitle: " & upcoming", liveTimelineEmpty: "Nothing scheduled right now — check back soon.", liveTimelineFooterNote: "Only official, publicly announced activities — dates as announced, always double-check official sources before booking travel.", liveFilterAll: "All", liveTodayLive: "Today · Live", liveKindGroup: "Group", liveKindSolo: "Solo", newBadgeLabel: "New", usernameCooldownNote: "You can only change this once every 7 days.", usernameConfirmTitle: "Change your username?", usernameConfirmCancel: "Cancel", usernameConfirmOk: "Yes, change it", subtitle: "Following the footsteps of your favorite artists", backToList: "← Back to list", chooserTourOption: "Tour route", chooserLiveOption: "All live activity", tripShareThis: "+ Share this trip", switchArtistLabel: "Switch artist", groupNoDataYet: "No tour or live data available yet for {group} — check back soon.", tripInviteLabel: "Invite people (optional)", shareTripUsernamePlaceholder: "Their username",
-        tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} is live now — {event} in {city}",
+        tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} is live now — {event} in {city}", tourModeLiveNowOne: "Live now", tourModeLiveNowCount: "{n} live now",
         tourModeEyebrow: "Tour Mode", tourModeChooseTour: "Choose a tour", tourModeStep: "Step {n} of {total}",
         tourModeHighlights: "Highlights", tourModeSurpriseSong: "Surprise song:", tourModeNoHighlightsYet: "No highlights added yet for this show.", tourModeNoSurpriseSongYet: "Not announced yet.",
         mapLoading: "Loading map…",
@@ -2239,7 +2239,7 @@ const translations = {
         accTitle: "Votre compte", accChangePhoto: "Changer la photo de profil", accResetPhoto: "Réinitialiser la photo de profil", accNameLabel: "Identifiant", accChangeUsernameHint: "Changer d'identifiant", accEmailLabel: "Adresse e-mail",
         accCountryLabel: "Pays qui vous intéresse", accCountryPlaceholder: "Choisir un pays (optionnel)",
         accActivityTitle: "Votre activité", accTrips: "Voyages", accVisited: "Visités", accWishlist: "Wishlist", accPasses: "Pass et facturation",
-        accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif",
+        accEditBtn: "Modifier le profil", accSaveBtn: "Enregistrer", accSaved: "✓ Enregistré avec succès", accNoPasses: "Aucun pass actif", accAmountPaid: "Montant payé",
         accDangerZone: "Zone de danger",
         accDeleteConfirmTitle: "Êtes-vous sûr(e) de vouloir supprimer votre compte ?",
         accDeleteConfirmBody: "Cette action est définitive. Vous ne serez pas remboursé(e) pour les pass débloqués, et toutes vos données — voyages, wishlist et lieux visités — seront définitivement perdues.",
@@ -2257,7 +2257,7 @@ const translations = {
         destTitle: "Explorer les destinations", destSub: "Parcourez tous les pays et villes présents sur Screen To Street", destCountries: "Pays", destCities: "Villes", destLocations: "Lieux", destViewMap: "Voir sur la carte →",
         artTitle: "Explorer les artistes", artSub: "Découvrez tous les groupes présents sur Screen To Street", artGroups: "Groupes", artFeatured: "Groupe à la une",
 
-        gateLoginTitle: "Se connecter pour continuer", gateLoginDesc: "Un compte est nécessaire pour explorer la carte.",
+        gateLoginTitle: "Se connecter pour continuer", gateLoginDesc: "Connectez-vous si vous avez déjà un compte, ou créez-en un si ce n'est pas le cas. Vous pouvez aussi continuer sans compte — 3 lieux inclus, gratuitement.", gateContinueFreeText: "Vous préférez ne pas créer de compte ?", gateContinueFreeLink: "Continuer gratuitement — 3 lieux inclus",
         gateEmailLabel: "Adresse e-mail", gatePasswordLabel: "Mot de passe", gateForgotPassword: "Mot de passe oublié ?",
         gateLoginBtn: "Se connecter", gateOrDivider: "OU", gateGoogleBtn: "Continuer avec Google",
         gateSignupPrompt: "Vous n'avez pas de compte ?", gateSignupLink: "S'inscrire",
@@ -2268,7 +2268,7 @@ const translations = {
         tourModeLiveIn: "En direct — BTS est en concert à {city}", tourModeSchedule: "Calendrier de la tournée", tourModeLive: "En direct", tourModeDone: "Terminé", tourModeUpcoming: "À venir", tourModePrev: "Précédent", tourModeNext: "Suivant",
         tourModeFooterNote: "Dates annoncées par la tournée — vérifiez toujours les sites de billetterie officiels avant de réserver un voyage.",
         liveBadgeLabel: "Live", liveTimelineTitle: " et à venir", liveTimelineEmpty: "Rien de prévu pour le moment — revenez bientôt.", liveTimelineFooterNote: "Uniquement des activités officielles et rendues publiques — dates annoncées, vérifiez toujours les sources officielles avant de réserver un voyage.", liveFilterAll: "Tous", liveTodayLive: "Aujourd'hui · En direct", liveKindGroup: "Groupe", liveKindSolo: "Solo", newBadgeLabel: "Nouveau", usernameCooldownNote: "Vous ne pouvez changer ceci qu'une fois tous les 7 jours.", usernameConfirmTitle: "Changer votre identifiant ?", usernameConfirmCancel: "Annuler", usernameConfirmOk: "Oui, changer", subtitle: "Sur les traces de vos artistes préférés", backToList: "← Retour à la liste", chooserTourOption: "Itinéraire de tournée", chooserLiveOption: "Toute l'activité en direct", tripShareThis: "+ Partager ce voyage", switchArtistLabel: "Changer d'artiste", groupNoDataYet: "Aucune donnée de tournée ou de live disponible pour {group} pour le moment — revenez bientôt.", tripInviteLabel: "Inviter des personnes (facultatif)", shareTripUsernamePlaceholder: "Leur pseudo",
-        tourModeGenericLabel: "Tournée", tourModeMemberLiveIn: "{member} est en direct — {event} à {city}",
+        tourModeGenericLabel: "Tournée", tourModeMemberLiveIn: "{member} est en direct — {event} à {city}", tourModeLiveNowOne: "En direct maintenant", tourModeLiveNowCount: "{n} en direct maintenant",
         tourModeEyebrow: "Mode Tournée", tourModeChooseTour: "Choisir une tournée", tourModeStep: "Étape {n} sur {total}",
         tourModeHighlights: "Temps forts", tourModeSurpriseSong: "Chanson surprise :", tourModeNoHighlightsYet: "Aucun temps fort ajouté pour ce concert pour le moment.", tourModeNoSurpriseSongYet: "Pas encore annoncée.",
         mapLoading: "Chargement de la carte…",
@@ -2302,7 +2302,7 @@ const translations = {
         accTitle: "Tu cuenta", accChangePhoto: "Cambiar foto de perfil", accResetPhoto: "Restablecer foto de perfil", accNameLabel: "Nombre de usuario", accChangeUsernameHint: "Cambiar nombre de usuario", accEmailLabel: "Correo electrónico",
         accCountryLabel: "País que te interesa", accCountryPlaceholder: "Elige un país (opcional)",
         accActivityTitle: "Tu actividad", accTrips: "Viajes", accVisited: "Visitados", accWishlist: "Lista de deseos", accPasses: "Pases y facturación",
-        accEditBtn: "Editar perfil", accSaveBtn: "Guardar cambios", accSaved: "✓ Guardado con éxito", accNoPasses: "Sin pases activos",
+        accEditBtn: "Editar perfil", accSaveBtn: "Guardar cambios", accSaved: "✓ Guardado con éxito", accNoPasses: "Sin pases activos", accAmountPaid: "Importe pagado",
         accDangerZone: "Zona de peligro",
         accDeleteConfirmTitle: "¿Seguro que quieres eliminar tu cuenta?",
         accDeleteConfirmBody: "Esta acción es permanente. No se te reembolsará ningún pase desbloqueado, y todos tus datos — viajes, lista de deseos y lugares visitados — se perderán definitivamente.",
@@ -2320,7 +2320,7 @@ const translations = {
         destTitle: "Explorar Destinos", destSub: "Explora todos los países y ciudades de Screen To Street", destCountries: "Países", destCities: "Ciudades", destLocations: "Lugares", destViewMap: "Ver en el mapa →",
         artTitle: "Explorar Artistas", artSub: "Descubre todos los grupos presentes en Screen To Street", artGroups: "Grupos", artFeatured: "Grupo destacado",
 
-        gateLoginTitle: "Inicia sesión para continuar", gateLoginDesc: "Necesitas una cuenta para explorar el mapa.",
+        gateLoginTitle: "Inicia sesión para continuar", gateLoginDesc: "Inicia sesión si ya tienes una cuenta, o regístrate si no la tienes. También puedes continuar sin cuenta — 3 lugares incluidos, gratis.", gateContinueFreeText: "¿Prefieres no crear una cuenta?", gateContinueFreeLink: "Continuar gratis — 3 lugares incluidos",
         gateEmailLabel: "Correo electrónico", gatePasswordLabel: "Contraseña", gateForgotPassword: "¿Olvidaste tu contraseña?",
         gateLoginBtn: "Iniciar sesión", gateOrDivider: "O", gateGoogleBtn: "Continuar con Google",
         gateSignupPrompt: "¿No tienes cuenta?", gateSignupLink: "Regístrate",
@@ -2331,7 +2331,7 @@ const translations = {
         tourModeLiveIn: "En directo — BTS está actuando en {city}", tourModeSchedule: "Calendario de la gira", tourModeLive: "En directo", tourModeDone: "Finalizado", tourModeUpcoming: "Próximamente", tourModePrev: "Anterior", tourModeNext: "Siguiente",
         tourModeFooterNote: "Fechas anunciadas por la gira — comprueba siempre los sitios oficiales de venta de entradas antes de reservar un viaje.",
         liveBadgeLabel: "En vivo", liveTimelineTitle: " y próximos", liveTimelineEmpty: "Nada programado por ahora — vuelve pronto.", liveTimelineFooterNote: "Solo actividades oficiales y anunciadas públicamente — fechas según lo anunciado, comprueba siempre las fuentes oficiales antes de reservar un viaje.", liveFilterAll: "Todos", liveTodayLive: "Hoy · En vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Nuevo", usernameCooldownNote: "Solo puedes cambiar esto una vez cada 7 días.", usernameConfirmTitle: "¿Cambiar tu nombre de usuario?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sí, cambiarlo", subtitle: "Siguiendo los pasos de tus artistas favoritos", backToList: "← Volver a la lista", chooserTourOption: "Ruta de la gira", chooserLiveOption: "Toda la actividad en directo", tripShareThis: "+ Compartir este viaje", switchArtistLabel: "Cambiar de artista", groupNoDataYet: "Aún no hay datos de gira ni de directo para {group} — vuelve pronto.", tripInviteLabel: "Invitar personas (opcional)", shareTripUsernamePlaceholder: "Su nombre de usuario",
-        tourModeGenericLabel: "Gira", tourModeMemberLiveIn: "{member} está en directo — {event} en {city}",
+        tourModeGenericLabel: "Gira", tourModeMemberLiveIn: "{member} está en directo — {event} en {city}", tourModeLiveNowOne: "En directo ahora", tourModeLiveNowCount: "{n} en directo ahora",
         tourModeEyebrow: "Modo Gira", tourModeChooseTour: "Elegir una gira", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Momentos destacados", tourModeSurpriseSong: "Canción sorpresa:", tourModeNoHighlightsYet: "Aún no se han añadido momentos destacados para este concierto.", tourModeNoSurpriseSongYet: "Aún no anunciada.",
         mapLoading: "Cargando el mapa…",
@@ -2364,7 +2364,7 @@ const translations = {
         accTitle: "Il tuo account", accChangePhoto: "Cambia foto profilo", accResetPhoto: "Ripristina foto profilo", accNameLabel: "Nome utente", accChangeUsernameHint: "Cambia nome utente", accEmailLabel: "Indirizzo email",
         accCountryLabel: "Paese che ti interessa", accCountryPlaceholder: "Scegli un paese (opzionale)",
         accActivityTitle: "La tua attività", accTrips: "Viaggi", accVisited: "Visitati", accWishlist: "Wishlist", accPasses: "Pass e fatturazione",
-        accEditBtn: "Modifica profilo", accSaveBtn: "Salva modifiche", accSaved: "✓ Salvato con successo", accNoPasses: "Nessun pass attivo",
+        accEditBtn: "Modifica profilo", accSaveBtn: "Salva modifiche", accSaved: "✓ Salvato con successo", accNoPasses: "Nessun pass attivo", accAmountPaid: "Importo pagato",
         accDangerZone: "Zona pericolosa",
         accDeleteConfirmTitle: "Sei sicuro di voler eliminare il tuo account?",
         accDeleteConfirmBody: "Questa azione è permanente. Non riceverai rimborsi per i pass sbloccati e tutti i tuoi dati — viaggi, wishlist e luoghi visitati — andranno persi definitivamente.",
@@ -2382,7 +2382,7 @@ const translations = {
         destTitle: "Esplora Destinazioni", destSub: "Esplora tutti i paesi e le città presenti su Screen To Street", destCountries: "Paesi", destCities: "Città", destLocations: "Luoghi", destViewMap: "Vedi sulla mappa →",
         artTitle: "Esplora Artisti", artSub: "Scopri tutti i gruppi presenti su Screen To Street", artGroups: "Gruppi", artFeatured: "Gruppo in evidenza",
 
-        gateLoginTitle: "Accedi per continuare", gateLoginDesc: "Devi avere un account per esplorare la mappa.",
+        gateLoginTitle: "Accedi per continuare", gateLoginDesc: "Accedi se hai già un account, oppure registrati se non lo hai. Puoi anche continuare senza account — 3 luoghi inclusi, gratis.", gateContinueFreeText: "Preferisci non creare un account?", gateContinueFreeLink: "Continua gratis — 3 luoghi inclusi",
         gateEmailLabel: "Indirizzo email", gatePasswordLabel: "Password", gateForgotPassword: "Password dimenticata?",
         gateLoginBtn: "Accedi", gateOrDivider: "OPPURE", gateGoogleBtn: "Continua con Google",
         gateSignupPrompt: "Non hai un account?", gateSignupLink: "Registrati",
@@ -2393,7 +2393,7 @@ const translations = {
         tourModeLiveIn: "In diretta — I BTS si esibiscono a {city}", tourModeSchedule: "Calendario del tour", tourModeLive: "In diretta", tourModeDone: "Concluso", tourModeUpcoming: "In arrivo", tourModePrev: "Precedente", tourModeNext: "Successivo",
         tourModeFooterNote: "Date annunciate dal tour — verifica sempre i siti di biglietteria ufficiali prima di prenotare un viaggio.",
         liveBadgeLabel: "Live", liveTimelineTitle: " e prossimi", liveTimelineEmpty: "Nulla in programma al momento — torna a trovarci presto.", liveTimelineFooterNote: "Solo attività ufficiali e annunciate pubblicamente — date come annunciate, verifica sempre le fonti ufficiali prima di prenotare un viaggio.", liveFilterAll: "Tutti", liveTodayLive: "Oggi · Live", liveKindGroup: "Gruppo", liveKindSolo: "Solo", newBadgeLabel: "Nuovo", usernameCooldownNote: "Puoi modificarlo solo una volta ogni 7 giorni.", usernameConfirmTitle: "Vuoi cambiare il tuo nome utente?", usernameConfirmCancel: "Annulla", usernameConfirmOk: "Sì, cambialo", subtitle: "Sulle orme dei tuoi artisti preferiti", backToList: "← Torna alla lista", chooserTourOption: "Percorso del tour", chooserLiveOption: "Tutta l'attività dal vivo", tripShareThis: "+ Condividi questo viaggio", switchArtistLabel: "Cambia artista", groupNoDataYet: "Nessun dato di tour o live disponibile ancora per {group} — torna a trovarci presto.", tripInviteLabel: "Invita persone (facoltativo)", shareTripUsernamePlaceholder: "Il loro nome utente",
-        tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} è in diretta — {event} a {city}",
+        tourModeGenericLabel: "Tour", tourModeMemberLiveIn: "{member} è in diretta — {event} a {city}", tourModeLiveNowOne: "In diretta ora", tourModeLiveNowCount: "{n} in diretta ora",
         tourModeEyebrow: "Modalità Tour", tourModeChooseTour: "Scegli un tour", tourModeStep: "Tappa {n} di {total}",
         tourModeHighlights: "Momenti salienti", tourModeSurpriseSong: "Canzone a sorpresa:", tourModeNoHighlightsYet: "Nessun momento saliente ancora aggiunto per questo concerto.", tourModeNoSurpriseSongYet: "Non ancora annunciata.",
         mapLoading: "Caricamento della mappa…",
@@ -2426,7 +2426,7 @@ const translations = {
         accTitle: "Sua conta", accChangePhoto: "Alterar foto de perfil", accResetPhoto: "Redefinir foto de perfil", accNameLabel: "Nome de usuário", accChangeUsernameHint: "Alterar nome de usuário", accEmailLabel: "Endereço de e-mail",
         accCountryLabel: "País de interesse", accCountryPlaceholder: "Escolha um país (opcional)",
         accActivityTitle: "Sua atividade", accTrips: "Viagens", accVisited: "Visitados", accWishlist: "Wishlist", accPasses: "Passes e faturamento",
-        accEditBtn: "Editar perfil", accSaveBtn: "Salvar alterações", accSaved: "✓ Salvo com sucesso", accNoPasses: "Nenhum passe ativo",
+        accEditBtn: "Editar perfil", accSaveBtn: "Salvar alterações", accSaved: "✓ Salvo com sucesso", accNoPasses: "Nenhum passe ativo", accAmountPaid: "Valor pago",
         accDangerZone: "Zona de perigo",
         accDeleteConfirmTitle: "Tem certeza de que deseja excluir sua conta?",
         accDeleteConfirmBody: "Esta ação é permanente. Você não será reembolsado por nenhum passe desbloqueado, e todos os seus dados — viagens, wishlist e locais visitados — serão perdidos definitivamente.",
@@ -2444,7 +2444,7 @@ const translations = {
         destTitle: "Explorar Destinos", destSub: "Explore todos os países e cidades do Screen To Street", destCountries: "Países", destCities: "Cidades", destLocations: "Locais", destViewMap: "Ver no mapa →",
         artTitle: "Explorar Artistas", artSub: "Descubra todos os grupos presentes no Screen To Street", artGroups: "Grupos", artFeatured: "Grupo em destaque",
 
-        gateLoginTitle: "Entre para continuar", gateLoginDesc: "Você precisa de uma conta para explorar o mapa.",
+        gateLoginTitle: "Entre para continuar", gateLoginDesc: "Entre se já tiver uma conta, ou cadastre-se se não tiver. Você também pode continuar sem conta — 3 locais incluídos, grátis.", gateContinueFreeText: "Prefere não criar uma conta?", gateContinueFreeLink: "Continuar grátis — 3 locais incluídos",
         gateEmailLabel: "Endereço de e-mail", gatePasswordLabel: "Senha", gateForgotPassword: "Esqueceu a senha?",
         gateLoginBtn: "Entrar", gateOrDivider: "OU", gateGoogleBtn: "Continuar com Google",
         gateSignupPrompt: "Não tem uma conta?", gateSignupLink: "Cadastre-se",
@@ -2455,7 +2455,7 @@ const translations = {
         tourModeLiveIn: "Ao vivo — BTS está se apresentando em {city}", tourModeSchedule: "Calendário da turnê", tourModeLive: "Ao vivo", tourModeDone: "Concluído", tourModeUpcoming: "Em breve", tourModePrev: "Anterior", tourModeNext: "Próximo",
         tourModeFooterNote: "Datas anunciadas pela turnê — sempre confira os sites oficiais de venda de ingressos antes de reservar uma viagem.",
         liveBadgeLabel: "Ao vivo", liveTimelineTitle: " e próximos", liveTimelineEmpty: "Nada programado no momento — volte em breve.", liveTimelineFooterNote: "Apenas atividades oficiais e anunciadas publicamente — datas conforme anunciadas, sempre confira as fontes oficiais antes de reservar uma viagem.", liveFilterAll: "Todos", liveTodayLive: "Hoje · Ao vivo", liveKindGroup: "Grupo", liveKindSolo: "Solo", newBadgeLabel: "Novo", usernameCooldownNote: "Você só pode alterar isso uma vez a cada 7 dias.", usernameConfirmTitle: "Alterar seu nome de usuário?", usernameConfirmCancel: "Cancelar", usernameConfirmOk: "Sim, alterar", subtitle: "Nos passos dos seus artistas favoritos", backToList: "← Voltar à lista", chooserTourOption: "Rota da turnê", chooserLiveOption: "Toda a atividade ao vivo", tripShareThis: "+ Compartilhar esta viagem", switchArtistLabel: "Trocar de artista", groupNoDataYet: "Ainda não há dados de turnê ou ao vivo para {group} — volte em breve.", tripInviteLabel: "Convidar pessoas (opcional)", shareTripUsernamePlaceholder: "O nome de usuário deles",
-        tourModeGenericLabel: "Turnê", tourModeMemberLiveIn: "{member} está ao vivo agora — {event} em {city}",
+        tourModeGenericLabel: "Turnê", tourModeMemberLiveIn: "{member} está ao vivo agora — {event} em {city}", tourModeLiveNowOne: "Ao vivo agora", tourModeLiveNowCount: "{n} ao vivo agora",
         tourModeEyebrow: "Modo Turnê", tourModeChooseTour: "Escolher uma turnê", tourModeStep: "Etapa {n} de {total}",
         tourModeHighlights: "Melhores momentos", tourModeSurpriseSong: "Música surpresa:", tourModeNoHighlightsYet: "Nenhum destaque adicionado ainda para este show.", tourModeNoSurpriseSongYet: "Ainda não anunciada.",
         mapLoading: "Carregando o mapa…",
@@ -2488,7 +2488,7 @@ const translations = {
         accTitle: "내 계정", accChangePhoto: "프로필 사진 변경", accResetPhoto: "프로필 사진 재설정", accNameLabel: "아이디", accChangeUsernameHint: "아이디 변경", accEmailLabel: "이메일 주소",
         accCountryLabel: "관심 있는 국가", accCountryPlaceholder: "국가 선택 (선택 사항)",
         accActivityTitle: "내 활동", accTrips: "여행", accVisited: "방문함", accWishlist: "위시리스트", accPasses: "이용권 및 결제",
-        accEditBtn: "프로필 수정", accSaveBtn: "변경사항 저장", accSaved: "✓ 저장되었습니다", accNoPasses: "활성화된 이용권 없음",
+        accEditBtn: "프로필 수정", accSaveBtn: "변경사항 저장", accSaved: "✓ 저장되었습니다", accNoPasses: "활성화된 이용권 없음", accAmountPaid: "결제 금액",
         accDangerZone: "위험 구역",
         accDeleteConfirmTitle: "정말 계정을 삭제하시겠습니까?",
         accDeleteConfirmBody: "이 작업은 되돌릴 수 없습니다. 잠금 해제한 이용권에 대한 환불은 제공되지 않으며, 여행·위시리스트·방문한 장소를 포함한 모든 데이터가 영구적으로 사라집니다.",
@@ -2506,7 +2506,7 @@ const translations = {
         destTitle: "여행지 둘러보기", destSub: "Screen To Street에 소개된 모든 국가와 도시를 살펴보세요", destCountries: "국가", destCities: "도시", destLocations: "장소", destViewMap: "지도에서 보기 →",
         artTitle: "아티스트 둘러보기", artSub: "Screen To Street에 소개된 모든 그룹을 만나보세요", artGroups: "그룹", artFeatured: "추천 그룹",
 
-        gateLoginTitle: "계속하려면 로그인하세요", gateLoginDesc: "지도를 보려면 계정이 필요합니다.",
+        gateLoginTitle: "계속하려면 로그인하세요", gateLoginDesc: "이미 계정이 있다면 로그인하고, 없다면 가입하세요. 계정 없이도 계속할 수 있습니다 — 무료로 3곳 이용 가능.", gateContinueFreeText: "계정을 만들고 싶지 않으신가요?", gateContinueFreeLink: "무료로 계속하기 — 3곳 포함",
         gateEmailLabel: "이메일 주소", gatePasswordLabel: "비밀번호", gateForgotPassword: "비밀번호를 잊으셨나요?",
         gateLoginBtn: "로그인", gateOrDivider: "또는", gateGoogleBtn: "Google로 계속하기",
         gateSignupPrompt: "계정이 없으신가요?", gateSignupLink: "회원가입",
@@ -2517,7 +2517,7 @@ const translations = {
         tourModeLiveIn: "라이브 중 — BTS가 {city}에서 공연 중입니다", tourModeSchedule: "투어 일정", tourModeLive: "라이브", tourModeDone: "종료", tourModeUpcoming: "예정", tourModePrev: "이전", tourModeNext: "다음",
         tourModeFooterNote: "투어 측이 발표한 날짜입니다 — 여행 예약 전 공식 티켓 판매 사이트를 꼭 확인하세요.",
         liveBadgeLabel: "라이브", liveTimelineTitle: " 및 예정", liveTimelineEmpty: "지금은 예정된 일정이 없습니다 — 곧 다시 확인해주세요.", liveTimelineFooterNote: "공식적으로 공개된 활동만 표시됩니다 — 발표된 날짜 기준이며, 여행 예약 전 항상 공식 출처를 확인하세요.", liveFilterAll: "전체", liveTodayLive: "오늘 · 라이브", liveKindGroup: "그룹", liveKindSolo: "솔로", newBadgeLabel: "신규", usernameCooldownNote: "7일에 한 번만 변경할 수 있습니다.", usernameConfirmTitle: "아이디를 변경하시겠습니까?", usernameConfirmCancel: "취소", usernameConfirmOk: "네, 변경합니다", subtitle: "당신이 좋아하는 아티스트의 발자취를 따라", backToList: "← 목록으로 돌아가기", chooserTourOption: "투어 경로", chooserLiveOption: "모든 라이브 활동", tripShareThis: "+ 이 여행 공유하기", switchArtistLabel: "아티스트 변경", groupNoDataYet: "{group}의 투어 또는 라이브 정보가 아직 없습니다 — 곧 다시 확인해주세요.", tripInviteLabel: "사람 초대하기 (선택 사항)", shareTripUsernamePlaceholder: "상대방 아이디",
-        tourModeGenericLabel: "투어", tourModeMemberLiveIn: "{member} 라이브 중 — {city}에서 {event}",
+        tourModeGenericLabel: "투어", tourModeMemberLiveIn: "{member} 라이브 중 — {city}에서 {event}", tourModeLiveNowOne: "지금 라이브", tourModeLiveNowCount: "지금 {n}건 라이브",
         tourModeEyebrow: "투어 모드", tourModeChooseTour: "투어 선택", tourModeStep: "{total}단계 중 {n}단계",
         tourModeHighlights: "하이라이트", tourModeSurpriseSong: "깜짝 곡:", tourModeNoHighlightsYet: "이 공연의 하이라이트가 아직 등록되지 않았습니다.", tourModeNoSurpriseSongYet: "아직 발표되지 않았습니다.",
         mapLoading: "지도를 불러오는 중…",
@@ -2550,7 +2550,7 @@ const translations = {
         accTitle: "アカウント", accChangePhoto: "プロフィール写真を変更", accResetPhoto: "プロフィール写真をリセット", accNameLabel: "ユーザー名", accChangeUsernameHint: "ユーザー名を変更", accEmailLabel: "メールアドレス",
         accCountryLabel: "興味のある国", accCountryPlaceholder: "国を選択（任意）",
         accActivityTitle: "アクティビティ", accTrips: "旅行", accVisited: "訪問済み", accWishlist: "ウィッシュリスト", accPasses: "パスとお支払い",
-        accEditBtn: "プロフィールを編集", accSaveBtn: "変更を保存", accSaved: "✓ 保存しました", accNoPasses: "有効なパスはありません",
+        accEditBtn: "プロフィールを編集", accSaveBtn: "変更を保存", accSaved: "✓ 保存しました", accNoPasses: "有効なパスはありません", accAmountPaid: "お支払い金額",
         accDangerZone: "危険ゾーン",
         accDeleteConfirmTitle: "本当にアカウントを削除しますか？",
         accDeleteConfirmBody: "この操作は取り消せません。解除済みのパスは返金されず、旅行・ウィッシュリスト・訪れた場所を含むすべてのデータが完全に失われます。",
@@ -2568,7 +2568,7 @@ const translations = {
         destTitle: "旅先を探す", destSub: "Screen To Streetで紹介されているすべての国と都市をチェック", destCountries: "国", destCities: "都市", destLocations: "スポット", destViewMap: "地図で見る →",
         artTitle: "アーティストを探す", artSub: "Screen To Streetで紹介されているすべてのグループを見る", artGroups: "グループ", artFeatured: "注目のグループ",
 
-        gateLoginTitle: "続けるにはログインしてください", gateLoginDesc: "地図を見るにはアカウントが必要です。",
+        gateLoginTitle: "続けるにはログインしてください", gateLoginDesc: "アカウントをお持ちの場合はログイン、お持ちでない場合は新規登録してください。アカウントなしで続けることもできます — 無料で3件まで閲覧可能です。", gateContinueFreeText: "アカウントを作成したくない場合は？", gateContinueFreeLink: "無料で続ける — 3件まで閲覧可能",
         gateEmailLabel: "メールアドレス", gatePasswordLabel: "パスワード", gateForgotPassword: "パスワードをお忘れですか？",
         gateLoginBtn: "ログイン", gateOrDivider: "または", gateGoogleBtn: "Googleで続ける",
         gateSignupPrompt: "アカウントをお持ちでないですか？", gateSignupLink: "新規登録",
@@ -2579,7 +2579,7 @@ const translations = {
         tourModeLiveIn: "ライブ配信中 — BTSは{city}で公演中です", tourModeSchedule: "ツアースケジュール", tourModeLive: "ライブ", tourModeDone: "終了", tourModeUpcoming: "開催予定", tourModePrev: "前へ", tourModeNext: "次へ",
         tourModeFooterNote: "ツアー側が発表した日程です — 旅行の予約前に必ず公式チケットサイトをご確認ください。",
         liveBadgeLabel: "ライブ", liveTimelineTitle: "・今後の予定", liveTimelineEmpty: "現在予定はありません — また後でご確認ください。", liveTimelineFooterNote: "公式に発表された活動のみを表示しています — 発表された日程です。旅行の予約前に必ず公式情報をご確認ください。", liveFilterAll: "すべて", liveTodayLive: "本日・ライブ", liveKindGroup: "グループ", liveKindSolo: "ソロ", newBadgeLabel: "新着", usernameCooldownNote: "この変更は7日に1回だけ行えます。", usernameConfirmTitle: "ユーザー名を変更しますか？", usernameConfirmCancel: "キャンセル", usernameConfirmOk: "はい、変更します", subtitle: "お気に入りのアーティストの足跡をたどって", backToList: "← リストに戻る", chooserTourOption: "ツアールート", chooserLiveOption: "すべてのライブ活動", tripShareThis: "+ この旅行を共有", switchArtistLabel: "アーティストを変更", groupNoDataYet: "{group}のツアー・ライブ情報はまだありません — また後でご確認ください。", tripInviteLabel: "メンバーを招待（任意）", shareTripUsernamePlaceholder: "相手のユーザー名",
-        tourModeGenericLabel: "ツアー", tourModeMemberLiveIn: "{member}がライブ配信中 — {city}で{event}",
+        tourModeGenericLabel: "ツアー", tourModeMemberLiveIn: "{member}がライブ配信中 — {city}で{event}", tourModeLiveNowOne: "現在ライブ中", tourModeLiveNowCount: "現在{n}件ライブ中",
         tourModeEyebrow: "ツアーモード", tourModeChooseTour: "ツアーを選択", tourModeStep: "ステップ {n}/{total}",
         tourModeHighlights: "ハイライト", tourModeSurpriseSong: "サプライズソング：", tourModeNoHighlightsYet: "この公演のハイライトはまだ追加されていません。", tourModeNoSurpriseSongYet: "まだ発表されていません。",
         mapLoading: "地図を読み込み中…",
@@ -2612,7 +2612,7 @@ const translations = {
         accTitle: "我的账户", accChangePhoto: "更换头像", accResetPhoto: "重置头像", accNameLabel: "用户名", accChangeUsernameHint: "更改用户名", accEmailLabel: "电子邮箱",
         accCountryLabel: "感兴趣的国家", accCountryPlaceholder: "选择国家（可选）",
         accActivityTitle: "我的动态", accTrips: "行程", accVisited: "已访问", accWishlist: "收藏清单", accPasses: "通行证与账单",
-        accEditBtn: "编辑资料", accSaveBtn: "保存更改", accSaved: "✓ 保存成功", accNoPasses: "暂无有效通行证",
+        accEditBtn: "编辑资料", accSaveBtn: "保存更改", accSaved: "✓ 保存成功", accNoPasses: "暂无有效通行证", accAmountPaid: "已支付金额",
         accDangerZone: "危险区域",
         accDeleteConfirmTitle: "确定要删除您的账户吗？",
         accDeleteConfirmBody: "此操作不可撤销。已解锁的通行证不会退款，且您的所有数据——行程、收藏清单和已访问地点——都将被永久删除。",
@@ -2630,7 +2630,7 @@ const translations = {
         destTitle: "探索目的地", destSub: "浏览 Screen To Street 收录的所有国家和城市", destCountries: "国家", destCities: "城市", destLocations: "地点", destViewMap: "在地图上查看 →",
         artTitle: "探索艺人", artSub: "了解 Screen To Street 收录的所有团体", artGroups: "团体", artFeatured: "精选团体",
 
-        gateLoginTitle: "登录以继续", gateLoginDesc: "您需要一个账户才能浏览地图。",
+        gateLoginTitle: "登录以继续", gateLoginDesc: "如果您已有账户，请登录；如果没有，请注册。您也可以不注册账户直接继续——免费包含3个地点。", gateContinueFreeText: "不想创建账户？", gateContinueFreeLink: "免费继续 —— 包含3个地点",
         gateEmailLabel: "电子邮箱", gatePasswordLabel: "密码", gateForgotPassword: "忘记密码？",
         gateLoginBtn: "登录", gateOrDivider: "或", gateGoogleBtn: "使用 Google 继续",
         gateSignupPrompt: "还没有账户？", gateSignupLink: "注册",
@@ -2641,7 +2641,7 @@ const translations = {
         tourModeLiveIn: "直播中 — BTS 正在{city}演出", tourModeSchedule: "巡演日程", tourModeLive: "直播中", tourModeDone: "已结束", tourModeUpcoming: "即将开始", tourModePrev: "上一个", tourModeNext: "下一个",
         tourModeFooterNote: "日期以巡演方公布为准——预订行程前请务必查看官方售票网站确认。",
         liveBadgeLabel: "直播", liveTimelineTitle: "与即将到来", liveTimelineEmpty: "目前暂无安排——请稍后再来查看。", liveTimelineFooterNote: "仅显示官方公开发布的活动——日期以官方公布为准，预订行程前请务必核实官方信息来源。", liveFilterAll: "全部", liveTodayLive: "今天 · 直播中", liveKindGroup: "团体", liveKindSolo: "单人", newBadgeLabel: "新增", usernameCooldownNote: "每7天只能更改一次。", usernameConfirmTitle: "要更改你的用户名吗？", usernameConfirmCancel: "取消", usernameConfirmOk: "是的，更改", subtitle: "追随你喜爱的艺人的足迹", backToList: "← 返回列表", chooserTourOption: "巡演路线", chooserLiveOption: "全部直播动态", tripShareThis: "+ 分享此行程", switchArtistLabel: "切换艺人", groupNoDataYet: "{group}暂无巡演或直播数据——请稍后再来查看。", tripInviteLabel: "邀请他人（可选）", shareTripUsernamePlaceholder: "对方的用户名",
-        tourModeGenericLabel: "巡演", tourModeMemberLiveIn: "{member} 直播中 — 于{city}参加{event}",
+        tourModeGenericLabel: "巡演", tourModeMemberLiveIn: "{member} 直播中 — 于{city}参加{event}", tourModeLiveNowOne: "现在直播中", tourModeLiveNowCount: "现在{n}个直播中",
         tourModeEyebrow: "巡演模式", tourModeChooseTour: "选择巡演", tourModeStep: "第 {n} 步，共 {total} 步",
         tourModeHighlights: "精彩瞬间", tourModeSurpriseSong: "惊喜曲目：", tourModeNoHighlightsYet: "该场演出暂无精彩瞬间记录。", tourModeNoSurpriseSongYet: "尚未公布。",
         mapLoading: "地图加载中…",
@@ -3652,6 +3652,30 @@ window.cancelNewTrip = function() {
     }
 };
 
+// Repère temporaire (deux anneaux qui s'étendent en boucle + un point plein) posé sur le
+// marqueur du lieu qu'on vient d'ouvrir — voir openDetailsPanel() ci-dessous. Sans ça,
+// dans une zone où plusieurs lieux sont proches, rien ne distingue visuellement le
+// marqueur visé de ses voisins une fois le flyTo() terminé. Un simple marqueur Leaflet
+// séparé plutôt qu'une classe sur le marqueur normal : ça marche même si le lieu est
+// pour l'instant caché dans un cluster (le repère apparaît à ses coordonnées exactes dès
+// que le zoom l'en fait sortir), sans avoir à retrouver/modifier le marqueur existant.
+function highlightSelectedLocationMarker(loc) {
+    if (typeof map === 'undefined' || !map || typeof L === 'undefined') return;
+    if (window.__selectedLocMarkerTimeout) clearTimeout(window.__selectedLocMarkerTimeout);
+    if (window.__selectedLocMarker) { map.removeLayer(window.__selectedLocMarker); window.__selectedLocMarker = null; }
+    const pulseIcon = L.divIcon({
+        className: '',
+        html: `<div class="selected-loc-pulse-wrap"><span class="selected-loc-pulse-ring"></span><span class="selected-loc-pulse-ring selected-loc-pulse-ring2"></span><span class="selected-loc-pulse-dot"></span></div>`,
+        iconSize: [40, 40], iconAnchor: [20, 20]
+    });
+    window.__selectedLocMarker = L.marker([loc.lat, loc.lng], { icon: pulseIcon, zIndexOffset: 9000, interactive: false }).addTo(map);
+    window.__selectedLocMarkerTimeout = setTimeout(() => {
+        if (window.__selectedLocMarker) { map.removeLayer(window.__selectedLocMarker); window.__selectedLocMarker = null; }
+        window.__selectedLocMarkerTimeout = null;
+    }, 3500);
+}
+window.highlightSelectedLocationMarker = highlightSelectedLocationMarker;
+
 window.openDetailsPanel = function(id) {
     const loc = celebLocations.find(l => l.id === id);
     if(!loc) return;
@@ -3677,7 +3701,8 @@ window.openDetailsPanel = function(id) {
     }
 
     currentLocationIdForMemory = loc.id;
-    
+    highlightSelectedLocationMarker(loc);
+
     const heroBg = document.getElementById('detail-hero-bg');
     if(heroBg) {
         const bgImg = loc.ytId ? `https://img.youtube.com/vi/${loc.ytId}/maxresdefault.jpg` : loc.img;
